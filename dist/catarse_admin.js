@@ -41,6 +41,18 @@ adminApp.models.ContributionDetail = ContributionDetail, adminApp.AdminContribut
         }, args && this.filter();
     },
     view: function(ctrl, args) {
+        var formatDate = function(date) {
+            var european = moment(date, "DD/MM/YYYY");
+            return european.isValid() ? european.format() : moment(date).format();
+        }, withStartDate = function(setter) {
+            return function(date) {
+                setter(formatDate(date));
+            };
+        }, withEndDate = function(setter) {
+            return function(date) {
+                setter(moment(formatDate(date)).endOf("day").format());
+            };
+        };
         return m("#admin-contributions-filter.w-section.page-header", [ m(".w-container", [ m(".fontsize-larger.u-text-center.u-marginbottom-30", "Apoios"), m(".w-form", [ m("form[data-name='Email Form'][id='email-form'][name='email-form']", {
             onsubmit: ctrl.filter
         }, [ m(".w-row.u-marginbottom-20", [ m(".w-col.w-col-10", [ m("input.w-input.text-field.positive.medium[id='field'][name='field'][placeholder='Busque por projeto, email, Ids do usuário e do apoio...'][type='text']", {
@@ -54,23 +66,23 @@ adminApp.models.ContributionDetail = ContributionDetail, adminApp.AdminContribut
                 overflow: "hidden",
                 height: " 0px"
             }
-        }, [ m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-3']", "Com o estado"), m("select.w-select.text-field.positive[id='field-3'][name='field-3']", {
+        }, [ m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-3']", "Com o estado"), m("select.w-select.text-field.positive[id='field-3']", {
             onchange: m.withAttr("value", ctrl.vm.state),
             value: ctrl.vm.state()
-        }, [ m("option[value='']", "Qualquer um"), m("option[value='pending']", "pending"), m("option[value='refused']", "refused"), m("option[value='paid']", "paid"), m("option[value='pending_refund']", "pending_refund"), m("option[value='refunded']", "refunded"), m("option[value='chargeback']", "chargeback"), m("option[value='deleted']", "deleted") ]) ]), m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-8']", "Gateway"), m("select.w-select.text-field.positive[data-name='Field 8'][id='field-8'][name='field-8']", {
+        }, [ m("option[value='']", "Qualquer um"), m("option[value='pending']", "pending"), m("option[value='refused']", "refused"), m("option[value='paid']", "paid"), m("option[value='pending_refund']", "pending_refund"), m("option[value='refunded']", "refunded"), m("option[value='chargeback']", "chargeback"), m("option[value='deleted']", "deleted") ]) ]), m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-8']", "Gateway"), m("select.w-select.text-field.positive[id='field-8']", {
             onchange: m.withAttr("value", ctrl.vm.gateway),
             value: ctrl.vm.gateway()
-        }, [ m("option[value='']", "Qualquer um"), m("option[value='Pagarme']", "Pagarme"), m("option[value='MoIP']", "MoIP"), m("option[value='PayPal']", "PayPal"), m("option[value='Credits']", "Créditos") ]) ]), m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-6']", "Valores entre"), m(".w-row", [ m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[data-name='Field 5'][id='field-5'][name='field-5'][type='text']", {
+        }, [ m("option[value='']", "Qualquer um"), m("option[value='Pagarme']", "Pagarme"), m("option[value='MoIP']", "MoIP"), m("option[value='PayPal']", "PayPal"), m("option[value='Credits']", "Créditos") ]) ]), m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-6']", "Valores entre"), m(".w-row", [ m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[id='field-6'][type='text']", {
             onchange: m.withAttr("value", ctrl.vm.value.gte),
             value: ctrl.vm.value.gte()
-        }) ]), m(".w-col.w-col-2.w-col-small-2.w-col-tiny-2", [ m(".fontsize-smaller.u-text-center.lineheight-looser", "e") ]), m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[data-name='Field 5'][id='field-5'][name='field-5'][type='text']", {
+        }) ]), m(".w-col.w-col-2.w-col-small-2.w-col-tiny-2", [ m(".fontsize-smaller.u-text-center.lineheight-looser", "e") ]), m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[id='field-5'][type='text']", {
             onchange: m.withAttr("value", ctrl.vm.value.lte),
             value: ctrl.vm.value.lte()
-        }) ]) ]) ]), m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-7']", "Período do apoio"), m(".w-row", [ m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[data-name='Field 5'][id='field-5'][name='field-5'][type='text']", {
-            onchange: m.withAttr("value", ctrl.vm.created_at.gte),
+        }) ]) ]) ]), m(".w-col.w-col-3.w-col-small-6", [ m("label.fontsize-smaller[for='field-9']", "Período do apoio"), m(".w-row", [ m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[id='field-9'][type='text']", {
+            onchange: m.withAttr("value", withStartDate(ctrl.vm.created_at.gte)),
             value: ctrl.vm.created_at.gte()
-        }) ]), m(".w-col.w-col-2.w-col-small-2.w-col-tiny-2", [ m(".fontsize-smaller.u-text-center.lineheight-looser", "e") ]), m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[data-name='Field 5'][id='field-5'][name='field-5'][type='text']", {
-            onchange: m.withAttr("value", ctrl.vm.created_at.lte),
+        }) ]), m(".w-col.w-col-2.w-col-small-2.w-col-tiny-2", [ m(".fontsize-smaller.u-text-center.lineheight-looser", "e") ]), m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m("input.w-input.text-field.positive[id='field-10'][type='text']", {
+            onchange: m.withAttr("value", withEndDate(ctrl.vm.created_at.lte)),
             value: ctrl.vm.created_at.lte()
         }) ]) ]) ]) ]) ]) ]) ]) ]);
     }
@@ -143,7 +155,7 @@ vm.state(""), vm.gateway("Pagarme"), adminApp.AdminContributionsList = {
     },
     view: function(ctrl, args) {
         var contribution = ctrl.contribution;
-        return m(".w-clearfix.card.u-radius.u-marginbottom-20.results-admin-contributions", [ m(".w-row", [ m(".w-col.w-col-4", [ m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m("img.user-avatar[src='" + contribution.user_profile_img + "']") ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", contribution.user_name), m(".fontsize-smallest", "Usuário: " + contribution.user_id), m(".fontsize-smallest.fontcolor-secondary", contribution.email), m(".fontsize-smallest.fontcolor-secondary", contribution.payer_email) ]) ]) ]), m(".w-col.w-col-4", [ m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m("img.thumb-project.u-radius[src=" + contribution.project_img + "][width=50]") ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", contribution.project_name), m(".fontsize-smallest.fontweight-semibold", contribution.project_state), m(".fontsize-smallest.fontcolor-secondary", momentify(contribution.project_starts_at) + " a " + momentify(contribution.project_ends_at)) ]) ]) ]), m(".w-col.w-col-2", [ m(".fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small", "R$" + contribution.value), m(".fontsize-smallest.fontcolor-secondary", momentify(contribution.paid_at, "DD/MM/YYYY hh:mm[h]")), m(".fontsize-smallest", "Id: " + contribution.payment_id) ]), m(".w-col.w-col-2", [ m(".fontsize-smallest.lineheight-looser.fontweight-semibold", [ m("span.fa.fa-circle" + ctrl.stateClass()), " " + contribution.state ]), m(".fontsize-smallest.fontweight-semibold", [ m("span.fa" + ctrl.paymentMethodClass()), " ", m("a.link-hidden[href='#']", contribution.payment_method) ]), ctrl.paymentDetails() ? m.component(adminApp.AdminContributionsListPaymentDetail, {
+        return m(".w-clearfix.card.u-radius.u-marginbottom-20.results-admin-contributions", [ m(".w-row", [ m(".w-col.w-col-4", [ m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m("img.user-avatar[src='" + contribution.user_profile_img + "']") ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", contribution.user_name), m(".fontsize-smallest", "Usuário: " + contribution.user_id), m(".fontsize-smallest.fontcolor-secondary", "Catarse: " + contribution.email), m(".fontsize-smallest.fontcolor-secondary", "Gateway: " + contribution.payer_email) ]) ]) ]), m(".w-col.w-col-4", [ m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m("img.thumb-project.u-radius[src=" + contribution.project_img + "][width=50]") ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", contribution.project_name), m(".fontsize-smallest.fontweight-semibold", contribution.project_state), m(".fontsize-smallest.fontcolor-secondary", momentify(contribution.project_online_date) + " a " + momentify(contribution.project_expires_at)) ]) ]) ]), m(".w-col.w-col-2", [ m(".fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small", "R$" + contribution.value), m(".fontsize-smallest.fontcolor-secondary", momentify(contribution.paid_at, "DD/MM/YYYY hh:mm[h]")), m(".fontsize-smallest", "ID do Gateway: " + contribution.gateway_id) ]), m(".w-col.w-col-2", [ m(".fontsize-smallest.lineheight-looser.fontweight-semibold", [ m("span.fa.fa-circle" + ctrl.stateClass()), " " + contribution.state ]), m(".fontsize-smallest.fontweight-semibold", [ m("span.fa" + ctrl.paymentMethodClass()), " ", m("a.link-hidden[href='#']", contribution.payment_method) ]), ctrl.paymentDetails() ? m.component(adminApp.AdminContributionsListPaymentDetail, {
             contribution: contribution
         }) : "" ]) ]), m(".divider.u-margintop-20.u-marginbottom-20"), m(".w-row.u-marginbottom-30", [ m(".w-col.w-col-2", [ m("a.btn.btn-small.btn-terciary[data-ix='show-dropdown'][href='#']", {
             style: {
