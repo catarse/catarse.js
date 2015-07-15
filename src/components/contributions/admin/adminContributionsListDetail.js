@@ -73,7 +73,7 @@ adminApp.AdminContributionsListDetail = {
             m(".w-col.w-col-9.w-col-small-9",[
               m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", contribution.project_name),
               m(".fontsize-smallest.fontweight-semibold", contribution.project_state),
-              m(".fontsize-smallest.fontcolor-secondary", momentify(contribution.project_online_date) + " a " +momentify(contribution.project_expires_at))
+              m(".fontsize-smallest.fontcolor-secondary", momentify(contribution.project_online_date) + " a " + momentify(contribution.project_expires_at))
             ])
           ])
         ]),
