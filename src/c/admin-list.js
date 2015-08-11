@@ -1,6 +1,8 @@
 window.c.AdminList = (function(m, h, c){
+  var admin = c.admin;
   return {
     controller: function(args) {
+      admin.isLoading = args.vm.isLoading;
       if (!args.vm.collection().length && args.vm.firstPage) {
         args.vm.firstPage().then(null, function(serverError) {
           c.error(serverError.message);
@@ -19,7 +21,7 @@ window.c.AdminList = (function(m, h, c){
           ]),
           m('#admin-contributions-list.w-container',[
             args.vm.collection().map(function(item) {
-              return m.component(c.AdminItem, {contribution: item, key: item.key});
+              return m.component(c.AdminItem, {builder: args.itemBuilder, item: item, key: item.key});
             }),
             m('.w-section.section',[
               m('.w-container',[

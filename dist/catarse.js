@@ -9,7 +9,8 @@ window.c = function(m) {
         models: {},
         pages: {},
         admin: {
-            error: m.prop()
+            error: m.prop(),
+            isLoading: m.prop(!0)
         },
         h: {}
     };
@@ -31,7 +32,7 @@ window.c = function(m) {
             p(p() === alternateState ? defaultState : alternateState);
         }, p;
     }, loader = function() {
-        return m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]');
+        return m('.u-text-center.u-margintop-30[style="margin-bottom:-110px;"]', [ m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]') ]);
     };
     return {
         momentify: momentify,
@@ -47,31 +48,45 @@ window.c = function(m) {
         teamTotal: teamTotal,
         teamMember: teamMember
     };
-}(window.m), window.c.admin.Contributions = function(m, c) {
+}(window.m), window.c.admin.Contributions = function(m, c, h) {
     var admin = c.admin;
     return {
         controller: function() {
-            var listVM = admin.contributionListVM, filterVM = admin.contributionFilterVM;
+            var listVM = admin.contributionListVM, filterVM = admin.contributionFilterVM, itemBuilder = [ {
+                component: c.AdminUser,
+                wrapperClass: ".w-col.w-col-4"
+            }, {
+                component: c.AdminProject,
+                wrapperClass: ".w-col.w-col-4"
+            }, {
+                component: c.AdminContribution,
+                wrapperClass: ".w-col.w-col-2"
+            }, {
+                component: c.AdminPayment,
+                wrapperClass: ".w-col.w-col-2"
+            } ], submit = function() {
+                return listVM.firstPage(filterVM.parameters()).then(null, function(serverError) {
+                    admin.error(serverError.message);
+                }), !1;
+            };
             return {
-                listVM: listVM,
                 filterVM: filterVM,
-                submit: function() {
-                    return listVM.firstPage(filterVM.parameters()).then(null, function(serverError) {
-                        admin.error(serverError.message);
-                    }), !1;
-                }
+                itemBuilder: itemBuilder,
+                listVM: listVM,
+                submit: submit
             };
         },
         view: function(ctrl) {
             return [ m.component(c.AdminFilter, {
                 form: ctrl.filterVM.formDescriber,
                 submit: ctrl.submit
-            }), admin.error() ? m(".card.card-error.u-radius.fontweight-bold", admin.error()) : m.component(c.AdminList, {
-                vm: ctrl.listVM
+            }), admin.error() ? m(".card.card-error.u-radius.fontweight-bold", admin.error()) : admin.isLoading() ? h.loader() : "", m.component(c.AdminList, {
+                vm: ctrl.listVM,
+                itemBuilder: ctrl.itemBuilder
             }) ];
         }
     };
-}(window.m, window.c), window.c.admin.contributionFilterVM = function(m, h, replaceDiacritics) {
+}(window.m, window.c, window.c.h), window.c.admin.contributionFilterVM = function(m, h, replaceDiacritics) {
     var vm = m.postgrest.filtersVM({
         full_text_index: "@@",
         state: "eq",
@@ -165,7 +180,14 @@ window.c = function(m) {
     }, vm;
 }(window.m, window.c.h, window.replaceDiacritics), window.c.admin.contributionListVM = function(m, models) {
     return m.postgrest.paginationVM(models.contributionDetail.getPageWithToken);
-}(window.m, window.c.models), window.c.AdminDetail = function(m, c) {
+}(window.m, window.c.models), window.c.AdminContribution = function(m, h) {
+    return {
+        view: function(ctrl, args) {
+            var contribution = args.item;
+            return m(".w-row", [ m(".fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small", "R$" + contribution.value), m(".fontsize-smallest.fontcolor-secondary", h.momentify(contribution.created_at, "DD/MM/YYYY HH:mm[h]")), m(".fontsize-smallest", [ "ID do Gateway: ", m('a.alt-link[target="_blank"][href="https://dashboard.pagar.me/#/transactions/' + contribution.gateway_id + '"]', contribution.gateway_id) ]) ]);
+        }
+    };
+}(window.m, window.c.h), window.c.AdminDetail = function(m, c) {
     return {
         controller: function() {
             return {
@@ -244,72 +266,42 @@ window.c = function(m) {
             }) ]) : "" ]) ]) ]) ]);
         }
     };
-}(window.c, window.m, window._, window.c.h), window.c.AdminItem = function(m, h, c) {
+}(window.c, window.m, window._, window.c.h), window.c.AdminItem = function(m, _, h, c) {
     return {
         controller: function(args) {
-            var userProfile, stateClass, paymentMethodClass, displayDetailBox, contribution = args.contribution;
-            return userProfile = function() {
-                return contribution.user_profile_img || "/assets/catarse_bootstrap/user.jpg";
-            }, stateClass = function() {
-                switch (contribution.state) {
-                  case "paid":
-                    return ".text-success";
-
-                  case "refunded":
-                    return ".text-refunded";
-
-                  case "pending":
-                  case "pending_refund":
-                    return ".text-waiting";
-
-                  default:
-                    return ".text-error";
-                }
-            }, paymentMethodClass = function() {
-                switch (contribution.payment_method) {
-                  case "BoletoBancario":
-                    return ".fa-barcode";
-
-                  case "CartaoDeCredito":
-                    return ".fa-credit-card";
-
-                  default:
-                    return ".fa-question";
-                }
-            }, displayDetailBox = c.ToggleDiv.toggler(), {
-                userProfile: userProfile,
-                stateClass: stateClass,
-                paymentMethodClass: paymentMethodClass,
+            var displayDetailBox = h.toggleProp(!1, !0);
+            return {
                 displayDetailBox: displayDetailBox
             };
         },
         view: function(ctrl, args) {
-            var contribution = args.contribution;
-            return m(".w-clearfix.card.u-radius.u-marginbottom-20.results-admin-contributions", [ m(".w-row", [ m(".w-col.w-col-4", [ m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m('img.user-avatar[src="' + ctrl.userProfile() + '"]') ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", [ m('a.alt-link[target="_blank"][href="/users/' + contribution.user_id + '"]', contribution.user_name) ]), m(".fontsize-smallest", "Usuário: " + contribution.user_id), m(".fontsize-smallest.fontcolor-secondary", "Catarse: " + contribution.email), m(".fontsize-smallest.fontcolor-secondary", "Gateway: " + contribution.payer_email) ]) ]) ]), m(".w-col.w-col-4", [ m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m("img.thumb-project.u-radius[src=" + contribution.project_img + "][width=50]") ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", [ m('a.alt-link[target="_blank"][href="/' + contribution.permalink + '"]', contribution.project_name) ]), m(".fontsize-smallest.fontweight-semibold", contribution.project_state), m(".fontsize-smallest.fontcolor-secondary", h.momentify(contribution.project_online_date) + " a " + h.momentify(contribution.project_expires_at)) ]) ]) ]), m(".w-col.w-col-2", [ m(".fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small", "R$" + contribution.value), m(".fontsize-smallest.fontcolor-secondary", h.momentify(contribution.created_at, "DD/MM/YYYY HH:mm[h]")), m(".fontsize-smallest", [ "ID do Gateway: ", m('a.alt-link[target="_blank"][href="https://dashboard.pagar.me/#/transactions/' + contribution.gateway_id + '"]', contribution.gateway_id) ]) ]), m(".w-col.w-col-2", [ m(".fontsize-smallest.lineheight-looser.fontweight-semibold", [ m("span.fa.fa-circle" + ctrl.stateClass()), " " + contribution.state ]), m(".fontsize-smallest.fontweight-semibold", [ m("span.fa" + ctrl.paymentMethodClass()), " ", m('a.link-hidden[href="#"]', contribution.payment_method) ]), m.component(c.PaymentBadge, {
-                contribution: contribution,
-                key: contribution.key
-            }) ]) ]), m('a.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary[data-ix="show-admin-cont-result"][href="javascript:void(0);"]', {
+            var item = args.item;
+            return m(".w-clearfix.card.u-radius.u-marginbottom-20.results-admin-items", [ m(".w-row", [ _.map(args.builder, function(component) {
+                return m(component.wrapperClass, [ m.component(component, {
+                    item: item,
+                    key: item.key
+                }) ]);
+            }) ]), m("button.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary", {
                 onclick: ctrl.displayDetailBox.toggle
-            }), m.component(c.ToggleDiv, {
-                display: ctrl.displayDetailBox,
-                content: m.component(c.AdminDetail, {
-                    contribution: contribution,
-                    key: contribution.key
-                })
-            }) ]);
+            }), ctrl.displayDetailBox() ? m.component(c.AdminDetail, {
+                item: item,
+                key: item.key
+            }) : "" ]);
         }
     };
-}(window.m, window.c.h, window.c), window.c.AdminList = function(m, h, c) {
+}(window.m, window._, window.c.h, window.c), window.c.AdminList = function(m, h, c) {
+    var admin = c.admin;
     return {
         controller: function(args) {
-            !args.vm.collection().length && args.vm.firstPage && args.vm.firstPage().then(null, function(serverError) {
+            admin.isLoading = args.vm.isLoading, !args.vm.collection().length && args.vm.firstPage && args.vm.firstPage().then(null, function(serverError) {
                 c.error(serverError.message);
             });
         },
         view: function(ctrl, args) {
             return m(".w-section.section", [ m(".w-container", [ m(".w-row.u-marginbottom-20", [ m(".w-col.w-col-9", [ m(".fontsize-base", [ m("span.fontweight-semibold", args.vm.total()), " apoios encontrados" ]) ]) ]), m("#admin-contributions-list.w-container", [ args.vm.collection().map(function(item) {
                 return m.component(c.AdminItem, {
-                    contribution: item,
+                    builder: args.itemBuilder,
+                    item: item,
                     key: item.key
                 });
             }), m(".w-section.section", [ m(".w-container", [ m(".w-row", [ m(".w-col.w-col-2.w-col-push-5", [ args.vm.isLoading() ? h.loader() : m("button#load-more.btn.btn-medium.btn-terciary", {
@@ -317,7 +309,14 @@ window.c = function(m) {
             }, "Carregar mais") ]) ]) ]) ]) ]) ]) ]);
         }
     };
-}(window.m, window.c.h, window.c), window.c.AdminReward = function(m, h, _) {
+}(window.m, window.c.h, window.c), window.c.AdminProject = function(m, h) {
+    return {
+        view: function(ctrl, args) {
+            var project = args.item;
+            return m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m("img.thumb-project.u-radius[src=" + project.project_img + "][width=50]") ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", [ m('a.alt-link[target="_blank"][href="/' + project.permalink + '"]', project.project_name) ]), m(".fontsize-smallest.fontweight-semibold", project.project_state), m(".fontsize-smallest.fontcolor-secondary", h.momentify(project.project_online_date) + " a " + h.momentify(project.project_expires_at)) ]) ]);
+        }
+    };
+}(window.m, window.c.h), window.c.AdminReward = function(m, h, _) {
     return {
         view: function(ctrl, args) {
             var reward = args.contribution.reward || {}, available = parseInt(reward.paid_count) + parseInt(reward.waiting_payment_count);
@@ -371,7 +370,16 @@ window.c = function(m) {
             }() ]) ]);
         }
     };
-}(window.m, window.c.h), window.c.FilterDateRange = function(m) {
+}(window.m, window.c.h), window.c.AdminUser = function(m) {
+    return {
+        view: function(ctrl, args) {
+            var user = args.item, userProfile = function() {
+                return user.user_profile_img || "/assets/catarse_bootstrap/user.jpg";
+            };
+            return m(".w-row", [ m(".w-col.w-col-3.w-col-small-3.u-marginbottom-10", [ m('img.user-avatar[src="' + userProfile() + '"]') ]), m(".w-col.w-col-9.w-col-small-9", [ m(".fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10", [ m('a.alt-link[target="_blank"][href="/users/' + user.user_id + '"]', user.user_name) ]), m(".fontsize-smallest", "Usuário: " + user.user_id), m(".fontsize-smallest.fontcolor-secondary", "Catarse: " + user.email), m(".fontsize-smallest.fontcolor-secondary", "Gateway: " + user.payer_email) ]) ]);
+        }
+    };
+}(window.m), window.c.FilterDateRange = function(m) {
     return {
         view: function(ctrl, args) {
             return m(".w-col.w-col-3.w-col-small-6", [ m('label.fontsize-smaller[for="' + args.index + '"]', args.label), m(".w-row", [ m(".w-col.w-col-5.w-col-small-5.w-col-tiny-5", [ m('input.w-input.text-field.positive[id="' + args.index + '"][type="text"]', {
@@ -415,41 +423,70 @@ window.c = function(m) {
             }) ]) ]) ]);
         }
     };
-}(window.m), window.c.PaymentBadge = function(m) {
+}(window.m), window.c.PaymentStatus = function(m) {
     return {
         controller: function(args) {
-            var contribution = args.contribution, card = null;
+            var displayPaymentMethod, paymentMethodClass, stateClass, payment = args.item, card = null;
             return card = function() {
-                if (contribution.gateway_data) switch (contribution.gateway.toLowerCase()) {
+                if (payment.gateway_data) switch (payment.gateway.toLowerCase()) {
                   case "moip":
                     return {
-                        first_digits: contribution.gateway_data.cartao_bin,
-                        last_digits: contribution.gateway_data.cartao_final,
-                        brand: contribution.gateway_data.cartao_bandeira
+                        first_digits: payment.gateway_data.cartao_bin,
+                        last_digits: payment.gateway_data.cartao_final,
+                        brand: payment.gateway_data.cartao_bandeira
                     };
 
                   case "pagarme":
                     return {
-                        first_digits: contribution.gateway_data.card_first_digits,
-                        last_digits: contribution.gateway_data.card_last_digits,
-                        brand: contribution.gateway_data.card_brand
+                        first_digits: payment.gateway_data.card_first_digits,
+                        last_digits: payment.gateway_data.card_last_digits,
+                        brand: payment.gateway_data.card_brand
                     };
                 }
-            }, {
-                displayPaymentMethod: function() {
-                    switch (contribution.payment_method.toLowerCase()) {
-                      case "boletobancario":
-                        return m("span#boleto-detail", "");
+            }, displayPaymentMethod = function() {
+                switch (payment.payment_method.toLowerCase()) {
+                  case "boletobancario":
+                    return m("span#boleto-detail", "");
 
-                      case "cartaodecredito":
-                        var cardData = card();
-                        return cardData ? m("#creditcard-detail.fontsize-smallest.fontcolor-secondary.lineheight-tight", [ cardData.first_digits + "******" + cardData.last_digits, m("br"), cardData.brand + " " + contribution.installments + "x" ]) : "";
-                    }
+                  case "cartaodecredito":
+                    var cardData = card();
+                    return cardData ? m("#creditcard-detail.fontsize-smallest.fontcolor-secondary.lineheight-tight", [ cardData.first_digits + "******" + cardData.last_digits, m("br"), cardData.brand + " " + payment.installments + "x" ]) : "";
                 }
+            }, paymentMethodClass = function() {
+                switch (payment.payment_method.toLowerCase()) {
+                  case "boletobancario":
+                    return ".fa-barcode";
+
+                  case "cartaodecredito":
+                    return ".fa-credit-card";
+
+                  default:
+                    return ".fa-question";
+                }
+            }, stateClass = function() {
+                switch (payment.state) {
+                  case "paid":
+                    return ".text-success";
+
+                  case "refunded":
+                    return ".text-refunded";
+
+                  case "pending":
+                  case "pending_refund":
+                    return ".text-waiting";
+
+                  default:
+                    return ".text-error";
+                }
+            }, {
+                displayPaymentMethod: displayPaymentMethod,
+                paymentMethodClass: paymentMethodClass,
+                stateClass: stateClass
             };
         },
-        view: function(ctrl) {
-            return m(".fontsize-smallest.fontcolor-secondary.lineheight-tight", [ ctrl.displayPaymentMethod() ]);
+        view: function(ctrl, args) {
+            var payment = args.item;
+            return m(".w-row", [ m(".fontsize-smallest.lineheight-looser.fontweight-semibold", [ m("span.fa.fa-circle" + ctrl.stateClass()), " " + payment.state ]), m(".fontsize-smallest.fontweight-semibold", [ m("span.fa" + ctrl.paymentMethodClass()), " ", m('a.link-hidden[href="#"]', payment.payment_method) ]), m(".fontsize-smallest.fontcolor-secondary.lineheight-tight", [ ctrl.displayPaymentMethod() ]) ]);
         }
     };
 }(window.m), window.c.TeamMembers = function(_, m, models) {
