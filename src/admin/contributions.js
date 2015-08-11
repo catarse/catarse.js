@@ -4,16 +4,36 @@ window.c.admin.Contributions = (function(m, c, h){
     controller: function(){
       var listVM = admin.contributionListVM,
           filterVM = admin.contributionFilterVM;
+      var itemBuilder = [
+        {
+          component: 'AdminUser',
+          wrapperClass: '.w-col.w-col-4'
+        },
+        {
+          component: 'AdminProject',
+          wrapperClass: '.w-col.w-col-4'
+        },
+        {
+          component: 'AdminContribution',
+          wrapperClass: '.w-col.w-col-2'
+        },
+        {
+          component: 'PaymentStatus',
+          wrapperClass: '.w-col.w-col-2'
+        }
+      ];
+      var submit = function(){
+        listVM.firstPage(filterVM.parameters()).then(null, function(serverError){
+          admin.error(serverError.message);
+        });
+        return false;
+      };
 
       return {
-        listVM: listVM,
         filterVM: filterVM,
-        submit: function(){
-          listVM.firstPage(filterVM.parameters()).then(null, function(serverError){
-            admin.error(serverError.message);
-          });
-          return false;
-        }
+        itemBuilder: itemBuilder,
+        listVM: listVM,
+        submit: submit
       };
     },
 
@@ -23,7 +43,7 @@ window.c.admin.Contributions = (function(m, c, h){
         admin.error() ?
           m('.card.card-error.u-radius.fontweight-bold', admin.error()) :
           admin.isLoading() ? h.loader() : '',
-          m.component(c.AdminList, {vm: ctrl.listVM})
+          m.component(c.AdminList, {vm: ctrl.listVM, itemBuilder: ctrl.itemBuilder})
       ];
     }
   };
