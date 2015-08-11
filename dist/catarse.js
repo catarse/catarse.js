@@ -9,7 +9,8 @@ window.c = function(m) {
         models: {},
         pages: {},
         admin: {
-            error: m.prop()
+            error: m.prop(),
+            isLoading: m.prop(!0)
         },
         h: {}
     };
@@ -31,7 +32,7 @@ window.c = function(m) {
             p(p() === alternateState ? defaultState : alternateState);
         }, p;
     }, loader = function() {
-        return m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]');
+        return m('.u-text-center.u-margintop-30[style="margin-bottom:-110px;"]', [ m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]') ]);
     };
     return {
         momentify: momentify,
@@ -47,7 +48,7 @@ window.c = function(m) {
         teamTotal: teamTotal,
         teamMember: teamMember
     };
-}(window.m), window.c.admin.Contributions = function(m, c) {
+}(window.m), window.c.admin.Contributions = function(m, c, h) {
     var admin = c.admin;
     return {
         controller: function() {
@@ -66,12 +67,12 @@ window.c = function(m) {
             return [ m.component(c.AdminFilter, {
                 form: ctrl.filterVM.formDescriber,
                 submit: ctrl.submit
-            }), admin.error() ? m(".card.card-error.u-radius.fontweight-bold", admin.error()) : m.component(c.AdminList, {
+            }), admin.error() ? m(".card.card-error.u-radius.fontweight-bold", admin.error()) : admin.isLoading() ? h.loader() : "", m.component(c.AdminList, {
                 vm: ctrl.listVM
             }) ];
         }
     };
-}(window.m, window.c), window.c.admin.contributionFilterVM = function(m, h, replaceDiacritics) {
+}(window.m, window.c, window.c.h), window.c.admin.contributionFilterVM = function(m, h, replaceDiacritics) {
     var vm = m.postgrest.filtersVM({
         full_text_index: "@@",
         state: "eq",
@@ -300,9 +301,10 @@ window.c = function(m) {
         }
     };
 }(window.m, window.c.h, window.c), window.c.AdminList = function(m, h, c) {
+    var admin = c.admin;
     return {
         controller: function(args) {
-            !args.vm.collection().length && args.vm.firstPage && args.vm.firstPage().then(null, function(serverError) {
+            admin.isLoading = args.vm.isLoading, !args.vm.collection().length && args.vm.firstPage && args.vm.firstPage().then(null, function(serverError) {
                 c.error(serverError.message);
             });
         },

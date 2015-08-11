@@ -1,4 +1,4 @@
-window.c.admin.Contributions = (function(m, c){
+window.c.admin.Contributions = (function(m, c, h){
   var admin = c.admin;
   return {
     controller: function(){
@@ -8,7 +8,7 @@ window.c.admin.Contributions = (function(m, c){
       return {
         listVM: listVM,
         filterVM: filterVM,
-        submit: function() {
+        submit: function(){
           listVM.firstPage(filterVM.parameters()).then(null, function(serverError){
             admin.error(serverError.message);
           });
@@ -17,13 +17,14 @@ window.c.admin.Contributions = (function(m, c){
       };
     },
 
-    view: function(ctrl) {
+    view: function(ctrl){
       return [
         m.component(c.AdminFilter,{form: ctrl.filterVM.formDescriber, submit: ctrl.submit}),
         admin.error() ?
           m('.card.card-error.u-radius.fontweight-bold', admin.error()) :
+          admin.isLoading() ? h.loader() : '',
           m.component(c.AdminList, {vm: ctrl.listVM})
       ];
     }
   };
-}(window.m, window.c));
+}(window.m, window.c, window.c.h));
