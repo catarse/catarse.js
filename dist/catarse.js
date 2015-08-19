@@ -28,20 +28,24 @@ window.c = function() {
         return p.toggle = function() {
             p(p() === alternateState ? defaultState : alternateState);
         }, p;
-    }, loader = function() {
+    }, idVM = m.postgrest.filtersVM({
+        id: "eq"
+    }), loader = function() {
         return m('.u-text-center.u-margintop-30[style="margin-bottom:-110px;"]', [ m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]') ]);
     };
     return {
         momentify: momentify,
         momentFromString: momentFromString,
         formatNumber: formatNumber,
+        idVM: idVM,
         toggleProp: toggleProp,
         loader: loader
     };
 }(window.m, window.moment), window.c.models = function(m) {
-    var contributionDetail = m.postgrest.model("contribution_details"), teamTotal = m.postgrest.model("team_totals", [ "member_count", "countries", "total_contributed_projects", "total_cities", "total_amount" ]), teamMember = m.postgrest.model("team_members");
+    var contributionDetail = m.postgrest.model("contribution_details"), contributions = m.postgrest.model("contributions"), teamTotal = m.postgrest.model("team_totals"), teamMember = m.postgrest.model("team_members");
     return teamMember.pageSize(40), {
         contributionDetail: contributionDetail,
+        contributions: contributions,
         teamTotal: teamTotal,
         teamMember: teamMember
     };
@@ -64,12 +68,13 @@ window.c = function() {
             } ], itemActions = [ {
                 component: "AdminInputAction",
                 data: {
-                    attrName: "user_id",
+                    property: "user_id",
+                    updateKey: "contribution_id",
                     callToAction: "Transferir",
                     innerLabel: "Id do novo apoiador:",
                     outerLabel: "Transferir Apoio",
                     placeholder: "ex: 129908",
-                    vm: listVM
+                    model: c.models.contributions
                 }
             } ], filterBuilder = [ {
                 component: "FilterMain",
@@ -246,20 +251,26 @@ window.c = function() {
 }(window.c, window.m, window._, window.c.h), window.c.AdminInputAction = function(m, h, c) {
     return {
         controller: function(args) {
+            var builder = args.data, data = {}, item = args.item, itemKey = args.property, newValue = m.prop(""), submit = function() {
+                return h.idVM.id(item[builder.updateKey]), data[itemKey] = newValue(), builder.model.patchWithToken(h.idVM.parameters(), data), 
+                !1;
+            };
             return {
-                toggler: h.toggleProp(!1, !0)
+                newValue: newValue,
+                toggler: h.toggleProp(!1, !0),
+                submit: submit
             };
         },
         view: function(ctrl, args) {
-            var action = args.data;
+            var data = args.data;
             return m(".w-col.w-col-2", [ m("button.btn.btn-small.btn-terciary", {
                 onclick: ctrl.toggler.toggle
-            }, action.outerLabel), ctrl.toggler() ? m("form.dropdown-list.card.u-radius.dropdown-list-medium.zindex-10", [ m("form.w-form", {
+            }, data.outerLabel), ctrl.toggler() ? m(".dropdown-list.card.u-radius.dropdown-list-medium.zindex-10", [ m("form.w-form", {
                 onsubmit: ctrl.submit
-            }, [ m("label", action.outerLabel), m('input.w-input.text-field[type="text"][placeholder="' + action.placeholder + '"]', {
-                onchange: m.withAttr("value", action.vm),
-                value: action.vm()
-            }), m('input.w-button.btn.btn-small[type="submit"][value="' + action.callToAction + '"]') ]) ]) : "" ]);
+            }, [ m("label", data.innerLabel), m('input.w-input.text-field[type="text"][placeholder="' + data.placeholder + '"]', {
+                onchange: m.withAttr("value", ctrl.newValue),
+                value: ctrl.newValue()
+            }), m('input.w-button.btn.btn-small[type="submit"][value="' + data.callToAction + '"]') ]) ]) : "" ]);
         }
     };
 }(window.m, window.c.h, window.c), window.c.AdminItem = function(m, _, h, c) {
