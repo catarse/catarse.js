@@ -210,7 +210,7 @@ window.c = function() {
     return {
         controller: function() {},
         view: function(ctrl, args) {
-            var actions = args.actions, item = args.item;
+            var actions = args.actions, item = args.item();
             return m("#admin-contribution-detail-box", [ m(".divider.u-margintop-20.u-marginbottom-20"), m(".w-row.u-marginbottom-30", _.map(actions, function(action) {
                 return m.component(c[action.component], {
                     data: action.data,
@@ -296,7 +296,7 @@ window.c = function() {
             };
         },
         view: function(ctrl, args) {
-            var item = args.item;
+            var item = args.item();
             return m(".w-clearfix.card.u-radius.u-marginbottom-20.results-admin-items", [ m(".w-row", [ _.map(args.builder, function(desc) {
                 return m(desc.wrapperClass, [ m.component(c[desc.component], {
                     item: item,
@@ -305,7 +305,7 @@ window.c = function() {
             }) ]), m("button.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary", {
                 onclick: ctrl.displayDetailBox.toggle
             }), ctrl.displayDetailBox() ? m.component(c.AdminDetail, {
-                item: item,
+                item: args.item,
                 actions: args.actions,
                 key: item.key
             }) : "" ]);
@@ -326,7 +326,7 @@ window.c = function() {
                 return m.component(c.AdminItem, {
                     builder: args.itemBuilder,
                     actions: args.itemActions,
-                    item: item,
+                    item: m.prop(item),
                     key: item.key
                 });
             }), m(".w-section.section", [ m(".w-container", [ m(".w-row", [ m(".w-col.w-col-2.w-col-push-5", [ list.isLoading() ? h.loader() : m("button#load-more.btn.btn-medium.btn-terciary", {

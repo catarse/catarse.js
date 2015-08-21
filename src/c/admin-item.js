@@ -10,7 +10,7 @@ window.c.AdminItem = (function(m, _, h, c){
     },
 
     view: function(ctrl, args) {
-      var item = args.item;
+      var item = args.item();
 
       return m('.w-clearfix.card.u-radius.u-marginbottom-20.results-admin-items',[
         m('.w-row',[
@@ -21,7 +21,7 @@ window.c.AdminItem = (function(m, _, h, c){
           })
         ]),
         m('button.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary', {onclick: ctrl.displayDetailBox.toggle}),
-        ctrl.displayDetailBox() ? m.component(c.AdminDetail, {item: item, actions: args.actions, key: item.key}) : ''
+        ctrl.displayDetailBox() ? m.component(c.AdminDetail, {item: args.item, actions: args.actions, key: item.key}) : ''
       ]);
     }
   };
