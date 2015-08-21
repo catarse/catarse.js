@@ -6,12 +6,12 @@ describe('AdminItem', function(){
   describe('view', function(){
     beforeAll(function(){
       spyOn(m, 'component').and.callThrough();
-      item = ContributionDetailMockery(1)[0];
+      item = m.prop(ContributionDetailMockery(1)[0]);
       itemDescriber = ItemDescriberMock();
       $output = mq(AdminItem, {builder: itemDescriber, item: item});
     });
 
-    it('should build an item from an item describer', function(){
+    it('should build an item from a propified item describer', function(){
       expect($output.has('.admin-user')).toBeTrue();
       expect($output.has('.admin-project')).toBeTrue();
       expect($output.has('.admin-contribution')).toBeTrue();
