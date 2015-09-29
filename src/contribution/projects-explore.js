@@ -161,7 +161,6 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
           m("a.link-hidden-white.fontweight-light.fontsize-larger[href='#']", ["Explore projetos incríveis ",m("span.fa.fa-angle-down", "")])
         ]),
 
-
         m(".w-row", [
           _.map(ctrl.categories(), (category) => {
             return m(".w-col.w-col-2.w-col-small-6.w-col-tiny-6", [
@@ -198,7 +197,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
             m(".fontsize-larger", ctrl.categoryName())
           ]),
 
-          m(".w-col.w-col-6.w-col-tiny-6", [
+          (ctrl.categoryFollowers()) ? m(".w-col.w-col-6.w-col-tiny-6", [
             m(".w-row", [
               m(".w-col.w-col-9.w-col-tiny-6.w-clearfix", [
                 m(".following.fontsize-small.fontcolor-secondary.u-right", `${ctrl.categoryFollowers()} seguidores`)
@@ -207,7 +206,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
                 m("a.btn.btn-small[href='#']", "Seguindo ")
               ])
             ])
-          ])
+          ]) : ''
 
         ])
       ])
