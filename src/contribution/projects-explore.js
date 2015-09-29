@@ -14,12 +14,18 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
           vm.categoryFollowers(category.followers);
           byCategoryId.category_id(category.id);
           project.getPage(byCategoryId.parameters()).then(vm.projectCollection);
+          vm.toggleCategories();
         },
 
         loadProjects: (filter) => {
           vm.categoryName(filter.title);
           vm.categoryFollowers(null);
           project.getPage(filter.filter.parameters()).then(vm.projectCollection);
+          vm.toggleCategories();
+        },
+
+        toggleCategories: () => {
+          document.getElementById('categories').classList.toggle('closed');
         }
       },
 
@@ -158,35 +164,37 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
       ]),
       m(".w-container.u-marginbottom-10", [
         m(".u-text-center.u-marginbottom-40", [
-          m("a.link-hidden-white.fontweight-light.fontsize-larger[href='#']", ["Explore projetos incríveis ",m("span.fa.fa-angle-down", "")])
+          m(".a.link-hidden-white.fontweight-light.fontsize-larger[href='#']",{onclick: ctrl.vm.toggleCategories}, ["Explore projetos incríveis ",m("span.fa.fa-angle-down", "")])
         ]),
 
-        m(".w-row", [
-          _.map(ctrl.categories(), (category) => {
-            return m(".w-col.w-col-2.w-col-small-6.w-col-tiny-6", [
-              m(`a.w-inline-block.btn-category${category.name_pt.length > 13 ? '.double-line' : ''}[href='#by_category_id/#${category.id}']`,
-                {onclick: ctrl.vm.loadCategory.bind(ctrl, category)}, [
-                m("div", [
-                  category.name_pt,
-                  m("span.badge.explore", category.online_projects)
+        m('#categories.category-slider',[
+          m(".w-row", [
+            _.map(ctrl.categories(), (category) => {
+              return m(".w-col.w-col-2.w-col-small-6.w-col-tiny-6", [
+                m(`a.w-inline-block.btn-category${category.name_pt.length > 13 ? '.double-line' : ''}[href='#by_category_id/#${category.id}']`,
+                  {onclick: ctrl.vm.loadCategory.bind(ctrl, category)}, [
+                  m("div", [
+                    category.name_pt,
+                    m("span.badge.explore", category.online_projects)
+                  ])
                 ])
-              ])
-            ]);
-          })
+              ]);
+            })
+          ]),
+
+          m(".w-row.u-marginbottom-30", [
+            _.map(ctrl.filters, (filter) => {
+              return m(".w-col.w-col-2.w-col-small-6.w-col-tiny-6", [
+                m(`a.w-inline-block.btn-category.filters${filter.length > 13 ? '.double-line' : ''}[href='#recommended']`, {onclick: ctrl.vm.loadProjects.bind(ctrl, filter)}, [
+                  m("div", [
+                    filter.title
+                  ])
+                ])
+              ]);
+            })
+
+          ])
         ]),
-
-        m(".w-row.u-marginbottom-30", [
-          _.map(ctrl.filters, (filter) => {
-            return m(".w-col.w-col-2.w-col-small-6.w-col-tiny-6", [
-              m("a.w-inline-block.btn-category.filters[href='#recommended']", {onclick: ctrl.vm.loadProjects.bind(ctrl, filter)}, [
-                m("div", [
-                  filter.title
-                ])
-              ])
-            ]);
-          })
-
-        ])
       ])
     ]),
 
@@ -227,7 +235,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
         m(".w-row", [
           m(".w-col.w-col-5"),
           m(".w-col.w-col-2", [
-            m("a.btn.btn-medium.btn-terciary[href='#']", "Carregar mais")
+            m("a.btn.btn-medium.btn-terciary[href='#loadMore']", {onclick: ctrl.projects.nextPage}, "Carregar mais")
           ]),
           m(".w-col.w-col-5")
         ])
