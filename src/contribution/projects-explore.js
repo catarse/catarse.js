@@ -5,7 +5,6 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
       let vm = {
         categoryCollection: m.prop([]),
         projectCollection: m.prop([]),
-        nearMeCollection: m.prop([]),
         categoryName: m.prop(),
         categoryFollowers: m.prop(),
 
