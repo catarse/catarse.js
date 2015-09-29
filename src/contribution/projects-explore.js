@@ -5,6 +5,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
       let vm = {
         categoryCollection: m.prop([]),
         projectCollection: m.prop([]),
+        nearMeCollection: m.prop([]),
         categoryName: m.prop(),
         categoryFollowers: m.prop(),
 
@@ -20,7 +21,12 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
         loadProjects: (filter) => {
           vm.categoryName(filter.title);
           vm.categoryFollowers(null);
-          project.getPage(filter.filter.parameters()).then(vm.projectCollection);
+          if(filter.filter === nearMe){
+            project.getPageWithToken(nearMe.parameters()).then(vm.projectCollection);
+          }
+          else{
+            project.getPage(filter.filter.parameters()).then(vm.projectCollection);
+          }
           vm.toggleCategories();
         },
 
@@ -34,6 +40,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
       categories = m.postgrest.filtersVM({}),
 
 
+      nearMe = m.postgrest.filtersVM({near_me: 'eq', state: 'eq'}),
       expiring = m.postgrest.filtersVM({expires_at: 'lte', state: 'eq'}),
       recents = m.postgrest.filtersVM({online_date: 'gte', state: 'eq'}),
       recommended = m.postgrest.filtersVM({recommended: 'eq', state: 'eq'}),
@@ -47,6 +54,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
       online.state('online');
       successful.state('successful');
       recommended.recommended('true').state('online');
+      nearMe.near_me('true');
 
       project.pageSize(9);
       category.getPage(categories.parameters()).then(vm.categoryCollection);
@@ -74,7 +82,7 @@ window.c.contribution.ProjectsExplore = ((m, c) => {
         },
         {
           title: 'Próximos a mim',
-          filter: successful
+          filter: nearMe
         }
       ];
 
