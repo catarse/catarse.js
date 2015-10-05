@@ -147,6 +147,8 @@ window.c.h = ((m, moment) => {
     };
   };
 
+  observable();
+
   return {
     momentify: momentify,
     momentFromString: momentFromString,
