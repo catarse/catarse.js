@@ -107,7 +107,47 @@ window.c.h = ((m, moment) => {
     const l = document.createElement('a');
     l.href = href;
     return l;
+  },
+
+  observable = () => {
+    let channels = {};
+    return {
+      register: function(subscriptions, controller) {
+        return () => {
+          let ctrl = new Controller;
+          let reload = controller.bind(ctrl);
+          Observable.on(subscriptions, reload);
+          ctrl.onunload = function() {
+            Observable.off(reload);
+          };
+          return ctrl;
+        };
+      },
+      on: (subscriptions, callback) => {
+        subscriptions.forEach(function(subscription) {
+          if (!channels[subscription]){
+            channels[subscription] = [];
+          }
+          channels[subscription].push(callback);
+        });
+      },
+      off: (callback) => {
+        for (let channel in channels) {
+          index = channels[channel].indexOf(callback);
+          if (index > -1){
+            channels[channel].splice(index, 1);
+          };
+        }
+      },
+      trigger: (channel, args) => {
+        _.map(channels[channel], (callback) => {
+          callback(args);
+        });
+      }
+    };
   };
+
+  observable();
 
   return {
     momentify: momentify,
@@ -124,6 +164,7 @@ window.c.h = ((m, moment) => {
     rewardRemaning: rewardRemaning,
     parseUrl: parseUrl,
     hashMatch: hashMatch,
-    useAvatarOrDefault: useAvatarOrDefault
+    useAvatarOrDefault: useAvatarOrDefault,
+    observable: observable
   };
 }(window.m, window.moment));
