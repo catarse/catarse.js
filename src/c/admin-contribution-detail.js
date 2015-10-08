@@ -59,7 +59,7 @@ window.c.AdminContributionDetail = (function(m, _, c, h){
         m('.w-row.u-marginbottom-30',
           [
             m.component(c.AdminInputAction, {data: actions.transfer, item: args.item}),
-            m.component(c.AdminRadioAction, {data: actions.reward, item: reward()}),
+            m.component(c.AdminRadioAction, {data: actions.reward, item: reward(), contribution: item}),
             m.component(c.AdminInputAction, {data: actions.remove, item: args.item})
           ]
         ),

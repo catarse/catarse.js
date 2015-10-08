@@ -2,9 +2,9 @@ window.c.AdminRadioAction = (function(m, h, c, _){
   return {
     controller: function(args){
       var builder = args.data,
+          contribution = args.contribution,
           complete = m.prop(false),
           data = {},
-          //TODO: Implement a descriptor to abstract the initial description
           error = m.prop(false),
           fail = m.prop(false),
           item = args.item,
@@ -21,11 +21,11 @@ window.c.AdminRadioAction = (function(m, h, c, _){
 
       setFilter[updateKey] = 'eq';
       var setVM = m.postgrest.filtersVM(setFilter);
-      setVM[updateKey](item[updateKey]);
+      setVM[updateKey](contribution[updateKey]);
 
       getFilter[getKey] = 'eq';
       var getVM = m.postgrest.filtersVM(getFilter);
-      getVM[getKey](item[getKey]);
+      getVM[getKey](item[getKey]); 
 
       var getLoader = m.postgrest.loaderWithToken(builder.getModel.getPageOptions(getVM.parameters()));
 
@@ -41,7 +41,7 @@ window.c.AdminRadioAction = (function(m, h, c, _){
         complete(true);
       };
 
-      const fetch = function(){
+      var fetch = function(){
         getLoader.load().then(radios, error);
       };
 
