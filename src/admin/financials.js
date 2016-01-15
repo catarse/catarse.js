@@ -47,8 +47,8 @@ window.c.admin.Financials = (function(m, c, h) {
                 m.component(c.AdminList, {
                     vm: ctrl.listVM,
                     label: label,
-                    listItem: c.AdminUserItem,
-                    listDetail: c.AdminUserDetail
+                    listItem: c.AdminFinancialItem,
+                    listDetail: c.AdminFinancialDetail
                 })
             ];
         }
