@@ -13,6 +13,9 @@ window.c.h = ((m, moment, I18n) => {
                     monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_')
                 });
         },
+        selfOrEmpty = (obj, emptyState = '') => {
+            return obj ? obj : emptyState;
+        },
         existy = (x) => {
             return x != null;
         },
@@ -332,6 +335,7 @@ window.c.h = ((m, moment, I18n) => {
         toAnchor: toAnchor,
         paramByName: paramByName,
         i18nScope: i18nScope,
+        selfOrEmpty: selfOrEmpty,
         scrollTo: scrollTo
     };
 }(window.m, window.moment, window.I18n));
