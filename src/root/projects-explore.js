@@ -207,7 +207,9 @@ const projectsExplore = {
                             let cardType = 'small',
                                 ref = 'ctrse_explore';
 
-                            if (ctrl.currentFilter().keyName === 'score' && !ctrl.isSearch()) {
+                            if (ctrl.isSearch()) {
+                              ref = 'ctrse_explore_pgsearch';
+                            } else if (ctrl.currentFilter().keyName === 'score') {
                                 if (idx === 0) {
                                     cardType = 'big';
                                     ref = 'ctrse_explore_featured_big';
