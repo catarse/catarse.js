@@ -29,7 +29,6 @@ const projectReport = {
             sendReport = () => {
                   submitDisabled(true);
                   let loaderOpts = models.projectReport.postOptions({
-                    user_id: user.user_id,
                     email: email(),
                     details: details(),
                     reason: reason() ,
