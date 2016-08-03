@@ -10,6 +10,7 @@ import projectPosts from './project-posts';
 
 const projectMain = {
     controller(args) {
+
         const project = args.project,
               hash = m.prop(window.location.hash),
               displayTabContent = () => {

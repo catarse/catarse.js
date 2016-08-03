@@ -4,12 +4,15 @@ import _ from 'underscore';
 import I18n from 'i18n-js';
 import moment from 'moment';
 import h from '../h';
+import menu from './menu';
 import models from '../models';
 import projectFilters from '../vms/project-filters-vm';
 import homeVM from '../vms/home-vm';
 import slider from '../c/slider';
 import projectRow from '../c/project-row';
 import contributionActivities from '../c/contribution-activities';
+import blogBanner from './blog-banner';
+import footer from './footer';
 import SignedFriendFacebookConnect from '../c/signed-friend-facebook-connect';
 import UnsignedFriendFacebookConnect from '../c/unsigned-friend-facebook-connect';
 
@@ -25,11 +28,13 @@ const projectsHome = {
             friendListVM = postgrest.paginationVM(models.userFriend, 'user_id.desc', {
                 'Prefer':  'count=exact'
             }),
-            currentUserId = args.root.getAttribute('data-currentuserid'),
-            hasFBAuth = args.root.getAttribute('data-hasfb') === 'true',
+            currentUser = h.getUser(),
+            hasFBAuth = currentUser ? currentUser.has_fb_auth : false,       
             vm = homeVM();
 
-        userFriendVM.user_id(currentUserId);
+        project.pageSize(20);
+
+        userFriendVM.user_id(currentUser.user_id);
 
         if (hasFBAuth && !friendListVM.collection().length) {
             friendListVM.firstPage(userFriendVM.parameters());
@@ -41,8 +46,6 @@ const projectsHome = {
                   collection = m.prop([]);
 
             cLoader.load().then(_.compose(collection, sample6));
-
-            project.pageSize(20);
 
             return {
                 title: f.title,
@@ -78,7 +81,8 @@ const projectsHome = {
             });
         };
 
-        return [
+        return m('#projects-home-component', [
+            // m.component(menu, {transparent: true}),
             m.component(slider, {
                 slides: slides(),
                 effect: 'fade',
@@ -93,10 +97,11 @@ const projectsHome = {
                     ref: `home_${collection.hash}`
                 });
             }),
-            //m.component(contributionActivities)
-            (ctrl.hasFBAuth ?
-             m.component(SignedFriendFacebookConnect, {friendListVM: ctrl.friendListVM}) : m.component(UnsignedFriendFacebookConnect))
-        ];
+            // m.component(contributionActivities),
+            ctrl.hasFBAuth ? m.component(SignedFriendFacebookConnect, {friendListVM: ctrl.friendListVM}) : m.component(UnsignedFriendFacebookConnect),
+            m.component(blogBanner)
+            // m.component(footer, {expanded: true})
+        ]);
     }
 };
 

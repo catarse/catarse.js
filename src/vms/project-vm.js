@@ -1,38 +1,43 @@
 import m from 'mithril';
 import _ from 'underscore';
+import postgrest from 'mithril-postgrest';
 import h from '../h';
 import models from '../models';
+import rewardVM from './reward-vm';
+import userVM from './user-vm';
 
-const projectVM = (project_id, project_user_id) => {
-    const vm = postgrest.filtersVM({
-        project_id: 'eq'
-    }),
-          idVM = h.idVM,
-          projectDetails = m.prop([]),
-          userDetails = m.prop([]),
-          rewardDetails = m.prop([]);
+const idVM = h.idVM,
+      currentProject = m.prop(),
+      userDetails = m.prop(),
+      vm = postgrest.filtersVM({project_id: 'eq'});
 
+const init = (project_id, project_user_id) => {
     vm.project_id(project_id);
     idVM.id(project_user_id);
 
     const lProject = postgrest.loaderWithToken(models.projectDetail.getRowOptions(vm.parameters())),
-          lUser = postgrest.loaderWithToken(models.userDetail.getRowOptions(idVM.parameters())),
-          lReward = postgrest.loaderWithToken(models.rewardDetail.getPageOptions(vm.parameters())),
-          isLoading = () => { return (lProject() || lUser() || lReward()); };
+          lUser = postgrest.loaderWithToken(models.userDetail.getRowOptions(idVM.parameters()));
 
-    lProject.load().then((data) => {
-        lUser.load().then(userDetails);
-        lReward.load().then(rewardDetails);
+    userVM.fetchUser(project_user_id, true, userDetails);
 
-        projectDetails(data);
-    });
+    rewardVM.fetchRewards(project_id);
 
-    return {
-        projectDetails: _.compose(_.first, projectDetails),
-        userDetails: userDetails,
-        rewardDetails: rewardDetails,
-        isLoading: isLoading
-    };
+    lProject.load().then(_.compose(currentProject, _.first));
 };
+
+const routeToProject = (project, ref) => () => {
+    currentProject(project);
+
+    return m.route(h.buildLink(project.permalink, ref), {project_id: project.project_id, project_user_id: project.project_user_id});
+};
+
+const projectVM = {
+    currentProject: currentProject,
+    userDetails: userDetails,
+    rewardDetails: rewardVM.rewards,
+    routeToProject: routeToProject,
+    init: init
+};
+
 
 export default projectVM;
