@@ -1,4 +1,11 @@
 // @flow
+/**
+ * This is our helpers module
+ * General methods to help with tasks that are not directly related to a view-model
+ * or component. Examples of such tasks are: \n
+ * - Retrieving a given data from the DOM (`getApihost`)
+ * - Storing session storage data (`storeObject`)
+**/
 import I18n from 'i18n-js';
 import _ from 'underscore';
 import moment from 'moment';
@@ -9,28 +16,33 @@ import CatarseAnalytics from 'CatarseAnalytics';
 
 const
     _dataCache : Object = {},
-    hashMatch = (str: string): boolean => { return window.location.hash === str; },
+
+    hashMatch = (str: string): boolean => window.location.hash === str,
+
     paramByName = (name: string): string => {
         const normalName = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]'),
-            regex = new RegExp('[\\?&]' + normalName + '=([^&#]*)'),
+            regex = new RegExp(`[\\?&]${normalName}=([^&#]*)`),
             results = regex.exec(location.search);
+        console.log('Third: ', window.location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
+
   	selfOrEmpty = (obj: any, emptyState: string = ''): any => {
       return obj ? obj : emptyState;
   	},
+
     setMomentifyLocale = (): void => {
         moment.locale('pt', {
                 months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
                 monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_')
             });
     },
-    existy = (x: any): boolean => {
-        return x != null;
-    },
+
+    existy = (x: any): boolean => x != null,
 
     momentify = (date: string, format: string): string => {
         format = format || 'DD/MM/YYYY';
+
         return date ? moment(date).locale('pt').format(format) : 'no date';
     },
 

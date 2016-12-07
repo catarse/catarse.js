@@ -1,3 +1,14 @@
+/**
+ * Wrapper to show contribution info on the admin page /admin/contributions
+ * @param item - a contribution resource
+ * @module adminCountributionDetail
+ *
+ * Example:
+ * import adminContributionDetail from './admin-contribution-detail.js'
+ * ...
+ * m(adminContributionDetail, {item: contribution()})
+ * ...
+**/
 import m from 'mithril';
 import _ from 'underscore';
 import h from '../h';
@@ -27,7 +38,17 @@ const adminContributionDetail = {
             return reward;
         };
 
+        const addOptions = (builder, id) => {
+            return _.extend({}, builder, {
+                requestOptions: {
+                    url: (`/admin/contributions/${id}/gateway_refund`),
+                    method: 'PUT'
+                }
+            });
+        };
+
         return {
+            addOptions: addOptions,
             reward: loadReward(),
             actions: {
                 transfer: {
@@ -84,47 +105,38 @@ const adminContributionDetail = {
             item = args.item,
             reward = ctrl.reward;
 
-        const addOptions = (builder, id) => {
-            return _.extend({}, builder, {
-                requestOptions: {
-                    url: (`/admin/contributions/${id}/gateway_refund`),
-                    method: 'PUT'
-                }
-            });
-        };
-
         return m('#admin-contribution-detail-box', [
             m('.divider.u-margintop-20.u-marginbottom-20'),
             m('.w-row.u-marginbottom-30', [
-                m.component(adminInputAction, {
+                m(adminInputAction, {
                     data: actions.transfer,
                     item: item
                 }),
-                (ctrl.l()) ? h.loader :
-                m.component(adminRadioAction, {
+                (ctrl.l()) ? h.loader() :
+                m(adminRadioAction, {
                     data: actions.reward,
                     item: reward,
                     getKeyValue: item.project_id,
                     updateKeyValue: item.contribution_id
                 }),
-                m.component(adminExternalAction, {
-                    data: addOptions(actions.refund, item.id),
+                m(adminExternalAction, {
+                    data: ctrl.addOptions(actions.refund, item.id),
                     item: item
                 }),
-                m.component(adminInputAction, {
+                m(adminInputAction, {
                     data: actions.remove,
                     item: item
                 })
             ]),
             m('.w-row.card.card-terciary.u-radius', [
-                m.component(adminTransaction, {
+                m(adminTransaction, {
                     contribution: item
                 }),
-                m.component(adminTransactionHistory, {
+                m(adminTransactionHistory, {
                     contribution: item
                 }),
-                (ctrl.l()) ? h.loader :
-                m.component(adminReward, {
+                (ctrl.l()) ? h.loader() :
+                m(adminReward, {
                     reward: reward,
                     key: item.key
                 })

@@ -1,11 +1,37 @@
 import h from '../../src/h';
 
-describe("helper methods", () => {
-    describe("h.formatNumber", () => {
-        let number = null,
-                formatNumber = h.formatNumber;
+describe('helper methods', () => {
+    describe('h.hashMatch', () => {
+        let testHash = '#test';
 
-        it("should format number", () => {
+        beforeEach(() => {
+            window.location.hash = testHash;
+        });
+
+        it('should return true if hash matches', () => {
+            expect(h.hashMatch(testHash)).toBeTrue();
+        });
+        it('should return false if hash doesn\'t match', () => {
+            expect(h.hashMatch('#failingHash')).toBeFalse();
+        });
+    });
+
+    describe('h.paramByName', () => {
+        let testParam = 'test';
+        beforeEach(() => {
+            window.location.search = `?test=${testParam}`;
+        });
+
+        it('should return the value of a url parameter given it\'s name', () => {
+            expect(h.paramByName(testParam)).toEqual(testParam)
+        });
+    });
+
+    describe('h.formatNumber', () => {
+        let number = null,
+            formatNumber = h.formatNumber;
+
+        it('should format number', () => {
             number = 120.20;
             expect(formatNumber(number)).toEqual('120');
             expect(formatNumber(number, 2, 3)).toEqual('120,20');
