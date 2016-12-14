@@ -76,8 +76,8 @@ const projectCard = {
 
         return m(ctrl.css().wrapper, [
             m(ctrl.css().innerWrapper, [
-                m(`a${ctrl.css().thumb}[href="/${project.permalink}"]`, {
-                    onclick: projectVM.routeToProject(project, args.ref),
+                m(`a${ctrl.css().thumb}[href="/${project.permalink}?ref=${args.ref}"]`, {
+                    config: m.route,
                     style: {
                         'background-image': `url(${project.project_img})`,
                         'display': 'block'
@@ -86,15 +86,15 @@ const projectCard = {
                 m(ctrl.css().descriptionWrapper, [
                     m(ctrl.css().description, [
                         m(ctrl.css().title, [
-                            m(`a.link-hidden[href="/${project.permalink}"]`,{
-                                onclick: projectVM.routeToProject(project, args.ref)
+                            m(`a.link-hidden[href="/${project.permalink}?ref=${args.ref}"]`,{
+                                config: m.route
                             },
                             project.project_name)
                         ]),
                         m(ctrl.css().author, `${I18n.t('by', I18nScope())} ${project.owner_name}`),
                         m(ctrl.css().headline, [
-                            m(`a.link-hidden[href="/${project.permalink}"]`,{
-                                onclick: projectVM.routeToProject(project, args.ref)
+                            m(`a.link-hidden[href="/${project.permalink}?ref=${args.ref}"]`,{
+                                config: m.route
                             },project.headline)
                         ])
                     ]),
