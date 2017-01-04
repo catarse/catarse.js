@@ -1,4 +1,4 @@
-import adminContributionDetail from '../../src/c/admin/contribution-detail.js';
+import adminContributionDetail from '../../src/c/admin-contribution-detail.js';
 import postgrest from 'mithril-postgrest';
 
 describe('adminExternalAction', () => {

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import addressTag from '../../src/c/address-tag.js';
 
-fdescribe('AddressTag', () => {
+describe('AddressTag', () => {
     let $output, projectDetail;
 
     describe('view', () => {

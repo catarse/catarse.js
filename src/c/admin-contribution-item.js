@@ -1,3 +1,15 @@
+/**
+ * Wrapper to show contribution info on the admin page /admin/contributions
+ * @param item - a contribution resource
+ * @param key - a unique value to keep the DOM state of the list when redrawing
+ * @module adminCountributionDetail
+ *
+ * Example:
+ * import adminContributionItem from './admin-contribution-item.js'
+ * ...
+ * contributions.map((item, idx) => m(adminContributionItem, {item: item, key: idx})
+ * ...
+**/
 import m from 'mithril';
 import h from '../h';
 import adminProject from './admin-project';
