@@ -35,19 +35,19 @@ const footer = {
                                                         '3'
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'http://facebook.com/catarse.me\']',
+                                                m('a.link-footer[href=\'http://facebook.com/JVNepal\'][target=\'blank\']',
                                                     ' Facebook'
                                                 ),
-                                                m('a.link-footer[href=\'http://twitter.com/catarse\']',
-                                                    ' Twitter'
-                                                ),
-                                                m('a.link-footer[href=\'http://instagram.com/catarse\']',
-                                                    ' Instagram'
-                                                ),
-                                                m('a.link-footer[href=\'http://github.com/catarse/catarse\']',
+                                                // m('a.link-footer[href=\'http://twitter.com/catarse\']',
+                                                //     ' Twitter'
+                                                // ),
+                                                // m('a.link-footer[href=\'http://instagram.com/catarse\']',
+                                                //     ' Instagram'
+                                                // ),
+                                                m('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']',
                                                     ' Github'
                                                 ),
-                                                m('a.link-footer[href=\'http://blog.catarse.me\']',
+                                                m('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']',
                                                     ' Blog'
                                                 ),
                                                 m('a.link-footer[href=\'https://www.catarse.me/pt/jobs\']',
@@ -145,12 +145,12 @@ const footer = {
                                     ),
                                     m('.w-widget.w-widget-facebook.u-marginbottom-20',
                                         m('.facebook',
-                                            m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/catarse.me\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']')
+                                            m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']')
                                         )
                                     ),
-                                    m('.w-widget.w-widget-twitter', [
-                                        m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
-                                    ]),
+                                    // m('.w-widget.w-widget-twitter', [
+                                    //     m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
+                                    // ]),
                                     m('.u-margintop-30',
                                         [
                                             m('.footer-full-signature-text.fontsize-small',
@@ -169,8 +169,8 @@ const footer = {
                         [
                             m('img.u-marginbottom-20[alt=\'Logo footer\'][src=\'/assets/logo-footer.png\']'),
                             m('.lineheight-loose',
-                                m('a.link-footer-inline[href=\'http://github.com/catarse/catarse\']',
-                                    'Feito com amor | 2016 | Open source'
+                                m('a.link-footer-inline[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']',
+                                    `Made wtih love | ${new Date().getFullYear()} | Open Source`
                                 )
                             )
                         ]
