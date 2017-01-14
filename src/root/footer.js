@@ -78,12 +78,6 @@ const footer = {
                                                 m('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']',
                                                     ' Central de Suporte'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/guides?ref=ctrse_footer\']',
-                                                    ' Guia dos Realizadores'
-                                                ),
-                                                m('a.link-footer[href=\'http://pesquisa.catarse.me/\']',
-                                                    ' Retrato FC Brasil 2013/2014'
-                                                ),
                                                 m('a.link-footer[href=\'/pt/terms-of-use\']',
                                                     ' Termos de uso'
                                                 ),
