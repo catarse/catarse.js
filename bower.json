@@ -4,7 +4,8 @@
   "homepage": "https://github.com/catarse/catarse.js",
   "authors": [
     "Diogo Biazus <diogo@biazus.me>",
-    "Vinícius Andrade <vchavesster@gmail.com>"
+    "Vinícius Andrade <vchavesster@gmail.com>",
+    "Sushant Bajracharya <sussyoung9@gmail.com>"
   ],
   "description": "A set of components to use in Catarse interface",
   "main": "dist/catarse.js",
