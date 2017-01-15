@@ -34,7 +34,11 @@ const blogBanner : Component = {
                         return m('.w-col.w-col-4.col-blog-post',
                             [
                                 m(`a.link-hidden.fontweight-semibold.fontsize-base.u-marginbottom-10[href="${post[2][1]}"][target=\'__blank\']`, post[0][1]),
-                                m('.fontsize-smaller.fontcolor-secondary.u-margintop-10', m.trust(post[1][1]))
+                                m('.fontsize-smaller.fontcolor-secondary.u-margintop-10', { config(el){
+                                    _.map(el.querySelectorAll('a:not([target=__blank])'), el =>
+                                    el.setAttribute('target', '__blank')
+                                )
+                                }},m.trust(post[1][1]))
                             ]
                         );
                     })),
