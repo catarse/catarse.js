@@ -1,6 +1,10 @@
 import m from 'mithril';
 import moment from 'moment';
 import postgrest from 'mithril-postgrest';
+import h from '../h';
+import I18n from 'i18n-js';
+
+const I18nScope = _.partial(h.i18nScope, 'projects');
 
 const projectFiltersVM = () => {
     const filtersVM = postgrest.filtersVM,
@@ -54,7 +58,7 @@ const projectFiltersVM = () => {
             score: {
               title: 'Todas as Categorias',
               filter: score,
-              nicename: 'Populares',
+              nicename: I18n.t('home.row_title', I18nScope()),
               isContextual: false,
               keyName: 'score'
           },

@@ -5,7 +5,9 @@ import userVM from '../vms/user-vm';
 import models from '../models';
 import h from '../h';
 import quickProjectList from '../c/quick-project-list';
+import I18n from 'i18n-js';
 
+const I18nScope = _.partial(h.i18nScope, 'layouts');
 const menuProfile = {
     controller(args) {
         const contributedProjects = m.prop(),
@@ -53,50 +55,50 @@ const menuProfile = {
                                 m(`.w-col.w-col-12`,
                                     [
                                         m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
-                                            `Meu histórico`
+                                            I18n.t('user.my_history', I18nScope())
                                         ),
                                         m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#contributions']`,
-                                                        `Histórico de apoio`
+                                                        I18n.t('user.support_history', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                   m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#projects']`,
-                                                    `Projetos criados`
+                                                      I18n.t('user.projects_created', I18nScope())
                                                    )
                                                  ),
                                                 m(`li.w-hidden-main.w-hidden-medium.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#projects']`,
-                                                        `Projetos criados`
+                                                        I18n.t('user.projects_created', I18nScope())
                                                     )
                                                 )
                                             ]
                                         ),
                                         m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
-                                            `Configurações`
+                                            I18n.t('user.settings', I18nScope())
                                         ),
                                         m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#about_me']`,
-                                                        `Sobre você`
+                                                        I18n.t('user.about_you', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#notifications']`,
-                                                        `Notificações`
+                                                        I18n.t('user.notifications', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#settings']`,
-                                                        `Dados e endereço`
+                                                        I18n.t('user.data_address', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#billing']`,
-                                                        `Banco e cartões`
+                                                        I18n.t('user.bank_cards', I18nScope())
                                                     )
                                                 )
                                             ]
@@ -109,22 +111,22 @@ const menuProfile = {
                                             [
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/new-admin#/users']`,
-                                                        `Usuários`
+                                                        I18n.t('user.users', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/new-admin']`,
-                                                        `Apoios`
+                                                        I18n.t('user.support', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/admin/financials']`,
-                                                        `Rel. Financeiros`
+                                                        I18n.t('user.financial_rel', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/admin/projects']`,
-                                                        `Admin projetos`
+                                                        I18n.t('user.admin_projects', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
@@ -134,14 +136,14 @@ const menuProfile = {
                                                 )
                                             ]
                                         ) : '',
-                                        m('.fontsize-mini', 'Seu e-mail de cadastro é: '),
+                                        m('.fontsize-mini', I18n.t('user.email_text', I18nScope())),
                                         m('.fontsize-smallest.u-marginbottom-20', [
                                             m('span.fontweight-semibold',`${user.email} `),
-                                            m(`a.alt-link[href='/pt/users/${user.id}/edit#settings']`, 'alterar e-mail')
+                                            m(`a.alt-link[href='/pt/users/${user.id}/edit#settings']`, I18n.t('user.change_email', I18nScope()))
                                         ]),
                                         m('.divider.u-marginbottom-20'),
                                         m(`a.alt-link[href='/pt/logout']`,
-                                            `Sair`
+                                            I18n.t('user.logout', I18nScope())
                                         )
                                     ]
                                 ),

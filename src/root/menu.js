@@ -3,6 +3,9 @@ import _ from 'underscore';
 import h from '../h';
 import menuSearch from '../c/menu-search';
 import menuProfile from '../c/menu-profile';
+import I18n from 'i18n-js';
+
+const I18nScope = _.partial(h.i18nScope, 'layouts');
 
 const menu = {
     controller(args) {
@@ -42,14 +45,14 @@ const menu = {
                             m('img[alt=\'Logo big\'][src=\'/assets/catarse_bootstrap/logo_big.png\']')
                         ),
                         args.menuShort ? '' : m('div#menu-components', [
-                            m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/start?ref=ctrse_header\']',{config: m.route}, 'Comece seu projeto'),
+                            m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/start?ref=ctrse_header\']',{config: m.route}, I18n.t('header.submit', I18nScope())),
                             m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/explore?ref=ctrse_header\']',{config: m.route},'Explore'),
                             m.component(menuSearch)
                         ])
                     ]
                 ),
                 m('.text-align-right.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [
-                    ctrl.user ? m.component(menuProfile, {user: ctrl.user}) : m('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/pt/login?ref=ctrse_header\']', 'Login'),
+                    ctrl.user ? m.component(menuProfile, {user: ctrl.user}) : m('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/pt/login?ref=ctrse_header\']', I18n.t('header.signin', I18nScope())),
                 ])
 
             ]),
@@ -57,7 +60,7 @@ const menu = {
                 [
                     m('a.header-link.w-nav-link[href=\'/pt/start?ref=ctrse_header\']',
                         {onclick: () => m.route('/start')},
-                        'Comece seu projeto'
+                        I18n.t('header.submit', I18nScope())
                     ),
                     m('a.header-link.w-nav-link[href=\'/pt/explore?ref=ctrse_header\']',
                         {onclick: () => m.route('/explore')},
