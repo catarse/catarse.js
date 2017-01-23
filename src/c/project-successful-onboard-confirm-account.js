@@ -40,7 +40,7 @@ const projectSuccessfulOnboardConfirmAccount = {
         const projectAccount = args.projectAccount,
               actionStage = ctrl.actionStage,
               currentStage = ctrl.currentStage,
-              personKind = (projectAccount.owner_document.length > 14 ? 'juridical' : 'natural'),
+              personKind = (projectAccount.owner_document.length > 14 ? 'Juridical' : 'Natural'),
               juridicalPerson = projectAccount.owner_document.length > 14;
 
         return m('.w-container.u-marginbottom-40', [
@@ -108,10 +108,10 @@ const projectSuccessfulOnboardConfirmAccount = {
             (currentStage() === 'start') ? m('#confirmation-dialog.w-row.bank-transfer-answer', [
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny'),
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
-                    m('a#confirm-account.btn.btn-large', {href: '#confirm_account', onclick: ctrl.changeToAction('accept')}, 'Sim')
+                    m('a#confirm-account.btn.btn-large', {href: '#confirm_account', onclick: ctrl.changeToAction('accept')}, 'Yes')
                 ]),
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
-                    m('a#refuse-account.btn.btn-large.btn-terciary', {href: '#error_account', onclick: ctrl.changeToAction('error')}, 'Não')
+                    m('a#refuse-account.btn.btn-large.btn-terciary', {href: '#error_account', onclick: ctrl.changeToAction('error')}, 'No')
                 ]),
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny')
             ]) : m.component(actionStage(), {

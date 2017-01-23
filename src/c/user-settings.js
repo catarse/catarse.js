@@ -83,7 +83,7 @@ const userSettings = {
                     if (_.isArray(err.errors)) {
                         error(err.errors.join('<br>'));
                     } else {
-                        error('Erro ao atualizar informações.');
+                        error('Error updating information.');
                     }
 
                     showError(true);
@@ -96,7 +96,7 @@ const userSettings = {
                 }
             },
             deleteAccount = () => {
-                if (window.confirm('Tem certeza que deseja desativar a sua conta?')) {
+                if (window.confirm('Are you sure you want to deactivate your account?')) {
                     deleteUser();
                 };
 
@@ -134,13 +134,13 @@ const userSettings = {
             // TODO: this form validation should be abstracted/merged together with others
             onSubmit = () => {
                 if (!validateEmailConfirmation()) {
-                    error('Confirmação de email está incorreta.');
+                    error('Email confirmation is incorrect.');
                     showError(true);
                 } else if (!validatePassword()) {
-                    error('Nova senha está incorreta.');
+                    error('New password is incorrect.');
                     showError(true);
                 } else if (!validateDocument()) {
-                    error('CPF/CNPJ inválido');
+                    error('New password is incorrect....');
                     showError(true);
                 } else {
                     updateUserData(user_id);
@@ -193,7 +193,7 @@ const userSettings = {
 
         return m('[id=\'settings-tab\']', [
             (ctrl.showSuccess() ? m.component(popNotification, {
-                message: 'As suas informações foram atualizadas'
+                message: 'Your information has been updated'
             }) : ''),
             (ctrl.showError() ? m.component(popNotification, {
                 message: m.trust(ctrl.error()),
@@ -210,7 +210,7 @@ const userSettings = {
                                     'Email'
                                 ),
                                 m('.fontsize-small.u-marginbottom-30',
-                                    'Mantenha esse email atualizado pois ele é o canal de comunicação entre você, a equipe do Catarse e a equipe dos projetos que você apoiou. '
+                                    'Keep this email up to date as it is the communication channel between you, the JVN team and the team of projects you have supported. '
                                 ),
                                 m('.fontsize-base.u-marginbottom-40', [
                                     m('span.fontweight-semibold.card.u-radius',
@@ -221,13 +221,13 @@ const userSettings = {
                                                 ctrl.showEmailForm.toggle()
                                             }
                                         },
-                                        'Alterar email'
+                                        'Change e-mail'
                                     )
                                 ]),
                                 m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
                                     m('.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label.fontweight-semibold',
-                                            'Novo email'
+                                            'New email'
                                         ),
                                         m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
                                             class: ctrl.emailHasError() ? 'error' : '',
@@ -238,7 +238,7 @@ const userSettings = {
                                     ]),
                                     m('.w-col.w-col-6', [
                                         m('label.field-label.fontweight-semibold',
-                                            'Confirmar novo email'
+                                            'Confirm new email'
                                         ),
                                         m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
                                             class: ctrl.emailHasError() ? 'error' : '',
@@ -248,10 +248,10 @@ const userSettings = {
                                             onchange: m.withAttr('value', fields.email_confirmation)
                                         })
                                     ]),
-                                    ctrl.emailHasError() ? m(inlineError, {message: 'Confirmação de email está incorreta.'}) : ''
+                                    ctrl.emailHasError() ? m(inlineError, {message: 'Email confirmation is incorrect.'}) : ''
                                 ]),
                                 m('.fontsize-base.fontweight-semibold',
-                                    'Nome'
+                                    'Name'
                                 ),
                                 m('.w-row.u-marginbottom-20', [
                                     m('.w-col.w-col-6.w-sub-col',
@@ -277,15 +277,15 @@ const userSettings = {
                                 ]),
                                 m('.divider.u-marginbottom-20'),
                                 m('.fontsize-base.fontweight-semibold',
-                                    'Endereço'
+                                    'Address'
                                 ),
                                 m('.fontsize-small.u-marginbottom-20',
-                                    'Esse é o endereço que foi informado ao realizar seu último apoio. Se você mudou de endereço, altere aqui e, caso você esteja aguardando alguma recompensa, avise por email ao realizador do projeto apoiado.'
+                                    'This is the address you were informed when making your last support. If you have changed your address, change here and, if you are waiting for some reward, notify the director of the project supported by email.'
                                 ),
                                 m('.w-row', [
                                     m('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label',
-                                            'País'
+                                            'Parents'
                                         ),
                                         m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
                                             onchange: m.withAttr('value', fields.country_id)
@@ -309,7 +309,7 @@ const userSettings = {
                                 m('.w-row', [
                                     m('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label',
-                                            'Endereço'
+                                            'Address'
                                         ),
                                         m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
                                             value: fields.street(),
@@ -323,7 +323,7 @@ const userSettings = {
                                         m('.w-row', [
                                             m('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [
                                                 m('label.field-label',
-                                                    'Número'
+                                                    'Number'
                                                 ),
                                                 m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
                                                     value: fields.number(),
@@ -335,7 +335,7 @@ const userSettings = {
                                             ]),
                                             m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                                 m('label.field-label',
-                                                    'Complemento'
+                                                    'Complement'
                                                 ),
                                                 m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
                                                     value: fields.complement(),
@@ -348,7 +348,7 @@ const userSettings = {
                                 m('.w-row', [
                                     m('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label',
-                                            'Bairro'
+                                            'Neighborhood'
                                         ),
                                         m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
                                             value: fields.neighbourhood(),
@@ -357,7 +357,7 @@ const userSettings = {
                                     ]),
                                     m('.input.string.optional.user_address_city.w-col.w-col-6', [
                                         m('label.field-label',
-                                            'Cidade'
+                                            'City'
                                         ),
                                         m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
                                             value: fields.city(),
@@ -371,7 +371,7 @@ const userSettings = {
                                 m('.w-row', [
                                     m('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label',
-                                            'Estado'
+                                            'state'
                                         ),
                                         m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
 
@@ -389,8 +389,8 @@ const userSettings = {
 
                                                 :
                                                 ''),
-                                            m('option[value=\'outro / other\']',
-                                                'Outro / Other'
+                                            m('option[value=\'Other / Other\']',
+                                                'Other / Other'
                                             )
                                         ]),
                                         m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_state\']',
@@ -413,7 +413,7 @@ const userSettings = {
                                             ]),
                                             m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                                 m('label.field-label',
-                                                    'Telefone'
+                                                    'Phone'
                                                 ),
                                                 m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
                                                     value: fields.phonenumber(),
@@ -426,15 +426,15 @@ const userSettings = {
                                 ]),
                                 m('.divider.u-maginbottom-20'),
                                 m('.fontsize-base.fontweight-semibold',
-                                    'Alterar minha senha'
+                                    'Change my password'
                                 ),
                                 m('.fontsize-small.u-marginbottom-20',
-                                    'Para que a senha seja alterada você precisa confirmar a sua senha atual.'
+                                    'In order for the password to be changed you must confirm your current password.'
                                 ),
                                 m('.w-row.u-marginbottom-20', [
                                     m('.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label.fontweight-semibold',
-                                            ' Senha atual'
+                                            ' current password'
                                         ),
                                         m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
                                             value: fields.current_password(),
@@ -443,7 +443,7 @@ const userSettings = {
                                     ]),
                                     m('.w-col.w-col-6', [
                                         m('label.field-label.fontweight-semibold',
-                                            ' Nova senha'
+                                            ' New password'
                                         ),
                                         m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
                                             class: ctrl.passwordHasError() ? 'error' : '',
@@ -452,20 +452,20 @@ const userSettings = {
                                             onblur: ctrl.validatePassword,
                                             onchange: m.withAttr('value', fields.password)
                                         }),
-                                        !ctrl.passwordHasError() ? '' : m(inlineError, {message: 'A sua nova senha deve ter no mínimo 6 caracteres.'})
+                                        !ctrl.passwordHasError() ? '' : m(inlineError, {message: 'Your new password must be at least 6 characters long.'})
                                     ])
                                 ]),
                                 m('.divider.u-marginbottom-20'),
                                 m('.fontweight-semibold.fontsize-smaller',
-                                    'Desativar minha conta'
+                                    'Disable my account'
                                 ),
                                 m('.fontsize-smallest',
-                                    'Todos os seus apoios serão convertidos em apoios anônimos, seus dados não serão mais visíveis, você sairá automaticamente do sistema e sua conta será desativada permanentemente.'
+                                    'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'
                                 ),
-                                m(`a.alt-link.fontsize-smaller[href=\'/pt/users/${user.id}\'][rel=\'nofollow\']`,{
+                                m(`a.alt-link.fontsize-smaller[href=\'/en/users/${user.id}\'][rel=\'nofollow\']`,{
                                         onclick: ctrl.deleteAccount,
                                     },
-                                    'Desativar minha conta no Catarse'
+                                    'Disable my JVN account'
                                 )
                             ])
                         )
@@ -474,7 +474,7 @@ const userSettings = {
                         m('.w-container',
                             m('.w-row', [
                                 m('.w-col.w-col-4.w-col-push-4',
-                                    m('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Salvar\']')
+                                    m('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'To save\']')
                                 ),
                                 m('.w-col.w-col-4')
                             ])
@@ -482,7 +482,7 @@ const userSettings = {
                     )
                 ])
             ]),
-            m('form.w-hidden', {action: `/pt/users/${user.id}`, method: 'post', config: ctrl.setDeleteForm}, [
+            m('form.w-hidden', {action: `/en/users/${user.id}`, method: 'post', config: ctrl.setDeleteForm}, [
                 m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
                 m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')
             ])

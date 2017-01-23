@@ -56,7 +56,7 @@ const projectDashboardMenu = {
               projectRoute = '/projects/' + project.project_id,
               editRoute = projectRoute + '/edit',
               editLinkClass = 'dashboard-nav-link-left ' + (project.is_published ? 'indent' : '');
-        let optionalOpt = m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)');
+        let optionalOpt = m('span.fontsize-smallest.fontcolor-secondary', ' (optional)');
 
         ctrl.body.className = ctrl.bodyToggleForNav();
 
@@ -94,12 +94,12 @@ const projectDashboardMenu = {
                                 ] : ''),
                                 m('a#description_link[class="' + editLinkClass + '"][href="' + editRoute + '#description' + '"]', I18n.t(`${project.mode}.description_tab`, linksScope())),
                                 m('a#video_link[class="' + editLinkClass + '"][href="' + editRoute + '#video' + '"]', [
-                                    'Vídeo', m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')
+                                    'Video', m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')
                                 ]),
                                 m('a#budget_link[class="' + editLinkClass + '"][href="' + editRoute + '#budget' + '"]', I18n.t(`${project.mode}.budget_tab`, linksScope())),
                                 m('a#card_link[class="' + editLinkClass + '"][href="' + editRoute + '#card' + '"]', I18n.t(`${project.mode}.card_tab`, linksScope())),
                                 m('a#dashboard_reward_link[class="' + editLinkClass + '"][href="' + editRoute + '#reward' + '"]', [
-                                    'Recompensas', optionalOpt
+                                    'Rewards', optionalOpt
                                 ]),
                                 m('a#dashboard_user_about_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_about' + '"]', I18n.t(`${project.mode}.about_you_tab`, linksScope())),
                                 ((project.is_published || project.state === 'draft') || project.is_admin_role ? [

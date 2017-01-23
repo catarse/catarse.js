@@ -47,7 +47,7 @@ const projectContributionReportContentCard = {
     view(ctrl, args) {
         let contribution = args.contribution(),
             profile_img = (_.isEmpty(contribution.profile_img_thumbnail) ? '/assets/catarse_bootstrap/user.jpg' : contribution.profile_img_thumbnail),
-            reward = contribution.reward || {minimum_value: 0, description: 'Nenhuma recompensa selecionada'};
+            reward = contribution.reward || {minimum_value: 0, description: 'No reward selected'};
         return m('.w-clearfix.card', [
             m('.w-row', [
                 m('.w-col.w-col-1.w-col-tiny-1', [
@@ -62,7 +62,7 @@ const projectContributionReportContentCard = {
                                 (contribution.has_another ? [
                                     m('a.link-hidden-light.badge.badge-light', '+1 apoio '),
                                 ] : ''),
-                                (contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' Apoio não-público')) : '')
+                                (contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' Non-public support')) : '')
                             ]),
                             m('.fontsize-smallest.lineheight-looser', (contribution.email))
                         ]),
@@ -74,7 +74,7 @@ const projectContributionReportContentCard = {
                             ])
                         ]),
                          m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [
-                             m('.fontsize-smallest.fontweight-semibold', `Recompensa: R$ ${h.formatNumber(reward.minimum_value, 2, 3)}`),
+                             m('.fontsize-smallest.fontweight-semibold', `Reward: Rs ${h.formatNumber(reward.minimum_value, 2, 3)}`),
                              m('.fontsize-smallest', reward.description.substring(0, 80) + '...')
                          ])/*,
                         m(".w-col.w-col-2.w-hidden-small.w-hidden-tiny.u-text-center", [

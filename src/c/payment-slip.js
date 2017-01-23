@@ -34,27 +34,27 @@ const paymentSlip = {
                     m('.w-col.w-col-12',
                         m('.u-margintop-30.u-marginbottom-60.u-radius.card-big.card', [
                             m('.fontsize-small.u-marginbottom-20',
-                                ctrl.slipPaymentDate() ? `Esse boleto bancário vence no dia ${h.momentify(ctrl.slipPaymentDate().slip_expiration_date)}.` : 'carregando...'
+                                ctrl.slipPaymentDate() ? `This bank slip expires on ${h.momentify(ctrl.slipPaymentDate().slip_expiration_date)}.` : 'Loading...'
                             ),
                             m('.fontsize-small.u-marginbottom-40',
-                                'Ao gerar o boleto, o realizador já está contando com o seu apoio. Pague até a data de vencimento pela internet, casas lotéricas, caixas eletrônicos ou agência bancária.'
+                                'In generating the ticket, the director is already counting on his support. Pay through the internet due date, lottery houses, ATMs or bank branch.'
                             ),
                             m('.w-row',
                                 m('.w-col.w-col-8.w-col-push-2', [
                             ctrl.loading() ? h.loader() : ctrl.completed() ? '' : m('input.btn.btn-large.u-marginbottom-20',{
                                 onclick: ctrl.buildSlip,
-                                value: 'Imprimir Boleto',
+                                value: 'Print Ticket',
                                 type: 'submit'
                             }),
                             ctrl.error() ? m.component(inlineError, {message: ctrl.error()}) : '',
                             m('.fontsize-smallest.u-text-center.u-marginbottom-30', [
-                                'Ao apoiar, você concorda com os ',
-                                m('a.alt-link[href=\'/pt/terms-of-use\']',
-                                    'Termos de Uso '
+                                'By supporting, you agree with the ',
+                                m('a.alt-link[href=\'/en/terms-of-use\']',
+                                    'Terms of use '
                                 ),
                                 'e ',
-                                m('a.alt-link[href=\'/pt/privacy-policy\']',
-                                    'Política de Privacidade'
+                                m('a.alt-link[href=\'/en/privacy-policy\']',
+                                    'privacy policy'
                                 )
                             ])
                         ])

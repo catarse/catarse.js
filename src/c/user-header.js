@@ -27,12 +27,12 @@ const userHeader = {
                           (hideDetails ? '' :
                           m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base',
                               [
-                                  `Chegou junto em ${h.momentify(user.created_at, 'MMMM [de] YYYY')}`,
+                                  `Arrived together at ${h.momentify(user.created_at, 'MMMM [de] YYYY')}`,
                                   m('br'),
-                                  (user.total_contributed_projects == 0 ? 'Ainda não apoiou projetos' :
-                                  `Apoiou ${h.pluralize(user.total_contributed_projects, ' projeto', ' projetos')}`),
+                                  (user.total_contributed_projects == 0 ? 'Has not yet supported projects' :
+                                  `Supported ${h.pluralize(user.total_contributed_projects, ' project', ' projects')}`),
                                   (user.total_published_projects > 0 ?
-                                  ` e já criou ${h.pluralize(user.total_published_projects, ' projeto', ' projetos')}` : '')
+                                  ` And already created ${h.pluralize(user.total_published_projects, ' project', ' projects')}` : '')
                               ]
                           ))
                       ]

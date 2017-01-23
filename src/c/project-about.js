@@ -15,8 +15,8 @@ const projectAbout = {
             };
         let fundingPeriod = () => {
             return (project.is_published && h.existy(project.zone_expires_at)) ? m('.funding-period', [
-                m('.fontsize-small.fontweight-semibold.u-text-center-small-only', 'Período de campanha'),
-                m('.fontsize-small.u-text-center-small-only', `${h.momentify(project.zone_online_date)} - ${h.momentify(project.zone_expires_at)} (${onlineDays()} dias)`)
+                m('.fontsize-small.fontweight-semibold.u-text-center-small-only', 'Campaign period'),
+                m('.fontsize-small.u-text-center-small-only', `${h.momentify(project.zone_online_date)} - ${h.momentify(project.zone_expires_at)} (${onlineDays()} days)`)
             ]) : '';
         };
 
@@ -25,23 +25,23 @@ const projectAbout = {
                 config: h.UIHelper()
             }, [
                 m('p.fontsize-base', [
-                    m('strong', 'O projeto'),
+                    m('strong', 'The project'),
                 ]),
                 m('.fontsize-base[itemprop="about"]', m.trust(h.selfOrEmpty(project.about_html, '...'))),
                 project.budget ? [
-                    m('p.fontsize-base.fontweight-semibold', 'Orçamento'),
+                    m('p.fontsize-base.fontweight-semibold', 'Budget'),
                     m('p.fontsize-base', m.trust(project.budget))
                 ] : '',
                 m.component(projectReport)
             ]),
             m('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', !_.isEmpty(args.rewardDetails()) ? [
-                m('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Recompensas'),
+                m('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Rewards'),
                 m.component(projectRewardList, {
                     project: args.project,
                     rewardDetails: args.rewardDetails
                 }), fundingPeriod()
             ] : [
-                m('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Sugestões de apoio'),
+                m('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Suggestions for support'),
                 m.component(projectSuggestedContributions, {project: args.project}),
                 fundingPeriod()
             ])

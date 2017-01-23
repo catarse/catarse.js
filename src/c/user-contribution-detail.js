@@ -21,10 +21,10 @@ const userContributionDetail = {
             m('.w-col.w-col-4',
               [
                   m('.fontsize-smallest.lineheight-tight.fontweight-semibold.u-marginbottom-10',
-                    'Valor do apoio:'
+                    'Value of support:'
                    ),
                   m('.fontsize-large',
-                    `R$${contribution.value}`
+                    `Rs${contribution.value}`
                    )
               ]
              ),
@@ -34,15 +34,15 @@ const userContributionDetail = {
             m('.w-col.w-col-4',
               [
                   m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10',
-                    'Recompensa:'
+                    'Reward:'
                    ),
                   m('.fontsize-smallest.lineheight-tight.u-marginbottom-20',
-                    (!_.isUndefined(ctrl.chosenReward) ? ctrl.chosenReward.description : 'Nenhuma recompensa selecionada.')
+                    (!_.isUndefined(ctrl.chosenReward) ? ctrl.chosenReward.description : 'No reward selected.')
                    ),
                   m('.fontsize-smallest.lineheight-looser',
                     (!_.isUndefined(ctrl.chosenReward) ? [
                         m('span.fontweight-semibold',
-                          'Estimativa de entrega: '
+                          'Estimated delivery: '
                          ),
                         h.momentify(ctrl.chosenReward.deliver_at, 'MMM/YYYY')
                     ] : '')

@@ -29,23 +29,23 @@ const projectDataStats = {
                 m('.w-row.u-text-center', [
                     m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
                         m('.fontweight-semibold.fontsize-large.lineheight-tight', `${progress}%`),
-                        m('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'financiado')
+                        m('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'Financed')
                     ]),
                     m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
-                        m('.fontweight-semibold.fontsize-large.lineheight-tight', `R$ ${h.formatNumber(project.pledged, 2)}`),
-                        m('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'levantados')
+                        m('.fontweight-semibold.fontsize-large.lineheight-tight', `Rs ${h.formatNumber(project.pledged, 2)}`),
+                        m('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'Raised')
                     ]),
                     m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
                         m('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions),
-                        m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'apoios')
+                        m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Supports')
                     ]),
                     m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
                         (_.isNull(project.expires_at) ? [
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', `${elapsedTextObj.total} ${elapsedTextObj.unit}`),
-                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'iniciado há')
+                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Started there')
                         ] : [
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', `${remainingTextObj.total}`),
-                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', `${remainingTextObj.unit} ${(remainingTextObj.total > 0 ? 'restantes' : 'restante')}`)
+                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', `${remainingTextObj.unit} ${(remainingTextObj.total > 0 ? 'remaining' : 'remaining')}`)
                         ])
                     ])
                 ])

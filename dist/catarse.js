@@ -1011,7 +1011,7 @@ var filterMain = {
         return m$1('.w-row', [m$1('.w-col.w-col-10', [m$1('input' + inputWrapperClass + '[placeholder="' + args.placeholder + '"][type="text"]', {
             onchange: m$1.withAttr('value', args.vm),
             value: args.vm()
-        })]), m$1('.w-col.w-col-2', [m$1('input#filter-btn' + btnClass + '[type="submit"][value="Buscar"]')])]);
+        })]), m$1('.w-col.w-col-2', [m$1('input#filter-btn' + btnClass + '[type="submit"][value="To seek"]')])]);
     }
 };
 
@@ -1033,7 +1033,7 @@ var adminFilter = {
             onsubmit: args.submit
         }, [main ? m$1.component(main.component, main.data) : '', m$1('.u-marginbottom-20.w-row', m$1('button.w-col.w-col-12.fontsize-smallest.link-hidden-light[style="background: none; border: none; outline: none; text-align: left;"][type="button"]', {
             onclick: ctrl.toggler.toggle
-        }, 'Filtros avançados  >')), ctrl.toggler() ? m$1('#advanced-search.w-row.admin-filters', [_$1.map(filterBuilder, function (f) {
+        }, 'Advanced Filters  >')), ctrl.toggler() ? m$1('#advanced-search.w-row.admin-filters', [_$1.map(filterBuilder, function (f) {
             return f.component !== filterMain ? m$1.component(f.component, f.data) : '';
         })]) : ''])])])]);
     }
@@ -1075,7 +1075,7 @@ var adminList = {
             error = args.vm.error,
             label = args.label || '';
 
-        return m$1('.w-section.section', [m$1('.w-container', error() ? m$1('.card.card-error.u-radius.fontweight-bold', error()) : [m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-9', [m$1('.fontsize-base', list.isLoading() ? 'Carregando ' + label.toLowerCase() + '...' : [m$1('span.fontweight-semibold', list.total()), ' ' + label.toLowerCase() + ' encontrados'])])]), m$1('#admin-contributions-list.w-container', [list.collection().map(function (item) {
+        return m$1('.w-section.section', [m$1('.w-container', error() ? m$1('.card.card-error.u-radius.fontweight-bold', error()) : [m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-9', [m$1('.fontsize-base', list.isLoading() ? 'Loading ' + label.toLowerCase() + '...' : [m$1('span.fontweight-semibold', list.total()), ' ' + label.toLowerCase() + ' Found'])])]), m$1('#admin-contributions-list.w-container', [list.collection().map(function (item) {
             return m$1.component(adminItem, {
                 listItem: args.listItem,
                 listDetail: args.listDetail,
@@ -1084,7 +1084,7 @@ var adminList = {
             });
         }), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-push-5', [list.isLoading() ? h.loader() : m$1('button#load-more.btn.btn-medium.btn-terciary', {
             onclick: list.nextPage
-        }, 'Carregar mais')])])])])])])]);
+        }, 'Load more')])])])])])])]);
     }
 };
 
@@ -1092,7 +1092,7 @@ var adminUser = {
     view: function view(ctrl, args) {
         var user = args.item;
 
-        return m$1('.w-row.admin-user', [m$1('.w-col.w-col-3.w-col-small-3.u-marginbottom-10', [m$1('img.user-avatar[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"]')]), m$1('.w-col.w-col-9.w-col-small-9', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10', [m$1('a.alt-link[target="_blank"][href="/users/' + user.id + '/edit"]', user.name || user.email)]), m$1('.fontsize-smallest', 'Usuário: ' + user.id), m$1('.fontsize-smallest.fontcolor-secondary', 'Email: ' + user.email), args.additional_data])]);
+        return m$1('.w-row.admin-user', [m$1('.w-col.w-col-3.w-col-small-3.u-marginbottom-10', [m$1('img.user-avatar[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"]')]), m$1('.w-col.w-col-9.w-col-small-9', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-10', [m$1('a.alt-link[target="_blank"][href="/users/' + user.id + '/edit"]', user.name || user.email)]), m$1('.fontsize-smallest', 'User: ' + user.id), m$1('.fontsize-smallest.fontcolor-secondary', 'Email: ' + user.email), args.additional_data])]);
     }
 };
 
@@ -1175,7 +1175,7 @@ var adminResetPassword = {
     },
     view: function view(ctrl, args) {
         var data = args.data,
-            btnValue = ctrl.l() ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = ctrl.l() ? 'please wait...' : data.callToAction;
 
         return m$1('.w-col.w-col-2', [m$1('button.btn.btn-small.btn-terciary', {
             onclick: ctrl.toggler.toggle
@@ -1186,7 +1186,7 @@ var adminResetPassword = {
         }, !ctrl.complete() ? [m$1('label', data.innerLabel), m$1('input.w-input.text-field[type="text"][name="' + data.property + '"][placeholder="' + data.placeholder + '"]', {
             onchange: m$1.withAttr('value', ctrl.newPassword),
             value: ctrl.newPassword()
-        }), m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', 'Senha alterada com sucesso.')])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', ctrl.error_message())])])]) : '']);
+        }), m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', 'Password changed successfully.')])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', ctrl.error_message())])])]) : '']);
     }
 };
 
@@ -1241,7 +1241,7 @@ var adminInputAction = {
     },
     view: function view(ctrl, args) {
         var data = args.data,
-            btnValue = ctrl.l() ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = ctrl.l() ? 'please wait...' : data.callToAction;
 
         return m$1('.w-col.w-col-2', [m$1('button.btn.btn-small.btn-terciary', {
             onclick: ctrl.toggler.toggle
@@ -1252,7 +1252,7 @@ var adminInputAction = {
         }, !ctrl.complete() ? [m$1('label', data.innerLabel), data.forceValue === undefined ? m$1('input.w-input.text-field[type="text"][placeholder="' + data.placeholder + '"]', {
             onchange: m$1.withAttr('value', ctrl.newValue),
             value: ctrl.newValue()
-        }) : '', m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', data.successMessage)])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', 'Houve um problema na requisição. ' + data.errorMessage)])])]) : '']);
+        }) : '', m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', data.successMessage)])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', 'There was a problem with the request. ' + data.errorMessage)])])]) : '']);
     }
 };
 
@@ -1285,7 +1285,7 @@ var adminNotificationHistory = {
         };
     },
     view: function view(ctrl) {
-        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Histórico de notificações'), ctrl.notifications().map(function (cEvent) {
+        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Notification history'), ctrl.notifications().map(function (cEvent) {
             return m$1('.w-row.fontsize-smallest.lineheight-looser.date-event', [m$1('.w-col.w-col-24', [m$1('.fontcolor-secondary', h.momentify(cEvent.sent_at, 'DD/MM/YYYY, HH:mm'), ' - ', m$1('a[target="blank"][href="/notifications/' + cEvent.relation + '/' + cEvent.id + '"]', cEvent.template_name), cEvent.origin ? ' - ' + cEvent.origin : '')])]);
         })]);
     }
@@ -1307,20 +1307,20 @@ var adminUserDetail = {
             actions: {
                 reset: {
                     property: 'password',
-                    callToAction: 'Redefinir',
-                    innerLabel: 'Nova senha de Usuário:',
-                    outerLabel: 'Redefinir senha',
+                    callToAction: 'Reset',
+                    innerLabel: 'New User Password:',
+                    outerLabel: 'Redefine password',
                     placeholder: 'ex: 123mud@r',
                     model: models.user
                 },
                 reactivate: {
                     property: 'deactivated_at',
                     updateKey: 'id',
-                    callToAction: 'Reativar',
-                    innerLabel: 'Tem certeza que deseja reativar esse usuário?',
-                    successMessage: 'Usuário reativado com sucesso!',
-                    errorMessage: 'O usuário não pôde ser reativado!',
-                    outerLabel: 'Reativar usuário',
+                    callToAction: 'Reactivate',
+                    innerLabel: 'Reactivate...',
+                    successMessage: 'Are you sure you want to re-enable this user?...',
+                    errorMessage: 'The user could not be reactivated!',
+                    outerLabel: 'Reactivate user',
                     forceValue: null,
                     model: models.user
                 }
@@ -1487,7 +1487,7 @@ var adminProject = {
 var adminContribution = {
     view: function view(ctrl, args) {
         var contribution = args.item;
-        return m$1('.w-row.admin-contribution', [m$1('.fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small', 'R$' + contribution.value), m$1('.fontsize-smallest.fontcolor-secondary', h.momentify(contribution.created_at, 'DD/MM/YYYY HH:mm[h]')), m$1('.fontsize-smallest', ['ID do Gateway: ', m$1('a.alt-link[target="_blank"][href="https://dashboard.pagar.me/#/transactions/' + contribution.gateway_id + '"]', contribution.gateway_id)])]);
+        return m$1('.w-row.admin-contribution', [m$1('.fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small', 'Rs' + contribution.value), m$1('.fontsize-smallest.fontcolor-secondary', h.momentify(contribution.created_at, 'DD/MM/YYYY HH:mm[h]')), m$1('.fontsize-smallest', ['Gateway ID: ', m$1('a.alt-link[target="_blank"][href="https://dashboard.pagar.me/#/transactions/' + contribution.gateway_id + '"]', contribution.gateway_id)])]);
     }
 };
 
@@ -1672,7 +1672,7 @@ var adminRadioAction = {
                 selectedItem(newItem);
             } else {
                 error({
-                    message: 'Nenhum item atualizado'
+                    message: 'No items updated'
                 });
             }
             complete(true);
@@ -1740,7 +1740,7 @@ var adminRadioAction = {
     view: function view(ctrl, args) {
         var data = args.data,
             item = args.item(),
-            btnValue = ctrl.setLoader() || ctrl.getLoader() ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = ctrl.setLoader() || ctrl.getLoader() ? 'please wait...' : data.callToAction;
 
         return m$1('.w-col.w-col-2', [m$1('button.btn.btn-small.btn-terciary', {
             onclick: ctrl.toggler.toggle
@@ -1755,8 +1755,8 @@ var adminRadioAction = {
                     ctrl.newID(radio.id);
                     ctrl.setDescription(radio.description);
                 }
-            }), m$1('label.w-form-label[for="r-' + index + '"]', 'R$' + radio.minimum_value)]);
-        }) : h.loader(), m$1('strong', 'Descrição'), m$1('p', ctrl.description()), m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', 'Recompensa alterada com sucesso!')])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', ctrl.error().message)])])]) : '']);
+            }), m$1('label.w-form-label[for="r-' + index + '"]', 'Rs' + radio.minimum_value)]);
+        }) : h.loader(), m$1('strong', 'Description'), m$1('p', ctrl.description()), m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', 'Reward changed successfully!')])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', ctrl.error().message)])])]) : '']);
     }
 };
 
@@ -1829,7 +1829,7 @@ var adminExternalAction = {
     },
     view: function view(ctrl, args) {
         var data = args.data,
-            btnValue = ctrl.l() ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = ctrl.l() ? 'please wait...' : data.callToAction;
 
         return m$1('.w-col.w-col-2', [m$1('button.btn.btn-small.btn-terciary', {
             onclick: ctrl.toggler.toggle
@@ -1837,14 +1837,14 @@ var adminExternalAction = {
             config: ctrl.unload
         }, [m$1('form.w-form', {
             onsubmit: ctrl.submit
-        }, !ctrl.complete() ? [m$1('label', data.innerLabel), m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', 'Requisição feita com sucesso.')])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', 'Houve um problema na requisição.')])])]) : '']);
+        }, !ctrl.complete() ? [m$1('label', data.innerLabel), m$1('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')] : !ctrl.error() ? [m$1('.w-form-done[style="display:block;"]', [m$1('p', 'Request successful.')])] : [m$1('.w-form-error[style="display:block;"]', [m$1('p', 'There was a problem with the request.')])])]) : '']);
     }
 };
 
 var adminTransaction = {
     view: function view(ctrl, args) {
         var contribution = args.contribution;
-        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Detalhes do apoio'), m$1('.fontsize-smallest.lineheight-looser', ['Valor: R$' + h.formatNumber(contribution.value, 2, 3), m$1('br'), 'Taxa: R$' + h.formatNumber(contribution.gateway_fee, 2, 3), m$1('br'), 'Aguardando Confirmação: ' + (contribution.waiting_payment ? 'Sim' : 'Não'), m$1('br'), 'Anônimo: ' + (contribution.anonymous ? 'Sim' : 'Não'), m$1('br'), 'Id pagamento: ' + contribution.gateway_id, m$1('br'), 'Apoio: ' + contribution.contribution_id, m$1('br'), 'Chave: \n', m$1('br'), contribution.key, m$1('br'), 'Meio: ' + contribution.gateway, m$1('br'), 'Operadora: ' + (contribution.gateway_data && contribution.gateway_data.acquirer_name), m$1('br'), contribution.is_second_slip ? [m$1('a.link-hidden[href="#"]', 'Boleto bancário'), ' ', m$1('span.badge', '2a via')] : ''])]);
+        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Detalhes do apoio'), m$1('.fontsize-smallest.lineheight-looser', ['Value: Rs' + h.formatNumber(contribution.value, 2, 3), m$1('br'), 'Rate: Rs' + h.formatNumber(contribution.gateway_fee, 2, 3), m$1('br'), 'Waiting confirmation: ' + (contribution.waiting_payment ? 'Yes' : 'No'), m$1('br'), 'Anonymous: ' + (contribution.anonymous ? 'Yes' : 'No'), m$1('br'), 'Id payment: ' + contribution.gateway_id, m$1('br'), 'Support: ' + contribution.contribution_id, m$1('br'), 'Key: \n', m$1('br'), contribution.key, m$1('br'), 'Medium: ' + contribution.gateway, m$1('br'), 'Operator: ' + (contribution.gateway_data && contribution.gateway_data.acquirer_name), m$1('br'), contribution.is_second_slip ? [m$1('a.link-hidden[href="#"]', 'Bank slip'), ' ', m$1('span.badge', '2nd route')] : ''])]);
     }
 };
 
@@ -1853,22 +1853,22 @@ var adminTransactionHistory = {
         var contribution = args.contribution,
             mapEvents = _$1.reduce([{
             date: contribution.paid_at,
-            name: 'Apoio confirmado'
+            name: 'Support Confirmed'
         }, {
             date: contribution.pending_refund_at,
-            name: 'Reembolso solicitado'
+            name: 'Reimbursement Requested'
         }, {
             date: contribution.refunded_at,
-            name: 'Estorno realizado'
+            name: 'Reversal made'
         }, {
             date: contribution.created_at,
-            name: 'Apoio criado'
+            name: 'Support created'
         }, {
             date: contribution.refused_at,
-            name: 'Apoio cancelado'
+            name: 'Support canceled'
         }, {
             date: contribution.deleted_at,
-            name: 'Apoio excluído'
+            name: 'Support deleted'
         }, {
             date: contribution.chargeback_at,
             name: 'Chargeback'
@@ -1887,7 +1887,7 @@ var adminTransactionHistory = {
         };
     },
     view: function view(ctrl) {
-        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Histórico da transação'), ctrl.orderedEvents.map(function (cEvent) {
+        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Transaction History'), ctrl.orderedEvents.map(function (cEvent) {
             return m$1('.w-row.fontsize-smallest.lineheight-looser.date-event', [m$1('.w-col.w-col-6', [m$1('.fontcolor-secondary', cEvent.date)]), m$1('.w-col.w-col-6', [m$1('div', cEvent.name)])]);
         })]);
     }
@@ -1898,7 +1898,7 @@ var adminReward = {
         var reward = args.reward(),
             available = parseInt(reward.paid_count) + parseInt(reward.waiting_payment_count);
 
-        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Recompensa'), m$1('.fontsize-smallest.lineheight-looser', reward.id ? ['ID: ' + reward.id, m$1('br'), 'Valor mínimo: R$' + h.formatNumber(reward.minimum_value, 2, 3), m$1('br'), m$1.trust('Disponíveis: ' + available + ' / ' + (reward.maximum_contributions || '&infin;')), m$1('br'), 'Aguardando confirmação: ' + reward.waiting_payment_count, m$1('br'), 'Descrição: ' + reward.description] : 'Apoio sem recompensa')]);
+        return m$1('.w-col.w-col-4', [m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Reward'), m$1('.fontsize-smallest.lineheight-looser', reward.id ? ['ID: ' + reward.id, m$1('br'), 'Minimum value: Rs' + h.formatNumber(reward.minimum_value, 2, 3), m$1('br'), m$1.trust('Available: ' + available + ' / ' + (reward.maximum_contributions || '&infin;')), m$1('br'), 'Waiting confirmation: ' + reward.waiting_payment_count, m$1('br'), 'Description: ' + reward.description] : 'Support without reward')]);
     }
 };
 
@@ -1926,12 +1926,12 @@ var adminContributionDetail = {
                 transfer: {
                     property: 'user_id',
                     updateKey: 'id',
-                    callToAction: 'Transferir',
-                    innerLabel: 'Id do novo apoiador:',
-                    outerLabel: 'Transferir Apoio',
+                    callToAction: 'Transfer',
+                    innerLabel: 'Id of new supporter:',
+                    outerLabel: 'Download Support',
                     placeholder: 'ex: 129908',
-                    successMessage: 'Apoio transferido com sucesso!',
-                    errorMessage: 'O apoio não foi transferido!',
+                    successMessage: 'Support transferred successfully!',
+                    errorMessage: 'Support has not been transferred!',
                     model: models.contributionDetail
                 },
                 reward: {
@@ -1939,33 +1939,33 @@ var adminContributionDetail = {
                     updateKey: 'contribution_id',
                     selectKey: 'reward_id',
                     radios: 'rewards',
-                    callToAction: 'Alterar Recompensa',
-                    outerLabel: 'Recompensa',
+                    callToAction: 'Change Reward',
+                    outerLabel: 'Reward',
                     getModel: models.rewardDetail,
                     updateModel: models.contributionDetail,
                     selectedItem: loadReward(),
-                    addEmpty: { id: -1, minimum_value: 10, description: 'Sem recompensa' },
+                    addEmpty: { id: -1, minimum_value: 10, description: 'No reward' },
                     validate: function validate(rewards, newRewardID) {
                         var reward = _$1.findWhere(rewards, { id: newRewardID });
-                        return args.item.value >= reward.minimum_value ? undefined : 'Valor mínimo da recompensa é maior do que o valor da contribuição.';
+                        return args.item.value >= reward.minimum_value ? undefined : 'Minimum reward value is greater than the contribution amount.';
                     }
                 },
                 refund: {
                     updateKey: 'id',
-                    callToAction: 'Reembolso direto',
-                    innerLabel: 'Tem certeza que deseja reembolsar esse apoio?',
-                    outerLabel: 'Reembolsar Apoio',
+                    callToAction: 'Direct refund',
+                    innerLabel: 'Are you sure you want to reimburse this support?',
+                    outerLabel: 'Refund Support',
                     model: models.contributionDetail
                 },
                 remove: {
                     property: 'state',
                     updateKey: 'id',
-                    callToAction: 'Apagar',
-                    innerLabel: 'Tem certeza que deseja apagar esse apoio?',
-                    outerLabel: 'Apagar Apoio',
+                    callToAction: 'Delete',
+                    innerLabel: 'Are you sure you want to delete this support?',
+                    outerLabel: 'Delete Support',
                     forceValue: 'deleted',
-                    successMessage: 'Apoio removido com sucesso!',
-                    errorMessage: 'O apoio não foi removido!',
+                    successMessage: 'Support removed successfully!',
+                    errorMessage: 'Support has not been removed!',
                     model: models.contributionDetail
                 }
             },
@@ -2016,7 +2016,7 @@ var filterNumberRange = {
         return m$1('.w-col.w-col-3.w-col-small-6', [m$1('label.fontsize-smaller[for="' + args.index + '"]', args.label), m$1('.w-row', [m$1('.w-col.w-col-5.w-col-small-5.w-col-tiny-5', [m$1('input.w-input.text-field.positive[id="' + args.index + '"][type="text"]', {
             onchange: m$1.withAttr('value', args.first),
             value: args.first()
-        })]), m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m$1('.fontsize-smaller.u-text-center.lineheight-looser', 'e')]), m$1('.w-col.w-col-5.w-col-small-5.w-col-tiny-5', [m$1('input.w-input.text-field.positive[type="text"]', {
+        })]), m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m$1('.fontsize-smaller.u-text-center.lineheight-looser', 'and')]), m$1('.w-col.w-col-5.w-col-small-5.w-col-tiny-5', [m$1('input.w-input.text-field.positive[type="text"]', {
             onchange: m$1.withAttr('value', args.last),
             value: args.last()
         })])])]);
@@ -2189,11 +2189,11 @@ var landingSignup = {
         var errorClasses = !ctrl.error ? '.positive.error' : '';
         return m$1('form.w-form[id="email-form"][method="post"][action="' + args.builder.customAction + '"]', {
             onsubmit: ctrl.submit
-        }, [m$1('.w-col.w-col-5', [m$1('input' + errorClasses + '.w-input.text-field.medium[name="EMAIL"][placeholder="Digite seu email"][type="text"]', {
+        }, [m$1('.w-col.w-col-5', [m$1('input' + errorClasses + '.w-input.text-field.medium[name="EMAIL"][placeholder="Type your e-mail"][type="text"]', {
             config: h.RDTracker('landing-flex'),
             onchange: m$1.withAttr('value', ctrl.email),
             value: ctrl.email()
-        }), ctrl.error() ? m$1('span.fontsize-smaller.text-error', 'E-mail inválido') : '']), m$1('.w-col.w-col-3', [m$1('input.w-button.btn.btn-large[type="submit"][value="Cadastrar"]')])]);
+        }), ctrl.error() ? m$1('span.fontsize-smaller.text-error', 'invalid E-mail') : '']), m$1('.w-col.w-col-3', [m$1('input.w-button.btn.btn-large[type="submit"][value="Register"]')])]);
     }
 };
 
@@ -2352,7 +2352,7 @@ var projectFiltersVM = function projectFiltersVM() {
             keyName: 'recent'
         },
         near_me: {
-            title: 'Próximos a mim',
+            title: 'Next to me',
             filter: nearMe,
             isContextual: false,
             keyName: 'near_me'
@@ -2711,7 +2711,7 @@ var projectFriends = {
             return m$1('img.user-avatar[src=\'' + profile_img + '\']');
         })]), m$1('p.fontsize-smallest.friend-namepile.lineheight-tighter', [m$1('span.fontweight-semibold', _$1.map(ctrl.friendsSample(), function (user) {
             return user.data.name.split(' ')[0];
-        }).join(friendsCount > 2 ? ', ' : ' e ')), friendsCount > 2 ? [' e ', m$1('span.fontweight-semibold', 'mais ' + (friendsCount - ctrl.friendsSample().length))] : '', friendsCount > 1 ? ' apoiaram' : ' apoiou'])]);
+        }).join(friendsCount > 2 ? ', ' : ' e ')), friendsCount > 2 ? [' and ', m$1('span.fontweight-semibold', 'more ' + (friendsCount - ctrl.friendsSample().length))] : '', friendsCount > 1 ? ' Supported' : ' Supported'])]);
     }
 };
 
@@ -2798,7 +2798,7 @@ var projectCard = {
             style: {
                 width: (ctrl.progress > 100 ? 100 : ctrl.progress) + '%'
             }
-        })])]), m$1('.card-project-stats', [m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [m$1('.fontsize-base.fontweight-semibold', Math.floor(project.progress) + '%')]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-center-small-only', [m$1('.fontsize-smaller.fontweight-semibold', 'Rs ' + h.formatNumber(project.pledged)), m$1('.fontsize-smallest.lineheight-tightest', I18n$1.t('contributed', I18nScope$2()))]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', project.expires_at ? [m$1('.fontsize-smaller.fontweight-semibold', ctrl.remainingTextObj.total + ' ' + ctrl.remainingTextObj.unit), m$1('.fontsize-smallest.lineheight-tightest', ctrl.remainingTextObj.total > 1 ? I18n$1.t('remaining.other', I18nScope$2()) : I18n$1.t('remaining.one', I18nScope$2()))] : [m$1('.fontsize-smallest.lineheight-tight', ['Iniciado há', m$1('br'), ctrl.elapsedTextObj.total + ' ' + ctrl.elapsedTextObj.unit])])])])]), args.showFriends && ctrl.type === 'big' ? m$1('.w-col.w-col-4.w-col-medium-6', [m$1.component(projectFriends, { project: project })]) : '']), args.showFriends && ctrl.type !== 'big' ? m$1.component(projectFriends, { project: project }) : '']);
+        })])]), m$1('.card-project-stats', [m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [m$1('.fontsize-base.fontweight-semibold', Math.floor(project.progress) + '%')]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-center-small-only', [m$1('.fontsize-smaller.fontweight-semibold', 'Rs ' + h.formatNumber(project.pledged)), m$1('.fontsize-smallest.lineheight-tightest', I18n$1.t('contributed', I18nScope$2()))]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', project.expires_at ? [m$1('.fontsize-smaller.fontweight-semibold', ctrl.remainingTextObj.total + ' ' + ctrl.remainingTextObj.unit), m$1('.fontsize-smallest.lineheight-tightest', ctrl.remainingTextObj.total > 1 ? I18n$1.t('remaining.other', I18nScope$2()) : I18n$1.t('remaining.one', I18nScope$2()))] : [m$1('.fontsize-smallest.lineheight-tight', ['Started there', m$1('br'), ctrl.elapsedTextObj.total + ' ' + ctrl.elapsedTextObj.unit])])])])]), args.showFriends && ctrl.type === 'big' ? m$1('.w-col.w-col-4.w-col-medium-6', [m$1.component(projectFriends, { project: project })]) : '']), args.showFriends && ctrl.type !== 'big' ? m$1.component(projectFriends, { project: project }) : '']);
     }
 };
 
@@ -2813,7 +2813,7 @@ var projectRow = {
             wrapper = args.wrapper || '.w-section.section.u-marginbottom-40';
 
         if (collection.loader() || collection.collection().length > 0) {
-            return m$1(wrapper, [m$1('.w-container', [!_$1.isUndefined(collection.title) || !_$1.isUndefined(collection.hash) ? m$1('.w-row.u-marginbottom-30', [m$1(showFriends ? '.w-col.w-col-8.w-col-small-6.w-col-tiny-6' : '.w-col.w-col-10.w-col-small-6.w-col-tiny-6', [m$1('.fontsize-large.lineheight-looser', title)]), m$1(showFriends ? '.w-col.w-col-4.w-col-small-6.w-col-tiny-6' : '.w-col.w-col-2.w-col-small-6.w-col-tiny-6', [m$1('.w-row', [showFriends ? m$1('.w-col.w-col-6', [m$1('a.btn.btn-no-border.btn-small.btn-terciary[href="/connect-facebook?ref=' + ref + '"]', 'Encontrar amigos')]) : '', m$1(showFriends ? '.w-col.w-col-6' : '.w-col.w-col-12', m$1('a.btn.btn-small.btn-terciary[href="/explore?ref=' + ref + '&filter=' + collection.hash + '"]', {
+            return m$1(wrapper, [m$1('.w-container', [!_$1.isUndefined(collection.title) || !_$1.isUndefined(collection.hash) ? m$1('.w-row.u-marginbottom-30', [m$1(showFriends ? '.w-col.w-col-8.w-col-small-6.w-col-tiny-6' : '.w-col.w-col-10.w-col-small-6.w-col-tiny-6', [m$1('.fontsize-large.lineheight-looser', title)]), m$1(showFriends ? '.w-col.w-col-4.w-col-small-6.w-col-tiny-6' : '.w-col.w-col-2.w-col-small-6.w-col-tiny-6', [m$1('.w-row', [showFriends ? m$1('.w-col.w-col-6', [m$1('a.btn.btn-no-border.btn-small.btn-terciary[href="/connect-facebook?ref=' + ref + '"]', 'Meet friends')]) : '', m$1(showFriends ? '.w-col.w-col-6' : '.w-col.w-col-12', m$1('a.btn.btn-small.btn-terciary[href="/explore?ref=' + ref + '&filter=' + collection.hash + '"]', {
                 config: m$1.route
             }, I18n$1.t('home.see_all', I18nScope$1())))])])]) : '', collection.loader() ? h.loader() : m$1('.w-row', _$1.map(collection.collection(), function (project) {
                 return m$1.component(projectCard, {
@@ -3065,13 +3065,13 @@ var projectDashboardMenu = {
             projectRoute = '/projects/' + project.project_id,
             editRoute = projectRoute + '/edit',
             editLinkClass = 'dashboard-nav-link-left ' + (project.is_published ? 'indent' : '');
-        var optionalOpt = m$1('span.fontsize-smallest.fontcolor-secondary', ' (opcional)');
+        var optionalOpt = m$1('span.fontsize-smallest.fontcolor-secondary', ' (optional)');
 
         ctrl.body.className = ctrl.bodyToggleForNav();
 
         return m$1('#project-nav', [m$1('.project-nav-wrapper', [m$1('nav.w-section.dashboard-nav.side', [m$1('a#dashboard_preview_link.w-inline-block.dashboard-project-name[href="' + (project.is_published ? '/' + project.permalink : editRoute + '#preview') + '"]', [m$1('img.thumb-project-dashboard[src="' + (project ? ctrl.projectThumb(project) : '/assets/thumb-project.png') + '"][width="114"]'), m$1('.fontcolor-negative.lineheight-tight.fontsize-small', project.name), m$1('img.u-margintop-10[src="/assets/catarse_bootstrap/badge-' + project.mode + '-h.png"][width=80]')]), m$1('#info-links', [m$1('a#dashboard_home_link[class="dashboard-nav-link-left ' + (h.locationActionMatch('insights') ? 'selected' : '') + '"][href="' + projectRoute + '/insights"]', [m$1('span.fa.fa-bar-chart.fa-lg.fa-fw'), I18n$1.t('start_tab', I18nScope$5())]), project.is_published ? [m$1('a#dashboard_reports_link.dashboard-nav-link-left[href="' + projectRoute + '/contributions_report"]', [m$1('span.fa.fa.fa-table.fa-lg.fa-fw'), I18n$1.t('reports_tab', I18nScope$5())]), m$1('a#dashboard_reports_link.dashboard-nav-link-left.u-marginbottom-30[href="' + editRoute + '#posts' + '"]', [m$1('span.fa.fa-bullhorn.fa-fw.fa-lg'), I18n$1.t('posts_tab', I18nScope$5()), m$1('span.badge', project.posts_count)])] : '']), m$1('.edit-project-div', [!project.is_published ? '' : m$1('button#toggle-edit-menu.dashboard-nav-link-left', {
             onclick: ctrl.editLinksToggle.toggle
-        }, [m$1('span.fa.fa-pencil.fa-fw.fa-lg'), I18n$1.t('edit_project', I18nScope$5())]), ctrl.editLinksToggle() ? m$1('#edit-menu-items', [m$1('#dashboard-links', [!project.is_published || project.is_admin_role ? [m$1('a#basics_link[class="' + editLinkClass + '"][href="' + editRoute + '#basics' + '"]', I18n$1.t(project.mode + '.basics_tab', linksScope())), m$1('a#goal_link[class="' + editLinkClass + '"][href="' + editRoute + '#goal' + '"]', I18n$1.t(project.mode + '.goal_tab', linksScope()))] : '', m$1('a#description_link[class="' + editLinkClass + '"][href="' + editRoute + '#description' + '"]', I18n$1.t(project.mode + '.description_tab', linksScope())), m$1('a#video_link[class="' + editLinkClass + '"][href="' + editRoute + '#video' + '"]', ['Vídeo', m$1('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')]), m$1('a#budget_link[class="' + editLinkClass + '"][href="' + editRoute + '#budget' + '"]', I18n$1.t(project.mode + '.budget_tab', linksScope())), m$1('a#card_link[class="' + editLinkClass + '"][href="' + editRoute + '#card' + '"]', I18n$1.t(project.mode + '.card_tab', linksScope())), m$1('a#dashboard_reward_link[class="' + editLinkClass + '"][href="' + editRoute + '#reward' + '"]', ['Recompensas', optionalOpt]), m$1('a#dashboard_user_about_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_about' + '"]', I18n$1.t(project.mode + '.about_you_tab', linksScope())), project.is_published || project.state === 'draft' || project.is_admin_role ? [m$1('a#dashboard_user_settings_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_settings' + '"]', I18n$1.t(project.mode + '.account_tab', linksScope()))] : '', !project.is_published ? [m$1('a#dashboard_preview_link[class="' + editLinkClass + '"][href="' + editRoute + '#preview' + '"]', [m$1('span.fa.fa-fw.fa-eye.fa-lg'), I18n$1.t(project.mode + '.preview_tab', linksScope())])] : ''])]) : '', !project.is_published && ctrl.showPublish() ? [m$1('.btn-send-draft-fixed', project.mode === 'aon' ? [project.state === 'draft' ? m$1('a.btn.btn-medium[href="/projects/' + project.project_id + '/validate_publish"]', [I18n$1.t('publish', I18nScope$5()), m$1.trust('&nbsp;&nbsp;'), m$1('span.fa.fa-chevron-right')]) : ''] : [project.state === 'draft' ? m$1('a.btn.btn-medium[href="/flexible_projects/' + project.project_id + '/validate_publish"]', [I18n$1.t('publish', I18nScope$5()), m$1.trust('&nbsp;&nbsp;'), m$1('span.fa.fa-chevron-right')]) : ''])] : [project.mode === 'flex' && project.is_published ? [m$1('.btn-send-draft-fixed', _$1.isNull(project.expires_at) ? m$1('a.w-button.btn.btn-medium.btn-secondary-dark[href="/projects/' + project.project_id + '/edit#announce_expiration"]', I18n$1.t('announce_expiration', I18nScope$5())) : '')] : '']])])]), m$1('a.btn-dashboard href="javascript:void(0);"', {
+        }, [m$1('span.fa.fa-pencil.fa-fw.fa-lg'), I18n$1.t('edit_project', I18nScope$5())]), ctrl.editLinksToggle() ? m$1('#edit-menu-items', [m$1('#dashboard-links', [!project.is_published || project.is_admin_role ? [m$1('a#basics_link[class="' + editLinkClass + '"][href="' + editRoute + '#basics' + '"]', I18n$1.t(project.mode + '.basics_tab', linksScope())), m$1('a#goal_link[class="' + editLinkClass + '"][href="' + editRoute + '#goal' + '"]', I18n$1.t(project.mode + '.goal_tab', linksScope()))] : '', m$1('a#description_link[class="' + editLinkClass + '"][href="' + editRoute + '#description' + '"]', I18n$1.t(project.mode + '.description_tab', linksScope())), m$1('a#video_link[class="' + editLinkClass + '"][href="' + editRoute + '#video' + '"]', ['Video', m$1('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')]), m$1('a#budget_link[class="' + editLinkClass + '"][href="' + editRoute + '#budget' + '"]', I18n$1.t(project.mode + '.budget_tab', linksScope())), m$1('a#card_link[class="' + editLinkClass + '"][href="' + editRoute + '#card' + '"]', I18n$1.t(project.mode + '.card_tab', linksScope())), m$1('a#dashboard_reward_link[class="' + editLinkClass + '"][href="' + editRoute + '#reward' + '"]', ['Rewards', optionalOpt]), m$1('a#dashboard_user_about_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_about' + '"]', I18n$1.t(project.mode + '.about_you_tab', linksScope())), project.is_published || project.state === 'draft' || project.is_admin_role ? [m$1('a#dashboard_user_settings_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_settings' + '"]', I18n$1.t(project.mode + '.account_tab', linksScope()))] : '', !project.is_published ? [m$1('a#dashboard_preview_link[class="' + editLinkClass + '"][href="' + editRoute + '#preview' + '"]', [m$1('span.fa.fa-fw.fa-eye.fa-lg'), I18n$1.t(project.mode + '.preview_tab', linksScope())])] : ''])]) : '', !project.is_published && ctrl.showPublish() ? [m$1('.btn-send-draft-fixed', project.mode === 'aon' ? [project.state === 'draft' ? m$1('a.btn.btn-medium[href="/projects/' + project.project_id + '/validate_publish"]', [I18n$1.t('publish', I18nScope$5()), m$1.trust('&nbsp;&nbsp;'), m$1('span.fa.fa-chevron-right')]) : ''] : [project.state === 'draft' ? m$1('a.btn.btn-medium[href="/flexible_projects/' + project.project_id + '/validate_publish"]', [I18n$1.t('publish', I18nScope$5()), m$1.trust('&nbsp;&nbsp;'), m$1('span.fa.fa-chevron-right')]) : ''])] : [project.mode === 'flex' && project.is_published ? [m$1('.btn-send-draft-fixed', _$1.isNull(project.expires_at) ? m$1('a.w-button.btn.btn-medium.btn-secondary-dark[href="/projects/' + project.project_id + '/edit#announce_expiration"]', I18n$1.t('announce_expiration', I18nScope$5())) : '')] : '']])])]), m$1('a.btn-dashboard href="javascript:void(0);"', {
             onclick: ctrl.bodyToggleForNav.toggle
         }, [m$1('span.fa.fa-bars.fa-lg')])]);
     }
@@ -3132,11 +3132,11 @@ var adminProjectDetailsCard = {
 
         return m$1('.project-details-card.card.u-radius.card-terciary.u-marginbottom-20', [m$1('div', [m$1('.fontsize-small.fontweight-semibold', [m$1('span.fontcolor-secondary', 'Status:'), ' ', m$1('span', {
             class: statusTextObj.cssClass
-        }, ctrl.isFinalLap() && project.open_for_contributions ? 'RETA FINAL' : statusTextObj.text), ' ']), project.is_published ? [m$1('.meter.u-margintop-20.u-marginbottom-10', [m$1('.meter-fill', {
+        }, ctrl.isFinalLap() && project.open_for_contributions ? 'FINAL STRAIGHT' : statusTextObj.text), ' ']), project.is_published ? [m$1('.meter.u-margintop-20.u-marginbottom-10', [m$1('.meter-fill', {
             style: {
                 width: (progress > 100 ? 100 : progress) + '%'
             }
-        })]), m$1('.w-row', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'financiado'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', progress + '%')]), m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'levantados'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', ['R$ ' + h.formatNumber(project.pledged, 2)])]), m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'apoios'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions)]), m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [_.isNull(project.expires_at) ? [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'iniciado há'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', elapsedTextObj.total + ' ' + elapsedTextObj.unit)] : [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'restam'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', remainingTextObj.total + ' ' + remainingTextObj.unit)]])])] : ''])]);
+        })]), m$1('.w-row', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Financed'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', progress + '%')]), m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Raised'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', ['Rs ' + h.formatNumber(project.pledged, 2)])]), m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Supports'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions)]), m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [_.isNull(project.expires_at) ? [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Started there'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', elapsedTextObj.total + ' ' + elapsedTextObj.unit)] : [m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Remain'), m$1('.fontweight-semibold.fontsize-large.lineheight-tight', remainingTextObj.total + ' ' + remainingTextObj.unit)]])])] : ''])]);
     }
 };
 
@@ -3147,7 +3147,7 @@ var adminProjectDetailsCard = {
  */
 var onlineSuccessModalContent = {
     view: function view(ctrl, args) {
-        return m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-larger.lineheight-tight', 'Sua campanha está no ar!!! Parabéns por esse primeiro grande passo. Boa sorte nessa jornada ;)')]);
+        return m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-larger.lineheight-tight', 'Your campaign is up in the air !!! Congratulations on that first big step. Good luck on this journey. ;)')]);
     }
 };
 
@@ -3167,7 +3167,7 @@ var projectDataStats = {
             remainingTextObj = h.translatedTime(project.remaining_time),
             elapsedTextObj = h.translatedTime(project.elapsed_time);
 
-        return m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-3.u-text-center-small-only', [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-20', [m$1('span.fontcolor-secondary', 'Status: '), m$1('span', { class: statusTextObj.cssClass }, statusTextObj.text)])]), m$1('.w-col.w-col-9', [m$1('.w-row.u-text-center', [m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', progress + '%'), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'financiado')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', 'R$ ' + h.formatNumber(project.pledged, 2)), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'levantados')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'apoios')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [_$1.isNull(project.expires_at) ? [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', elapsedTextObj.total + ' ' + elapsedTextObj.unit), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'iniciado há')] : [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', '' + remainingTextObj.total), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', remainingTextObj.unit + ' ' + (remainingTextObj.total > 0 ? 'restantes' : 'restante'))]])])])]);
+        return m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-3.u-text-center-small-only', [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-20', [m$1('span.fontcolor-secondary', 'Status: '), m$1('span', { class: statusTextObj.cssClass }, statusTextObj.text)])]), m$1('.w-col.w-col-9', [m$1('.w-row.u-text-center', [m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', progress + '%'), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'Financed')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', 'Rs ' + h.formatNumber(project.pledged, 2)), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'Raised')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Supports')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [_$1.isNull(project.expires_at) ? [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', elapsedTextObj.total + ' ' + elapsedTextObj.unit), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Started there')] : [m$1('.fontweight-semibold.fontsize-large.lineheight-tight', '' + remainingTextObj.total), m$1('.fontcolor-secondary.lineheight-tighter.fontsize-small', remainingTextObj.unit + ' ' + (remainingTextObj.total > 0 ? 'remaining' : 'remaining'))]])])])]);
     }
 };
 
@@ -3185,7 +3185,7 @@ var deleteProjectModalContent = {
         check = m$1.prop('');
 
     var deleteProject = function deleteProject() {
-      if (check() === 'deletar-rascunho') {
+      if (check() === 'Delete-draft') {
         var loaderOpts = models.deleteProject.postOptions({
           _project_id: args.project.project_id
         });
@@ -3194,12 +3194,12 @@ var deleteProjectModalContent = {
           deleteSuccess(true);
         }).catch(function (err) {
           confirmed(false);
-          error('Erro ao deletar projeto. Por favor tente novamente.');
+          error('Error deleting project. Please try again.');
           m$1.redraw();
         });
       } else {
         confirmed(false);
-        error('Por favor, corrija os seguintes erros: para deletar definitivamente o projeto você deverá preencher "deletar-rascunho".');
+        error('Please correct the following errors: To permanently delete the project you must fill in "delete-draft".');
       }
       return false;
     };
@@ -3214,7 +3214,7 @@ var deleteProjectModalContent = {
   },
   view: function view(ctrl, args) {
     var project = args.project;
-    return m$1('div', ctrl.deleteSuccess() ? '' : m$1('.modal-dialog-header', m$1('.fontsize-large.u-text-center', ['Confirmar ', m$1('span.fa.fa-trash', '')])), m$1('form.modal-dialog-content', { onsubmit: ctrl.deleteProject }, ctrl.deleteSuccess() ? [m$1('.fontsize-base.u-margintop-30', 'Projeto deletado com sucesso. Clique no link abaixo para voltar a página inicial.'), m$1('a.btn.btn-inactive.btn-large.u-margintop-30[href=\'/pt/users/' + h.getUser().user_id + '/edit#projects\']', 'Voltar')] : [m$1('.fontsize-base.u-marginbottom-60', ['O projeto será deletado permanentemente e todos os dados que você preencheu na edição do rascunho não poderão ser recuperados.']), m$1('.fontsize-base.u-marginbottom-10', ['Confirme escrevendo ', 'no campo abaixo ', m$1('span.fontweight-semibold.text-error', 'deletar-rascunho')]), m$1('.w-form', m$1('.text-error.u-marginbottom-10', ctrl.error()), [m$1('div', m$1('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: ctrl.confirmed() ? false : 'error', placeholder: 'deletar-rascunho', onchange: m$1.withAttr('value', ctrl.check) }))]), m$1('div', m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.u-text-center.w-col.w-col-6', [m$1('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Deletar para sempre\']'), m$1('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayDeleteModal.toggle }, 'Cancelar')]), m$1('.w-col.w-col-3')]))]));
+    return m$1('div', ctrl.deleteSuccess() ? '' : m$1('.modal-dialog-header', m$1('.fontsize-large.u-text-center', ['Confirm ', m$1('span.fa.fa-trash', '')])), m$1('form.modal-dialog-content', { onsubmit: ctrl.deleteProject }, ctrl.deleteSuccess() ? [m$1('.fontsize-base.u-margintop-30', 'Project deleted successfully. Click the link below to return to the homepage.'), m$1('a.btn.btn-inactive.btn-large.u-margintop-30[href=\'/en/users/' + h.getUser().user_id + '/edit#projects\']', 'Voltar')] : [m$1('.fontsize-base.u-marginbottom-60', ['The project will be permanently deleted and all data you filled in the draft edition will not be retrieved.']), m$1('.fontsize-base.u-marginbottom-10', ['Confirm writing ', 'In the field below', m$1('span.fontweight-semibold.text-error', 'Delete-draft')]), m$1('.w-form', m$1('.text-error.u-marginbottom-10', ctrl.error()), [m$1('div', m$1('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: ctrl.confirmed() ? false : 'error', placeholder: 'Delete-draft', onchange: m$1.withAttr('value', ctrl.check) }))]), m$1('div', m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.u-text-center.w-col.w-col-6', [m$1('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Delete forever\']'), m$1('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayDeleteModal.toggle }, 'Cancel')]), m$1('.w-col.w-col-3')]))]));
   }
 };
 
@@ -3234,7 +3234,7 @@ var projectDeleteButton = {
             displayModal: ctrl.displayDeleteModal,
             hideCloseButton: true,
             content: [deleteProjectModalContent, { displayDeleteModal: ctrl.displayDeleteModal, project: args.project }]
-        }) : '', m$1('.before-footer', m$1('.w-container', m$1('a.btn.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button[href=\'javascript:void(0);\']', { onclick: ctrl.displayDeleteModal.toggle, style: { 'transition': 'all 0.5s ease 0s' } }, [m$1.trust('&nbsp;'), 'Deletar projeto ', m$1('span.fa.fa-trash', '')])))]);
+        }) : '', m$1('.before-footer', m$1('.w-container', m$1('a.btn.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button[href=\'javascript:void(0);\']', { onclick: ctrl.displayDeleteModal.toggle, style: { 'transition': 'all 0.5s ease 0s' } }, [m$1.trust('&nbsp;'), 'Delete Project ', m$1('span.fa.fa-trash', '')])))]);
     }
 };
 
@@ -3285,7 +3285,7 @@ var projectCancelButton = {
         return m$1('div', [ctrl.displayCancelModal() ? m$1.component(modalBox, {
             displayModal: ctrl.displayCancelModal,
             content: [cancelProjectModalContent, { displayModal: ctrl.displayCancelModal }]
-        }) : '', m$1('.w-row.before-footer', m$1('.w-col.w-col-12', m$1('.w-container', m$1('button.btn.btn-cancel.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button', { onclick: ctrl.displayCancelModal.toggle, style: { 'transition': 'all 0.5s ease 0s' } }, [m$1('span.fa.fa-times-circle', ''), m$1.trust('&nbsp;'), 'Cancelar projeto']))))]);
+        }) : '', m$1('.w-row.before-footer', m$1('.w-col.w-col-12', m$1('.w-container', m$1('button.btn.btn-cancel.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button', { onclick: ctrl.displayCancelModal.toggle, style: { 'transition': 'all 0.5s ease 0s' } }, [m$1('span.fa.fa-times-circle', ''), m$1.trust('&nbsp;'), 'Cancel Project']))))]);
     }
 };
 
@@ -3432,7 +3432,7 @@ var projectDataTable = {
 var projectReminderCount = {
     view: function view(ctrl, args) {
         var project = args.resource;
-        return m$1('#project-reminder-count.card.u-radius.u-text-center.medium.u-marginbottom-80', [m$1('.fontsize-large.fontweight-semibold', 'Total de pessoas que clicaram no botão Lembrar-me'), m$1('.fontsize-smaller.u-marginbottom-30', 'Um lembrete por email é enviado 48 horas antes do término da sua campanha'), m$1('.fontsize-jumbo', project.reminder_count)]);
+        return m$1('#project-reminder-count.card.u-radius.u-text-center.medium.u-marginbottom-80', [m$1('.fontsize-large.fontweight-semibold', 'Total people who clicked on the Remember me button'), m$1('.fontsize-smaller.u-marginbottom-30', 'An email reminder is sent 48 hours before the end of your campaign'), m$1('.fontsize-jumbo', project.reminder_count)]);
     }
 };
 
@@ -3516,7 +3516,7 @@ var projectSuccessfulOnboardConfirmAccountError = {
                 return ctrl.error(false);
             },
             onchange: m$1.withAttr('value', ctrl.errorReasonM)
-        }), ctrl.error() ? m$1('.w-row', [m$1('.w-col.w-col-6.w-col-push-3.u-text-center', [m$1('span.fontsize-smallest.text-error', 'Campo Obrigatório')])]) : '', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('a.w-button.btn.btn-medium', {
+        }), ctrl.error() ? m$1('.w-row', [m$1('.w-col.w-col-6.w-col-push-3.u-text-center', [m$1('span.fontsize-smallest.text-error', 'Required field')])]) : '', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('a.w-button.btn.btn-medium', {
             href: '#confirm_account_refuse',
             onclick: ctrl.addErrorReason
         }, I18n$1.t('cta', I18nScope$8()))])])])])])]);
@@ -3581,10 +3581,10 @@ var projectSuccessfulOnboardConfirmAccount = {
         var projectAccount = args.projectAccount,
             actionStage = ctrl.actionStage,
             currentStage = ctrl.currentStage,
-            personKind = projectAccount.owner_document.length > 14 ? 'juridical' : 'natural',
+            personKind = projectAccount.owner_document.length > 14 ? 'Juridical' : 'Natural',
             juridicalPerson = projectAccount.owner_document.length > 14;
 
-        return m$1('.w-container.u-marginbottom-40', [m$1('.u-text-center', [m$1('.fontsize-large.fontweight-semibold.u-marginbottom-30', I18n$1.t('title', I18nScope$7()))]), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-6', [m$1('.fontsize-base.u-marginbottom-30.card.card-terciary', [m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.label', I18nScope$7())), I18n$1.t('person.' + personKind + '.label', I18nScope$7())]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.' + personKind + '.name', I18nScope$7())), projectAccount.owner_name]), projectAccount.state_inscription && juridicalPerson ? m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.state_inscription', I18nScope$7())), projectAccount.state_inscription]) : '', m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.' + personKind + '.document', I18nScope$7())), projectAccount.owner_document]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.bank.name', I18nScope$7())), projectAccount.bank_name]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.bank.agency', I18nScope$7())), '' + projectAccount.agency + (_$1.isEmpty(projectAccount.agency_digit) ? '' : '-' + projectAccount.agency_digit)]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.bank.account', I18nScope$7())), projectAccount.account + '-' + projectAccount.account_digit])])]), m$1('.w-col.w-col-6', [m$1('.fontsize-base.u-marginbottom-30.card.card-terciary', [m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.address', I18nScope$7())), projectAccount.address_street + ', ' + projectAccount.address_number + ' ' + (!_$1.isNull(projectAccount.address_complement) ? ', ' + projectAccount.address_complement : '')]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.neighbourhood', I18nScope$7())), projectAccount.address_neighbourhood]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.city', I18nScope$7())), projectAccount.address_city]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.state', I18nScope$7())), projectAccount.address_state]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.zip_code', I18nScope$7())), projectAccount.address_zip_code])])])]), currentStage() === 'start' ? m$1('#confirmation-dialog.w-row.bank-transfer-answer', [m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny'), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('a#confirm-account.btn.btn-large', { href: '#confirm_account', onclick: ctrl.changeToAction('accept') }, 'Sim')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('a#refuse-account.btn.btn-large.btn-terciary', { href: '#error_account', onclick: ctrl.changeToAction('error') }, 'Não')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny')]) : m$1.component(actionStage(), {
+        return m$1('.w-container.u-marginbottom-40', [m$1('.u-text-center', [m$1('.fontsize-large.fontweight-semibold.u-marginbottom-30', I18n$1.t('title', I18nScope$7()))]), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-6', [m$1('.fontsize-base.u-marginbottom-30.card.card-terciary', [m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.label', I18nScope$7())), I18n$1.t('person.' + personKind + '.label', I18nScope$7())]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.' + personKind + '.name', I18nScope$7())), projectAccount.owner_name]), projectAccount.state_inscription && juridicalPerson ? m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.state_inscription', I18nScope$7())), projectAccount.state_inscription]) : '', m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.' + personKind + '.document', I18nScope$7())), projectAccount.owner_document]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.bank.name', I18nScope$7())), projectAccount.bank_name]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.bank.agency', I18nScope$7())), '' + projectAccount.agency + (_$1.isEmpty(projectAccount.agency_digit) ? '' : '-' + projectAccount.agency_digit)]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.bank.account', I18nScope$7())), projectAccount.account + '-' + projectAccount.account_digit])])]), m$1('.w-col.w-col-6', [m$1('.fontsize-base.u-marginbottom-30.card.card-terciary', [m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.address', I18nScope$7())), projectAccount.address_street + ', ' + projectAccount.address_number + ' ' + (!_$1.isNull(projectAccount.address_complement) ? ', ' + projectAccount.address_complement : '')]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.neighbourhood', I18nScope$7())), projectAccount.address_neighbourhood]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.city', I18nScope$7())), projectAccount.address_city]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.state', I18nScope$7())), projectAccount.address_state]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('person.zip_code', I18nScope$7())), projectAccount.address_zip_code])])])]), currentStage() === 'start' ? m$1('#confirmation-dialog.w-row.bank-transfer-answer', [m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny'), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('a#confirm-account.btn.btn-large', { href: '#confirm_account', onclick: ctrl.changeToAction('accept') }, 'Yes')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m$1('a#refuse-account.btn.btn-large.btn-terciary', { href: '#error_account', onclick: ctrl.changeToAction('error') }, 'No')]), m$1('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny')]) : m$1.component(actionStage(), {
             projectAccount: projectAccount,
             changeToAction: ctrl.changeToAction,
             addErrorReason: args.addErrorReason,
@@ -3602,7 +3602,7 @@ var successfulProjectTaxModal = {
     view: function view(ctrl, args) {
         var pt = args.projectTransfer;
 
-        return m$1('div', [m$1('.modal-dialog-header', [m$1('.fontsize-large.u-text-center', 'Extrato do projeto')]), m$1('.modal-dialog-content', [m$1('p.fontsize-small.u-marginbottom-40', ['Confira o extrato do seu projeto, já incluindo as taxas e retenções. Se você tiver dúvidas sobre como esse cálculo é feito, ', m$1('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/articles/202037493-FINANCIADO-Como-ser%C3%A1-feito-o-repasse-do-dinheiro-"][target="__blank"]', 'acesse aqui'), '.']), m$1('div', [m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-4', [m$1('.text-success', '+\xA0R$ ' + h.formatNumber(pt.pledged, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Arrecada\xE7\xE3o total (' + pt.total_contributions + ' apoios)')])]), pt.irrf_tax > 0 ? m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-4', [m$1('.text-success', '+ R$ ' + h.formatNumber(pt.irrf_tax, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Retenção IRF (Imposto de Renda na Fonte)')])]) : '', m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-4', [m$1('.text-error', '- R$ ' + h.formatNumber(pt.catarse_fee, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Taxa do Catarse e meio de pagamento (' + h.formatNumber(pt.service_fee * 100, 2) + '%)\xA0')])]), m$1('.divider.u-marginbottom-10'), m$1('.w-row.fontsize-base.fontweight-semibold', [m$1('.w-col.w-col-4', [m$1('div', 'R$ ' + h.formatNumber(pt.total_amount, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Total a ser transferido')])])])])]);
+        return m$1('div', [m$1('.modal-dialog-header', [m$1('.fontsize-large.u-text-center', 'Project Extract')]), m$1('.modal-dialog-content', [m$1('p.fontsize-small.u-marginbottom-40', ['Check the extract of your project, including the fees and retentions. If you have questions about how this calculation is done, ', m$1('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/articles/202037493-FINANCIADO-Como-ser%C3%A1-feito-o-repasse-do-dinheiro-"][target="__blank"]', 'Access here'), '.']), m$1('div', [m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-4', [m$1('.text-success', '+\xA0Rs ' + h.formatNumber(pt.pledged, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Total collection (' + pt.total_contributions + ' Supports)')])]), pt.irrf_tax > 0 ? m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-4', [m$1('.text-success', '+ Rs ' + h.formatNumber(pt.irrf_tax, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Retention IRRF (Income Tax withholding)')])]) : '', m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-4', [m$1('.text-error', '- Rs ' + h.formatNumber(pt.catarse_fee, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'JVN fee and means of payment (' + h.formatNumber(pt.service_fee * 100, 2) + '%)\xA0')])]), m$1('.divider.u-marginbottom-10'), m$1('.w-row.fontsize-base.fontweight-semibold', [m$1('.w-col.w-col-4', [m$1('div', 'Rs ' + h.formatNumber(pt.total_amount, 2))]), m$1('.w-col.w-col-8', [m$1('div', 'Total to be transferred')])])])])]);
     }
 };
 
@@ -3951,7 +3951,7 @@ var copyTextInput = {
             style: 'margin-bottom:0;'
         }, args.value)), m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', m$1('.btn.btn-medium.btn-no-border.btn-terciary.fa.fa-clipboard.w-button', {
             config: ctrl.setClickHandler
-        })), ctrl.showSuccess() ? m$1.component(popNotification, { message: 'Link copiado' }) : '']);
+        })), ctrl.showSuccess() ? m$1.component(popNotification, { message: 'Link copied' }) : '']);
     }
 };
 
@@ -3959,7 +3959,7 @@ var projectInviteCard = {
     view: function view(ctrl, args) {
         var project = args.project;
 
-        return m$1('.card.card-secondary.u-marginbottom-20.u-radius.w-clearfix', [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-30.u-text-center', 'Convide seus amigos para apoiar sua campanha'), m$1('.w-row', [m$1('.w-sub-col.u-marginbottom-20.w-col.w-col-4', [m$1.component(facebookButton, { url: h.projectFullPermalink(project) + '?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share_insights', medium: true })]), m$1('.w-sub-col.u-marginbottom-20.w-col.w-col-4', [m$1.component(facebookButton, { messenger: true, url: h.projectFullPermalink(project) + '?ref=facebook&utm_source=facebook.com&utm_medium=messenger&utm_campaign=project_share_insights', medium: true })]), m$1('.w-col.w-col-4', [m$1('.w-form', [m$1('form[data-name=\'Email Form 2\'][id=\'email-form-2\'][name=\'email-form-2\']', [m$1.component(copyTextInput, { value: h.projectFullPermalink(project) + '?ref=project_link' })])])])])]);
+        return m$1('.card.card-secondary.u-marginbottom-20.u-radius.w-clearfix', [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-30.u-text-center', 'Invite your friends to support your campaign'), m$1('.w-row', [m$1('.w-sub-col.u-marginbottom-20.w-col.w-col-4', [m$1.component(facebookButton, { url: h.projectFullPermalink(project) + '?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share_insights', medium: true })]), m$1('.w-sub-col.u-marginbottom-20.w-col.w-col-4', [m$1.component(facebookButton, { messenger: true, url: h.projectFullPermalink(project) + '?ref=facebook&utm_source=facebook.com&utm_medium=messenger&utm_campaign=project_share_insights', medium: true })]), m$1('.w-col.w-col-4', [m$1('.w-form', [m$1('form[data-name=\'Email Form 2\'][id=\'email-form-2\'][name=\'email-form-2\']', [m$1.component(copyTextInput, { value: h.projectFullPermalink(project) + '?ref=project_link' })])])])])]);
     }
 };
 
@@ -4162,7 +4162,7 @@ var projectContributionReportHeader = {
 
         rewardFilter.data.options = args.mapRewardsToOptions();
 
-        return m$1('.w-section.dashboard-header', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-larger.u-text-center.fontweight-semibold.lineheight-looser.u-marginbottom-30', 'Relatório de apoios')]), m$1('.w-col.w-col-3')]), m$1('.w-form', [m$1('form', { onsubmit: args.submit }, [m$1('.w-row', [m$1('.w-col.w-col-5', [m$1('.w-row', [m$1.component(paymentStateFilter.component, paymentStateFilter.data), m$1.component(rewardFilter.component, rewardFilter.data)])]), m$1('.w-col.w-col-7.u-margintop-20', [m$1('.w-row', [m$1('.w-col.w-col-8._w-sub-col', [m$1.component(mainFilter.component, mainFilter.data)]), m$1('.w-col.w-col-4.w-clearfix.w-hidden-small.w-hidden-tiny', [m$1('a.alt-link.u-right.fontsize-small.lineheight-looser[href="/projects/' + project_id + '/download_reports"]', [m$1('span.fa.fa-download', '.'), ' Baixar relatórios'])])])])])])])])]);
+        return m$1('.w-section.dashboard-header', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-larger.u-text-center.fontweight-semibold.lineheight-looser.u-marginbottom-30', 'Support report')]), m$1('.w-col.w-col-3')]), m$1('.w-form', [m$1('form', { onsubmit: args.submit }, [m$1('.w-row', [m$1('.w-col.w-col-5', [m$1('.w-row', [m$1.component(paymentStateFilter.component, paymentStateFilter.data), m$1.component(rewardFilter.component, rewardFilter.data)])]), m$1('.w-col.w-col-7.u-margintop-20', [m$1('.w-row', [m$1('.w-col.w-col-8._w-sub-col', [m$1.component(mainFilter.component, mainFilter.data)]), m$1('.w-col.w-col-4.w-clearfix.w-hidden-small.w-hidden-tiny', [m$1('a.alt-link.u-right.fontsize-small.lineheight-looser[href="/projects/' + project_id + '/download_reports"]', [m$1('span.fa.fa-download', '.'), ' Download reports'])])])])])])])])]);
     }
 };
 
@@ -4211,22 +4211,22 @@ var projectContributionReportContentCard = {
     view: function view(ctrl, args) {
         var contribution = args.contribution(),
             profile_img = _$1.isEmpty(contribution.profile_img_thumbnail) ? '/assets/catarse_bootstrap/user.jpg' : contribution.profile_img_thumbnail,
-            reward = contribution.reward || { minimum_value: 0, description: 'Nenhuma recompensa selecionada' };
-        return m$1('.w-clearfix.card', [m$1('.w-row', [m$1('.w-col.w-col-1.w-col-tiny-1', [m$1('img.user-avatar.u-marginbottom-10[src=\'' + profile_img + '\']')]), m$1('.w-col.w-col-11.w-col-tiny-11', [m$1('.w-row', [m$1('.w-col.w-col-3', [m$1('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m$1('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m$1('a.link-hidden-light.badge.badge-light', '+1 apoio ')] : '', contribution.anonymous ? m$1('span.fa.fa-eye-slash.fontcolor-secondary', m$1('span.fontcolor-secondary[style="font-size:11px;"]', ' Apoio não-público')) : '']), m$1('.fontsize-smallest.lineheight-looser', contribution.email)]), m$1('.w-col.w-col-3', [m$1('.lineheight-tighter', [m$1('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m$1('span.fontsize-large', 'R$ ' + h.formatNumber(contribution.value, 2, 3))])]), m$1('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m$1('.fontsize-smallest.fontweight-semibold', 'Recompensa:\xA0R$ ' + h.formatNumber(reward.minimum_value, 2, 3)), m$1('.fontsize-smallest', reward.description.substring(0, 80) + '...')]) /*,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           m(".w-col.w-col-2.w-hidden-small.w-hidden-tiny.u-text-center", [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            m(".fontsize-smallest.fontcolor-secondary", "Enviei!"),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            m(".fontsize-smallest.u-marginbottom-20.lineheight-loose", [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                m("a.checkbox-big[href='#']", ".")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ])
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ]),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           m(".w-col.w-col-2", [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            m(".fontsize-smallest", [
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                m("a.link-hidden[href='#']", "Questionário")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ," "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ,m("span.fontweight-semibold.text-waiting", "enviado")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ]),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            m(".fontsize-smallest.fontcolor-terciary", "em 29/10/2015")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ])*/
+            reward = contribution.reward || { minimum_value: 0, description: 'No reward selected' };
+        return m$1('.w-clearfix.card', [m$1('.w-row', [m$1('.w-col.w-col-1.w-col-tiny-1', [m$1('img.user-avatar.u-marginbottom-10[src=\'' + profile_img + '\']')]), m$1('.w-col.w-col-11.w-col-tiny-11', [m$1('.w-row', [m$1('.w-col.w-col-3', [m$1('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m$1('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m$1('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m$1('a.link-hidden-light.badge.badge-light', '+1 apoio ')] : '', contribution.anonymous ? m$1('span.fa.fa-eye-slash.fontcolor-secondary', m$1('span.fontcolor-secondary[style="font-size:11px;"]', ' Non-public support')) : '']), m$1('.fontsize-smallest.lineheight-looser', contribution.email)]), m$1('.w-col.w-col-3', [m$1('.lineheight-tighter', [m$1('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m$1('span.fontsize-large', 'R$ ' + h.formatNumber(contribution.value, 2, 3))])]), m$1('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m$1('.fontsize-smallest.fontweight-semibold', 'Reward:\xA0Rs ' + h.formatNumber(reward.minimum_value, 2, 3)), m$1('.fontsize-smallest', reward.description.substring(0, 80) + '...')]) /*,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        m(".w-col.w-col-2.w-hidden-small.w-hidden-tiny.u-text-center", [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         m(".fontsize-smallest.fontcolor-secondary", "Enviei!"),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         m(".fontsize-smallest.u-marginbottom-20.lineheight-loose", [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             m("a.checkbox-big[href='#']", ".")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ])
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ]),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        m(".w-col.w-col-2", [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         m(".fontsize-smallest", [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             m("a.link-hidden[href='#']", "Questionário")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ," "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ,m("span.fontweight-semibold.text-waiting", "enviado")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ]),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         m(".fontsize-smallest.fontcolor-terciary", "em 29/10/2015")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ])*/
         ])])])]);
     }
 };
@@ -4234,12 +4234,12 @@ var projectContributionReportContentCard = {
 var projectContributionReportContent = {
     view: function view(ctrl, args) {
         var list = args.list;
-        return m$1('.w-section.bg-gray.before-footer.section', [m$1('.w-container', [m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-9.w-col-small-6.w-col-tiny-6', [m$1('.fontsize-base', [m$1('span.fontweight-semibold', list.isLoading() ? '' : list.total()), ' apoios'])])]), _$1.map(list.collection(), function (item) {
+        return m$1('.w-section.bg-gray.before-footer.section', [m$1('.w-container', [m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-9.w-col-small-6.w-col-tiny-6', [m$1('.fontsize-base', [m$1('span.fontweight-semibold', list.isLoading() ? '' : list.total()), ' Supports'])])]), _$1.map(list.collection(), function (item) {
             var contribution = m$1.prop(item);
             return m$1.component(projectContributionReportContentCard, { project: args.project, contribution: contribution });
         })]), m$1('.w-section.section.bg-gray', [m$1('.w-container', [m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-2.w-col-push-5', [!list.isLoading() ? list.isLastPage() ? '' : m$1('button#load-more.btn.btn-medium.btn-terciary', {
             onclick: list.nextPage
-        }, 'Carregar mais') : h.loader()])])])])]);
+        }, 'Load more') : h.loader()])])])])]);
     }
 };
 
@@ -4333,7 +4333,7 @@ var ProjectContributionStateLegendModal = {
         var project = _$1.first(args.project()),
             project_stage = project.state == 'waiting_funds' ? 'online' : project.state;
 
-        return m$1('div', [m$1('.modal-dialog-header', [m$1('.fontsize-large.u-text-center', 'Status do apoio')]), m$1('.modal-dialog-content', _$1.map(ctrl.stages[project_stage], function (item, i) {
+        return m$1('div', [m$1('.modal-dialog-header', [m$1('.fontsize-large.u-text-center', 'Support Status')]), m$1('.modal-dialog-content', _$1.map(ctrl.stages[project_stage], function (item, i) {
             return m$1('.u-marginbottom-20', [m$1('.fontsize-small.fontweight-semibold', [m$1('span' + item.i_class), ' \xA0' + item.label]), m$1('.fontsize-smaller', m$1.trust(item.text))]);
         }))]);
     }
@@ -4526,7 +4526,7 @@ var search = {
     view: function view(ctrl) {
         var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        var action = args.action || '/pt/explore?ref=ctrse_explore_pgsearch',
+        var action = args.action || '/en/explore?ref=ctrse_explore_pgsearch',
             method = args.method || 'GET';
 
         return m$1('#search.w-container.w-hidden-main.w-hidden-medium', [m$1('.w-row', [m$1('.w-col.w-col-10.u-marginbottom-20', [m$1('.w-form', [m$1('form#email-form', { action: action, method: method }, [m$1('.w-row', [m$1('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m$1('input[type="text"][name="pg_search"][placeholder=' + I18n$1.t('header.search', I18nScope$14()) + ']#pg_search_inside.w-input.text-field.negative.prefix')]), m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m$1('button.w-inline-block.btn.btn-dark.btn-attached.postfix', [m$1('img.header-lupa[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/54e44178b2135fce2b6cd235_lupa.png"]')])])])])])])])]);
@@ -4833,7 +4833,7 @@ var I18nScope$19 = _.partial(h.i18nScope, 'layouts');
 
 var menuSearch = {
     view: function view(ctrl, args) {
-        return m$1('span#menu-search', [m$1('.w-form.w-hidden-small.w-hidden-tiny.header-search[id=\'discover-form-wrapper\']', [m$1('form.discover-form[accept-charset=\'UTF-8\'][action=\'/pt/explore?ref=ctrse_header\'][id=\'search-form\'][method=\'get\']', [m$1('div', { style: { 'display': 'none' } }, m$1('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']')), m$1('input.w-input.text-field.negative.prefix.search-input[autocomplete=\'off\'][id=\'pg_search\'][name=\'pg_search\'][placeholder=\'' + I18n$1.t('header.search', I18nScope$19()) + '\'][type=\'text\']')]), m$1('.search-pre-result.w-hidden[data-searchpath=\'/pt/auto_complete_projects\']', [m$1('.result', m$1('.u-text-center', m$1('img[alt=\'Loader\'][src=\'/assets/catarse_bootstrap/loader.gif\']'))), m$1('a.btn.btn-small.btn-terciary.see-more-projects[href=\'javascript:void(0);\']', ' ver todos')])]), m$1('a.w-inline-block.w-hidden-small.w-hidden-tiny.btn.btn-dark.btn-attached.postfix[href=\'#\'][id=\'pg_search_submit\']', m$1('img.header-lupa[alt=\'Lupa\'][data-pin-nopin=\'true\'][src=\'/assets/catarse_bootstrap/lupa.png\']'))]);
+        return m$1('span#menu-search', [m$1('.w-form.w-hidden-small.w-hidden-tiny.header-search[id=\'discover-form-wrapper\']', [m$1('form.discover-form[accept-charset=\'UTF-8\'][action=\'/en/explore?ref=ctrse_header\'][id=\'search-form\'][method=\'get\']', [m$1('div', { style: { 'display': 'none' } }, m$1('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']')), m$1('input.w-input.text-field.negative.prefix.search-input[autocomplete=\'off\'][id=\'pg_search\'][name=\'pg_search\'][placeholder=\'' + I18n$1.t('header.search', I18nScope$19()) + '\'][type=\'text\']')]), m$1('.search-pre-result.w-hidden[data-searchpath=\'/en/auto_complete_projects\']', [m$1('.result', m$1('.u-text-center', m$1('img[alt=\'Loader\'][src=\'/assets/catarse_bootstrap/loader.gif\']'))), m$1('a.btn.btn-small.btn-terciary.see-more-projects[href=\'javascript:void(0);\']', ' see all')])]), m$1('a.w-inline-block.w-hidden-small.w-hidden-tiny.btn.btn-dark.btn-attached.postfix[href=\'#\'][id=\'pg_search_submit\']', m$1('img.header-lupa[alt=\'Magnifying glass\'][data-pin-nopin=\'true\'][src=\'/assets/catarse_bootstrap/lupa.png\']'))]);
     }
 };
 
@@ -4869,7 +4869,7 @@ var menuProfile = {
 
         return m$1('.w-dropdown.user-profile', [m$1('a.w-dropdown-toggle.dropdown-toggle[href=\'javascript:void()\'][id=\'user-menu\']', {
             onclick: ctrl.toggleMenu.toggle
-        }, [m$1('.user-name-menu', ctrl.userName()), m$1('img.user-avatar[alt=\'Thumbnail - ' + user.name + '\'][height=\'40\'][src=\'' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '\'][width=\'40\']')]), ctrl.toggleMenu() ? m$1('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' }, [m$1('.w-row', [m$1('.w-col.w-col-12', [m$1('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', I18n$1.t('user.my_history', I18nScope$20())), m$1('ul.w-list-unstyled.u-marginbottom-20', [m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#contributions\']', I18n$1.t('user.support_history', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#projects\']', I18n$1.t('user.projects_created', I18nScope$20()))), m$1('li.w-hidden-main.w-hidden-medium.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#projects\']', I18n$1.t('user.projects_created', I18nScope$20())))]), m$1('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', I18n$1.t('user.settings', I18nScope$20())), m$1('ul.w-list-unstyled.u-marginbottom-20', [m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#about_me\']', I18n$1.t('user.about_you', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#notifications\']', I18n$1.t('user.notifications', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#settings\']', I18n$1.t('user.data_address', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '/edit#billing\']', I18n$1.t('user.bank_cards', I18nScope$20())))]), m$1('.divider.u-marginbottom-20'), args.user.is_admin_role ? m$1('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', 'Admin') : '', args.user.is_admin_role ? m$1('ul.w-list-unstyled.u-marginbottom-20', [m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/new-admin#/users\']', I18n$1.t('user.users', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/new-admin\']', I18n$1.t('user.support', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/admin/financials\']', I18n$1.t('user.financial_rel', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/admin/projects\']', I18n$1.t('user.admin_projects', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/pt/dbhero\']', 'Dataclips'))]) : '', m$1('.fontsize-mini', I18n$1.t('user.email_text', I18nScope$20())), m$1('.fontsize-smallest.u-marginbottom-20', [m$1('span.fontweight-semibold', user.email + ' '), m$1('a.alt-link[href=\'/pt/users/' + user.id + '/edit#settings\']', I18n$1.t('user.change_email', I18nScope$20()))]), m$1('.divider.u-marginbottom-20'), m$1('a.alt-link[href=\'/pt/logout\']', I18n$1.t('user.logout', I18nScope$20()))])])]) : '']);
+        }, [m$1('.user-name-menu', ctrl.userName()), m$1('img.user-avatar[alt=\'Thumbnail - ' + user.name + '\'][height=\'40\'][src=\'' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '\'][width=\'40\']')]), ctrl.toggleMenu() ? m$1('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' }, [m$1('.w-row', [m$1('.w-col.w-col-12', [m$1('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', I18n$1.t('user.my_history', I18nScope$20())), m$1('ul.w-list-unstyled.u-marginbottom-20', [m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#contributions\']', I18n$1.t('user.support_history', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#projects\']', I18n$1.t('user.projects_created', I18nScope$20()))), m$1('li.w-hidden-main.w-hidden-medium.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#projects\']', I18n$1.t('user.projects_created', I18nScope$20())))]), m$1('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', I18n$1.t('user.settings', I18nScope$20())), m$1('ul.w-list-unstyled.u-marginbottom-20', [m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#about_me\']', I18n$1.t('user.about_you', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#notifications\']', I18n$1.t('user.notifications', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#settings\']', I18n$1.t('user.data_address', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#billing\']', I18n$1.t('user.bank_cards', I18nScope$20())))]), m$1('.divider.u-marginbottom-20'), args.user.is_admin_role ? m$1('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', 'Admin') : '', args.user.is_admin_role ? m$1('ul.w-list-unstyled.u-marginbottom-20', [m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/new-admin#/users\']', I18n$1.t('user.users', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/new-admin\']', I18n$1.t('user.support', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/admin/financials\']', I18n$1.t('user.financial_rel', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/admin/projects\']', I18n$1.t('user.admin_projects', I18nScope$20()))), m$1('li.lineheight-looser', m$1('a.alt-link.fontsize-smaller[href=\'/en/dbhero\']', 'Dataclips'))]) : '', m$1('.fontsize-mini', I18n$1.t('user.email_text', I18nScope$20())), m$1('.fontsize-smallest.u-marginbottom-20', [m$1('span.fontweight-semibold', user.email + ' '), m$1('a.alt-link[href=\'/en/users/' + user.id + '/edit#settings\']', I18n$1.t('user.change_email', I18nScope$20()))]), m$1('.divider.u-marginbottom-20'), m$1('a.alt-link[href=\'/en/logout\']', I18n$1.t('user.logout', I18nScope$20()))])])]) : '']);
     }
 };
 
@@ -5189,9 +5189,9 @@ var projectShareBox = {
             style: 'display: block;'
         }, [m$1('.w-hidden-main.w-hidden-medium.w-clearfix', [m$1('a.btn.btn-small.btn-terciary.btn-inline.u-right', {
             onclick: args.displayShareBox.toggle
-        }, 'Fechar'), m$1('.fontsize-small.fontweight-semibold.u-marginbottom-30', 'Compartilhe este projeto')]), m$1('.w-widget.w-widget-twitter.w-hidden-small.w-hidden-tiny.share-block', [m$1('iframe[allowtransparency="true"][width="120px"][height="22px"][frameborder="0"][scrolling="no"][src="//platform.twitter.com/widgets/tweet_button.8d007ddfc184e6776be76fe9e5e52d69.en.html#_=1442425984936&count=horizontal&dnt=false&id=twitter-widget-1&lang=en&original_referer=https%3A%2F%2Fwww.catarse.me%2Fpt%2F' + args.project().permalink + '&size=m&text=Confira%20o%20projeto%20' + args.project().name + '%20no%20%40catarse&type=share&url=https%3A%2F%2Fwww.catarse.me%2Fpt%2F' + args.project().permalink + '%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share&via=catarse"]')]), m$1('a.w-hidden-small.widget-embed.w-hidden-tiny.fontsize-small.link-hidden.fontcolor-secondary[href="js:void(0);"]', {
+        }, 'Close'), m$1('.fontsize-small.fontweight-semibold.u-marginbottom-30', 'Share this project')]), m$1('.w-widget.w-widget-twitter.w-hidden-small.w-hidden-tiny.share-block', [m$1('iframe[allowtransparency="true"][width="120px"][height="22px"][frameborder="0"][scrolling="no"][src="//platform.twitter.com/widgets/tweet_button.8d007ddfc184e6776be76fe9e5e52d69.en.html#_=1442425984936&count=horizontal&dnt=false&id=twitter-widget-1&lang=en&original_referer=https%3A%2F%2Fwww.catarse.me%2Fpt%2F' + args.project().permalink + '&size=m&text=Confira%20o%20projeto%20' + args.project().name + '%20no%20%40catarse&type=share&url=https%3A%2F%2Fwww.catarse.me%2Fpt%2F' + args.project().permalink + '%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share&via=catarse"]')]), m$1('a.w-hidden-small.widget-embed.w-hidden-tiny.fontsize-small.link-hidden.fontcolor-secondary[href="js:void(0);"]', {
             onclick: ctrl.displayEmbed.toggle
-        }, '< embed >'), ctrl.displayEmbed() ? m$1('.embed-expanded.u-margintop-30', [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-20', 'Insira um widget em seu site'), m$1('.w-form', [m$1('input.w-input[type="text"][value="<iframe frameborder="0" height="340px" src="https://www.catarse.me/pt/projects/' + args.project().project_id + '/embed" width="300px" scrolling="no"></iframe>"]')]), m$1('.card-embed', [m$1('iframe[frameborder="0"][height="350px"][src="/projects/' + args.project().project_id + '/embed"][width="300px"][scrolling="no"]')])]) : '', args.project().permalink ? m$1.component(facebookButton, {
+        }, '< embed >'), ctrl.displayEmbed() ? m$1('.embed-expanded.u-margintop-30', [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-20', 'Insert a widget on your site'), m$1('.w-form', [m$1('input.w-input[type="text"][value="<iframe frameborder="0" height="340px" src="https://www.catarse.me/en/projects/' + args.project().project_id + '/embed" width="300px" scrolling="no"></iframe>"]')]), m$1('.card-embed', [m$1('iframe[frameborder="0"][height="350px"][src="/projects/' + args.project().project_id + '/embed"][width="300px"][scrolling="no"]')])]) : '', args.project().permalink ? m$1.component(facebookButton, {
             mobile: true,
             url: 'https://www.catarse.me/' + args.project().permalink + '?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share'
         }) : '', m$1('a.w-hidden-main.w-hidden-medium.btn.btn-medium.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20' + args.project().name + '%20https://www.catarse.me/' + args.project().permalink + '%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]', [m$1('span.fa.fa-twitter'), ' Tweet']), m$1('a.w-hidden-main.w-hidden-medium.btn.btn-medium[data-action="share/whatsapp/share"]', {
@@ -5208,7 +5208,7 @@ var addressTag = {
             city: ''
         };
 
-        return !_.isNull(address) ? m$1('a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light.u-marginbottom-10[href="/pt/explore?pg_search=' + address.state_acronym + '"]', {
+        return !_.isNull(address) ? m$1('a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light.u-marginbottom-10[href="/en/explore?pg_search=' + address.state_acronym + '"]', {
             onclick: h.analytics.event({
                 cat: 'project_view',
                 act: 'project_location_link',
@@ -5223,7 +5223,7 @@ var categoryTag = {
     view: function view(ctrl, args) {
         var project = args.project;
 
-        return project ? m$1('a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light[href="/pt/explore#by_category_id/' + project().category_id + '"]', {
+        return project ? m$1('a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light[href="/en/explore#by_category_id/' + project().category_id + '"]', {
             onclick: h.analytics.event({
                 cat: 'project_view',
                 act: 'project_category_link',
@@ -5247,7 +5247,7 @@ var projectHighlight = {
             style: 'min-height: 240px;'
         }, [m$1('iframe.embedly-embed[itemprop="video"][src="' + project().video_embed_url + '"][frameborder="0"][allowFullScreen]')]) : m$1('.project-image', {
             style: 'background-image:url(\'' + (project().original_image || project().project_img) + '\');'
-        }), m$1('.w-hidden-small.w-hidden-tiny', [m$1.component(addressTag, { project: project }), m$1.component(categoryTag, { project: project })]), m$1('.project-blurb', project().headline), m$1('.project-share.w-hidden-small.w-hidden-tiny', m$1('.u-marginbottom-30.u-text-center-small-only', [m$1('.w-inline-block.fontcolor-secondary.fontsize-smaller.u-marginright-20', 'Compartilhar:'), project().permalink ? m$1.component(facebookButton, {
+        }), m$1('.w-hidden-small.w-hidden-tiny', [m$1.component(addressTag, { project: project }), m$1.component(categoryTag, { project: project })]), m$1('.project-blurb', project().headline), m$1('.project-share.w-hidden-small.w-hidden-tiny', m$1('.u-marginbottom-30.u-text-center-small-only', [m$1('.w-inline-block.fontcolor-secondary.fontsize-smaller.u-marginright-20', 'To share:'), project().permalink ? m$1.component(facebookButton, {
             url: 'https://www.catarse.me/' + project().permalink + '?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share'
         }) : '', project().permalink ? m$1.component(facebookButton, {
             messenger: true,
@@ -5257,7 +5257,7 @@ var projectHighlight = {
                 'transition': 'all 0.5s ease 0s'
             },
             onclick: ctrl.displayShareBox.toggle
-        }, ['···', ' Mais']), ctrl.displayShareBox() ? m$1(projectShareBox, {
+        }, ['···', ' More']), ctrl.displayShareBox() ? m$1(projectShareBox, {
             project: project,
             displayShareBox: ctrl.displayShareBox
         }) : '']))]);
@@ -5281,17 +5281,17 @@ var projectMode = {
         var project = args.project(),
             mode = project.mode,
             modeImgSrc = mode === 'aon' ? '/assets/aon-badge.png' : '/assets/flex-badge.png',
-            modeTitle = mode === 'aon' ? 'Campanha Tudo-ou-nada ' : 'Campanha Flexível ',
-            goal = _$1.isNull(project.goal) ? 'não definida' : h.formatNumber(project.goal),
+            modeTitle = mode === 'aon' ? 'All-or-nothing Campaign ' : 'Flexible Campaign ',
+            goal = _$1.isNull(project.goal) ? 'not defined' : h.formatNumber(project.goal),
             buildTooltip = function buildTooltip(el) {
             return m$1.component(tooltip, {
                 el: el,
-                text: mode === 'aon' ? 'Somente receber\xE1 os recursos se atingir ou ultrapassar a meta at\xE9 o dia ' + h.momentify(project.zone_expires_at, 'DD/MM/YYYY') + '.' : 'O realizador receberá todos os recursos quando encerrar a campanha, mesmo que não tenha atingido esta meta.',
+                text: mode === 'aon' ? 'You will only receive the resources if you reach or exceed the goal until the ' + h.momentify(project.zone_expires_at, 'DD/MM/YYYY') + '.' : 'The director will receive all the resources when he closes the campaign, even if he has not reached this goal.',
                 width: 280
             });
         };
 
-        return m$1('#' + mode + '.w-row', [m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [!_$1.isEmpty(project) ? m$1('img[src="' + modeImgSrc + '"][width=\'30\']') : '']), m$1('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m$1('.fontsize-base.fontweight-semibold', 'Meta R$ ' + h.selfOrEmpty(goal, '--')), m$1('.w-inline-block.fontsize-smallest._w-inline-block', [!_$1.isEmpty(project) ? modeTitle : '', buildTooltip('span.w-inline-block.tooltip-wrapper.fa.fa-question-circle.fontcolor-secondary')])])]);
+        return m$1('#' + mode + '.w-row', [m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [!_$1.isEmpty(project) ? m$1('img[src="' + modeImgSrc + '"][width=\'30\']') : '']), m$1('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m$1('.fontsize-base.fontweight-semibold', 'Goal Rs ' + h.selfOrEmpty(goal, '--')), m$1('.w-inline-block.fontsize-smallest._w-inline-block', [!_$1.isEmpty(project) ? modeTitle : '', buildTooltip('span.w-inline-block.tooltip-wrapper.fa.fa-question-circle.fontcolor-secondary')])])]);
     }
 };
 
@@ -5360,10 +5360,10 @@ var projectReminder = {
 
         return m$1('#project-reminder' + mainClass, [m$1('a.btn.btn-small.btn-terciary.w-hidden-main.w-hidden-medium[data-ix=\'popshare\'][href=\'#\']', {
             onclick: onclickFunc
-        }, project().in_reminder ? [m$1('span.fa.fa-heart'), ' Lembrete ativo'] : [m$1('span.fa.fa-heart-o'), ' Lembrar-me']), m$1('button[class="w-hidden-small w-hidden-tiny ' + buttonClass + ' ' + (project().in_reminder ? 'link-hidden-success' : 'fontcolor-secondary') + ' fontweight-semibold"]', {
+        }, project().in_reminder ? [m$1('span.fa.fa-heart'), 'Active Reminder'] : [m$1('span.fa.fa-heart-o'), ' Remember Me Forgot your password?']), m$1('button[class="w-hidden-small w-hidden-tiny ' + buttonClass + ' ' + (project().in_reminder ? 'link-hidden-success' : 'fontcolor-secondary') + ' fontweight-semibold"]', {
             onclick: onclickFunc
         }, [ctrl.l() ? h.loader() : project().in_reminder ? m$1('span.fa.fa-heart') : m$1('span.fa.fa-heart-o')]), ctrl.popNotification() ? m$1.component(popNotification, {
-            message: 'Ok! Vamos te mandar um lembrete por e-mail 48 horas antes do fim da campanha'
+            message: 'OK! We`ll email you a reminder 48 hours before the end of the campaign'
         }) : '']);
     }
 };
@@ -5426,7 +5426,7 @@ var ownerMessageContent = {
         };
     },
     view: function view(ctrl, args) {
-        var successMessage = m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-large', 'Sua mensagem foi enviada com sucesso para ' + ctrl.userDetails().name + '. Voc\xEA vai receber uma c\xF3pia no seu email e pode seguir a conversa por l\xE1!')]),
+        var successMessage = m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-large', 'Your message was successfully sent to ' + ctrl.userDetails().name + '. You will receive a copy in your email and you can follow the conversation there!')]),
             contactForm = [m$1('.modal-dialog-content', [m$1('.w-form', [m$1('form', {
             onsubmit: h.validate().submit([{
                 prop: ctrl.from_name,
@@ -5444,16 +5444,16 @@ var ownerMessageContent = {
         })]), m$1('.w-col.w-col-6', [m$1('label.fontsize-smaller', 'Seu email'), m$1('input.w-input.text-field[value=\'' + ctrl.from_email() + '\'][type=\'text\'][required=\'required\']', {
             onchange: m$1.withAttr('value', ctrl.from_email),
             class: h.validate().hasError(ctrl.from_email) ? 'error' : ''
-        })])]), m$1('label', 'Mensagem'), m$1('textarea.w-input.text-field.height-small[required=\'required\']', {
+        })])]), m$1('label', 'Message'), m$1('textarea.w-input.text-field.height-small[required=\'required\']', {
             onchange: m$1.withAttr('value', ctrl.content),
             class: h.validate().hasError(ctrl.content) ? 'error' : ''
-        }), m$1('.u-marginbottom-10.fontsize-smallest.fontcolor-terciary', 'Você receberá uma cópia desta mensagem em seu email.'), m$1('.w-row', h.validationErrors().length ? _$1.map(h.validationErrors(), function (errors) {
+        }), m$1('.u-marginbottom-10.fontsize-smallest.fontcolor-terciary', 'You will receive a copy of this message in your email.'), m$1('.w-row', h.validationErrors().length ? _$1.map(h.validationErrors(), function (errors) {
             return m$1('span.fontsize-smallest.text-error', [m$1('span.fa.fa-exclamation-triangle'), ' ' + errors.message, m$1('br')]);
-        }) : ''), m$1('.modal-dialog-nav-bottom', m$1('.w-row', m$1('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m$1('input.w-button.btn.btn-large[type="submit"][value="Enviar mensagem"]', {
+        }) : ''), m$1('.modal-dialog-nav-bottom', m$1('.w-row', m$1('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m$1('input.w-button.btn.btn-large[type="submit"][value="Send message"]', {
             disabled: ctrl.submitDisabled()
         }) : h.loader())))])])])];
 
-        return m$1('div', [m$1('.modal-dialog-header', m$1('.fontsize-large.u-text-center', 'Enviar mensagem')), ctrl.sendSuccess() ? successMessage : contactForm]);
+        return m$1('div', [m$1('.modal-dialog-header', m$1('.fontsize-large.u-text-center', 'Send message')), ctrl.sendSuccess() ? successMessage : contactForm]);
     }
 };
 
@@ -5466,17 +5466,17 @@ var projectUserCard = {
         var contactModalC = [ownerMessageContent, args.userDetails];
         var userDetail = args.userDetails();
 
-        return m$1('#user-card', _$1.isEmpty(userDetail) ? 'carregando...' : m$1('.u-marginbottom-30.u-text-center-small-only', [ctrl.displayModal() ? m$1.component(modalBox, {
+        return m$1('#user-card', _$1.isEmpty(userDetail) ? 'Loading...' : m$1('.u-marginbottom-30.u-text-center-small-only', [ctrl.displayModal() ? m$1.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: contactModalC
         }) : '', m$1('.w-row', [m$1('.w-col.w-col-4', [m$1('img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="' + userDetail.profile_img_thumbnail + '"]')]), m$1('.w-col.w-col-8', [m$1('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [m$1('a.link-hidden[href="/users/' + userDetail.id + '"]', { config: m$1.route, onclick: function onclick() {
                 m$1.route("/users/" + userDetail.id, { user_id: userDetail.id });
                 h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
-            } }, userDetail.name)]), m$1('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' criado', ' criados'), m$1.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' apoiado', ' apoiados')]), m$1('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Perfil no Facebook')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Perfil no Twitter')]) : '', _$1.map(userDetail.links, function (link) {
+            } }, userDetail.name)]), m$1('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' Created', ' Created'), m$1.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' Supported', ' Supported')]), m$1('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Facebook profile')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Twitter Profile')]) : '', _$1.map(userDetail.links, function (link) {
             var parsedLink = h.parseUrl(link.link);
 
             return !_$1.isEmpty(parsedLink.hostname) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_otherlinks', lbl: link.link, project: project() }) }, parsedLink.hostname)]) : '';
-        })]), !_$1.isEmpty(userDetail) ? [m$1('a.w-button.btn.btn-terciary.btn-small.btn-inline[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.displayModal.toggle) }, 'Enviar mensagem')] : '', args.project().is_admin_role ? m$1('p', userDetail.email) : ''])])]));
+        })]), !_$1.isEmpty(userDetail) ? [m$1('a.w-button.btn.btn-terciary.btn-small.btn-inline[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.displayModal.toggle) }, 'Send message')] : '', args.project().is_admin_role ? m$1('p', userDetail.email) : ''])])]));
     }
 };
 
@@ -5504,8 +5504,8 @@ var projectSidebar = {
                         incrementProgress = function incrementProgress() {
                         if (progress <= parseInt(project().progress)) {
                             progressBar.style.width = progress + '%';
-                            pledgedEl.innerText = 'R$ ' + h.formatNumber(pledged);
-                            contributorsEl.innerText = parseInt(contributors) + ' pessoas';
+                            pledgedEl.innerText = 'Rs ' + h.formatNumber(pledged);
+                            contributorsEl.innerText = parseInt(contributors) + ' people';
                             el.innerText = progress + '%';
                             pledged = pledged + pledgedIncrement;
                             contributors = contributors + contributorsIncrement;
@@ -5558,7 +5558,7 @@ var projectSidebar = {
             return states[project().state];
         };
 
-        return m$1('#project-sidebar.aside', [m$1('.project-stats', [m$1('.project-stats-inner', [m$1('.project-stats-info', [m$1('.u-marginbottom-20', [m$1('#pledged.fontsize-largest.fontweight-semibold.u-text-center-small-only', 'R$ ' + (project().pledged ? h.formatNumber(project().pledged) : '0')), m$1('.fontsize-small.u-text-center-small-only', [I18n$1.t('contributors_call', I18nScope$22()), m$1('span#contributors.fontweight-semibold', I18n$1.t('contributors_count', I18nScope$22({ count: project().total_contributors }))), !project().expires_at && elapsed ? ' em ' + I18n$1.t('datetime.distance_in_words.x_' + elapsed.unit, { count: elapsed.total }, I18nScope$22()) : ''])]), m$1('.meter', [m$1('#progressBar.meter-fill', {
+        return m$1('#project-sidebar.aside', [m$1('.project-stats', [m$1('.project-stats-inner', [m$1('.project-stats-info', [m$1('.u-marginbottom-20', [m$1('#pledged.fontsize-largest.fontweight-semibold.u-text-center-small-only', 'Rs ' + (project().pledged ? h.formatNumber(project().pledged) : '0')), m$1('.fontsize-small.u-text-center-small-only', [I18n$1.t('contributors_call', I18nScope$22()), m$1('span#contributors.fontweight-semibold', I18n$1.t('contributors_count', I18nScope$22({ count: project().total_contributors }))), !project().expires_at && elapsed ? ' em ' + I18n$1.t('datetime.distance_in_words.x_' + elapsed.unit, { count: elapsed.total }, I18nScope$22()) : ''])]), m$1('.meter', [m$1('#progressBar.meter-fill', {
             style: {
                 width: project().progress + '%'
             }
@@ -5578,7 +5578,7 @@ var projectSidebar = {
             type: 'link'
         }))]) : '', m$1('.friend-backed-card.project-page', [!_$1.isUndefined(project()) && project().contributed_by_friends ? m$1.component(projectFriends, { project: project() }) : '']), m$1('div[class="fontsize-smaller u-marginbottom-30 ' + displayCardClass() + '"]', displayStatusText())]), m$1('.project-share.w-hidden-main.w-hidden-medium', [m$1.component(addressTag, { project: project }), m$1.component(categoryTag, { project: project }), m$1('.u-marginbottom-30.u-text-center-small-only', m$1('button.btn.btn-inline.btn-medium.btn-terciary', {
             onclick: ctrl.displayShareBox.toggle
-        }, 'Compartilhar este projeto')), ctrl.displayShareBox() ? m$1(projectShareBox, {
+        }, 'Share this project')), ctrl.displayShareBox() ? m$1(projectShareBox, {
             project: project,
             displayShareBox: ctrl.displayShareBox
         }) : '']), m$1('.user-c', m$1.component(projectUserCard, {
@@ -5602,7 +5602,7 @@ var userContributionDetail = {
     view: function view(ctrl, args) {
         var contribution = args.contribution;
 
-        return m$1('.user-contribution-detail', [m$1('.w-col.w-col-4', [m$1('.fontsize-smallest.lineheight-tight.fontweight-semibold.u-marginbottom-10', 'Valor do apoio:'), m$1('.fontsize-large', 'R$' + contribution.value)]), m$1('.w-col.w-col-4', m$1.component(paymentStatus, { item: contribution })), m$1('.w-col.w-col-4', [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', 'Recompensa:'), m$1('.fontsize-smallest.lineheight-tight.u-marginbottom-20', !_$1.isUndefined(ctrl.chosenReward) ? ctrl.chosenReward.description : 'Nenhuma recompensa selecionada.'), m$1('.fontsize-smallest.lineheight-looser', !_$1.isUndefined(ctrl.chosenReward) ? [m$1('span.fontweight-semibold', 'Estimativa de entrega: '), h.momentify(ctrl.chosenReward.deliver_at, 'MMM/YYYY')] : '')])]);
+        return m$1('.user-contribution-detail', [m$1('.w-col.w-col-4', [m$1('.fontsize-smallest.lineheight-tight.fontweight-semibold.u-marginbottom-10', 'Value of support:'), m$1('.fontsize-large', 'Rs' + contribution.value)]), m$1('.w-col.w-col-4', m$1.component(paymentStatus, { item: contribution })), m$1('.w-col.w-col-4', [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', 'Reward:'), m$1('.fontsize-smallest.lineheight-tight.u-marginbottom-20', !_$1.isUndefined(ctrl.chosenReward) ? ctrl.chosenReward.description : 'No reward selected.'), m$1('.fontsize-smallest.lineheight-looser', !_$1.isUndefined(ctrl.chosenReward) ? [m$1('span.fontweight-semibold', 'Estimated delivery: '), h.momentify(ctrl.chosenReward.deliver_at, 'MMM/YYYY')] : '')])]);
     }
 };
 
@@ -5681,7 +5681,7 @@ var projectHeader = {
         var project = args.project,
             rewardDetails = args.rewardDetails;
 
-        return !_$1.isUndefined(project()) ? m$1('#project-header', [m$1('.w-section.section-product.' + project().mode), m$1('.w-section.page-header.u-text-center', [m$1('.w-container', [m$1('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m$1('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['por ', project().user ? project().user.name : project().owner_name ? project().owner_name : '']), !_$1.isEmpty(ctrl.projectContributions()) ? m$1('.card.card-terciary.u-radius.u-margintop-20', [m$1('.fontsize-small.u-text-center', [m$1('span.fa.fa-thumbs-up'), ' Você é apoiador deste projeto! ', m$1('a.alt-link[href=\'javascript:void(0);\']', { onclick: ctrl.showContributions.toggle }, 'Detalhes')]), ctrl.showContributions() ? m$1('.card.u-margintop-20', m$1('.w-row', _$1.map(ctrl.projectContributions(), function (contribution) {
+        return !_$1.isUndefined(project()) ? m$1('#project-header', [m$1('.w-section.section-product.' + project().mode), m$1('.w-section.page-header.u-text-center', [m$1('.w-container', [m$1('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m$1('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['per ', project().user ? project().user.name : project().owner_name ? project().owner_name : '']), !_$1.isEmpty(ctrl.projectContributions()) ? m$1('.card.card-terciary.u-radius.u-margintop-20', [m$1('.fontsize-small.u-text-center', [m$1('span.fa.fa-thumbs-up'), ' You are a supporter of this project! ', m$1('a.alt-link[href=\'javascript:void(0);\']', { onclick: ctrl.showContributions.toggle }, 'Details')]), ctrl.showContributions() ? m$1('.card.u-margintop-20', m$1('.w-row', _$1.map(ctrl.projectContributions(), function (contribution) {
             return m$1.component(userContributionDetail, { contribution: contribution, rewardDetails: rewardDetails });
         }))) : '']) : ''])]), m$1('.w-section.project-main', [m$1('.w-container', [m$1('.w-row.project-main', [m$1('.w-col.w-col-8.project-highlight', m$1.component(projectHighlight, {
             project: project
@@ -5741,29 +5741,29 @@ var projectTabs = {
             style: 'float: left;',
             onclick: h.analytics.event({
                 cat: 'project_view', act: 'project_rewards_view', project: project() })
-        }, 'Recompensas') : m$1('a[id="rewards-link"][class="w-hidden-main w-hidden-medium dashboard-nav-link mf ' + (h.hashMatch('#contribution_suggestions') ? 'selected' : '') + '"][href="/' + project().permalink + '#contribution_suggestions"]', {
+        }, 'Rewards') : m$1('a[id="rewards-link"][class="w-hidden-main w-hidden-medium dashboard-nav-link mf ' + (h.hashMatch('#contribution_suggestions') ? 'selected' : '') + '"][href="/' + project().permalink + '#contribution_suggestions"]', {
             style: 'float: left;',
             onclick: h.analytics.event({
                 cat: 'project_view', act: 'project_contribsuggestions_view', project: project() })
-        }, 'Valores Sugeridos'), m$1('a[id="about-link"][class="dashboard-nav-link mf ' + (h.hashMatch('#about') || h.hashMatch('') ? 'selected' : '') + '"][href="#about"]', {
+        }, 'Suggested Values'), m$1('a[id="about-link"][class="dashboard-nav-link mf ' + (h.hashMatch('#about') || h.hashMatch('') ? 'selected' : '') + '"][href="#about"]', {
             style: 'float: left;',
             onclick: h.analytics.event({
                 cat: 'project_view', act: 'project_about_view', project: project() })
-        }, 'Sobre'), m$1('a[id="posts-link"][class="dashboard-nav-link mf ' + (h.hashMatch('#posts') ? 'selected' : '') + '"][href="#posts"]', {
+        }, 'About'), m$1('a[id="posts-link"][class="dashboard-nav-link mf ' + (h.hashMatch('#posts') ? 'selected' : '') + '"][href="#posts"]', {
             style: 'float: left;',
             onclick: h.analytics.event({
                 cat: 'project_view', act: 'project_posts_view', project: project() })
-        }, ['Novidades ', m$1('span.badge', project() ? project().posts_count : '')]), m$1('a[id="contributions-link"][class="w-hidden-small w-hidden-tiny dashboard-nav-link mf ' + (h.hashMatch('#contributions') ? 'selected' : '') + '"][href="#contributions"]', {
+        }, ['News ', m$1('span.badge', project() ? project().posts_count : '')]), m$1('a[id="contributions-link"][class="w-hidden-small w-hidden-tiny dashboard-nav-link mf ' + (h.hashMatch('#contributions') ? 'selected' : '') + '"][href="#contributions"]', {
             style: 'float: left;',
             onclick: h.analytics.event({
                 cat: 'project_view', act: 'project_contributions_view', project: project() })
-        }, ['Apoiadores ', m$1('span.badge.w-hidden-small.w-hidden-tiny', project() ? project().total_contributors : '-')]), m$1('a[id="comments-link"][class="dashboard-nav-link mf ' + (h.hashMatch('#comments') ? 'selected' : '') + '"][href="#comments"]', {
+        }, ['Supporters ', m$1('span.badge.w-hidden-small.w-hidden-tiny', project() ? project().total_contributors : '-')]), m$1('a[id="comments-link"][class="dashboard-nav-link mf ' + (h.hashMatch('#comments') ? 'selected' : '') + '"][href="#comments"]', {
             style: 'float: left;',
             onclick: h.analytics.event({
                 cat: 'project_view', act: 'project_comments_view', project: project() })
-        }, ['Comentários ', project() ? m$1('fb:comments-count[href="http://www.catarse.me/' + project().permalink + '"][class="badge project-fb-comment w-hidden-small w-hidden-tiny"][style="display: inline"]', m$1.trust('&nbsp;')) : '-'])]), project() ? m$1('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', project().open_for_contributions ? [m$1('.w-row.project-nav-back-button', [m$1('.w-col.w-col-6.w-col-medium-8', [m$1('a.w-button.btn[href="/projects/' + project().project_id + '/contributions/new"]', {
+        }, ['Comments ', project() ? m$1('fb:comments-count[href="http://www.catarse.me/' + project().permalink + '"][class="badge project-fb-comment w-hidden-small w-hidden-tiny"][style="display: inline"]', m$1.trust('&nbsp;')) : '-'])]), project() ? m$1('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', project().open_for_contributions ? [m$1('.w-row.project-nav-back-button', [m$1('.w-col.w-col-6.w-col-medium-8', [m$1('a.w-button.btn[href="/projects/' + project().project_id + '/contributions/new"]', {
             onclick: h.analytics.event({ cat: 'contribution_create', act: 'contribution_floatingbtn_click', project: project() })
-        }, 'Apoiar ‍este projeto')]), m$1('.w-col.w-col-6.w-col-medium-4', {
+        }, 'Support this project')]), m$1('.w-col.w-col-6.w-col-medium-4', {
             onclick: h.analytics.event({ cat: 'project_view', act: 'project_floatingreminder_click', project: project() })
         }, [m$1.component(projectReminder, { project: project, type: 'button', hideTextOnMobile: true })])])] : '') : ''])])]), ctrl.isFixed() && !project().is_owner_or_admin ? m$1('.w-section.project-nav') : ''] : '');
     }
@@ -5782,7 +5782,7 @@ var projectRewardList = {
             var valueFloat = h.monetaryToFloat(vm.contributionValue);
 
             if (valueFloat < vm.selectedReward().minimum_value) {
-                vm.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + vm.selectedReward().minimum_value);
+                vm.error('The support amount for this reward must be at least Rs' + vm.selectedReward().minimum_value);
             } else {
                 vm.error('');
 
@@ -5844,13 +5844,13 @@ var projectRewardList = {
                         reward_value: reward.minimum_value
                     }
                 }, ctrl.selectReward(reward))
-            }, [reward.minimum_value >= 100 ? m$1('.tag-circle-installment', [m$1('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'), m$1('.fontsize-mini.lineheight-tightest', 's/ juros')]) : '', m$1('.u-marginbottom-20', [m$1('.fontsize-base.fontweight-semibold', 'Para R$ ' + h.formatNumber(reward.minimum_value) + ' ou mais'), m$1('.fontsize-smaller.fontweight-semibold', h.pluralize(reward.paid_count, ' apoio', ' apoios')), reward.maximum_contributions > 0 ? [reward.waiting_payment_count > 0 ? m$1('.maximum_contributions.in_time_to_confirm.clearfix', [m$1('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' apoio em prazo de confirmação', ' apoios em prazo de confirmação.'))]) : '', h.rewardSouldOut(reward) ? m$1('.u-margintop-10', [m$1('span.badge.badge-gone.fontsize-smaller', 'Esgotada')]) : m$1('.u-margintop-10', [m$1('span.badge.badge-attention.fontsize-smaller', [m$1('span.fontweight-bold', 'Limitada'), project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' de ' + reward.maximum_contributions + ' disponíveis)' : ''])])] : '']), m$1('.fontsize-smaller.u-margintop-20', m$1.trust(h.simpleFormat(h.strip(reward.description)))), !_$1.isEmpty(reward.deliver_at) ? m$1('.fontsize-smaller', [m$1('b', 'Estimativa de Entrega: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : '', project.open_for_contributions && !h.rewardSouldOut(reward) ? [ctrl.openedReward().id === reward.id ? m$1('.w-form', [m$1('form.u-margintop-30', {
+            }, [reward.minimum_value >= 100 ? m$1('.tag-circle-installment', [m$1('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'), m$1('.fontsize-mini.lineheight-tightest', 's/ interest')]) : '', m$1('.u-marginbottom-20', [m$1('.fontsize-base.fontweight-semibold', 'For Rs ' + h.formatNumber(reward.minimum_value) + ' or more'), m$1('.fontsize-smaller.fontweight-semibold', h.pluralize(reward.paid_count, ' apoio', ' apoios')), reward.maximum_contributions > 0 ? [reward.waiting_payment_count > 0 ? m$1('.maximum_contributions.in_time_to_confirm.clearfix', [m$1('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' Support in confirmation period', ' Support in confirmation period....'))]) : '', h.rewardSouldOut(reward) ? m$1('.u-margintop-10', [m$1('span.badge.badge-gone.fontsize-smaller', 'Out of stock')]) : m$1('.u-margintop-10', [m$1('span.badge.badge-attention.fontsize-smaller', [m$1('span.fontweight-bold', 'Limitada'), project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' in ' + reward.maximum_contributions + ' Available)' : ''])])] : '']), m$1('.fontsize-smaller.u-margintop-20', m$1.trust(h.simpleFormat(h.strip(reward.description)))), !_$1.isEmpty(reward.deliver_at) ? m$1('.fontsize-smaller', [m$1('b', 'Estimated Delivery: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : '', project.open_for_contributions && !h.rewardSouldOut(reward) ? [ctrl.openedReward().id === reward.id ? m$1('.w-form', [m$1('form.u-margintop-30', {
                 onsubmit: ctrl.submitContribution
-            }, [m$1('.divider.u-marginbottom-20'), m$1('.fontcolor-secondary.u-marginbottom-10', 'Valor do apoio'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('.back-reward-input-reward.placeholder', 'R$')), m$1('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m$1('input.w-input.back-reward-input-reward[type="tel"]', {
+            }, [m$1('.divider.u-marginbottom-20'), m$1('.fontcolor-secondary.u-marginbottom-10', 'Value of support'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('.back-reward-input-reward.placeholder', 'Rs')), m$1('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m$1('input.w-input.back-reward-input-reward[type="tel"]', {
                 config: ctrl.setInput,
                 onkeyup: m$1.withAttr('value', ctrl.applyMask),
                 value: ctrl.contributionValue()
-            }))]), m$1('input.w-button.btn.btn-medium[type="submit"][value="Continuar >"]'), ctrl.error().length > 0 ? m$1('.text-error', [m$1('br'), m$1('span.fa.fa-exclamation-triangle'), ' ' + ctrl.error()]) : ''])]) : ''] : '']);
+            }))]), m$1('input.w-button.btn.btn-medium[type="submit"][value="Continue >"]'), ctrl.error().length > 0 ? m$1('.text-error', [m$1('br'), m$1('span.fa.fa-exclamation-triangle'), ' ' + ctrl.error()]) : ''])]) : ''] : '']);
         }));
     }
 };
@@ -5876,7 +5876,7 @@ var projectSuggestedContributions = {
             suggestedValues = [10, 25, 50, 100];
 
         return m$1('#suggestions', _$1.map(suggestedValues, function (amount) {
-            return project ? m$1('a[href="' + suggestionUrl(amount) + '"].card-reward.card-big.card-secondary.u-marginbottom-20', [m$1('.fontsize-larger', 'R$\xA0' + amount)]) : '';
+            return project ? m$1('a[href="' + suggestionUrl(amount) + '"].card-reward.card-big.card-secondary.u-marginbottom-20', [m$1('.fontsize-larger', 'Rs\xA0' + amount)]) : '';
         }));
     }
 };
@@ -5921,7 +5921,7 @@ var projectContributions$1 = {
         var lContributionsPerDay = postgrest$1.loader(models.projectContributionsPerDay.getRowOptions(filterStats.parameters()));
         lContributionsPerDay.load().then(contributionsPerDay);
 
-        var contributionsPerLocationTable = [['Estado', 'Apoios', 'R$ apoiados (% do total)']];
+        var contributionsPerLocationTable = [['state', 'Support', 'Rs Supported (% Of total)']];
         var buildPerLocationTable = function buildPerLocationTable(contributions) {
             return !_$1.isEmpty(contributions) ? _$1.map(_$1.first(contributions).source, function (contribution) {
                 var column = [];
@@ -5929,7 +5929,7 @@ var projectContributions$1 = {
                 column.push(contribution.state_acronym || 'Outro/other');
                 column.push(contribution.total_contributions);
                 column.push([contribution.total_contributed, [//Adding row with custom comparator => read project-data-table description
-                m$1('input[type="hidden"][value="' + contribution.total_contributed + '"'), 'R$ ', h.formatNumber(contribution.total_contributed, 2, 3), m$1('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')]]);
+                m$1('input[type="hidden"][value="' + contribution.total_contributed + '"'), 'Rs ', h.formatNumber(contribution.total_contributed, 2, 3), m$1('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')]]);
                 return contributionsPerLocationTable.push(column);
             }) : [];
         };
@@ -5959,7 +5959,7 @@ var projectContributions$1 = {
             stats = ctrl.contributionsStats(),
             groupedCollection = ctrl.groupedCollection(list.collection());
 
-        return m$1('#project_contributions', m$1('#contributions_top', [m$1('.section.w-section', m$1('.w-container', m$1('.w-row', ctrl.lContributionsStats() ? h.loader() : !_$1.isEmpty(stats) ? [m$1('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [m$1('.fontsize-megajumbo', stats.total), m$1('.fontsize-large', 'pessoas apoiam este projeto')]), m$1('.w-col.w-col-6', m$1('.card.card-terciary.u-radius', m$1('.w-row', [m$1('.u-marginbottom-20.w-col.w-col-6.w-col-small-6', [m$1('.fontweight-semibold.u-marginbottom-10', 'Apoiadores novos'), m$1('.fontsize-largest.u-marginbottom-10', Math.floor(stats.new_percent) + '%'), m$1('.fontsize-smallest', 'apoiadores que nunca tinham apoiado um projeto no Catarse')]), m$1('.w-col.w-col-6.w-col-small-6', [m$1('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'), m$1('.fontweight-semibold.u-marginbottom-10', 'Apoiadores recorrentes'), m$1('.fontsize-largest.u-marginbottom-10', Math.ceil(stats.returning_percent) + '%'), m$1('.fontsize-smallest', 'apoiadores que já tinham apoiado um projeto no Catarse')])])))] : ''))), m$1('.divider.w-section'), m$1('.section.w-section', m$1('.w-container', [m$1('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Apoiadores'), m$1('.project-contributions.w-clearfix', _$1.map(groupedCollection, function (group, idx) {
+        return m$1('#project_contributions', m$1('#contributions_top', [m$1('.section.w-section', m$1('.w-container', m$1('.w-row', ctrl.lContributionsStats() ? h.loader() : !_$1.isEmpty(stats) ? [m$1('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [m$1('.fontsize-megajumbo', stats.total), m$1('.fontsize-large', 'People support this project')]), m$1('.w-col.w-col-6', m$1('.card.card-terciary.u-radius', m$1('.w-row', [m$1('.u-marginbottom-20.w-col.w-col-6.w-col-small-6', [m$1('.fontweight-semibold.u-marginbottom-10', 'New supporters'), m$1('.fontsize-largest.u-marginbottom-10', Math.floor(stats.new_percent) + '%'), m$1('.fontsize-smallest', 'Supporters who had never supported a project in JVN')]), m$1('.w-col.w-col-6.w-col-small-6', [m$1('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'), m$1('.fontweight-semibold.u-marginbottom-10', 'Recurring supporters'), m$1('.fontsize-largest.u-marginbottom-10', Math.ceil(stats.returning_percent) + '%'), m$1('.fontsize-smallest', 'Supporters who had already supported a project in JVN')])])))] : ''))), m$1('.divider.w-section'), m$1('.section.w-section', m$1('.w-container', [m$1('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Supporters'), m$1('.project-contributions.w-clearfix', _$1.map(groupedCollection, function (group, idx) {
             return m$1('.w-row', _$1.map(group, function (contribution) {
                 return m$1('.project-contribution-item.w-col.w-col-4', [
                 // here new card
@@ -5977,25 +5977,25 @@ var projectContributions$1 = {
                         lbl: contribution.user_id,
                         project: args.project()
                     })
-                }, contribution.data.name), m$1('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', contribution.data.city + ',' + contribution.data.state), m$1('.fontsize-smaller', [m$1('span.fontweight-semibold', contribution.data.total_contributed_projects), ' apoiados  |  ', m$1('span.fontweight-semibold', contribution.data.total_published_projects), ' criado'])])
+                }, contribution.data.name), m$1('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', contribution.data.city + ',' + contribution.data.state), m$1('.fontsize-smaller', [m$1('span.fontweight-semibold', contribution.data.total_contributed_projects), ' Supported  |  ', m$1('span.fontweight-semibold', contribution.data.total_published_projects), ' Created'])])
                 // new card
                 ]);
             }));
         })), m$1('.w-row.u-marginbottom-40.u-margintop-20', [m$1('.w-col.w-col-2.w-col-push-5', [!list.isLoading() ? list.isLastPage() ? '' : m$1('button#load-more.btn.btn-medium.btn-terciary', {
             onclick: list.nextPage
-        }, 'Carregar mais') : h.loader()])])]))]), m$1('.before-footer.bg-gray.section.w-section', m$1('.w-container', [m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-12.u-text-center', {
+        }, 'Load more') : h.loader()])])]))]), m$1('.before-footer.bg-gray.section.w-section', m$1('.w-container', [m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-12.u-text-center', {
             style: {
                 'min-height': '300px'
             }
         }, [!ctrl.lContributionsPerDay() ? m$1.component(projectDataChart, {
             collection: ctrl.contributionsPerDay,
-            label: 'R$ arrecadados por dia',
+            label: 'Rs Collected per day',
             dataKey: 'total_amount',
             xAxis: function xAxis(item) {
                 return h.momentify(item.paid_at);
             },
-            emptyState: 'Apoios não contabilizados'
-        }) : h.loader()])]), m$1('.w-row', m$1('.w-col.w-col-12.u-text-center', [m$1('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', 'De onde vem os apoios'), !ctrl.lContributionsPerLocation() ? !_$1.isEmpty(_$1.rest(ctrl.contributionsPerLocationTable)) ? m$1.component(projectDataTable, {
+            emptyState: 'Unaccounted support'
+        }) : h.loader()])]), m$1('.w-row', m$1('.w-col.w-col-12.u-text-center', [m$1('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', 'Where does the support come from?'), !ctrl.lContributionsPerLocation() ? !_$1.isEmpty(_$1.rest(ctrl.contributionsPerLocationTable)) ? m$1.component(projectDataTable, {
             table: ctrl.contributionsPerLocationTable,
             defaultSortIndex: -2
         }) : '' : h.loader()]))])));
@@ -6068,7 +6068,7 @@ var projectReport = {
   view: function view(ctrl, args) {
     var user = ctrl.user;
 
-    return m$1('.card.card-terciary.u-radius', [m$1('.fontsize-small.u-marginbottom-20', ['Este projeto desrespeita', m$1.trust('&nbsp;'), m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638\'][target=\'_blank\']', 'nossas regras? ')]), ctrl.sendSuccess() ? m$1('.w-form', m$1('p', 'Obrigado! A sua denúncia foi recebida.')) : [m$1('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']', { onclick: ctrl.checkLogin }, 'Denunciar este projeto'), ctrl.displayForm() ? m$1('#report-form.u-margintop-30', m$1('.w-form', m$1('form', { onsubmit: ctrl.sendReport, config: ctrl.checkScroll }, [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-10', 'Por que você está denunciando este projeto?'), m$1('select.w-select.text-field.positive[required=\'required\']', { onchange: m$1.withAttr('value', ctrl.reason) }, [m$1('option[value=\'\']', 'Selecione um motivo'), m$1('option[value=\'Violação de propriedade intelectual\']', 'Violação de propriedade intelectual'), m$1('option[value=\'Calúnia, injúria, difamação ou discriminação\']', 'Calúnia, injúria, difamação ou discriminação'), m$1('option[value=\'Escopo de projeto proibido\']', 'Escopo de projeto proibido'), m$1('option[value=\'Recompensas proibidas\']', 'Recompensas proibidas'), m$1('option[value=\'Cenas de sexo explícitas e gratuitas\']', 'Cenas de sexo explícitas e gratuitas'), m$1('option[value=\'Abuso de SPAM\']', 'Abuso de SPAM'), m$1('option[value=\'Outros\']', 'Outros')]), m$1('textarea.w-input.text-field.positive.u-marginbottom-30', { placeholder: 'Por favor, dê mais detalhes que nos ajudem a identificar o problema', onchange: m$1.withAttr('value', ctrl.details) }), m$1('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Enviar denúncia\']', { disabled: ctrl.submitDisabled() })]))) : '']]);
+    return m$1('.card.card-terciary.u-radius', [m$1('.fontsize-small.u-marginbottom-20', ['This project disrespects', m$1.trust('&nbsp;'), m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638\'][target=\'_blank\']', 'Our rules? ')]), ctrl.sendSuccess() ? m$1('.w-form', m$1('p', 'Thank you! Your report has been received.')) : [m$1('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']', { onclick: ctrl.checkLogin }, 'Report this project'), ctrl.displayForm() ? m$1('#report-form.u-margintop-30', m$1('.w-form', m$1('form', { onsubmit: ctrl.sendReport, config: ctrl.checkScroll }, [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-10', 'Why are you denouncing this project?'), m$1('select.w-select.text-field.positive[required=\'required\']', { onchange: m$1.withAttr('value', ctrl.reason) }, [m$1('option[value=\'\']', 'Select a reason'), m$1('option[value=\'Intellectual Property infringement\']', 'Intellectual Property infringement'), m$1('option[value=\'Slander, libel, defamation or discrimination\']', 'Slander, libel, defamation or discrimination'), m$1('option[value=\'Prohibited project scope\']', 'Prohibited project scope'), m$1('option[value=\'Forbidden Rewards\']', 'Forbidden Rewards'), m$1('option[value=\'Explicit free sex scenes\']', 'Explicit free sex scenes'), m$1('option[value=\'SPAM abuse\']', 'SPAM abuse'), m$1('option[value=\'Others\']', 'Others')]), m$1('textarea.w-input.text-field.positive.u-marginbottom-30', { placeholder: 'Please give more details to help us identify the problem', onchange: m$1.withAttr('value', ctrl.details) }), m$1('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Send Complaint\']', { disabled: ctrl.submitDisabled() })]))) : '']]);
   }
 };
 
@@ -6082,15 +6082,15 @@ var projectAbout = {
             return -Math.ceil(duration.asDays());
         };
         var fundingPeriod = function fundingPeriod() {
-            return project.is_published && h.existy(project.zone_expires_at) ? m$1('.funding-period', [m$1('.fontsize-small.fontweight-semibold.u-text-center-small-only', 'Período de campanha'), m$1('.fontsize-small.u-text-center-small-only', h.momentify(project.zone_online_date) + ' - ' + h.momentify(project.zone_expires_at) + ' (' + onlineDays() + ' dias)')]) : '';
+            return project.is_published && h.existy(project.zone_expires_at) ? m$1('.funding-period', [m$1('.fontsize-small.fontweight-semibold.u-text-center-small-only', 'Campaign period'), m$1('.fontsize-small.u-text-center-small-only', h.momentify(project.zone_online_date) + ' - ' + h.momentify(project.zone_expires_at) + ' (' + onlineDays() + ' days)')]) : '';
         };
 
         return m$1('#project-about', [m$1('.project-about.w-col.w-col-8', {
             config: h.UIHelper()
-        }, [m$1('p.fontsize-base', [m$1('strong', 'O projeto')]), m$1('.fontsize-base[itemprop="about"]', m$1.trust(h.selfOrEmpty(project.about_html, '...'))), project.budget ? [m$1('p.fontsize-base.fontweight-semibold', 'Orçamento'), m$1('p.fontsize-base', m$1.trust(project.budget))] : '', m$1.component(projectReport)]), m$1('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', !_.isEmpty(args.rewardDetails()) ? [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Recompensas'), m$1.component(projectRewardList, {
+        }, [m$1('p.fontsize-base', [m$1('strong', 'The project')]), m$1('.fontsize-base[itemprop="about"]', m$1.trust(h.selfOrEmpty(project.about_html, '...'))), project.budget ? [m$1('p.fontsize-base.fontweight-semibold', 'Budget'), m$1('p.fontsize-base', m$1.trust(project.budget))] : '', m$1.component(projectReport)]), m$1('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', !_.isEmpty(args.rewardDetails()) ? [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Rewards'), m$1.component(projectRewardList, {
             project: args.project,
             rewardDetails: args.rewardDetails
-        }), fundingPeriod()] : [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Sugestões de apoio'), m$1.component(projectSuggestedContributions, { project: args.project }), fundingPeriod()])]);
+        }), fundingPeriod()] : [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Suggestions for support'), m$1.component(projectSuggestedContributions, { project: args.project }), fundingPeriod()])]);
     }
 };
 
@@ -6142,14 +6142,14 @@ var projectPosts = {
         var list = ctrl.listVM,
             project = args.project() || {};
 
-        return m$1('.project-posts.w-section', [m$1('.w-container.u-margintop-20', [project.is_owner_or_admin ? [!list.isLoading() ? _$1.isEmpty(list.collection()) ? m$1('.w-hidden-small.w-hidden-tiny', [m$1('.fontsize-base.u-marginbottom-30.u-margintop-20', 'Toda novidade publicada no Catarse é enviada diretamente para o email de quem já apoiou seu projeto e também fica disponível para visualização no site. Você pode optar por deixá-la pública, ou visível somente para seus apoiadores aqui nesta aba.')]) : '' : '', m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4'), m$1('.w-col.w-col-4', [m$1('a.btn.btn-edit.btn-small[href=\'/pt/projects/' + project.project_id + '/edit#posts\']', 'Escrever novidade')]), m$1('.w-col.w-col-4')])] : '', _$1.map(list.collection(), function (post) {
-            return m$1('.w-row', [m$1('.w-col.w-col-1'), m$1('.w-col.w-col-10', [m$1('.post', [m$1('.u-marginbottom-60 .w-clearfix', [m$1('.fontsize-small.fontcolor-secondary.u-text-center', h.momentify(post.created_at)), m$1('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [m$1('a.link-hidden[href="/projects/' + post.project_id + '/posts/' + post.id + '#posts"]', post.title)]), !_$1.isEmpty(post.comment_html) ? m$1('.fontsize-base', m$1.trust(post.comment_html)) : m$1('.fontsize-base', 'Post exclusivo para apoiadores.')]), m$1('.divider.u-marginbottom-60')])]), m$1('.w-col.w-col-1')]);
+        return m$1('.project-posts.w-section', [m$1('.w-container.u-margintop-20', [project.is_owner_or_admin ? [!list.isLoading() ? _$1.isEmpty(list.collection()) ? m$1('.w-hidden-small.w-hidden-tiny', [m$1('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in the Catarse is sent directly to the email of who has already supported his project and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')]) : '' : '', m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4'), m$1('.w-col.w-col-4', [m$1('a.btn.btn-edit.btn-small[href=\'/en/projects/' + project.project_id + '/edit#posts\']', 'Writing novelty')]), m$1('.w-col.w-col-4')])] : '', _$1.map(list.collection(), function (post) {
+            return m$1('.w-row', [m$1('.w-col.w-col-1'), m$1('.w-col.w-col-10', [m$1('.post', [m$1('.u-marginbottom-60 .w-clearfix', [m$1('.fontsize-small.fontcolor-secondary.u-text-center', h.momentify(post.created_at)), m$1('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [m$1('a.link-hidden[href="/projects/' + post.project_id + '/posts/' + post.id + '#posts"]', post.title)]), !_$1.isEmpty(post.comment_html) ? m$1('.fontsize-base', m$1.trust(post.comment_html)) : m$1('.fontsize-base', 'Exclusive post for supporters.')]), m$1('.divider.u-marginbottom-60')])]), m$1('.w-col.w-col-1')]);
         }), m$1('.w-row', [!_$1.isUndefined(args.post_id) ? '' : !list.isLoading() ? list.collection().length === 0 && args.projectContributions().length === 0 ? !project.is_owner_or_admin ? m$1('.w-col.w-col-10.w-col-push-1', m$1('p.fontsize-base', m$1.trust(I18n$1.t('empty', I18nScope$23({
             project_user_name: args.userDetails().name,
             project_id: project.project_id
-        }))))) : '' : m$1('.w-col.w-col-2.w-col-push-5', list.isLastPage() ? list.collection().length === 0 ? 'Nenhuma novidade.' : '' : m$1('button#load-more.btn.btn-medium.btn-terciary', {
+        }))))) : '' : m$1('.w-col.w-col-2.w-col-push-5', list.isLastPage() ? list.collection().length === 0 ? 'No news.' : '' : m$1('button#load-more.btn.btn-medium.btn-terciary', {
             onclick: list.nextPage
-        }, 'Carregar mais')) : m$1('.w-col.w-col-2.w-col-push-5', h.loader())])])]);
+        }, 'Load more')) : m$1('.w-col.w-col-2.w-col-push-5', h.loader())])])]);
     }
 };
 
@@ -6252,7 +6252,7 @@ var userHeader = {
             hideDetails = args.hideDetails,
             profileImage = userVM.displayImage(user),
             coverImage = userVM.displayCover(user);
-        return m$1('.hero-' + (hideDetails ? 'small' : 'half'), [m$1('.w-container.content-hero-profile', m$1('.w-row.u-text-center', m$1('.w-col.w-col-8.w-col-push-2', [hideDetails ? '' : m$1('.u-marginbottom-20', m$1('.avatar_wrapper', m$1('img.thumb.big.u-round[alt=\'User\'][src=\'' + profileImage + '\']'))), m$1('.fontsize-larger.fontweight-semibold.u-marginbottom-20', user.name), hideDetails ? '' : m$1('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base', ['Chegou junto em ' + h.momentify(user.created_at, 'MMMM [de] YYYY'), m$1('br'), user.total_contributed_projects == 0 ? 'Ainda não apoiou projetos' : 'Apoiou ' + h.pluralize(user.total_contributed_projects, ' projeto', ' projetos'), user.total_published_projects > 0 ? ' e j\xE1 criou ' + h.pluralize(user.total_published_projects, ' projeto', ' projetos') : ''])]))), m$1('.hero-profile', { style: 'background-image:url(\'' + coverImage + '\');' })]);
+        return m$1('.hero-' + (hideDetails ? 'small' : 'half'), [m$1('.w-container.content-hero-profile', m$1('.w-row.u-text-center', m$1('.w-col.w-col-8.w-col-push-2', [hideDetails ? '' : m$1('.u-marginbottom-20', m$1('.avatar_wrapper', m$1('img.thumb.big.u-round[alt=\'User\'][src=\'' + profileImage + '\']'))), m$1('.fontsize-larger.fontweight-semibold.u-marginbottom-20', user.name), hideDetails ? '' : m$1('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base', ['Arrived together at ' + h.momentify(user.created_at, 'MMMM [de] YYYY'), m$1('br'), user.total_contributed_projects == 0 ? 'Has not yet supported projects' : 'Supported ' + h.pluralize(user.total_contributed_projects, ' project', ' projects'), user.total_published_projects > 0 ? ' And already created ' + h.pluralize(user.total_published_projects, ' project', ' projects') : ''])]))), m$1('.hero-profile', { style: 'background-image:url(\'' + coverImage + '\');' })]);
     }
 };
 
@@ -6279,7 +6279,7 @@ var loadMoreBtn = {
             cssClass = args.cssClass;
         return m$1('.w-col.w-col-2' + cssClass, [!collection.isLoading() ? collection.isLastPage() ? '' : m$1('button#load-more.btn.btn-medium.btn-terciary', {
             onclick: collection.nextPage
-        }, 'Carregar mais') : h.loader()]);
+        }, 'Load more') : h.loader()]);
     }
 };
 
@@ -6323,14 +6323,14 @@ var userCreated = {
         var projects_collection = ctrl.projects.collection();
 
         return m$1('.content[id=\'created-tab\']', ctrl.error() ? m$1.component(inlineError, {
-            message: 'Erro ao carregar os projetos.'
+            message: 'Error loading projects.'
         }) : !ctrl.loader() ? [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
             return m$1.component(projectCard, {
                 project: project,
                 ref: 'user_contributed',
                 showFriends: false
             });
-        }) : m$1('.w-container', m$1('.u-margintop-30.u-text-center.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-large.u-marginbottom-30', 'O que você está esperando para tirar seu projeto do papel aqui no Catarse?'), m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', m$1('a.btn.btn-large[href=\'/start\']', 'Comece agora!')), m$1('.w-col.w-col-3')])]), m$1('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m$1('.w-row.u-marginbottom-40.u-margintop-30', [m$1(loadMoreBtn, {
+        }) : m$1('.w-container', m$1('.u-margintop-30.u-text-center.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-large.u-marginbottom-30', 'What are you waiting for to get your project out of paper here at JVN?'), m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', m$1('a.btn.btn-large[href=\'/start\']', 'Start now!')), m$1('.w-col.w-col-3')])]), m$1('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m$1('.w-row.u-marginbottom-40.u-margintop-30', [m$1(loadMoreBtn, {
             collection: ctrl.projects,
             cssClass: '.w-col-push-5'
         })]) : ''] : h.loader());
@@ -6376,13 +6376,13 @@ var userContributed = {
     },
     view: function view(ctrl, args) {
         var projects_collection = ctrl.projects.collection();
-        return ctrl.error() ? m$1.component(inlineError, { message: 'Erro ao carregar os projetos.' }) : ctrl.loader() ? h.loader() : m$1('.content[id=\'contributed-tab\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
+        return ctrl.error() ? m$1.component(inlineError, { message: 'Error loading projects.' }) : ctrl.loader() ? h.loader() : m$1('.content[id=\'contributed-tab\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
             return m$1.component(projectCard, {
                 project: project,
                 ref: 'user_contributed',
                 showFriends: false
             });
-        }) : m$1('.w-container', m$1('.u-margintop-30.u-text-center.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-large.u-marginbottom-30', 'Ora, ora... você ainda não apoiou nenhum projeto no Catarse!'), m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', m$1('a.btn.btn-large[href=\'/explore\']', 'Que tal apoiar agora?')), m$1('.w-col.w-col-3')])]), m$1('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m$1('.w-row.u-marginbottom-40.u-margintop-30', [m$1(loadMoreBtn, { collection: ctrl.projects, cssClass: '.w-col-push-5' })]) : '']);
+        }) : m$1('.w-container', m$1('.u-margintop-30.u-text-center.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-large.u-marginbottom-30', 'Well, now ... you have not yet supported any project in JVN!'), m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', m$1('a.btn.btn-large[href=\'/explore\']', 'How about supporting now?')), m$1('.w-col.w-col-3')])]), m$1('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m$1('.w-row.u-marginbottom-40.u-margintop-30', [m$1(loadMoreBtn, { collection: ctrl.projects, cssClass: '.w-col-push-5' })]) : '']);
     }
 };
 
@@ -6402,12 +6402,12 @@ var userCard = {
         var user = ctrl.userDetails(),
             contactModalC = [ownerMessageContent, ctrl.userDetails],
             profileImage = userVM.displayImage(user);
-        return m$1('#user-card', m$1('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [m$1('.w-row', [m$1('.w-col.w-col-4.w.col-small-4.w-col-tiny-4.w-clearfix', m$1('img.thumb.u-round[itemprop=\'image\'][src=\'' + profileImage + '\'][width=\'100\']')), m$1('.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m$1('.fontsize-small.fontweight-semibold.lineheight-tighter[itemprop=\'name\']', m$1('a.link-hidden[href="/users/' + user.id + '"]', user.name)), m$1('.fontsize-smallest.lineheight-looser[itemprop=\'address\']', user.address_city), m$1('.fontsize-smallest', h.pluralize(user.total_published_projects, ' projeto', ' projetos') + ' criados'), m$1('.fontsize-smallest', 'apoiou ' + h.pluralize(user.total_contributed_projects, ' projeto', ' projetos'))])]), m$1('.project-author-contacts', [m$1('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [!_$1.isEmpty(user.facebook_link) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Perfil no Facebook')]) : '', !_$1.isEmpty(user.twitter_username) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Perfil no Twitter')]) : '', _$1.map(user.links, function (link) {
+        return m$1('#user-card', m$1('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [m$1('.w-row', [m$1('.w-col.w-col-4.w.col-small-4.w-col-tiny-4.w-clearfix', m$1('img.thumb.u-round[itemprop=\'image\'][src=\'' + profileImage + '\'][width=\'100\']')), m$1('.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m$1('.fontsize-small.fontweight-semibold.lineheight-tighter[itemprop=\'name\']', m$1('a.link-hidden[href="/users/' + user.id + '"]', user.name)), m$1('.fontsize-smallest.lineheight-looser[itemprop=\'address\']', user.address_city), m$1('.fontsize-smallest', h.pluralize(user.total_published_projects, ' project', ' projects') + ' Created'), m$1('.fontsize-smallest', 'Supported ' + h.pluralize(user.total_contributed_projects, ' project', ' projects'))])]), m$1('.project-author-contacts', [m$1('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [!_$1.isEmpty(user.facebook_link) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook profile')]) : '', !_$1.isEmpty(user.twitter_username) ? m$1('li', [m$1('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')]) : '', _$1.map(user.links, function (link) {
             return m$1('li', [m$1('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', link.link)]);
         })])]), ctrl.displayModal() ? m$1.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: contactModalC
-        }) : '', !_$1.isEmpty(user.email) ? m$1('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', { onclick: ctrl.displayModal.toggle }, 'Enviar mensagem') : '']));
+        }) : '', !_$1.isEmpty(user.email) ? m$1('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', { onclick: ctrl.displayModal.toggle }, 'Send message') : '']));
     }
 };
 
@@ -6434,7 +6434,7 @@ var userAbout = {
     },
     view: function view(ctrl, args) {
         var user = ctrl.userDetails();
-        return ctrl.error() ? m$1.component(inlineError, { message: 'Erro ao carregar dados.' }) : ctrl.loader() ? h.loader() : m$1('.content[id=\'about-tab\']', m$1('.w-container[id=\'about-content\']', m$1('.w-row', [m$1('.w-col.w-col-8', m$1('.fontsize-base', user.about_html ? m$1.trust(user.about_html) : '')), m$1('.w-col.w-col-4', user.id ? m$1.component(userCard, { userId: user.id }) : h.loader)])));
+        return ctrl.error() ? m$1.component(inlineError, { message: 'Error loading data.' }) : ctrl.loader() ? h.loader() : m$1('.content[id=\'about-tab\']', m$1('.w-container[id=\'about-content\']', m$1('.w-row', [m$1('.w-col.w-col-8', m$1('.fontsize-base', user.about_html ? m$1.trust(user.about_html) : '')), m$1('.w-col.w-col-4', user.id ? m$1.component(userCard, { userId: user.id }) : h.loader)])));
     }
 };
 
@@ -6515,24 +6515,24 @@ var userAboutEdit = {
     view: function view(ctrl, args) {
         var user = args.user || {};
         return m$1('#about-tab.content', m$1('form.simple_form.w-form', {
-            action: '/pt/users/' + user.id,
+            action: '/en/users/' + user.id,
             novalidate: true,
             enctype: 'multipart/form-data',
             'accept-charset': 'UTF-8',
             method: 'POST'
-        }, [m$1('input[name="utf8"][type="hidden"][value="✓"]'), m$1('input[name="_method"][type="hidden"][value="patch"]'), m$1('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m$1('div', m$1('.w-container', m$1('.w-row', m$1('.w-col.w-col-10.w-col-push-1', [m$1('.w-form', [m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Imagem do perfil'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Essa imagem será utilizada como a miniatura de seu perfil (PNG, JPG tamanho 280 x 280)')]), m$1('.w-col.w-col-4.w-sub-col', m$1('.input.file.optional.user_uploaded_image.field_with_hint', [m$1('label.field-label'), m$1('span.hint', m$1('img[alt="Avatar do Usuario"][src="' + userVM.displayImage(user) + '"]')), m$1('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', { name: 'user[uploaded_image]' })]))]), m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Imagem de capa do perfil'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Essa imagem será utilizada como fundo do cabeçalho do seu perfil público (PNG ou JPG). Caso você não envie nenhum imagem aqui, utilizaremos sua imagem de perfil como alternativa.')]), m$1('.w-col.w-col-4.w-sub-col', m$1('.input.file.optional.user_cover_image', [m$1('label.field-label'), m$1('span.hint', user.profile_cover_image ? m$1('img', { src: user.profile_cover_image }) : ''), m$1('input.file.optional.w-input.text-field[id="user_cover_image"][type="file"]', { name: 'user[cover_image]' })]))])]), !user.is_admin ? '' : m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', 'Endereço do seu perfil'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', 'Seu perfil público pode ter uma URL personalizada. Escolha uma fácil de guardar!    ')]), m$1('.w-col.w-col-7', m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', m$1('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
+        }, [m$1('input[name="utf8"][type="hidden"][value="✓"]'), m$1('input[name="_method"][type="hidden"][value="patch"]'), m$1('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m$1('div', m$1('.w-container', m$1('.w-row', m$1('.w-col.w-col-10.w-col-push-1', [m$1('.w-form', [m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Profile picture'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', ' This image will be used as your profile thumbnail (PNG, JPG size 280x280)')]), m$1('.w-col.w-col-4.w-sub-col', m$1('.input.file.optional.user_uploaded_image.field_with_hint', [m$1('label.field-label'), m$1('span.hint', m$1('img[alt="User avatar"][src="' + userVM.displayImage(user) + '"]')), m$1('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', { name: 'user[uploaded_image]' })]))]), m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Profile Cover Image'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  This image will be used as the background of your public profile header (PNG or JPG). If you do not submit any images here, we will use your profile image as an alternative.')]), m$1('.w-col.w-col-4.w-sub-col', m$1('.input.file.optional.user_cover_image', [m$1('label.field-label'), m$1('span.hint', user.profile_cover_image ? m$1('img', { src: user.profile_cover_image }) : ''), m$1('input.file.optional.w-input.text-field[id="user_cover_image"][type="file"]', { name: 'user[cover_image]' })]))])]), !user.is_admin ? '' : m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', 'Address of your profile'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', 'Your public profile may have a custom URL. Choose an easy to save!    ')]), m$1('.w-col.w-col-7', m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', m$1('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
             name: 'user[permalink]',
             value: h.selfOrEmpty(user.permalink)
-        })), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover', m$1('.fontcolor-secondary.fontsize-smaller', '  .catarse.me'))]))]), m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Nome'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Esse é o nome que os usuários irão ver no seu perfil público')]), m$1('.w-col.w-col-7', m$1('input.string.optional.w-input.text-field.positive[id="user_name"][type="text"]', {
+        })), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover', m$1('.fontcolor-secondary.fontsize-smaller', '  .catarse.me'))]))]), m$1('.w-row.u-marginbottom-30.card.card-terciary', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Name'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  This is the name that users will see in your public profile')]), m$1('.w-col.w-col-7', m$1('input.string.optional.w-input.text-field.positive[id="user_name"][type="text"]', {
             name: 'user[name]',
             value: user.name
-        }))]), m$1('.w-form.card.card-terciary.u-marginbottom-30', [m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Perfil do facebook'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Cole o link do seu perfil')]), m$1('.w-col.w-col-7', m$1('input.string.optional.w-input.text-field.positive[type="text"]', {
+        }))]), m$1('.w-form.card.card-terciary.u-marginbottom-30', [m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Facebook profile'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Paste your profile link')]), m$1('.w-col.w-col-7', m$1('input.string.optional.w-input.text-field.positive[type="text"]', {
             name: 'user[facebook_link]',
             value: user.facebook_link
-        }))]), m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Perfil do twitter'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Cole o link do seu perfil')]), m$1('.w-col.w-col-7', m$1('input.string.optional.w-input.text-field.positive[type="text"]', {
+        }))]), m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold', '  Twitter profile'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary', '  Paste your profile link')]), m$1('.w-col.w-col-7', m$1('input.string.optional.w-input.text-field.positive[type="text"]', {
             name: 'user[twitter]',
             value: user.twitter_username
-        }))])]), m$1('.w-form.card.card-terciary.u-marginbottom-30', m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold[for="name-8"]', ' Presença na internet'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Inclua links que ajudem outros usuários a te conhecer melhor. ')]), m$1('.w-col.w-col-7', [m$1('.w-row', [user.links && user.links.length <= 0 ? '' : m$1('.link', _$1.map(user.links, function (link, idx) {
+        }))])]), m$1('.w-form.card.card-terciary.u-marginbottom-30', m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-5.w-sub-col', [m$1('label.field-label.fontweight-semibold[for="name-8"]', ' Presence on the internet'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')]), m$1('.w-col.w-col-7', [m$1('.w-row', [user.links && user.links.length <= 0 ? '' : m$1('.link', _$1.map(user.links, function (link, idx) {
             var toRemove = _$1.indexOf(ctrl.removeLinks, link.id) >= 0;
 
             return m$1('div', {
@@ -6553,7 +6553,7 @@ var userAboutEdit = {
             })), m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m$1('button.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border', {
                 onclick: ctrl.removeLink(link.id, idx)
             })])]);
-        }))]), m$1('.w-row', [m$1('.w-col.w-col-6.w-col-push-6', m$1('a.btn.btn-small.btn-terciary', { onclick: ctrl.addLink }, m$1('span.translation_missing', 'Add Link')))])])])), m$1('.w-row', m$1('.w-col', m$1('.card.card-terciary.u-marginbottom-30', [m$1('label.field-label.fontweight-semibold', 'Sobre'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20', 'Fale sobre você e tente fornecer as informações mais relevantes para que visitantes possam te conhecer melhor. '), m$1('.w-form', m$1('.preview-container.u-marginbottom-40', h.redactor('user[about_html]', m$1.prop(user.about_html))))])))])))), m$1('div', m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'), m$1('input.btn.btn.btn-large[name="commit"][type="submit"][value="Salvar"]')]), m$1('.w-col.w-col-4')])))]));
+        }))]), m$1('.w-row', [m$1('.w-col.w-col-6.w-col-push-6', m$1('a.btn.btn-small.btn-terciary', { onclick: ctrl.addLink }, m$1('span.translation_missing', 'Add Link')))])])])), m$1('.w-row', m$1('.w-col', m$1('.card.card-terciary.u-marginbottom-30', [m$1('label.field-label.fontweight-semibold', 'Sobre'), m$1('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20', 'Talk about yourself and try to provide the most relevant information so visitors can get to know you better. '), m$1('.w-form', m$1('.preview-container.u-marginbottom-40', h.redactor('user[about_html]', m$1.prop(user.about_html))))])))])))), m$1('div', m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'), m$1('input.btn.btn.btn-large[name="commit"][type="submit"][value="To save"]')]), m$1('.w-col.w-col-4')])))]));
     }
 };
 
@@ -6582,14 +6582,14 @@ var userContributedBox = {
         var collection = args.collection,
             pagination = args.pagination,
             title = args.title;
-        return !_$1.isEmpty(collection) ? m$1('.section-one-column.u-marginbottom-30', [m$1('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center', title), m$1('.w-row.w-hidden-small.w-hidden-tiny.card.card-secondary', [m$1('.w-col.w-col-3', m$1('.fontsize-small.fontweight-semibold', 'Projetos que apoiei')), m$1('.w-col.w-col-2', m$1('.fontsize-small.fontweight-semibold', 'Valor do apoio')), m$1('.w-col.w-col-3', m$1('.fontsize-small.fontweight-semibold', 'Status do apoio')), m$1('.w-col.w-col-4', m$1('.fontsize-small.fontweight-semibold', 'Recompensa'))]), _$1.map(collection, function (contribution) {
-            return m$1('.w-row.card', [m$1('.w-col.w-col-3', m$1('.w-row', [m$1('.w-col.w-col-4.u-marginbottom-10', m$1('a[href=\'/' + contribution.permalink + '\']', m$1('img.thumb-project.u-radius[alt=\'' + contribution.project_name + '\'][src=\'' + contribution.project_image + '\'][width=\'50\']'))), m$1('.w-col.w-col-8', m$1('.fontsize-small.fontweight-semibold', m$1('a.alt-link[href=\'/' + contribution.permalink + '\']', contribution.project_name)))])), m$1('.w-col.w-col-2.u-marginbottom-10', m$1('.fontsize-base.inline-block', [m$1('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Valor do apoio'), ' R$ ' + contribution.value])), m$1('.w-col.w-col-3.u-marginbottom-10', [m$1('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold', 'Status'), m$1('.fontsize-smaller.fontweight-semibold', [m$1('.lineheight-tighter'), m$1('span.fa.fa-circle.fontsize-smallest.' + (contribution.state == 'paid' ? 'text-success' : contribution.state == 'pending' ? 'text-waiting' : 'text-error'), m$1.trust('&nbsp;')), I18n.t(contribution.state, I18nScope$24({
+        return !_$1.isEmpty(collection) ? m$1('.section-one-column.u-marginbottom-30', [m$1('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center', title), m$1('.w-row.w-hidden-small.w-hidden-tiny.card.card-secondary', [m$1('.w-col.w-col-3', m$1('.fontsize-small.fontweight-semibold', 'Projects I supported')), m$1('.w-col.w-col-2', m$1('.fontsize-small.fontweight-semibold', 'Value of support')), m$1('.w-col.w-col-3', m$1('.fontsize-small.fontweight-semibold', 'Support Status')), m$1('.w-col.w-col-4', m$1('.fontsize-small.fontweight-semibold', 'Reward'))]), _$1.map(collection, function (contribution) {
+            return m$1('.w-row.card', [m$1('.w-col.w-col-3', m$1('.w-row', [m$1('.w-col.w-col-4.u-marginbottom-10', m$1('a[href=\'/' + contribution.permalink + '\']', m$1('img.thumb-project.u-radius[alt=\'' + contribution.project_name + '\'][src=\'' + contribution.project_image + '\'][width=\'50\']'))), m$1('.w-col.w-col-8', m$1('.fontsize-small.fontweight-semibold', m$1('a.alt-link[href=\'/' + contribution.permalink + '\']', contribution.project_name)))])), m$1('.w-col.w-col-2.u-marginbottom-10', m$1('.fontsize-base.inline-block', [m$1('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Value of support'), ' Rs ' + contribution.value])), m$1('.w-col.w-col-3.u-marginbottom-10', [m$1('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold', 'Status'), m$1('.fontsize-smaller.fontweight-semibold', [m$1('.lineheight-tighter'), m$1('span.fa.fa-circle.fontsize-smallest.' + (contribution.state == 'paid' ? 'text-success' : contribution.state == 'pending' ? 'text-waiting' : 'text-error'), m$1.trust('&nbsp;')), I18n.t(contribution.state, I18nScope$24({
                 date: h.momentify(contribution[contribution.state + '_at'])
-            }))]), m$1('.fontsize-smallest', contribution.installments > 1 ? contribution.installments + ' x R$ ' + contribution.installment_value + ' ' : '', contribution.payment_method == 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito'), contributionVM.canShowReceipt(contribution) ? m$1('a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href=\'https://www.catarse.me/pt/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/receipt\'][target=\'__blank\']', 'Ver recibo') : '', contributionVM.canShowSlip(contribution) ? m$1('a.btn.btn-inline.btn-small.u-margintop-10[href=\'' + contribution.gateway_data['boleto_url'] + '\'][target=\'__blank\']', 'Imprimir boleto') : '', contributionVM.canGenerateSlip(contribution) ? m$1('a.btn.btn-inline.btn-small.u-margintop-10[href=\'https://www.catarse.me/pt/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/second_slip\'][target=\'__blank\']', 'Gerar 2a via') : '', m$1('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [m$1('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']' + (contribution.anonymous ? '[checked=\'checked\']' : '') + '[value=\'1\']', {
+            }))]), m$1('.fontsize-smallest', contribution.installments > 1 ? contribution.installments + ' x R$ ' + contribution.installment_value + ' ' : '', contribution.payment_method == 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito'), contributionVM.canShowReceipt(contribution) ? m$1('a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href=\'https://www.catarse.me/pt/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/receipt\'][target=\'__blank\']', 'View Receipt') : '', contributionVM.canShowSlip(contribution) ? m$1('a.btn.btn-inline.btn-small.u-margintop-10[href=\'' + contribution.gateway_data['boleto_url'] + '\'][target=\'__blank\']', 'Print Ticket') : '', contributionVM.canGenerateSlip(contribution) ? m$1('a.btn.btn-inline.btn-small.u-margintop-10[href=\'https://www.catarse.me/pt/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/second_slip\'][target=\'__blank\']', 'Generate 2nd via') : '', m$1('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [m$1('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']' + (contribution.anonymous ? '[checked=\'checked\']' : '') + '[value=\'1\']', {
                 onclick: function onclick() {
                     return ctrl.toggleAnonymous(contribution.project_id, contribution.contribution_id);
                 }
-            }), m$1('label.w-form-label', 'Quero que meu apoio não seja público')])]), m$1('.w-col.w-col-4', m$1('.fontsize-smallest', [m$1('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Recompensa'), contribution.reward_id ? m$1.trust(h.simpleFormat(contribution.reward_description)) : ' Não selecionou recompensa']), m$1('.fontsize-smallest.lineheight-looser', [m$1('span.fontweight-semibold', 'Estimativa de entrega: '), h.momentify(contribution.deliver_at, 'MMMM/YYYY')]))]);
+            }), m$1('label.w-form-label', 'I want my support not to be public')])]), m$1('.w-col.w-col-4', m$1('.fontsize-smallest', [m$1('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Reward'), contribution.reward_id ? m$1.trust(h.simpleFormat(contribution.reward_description)) : ' You have not selected a reward']), m$1('.fontsize-smallest.lineheight-looser', [m$1('span.fontweight-semibold', 'Estimated delivery: '), h.momentify(contribution.deliver_at, 'MMMM/YYYY')]))]);
         }), m$1('.w-row.u-marginbottom-40.u-margintop-30', [m$1(loadMoreBtn, {
             collection: pagination,
             cssClass: '.w-col-push-5'
@@ -6651,22 +6651,22 @@ var userPrivateContributed = {
             failedCollection = ctrl.failedPages.collection();
 
         return m$1('.content[id=\'private-contributed-tab\']', ctrl.error() ? m$1.component(inlineError, {
-            message: 'Erro ao carregar os projetos.'
-        }) : ctrl.loader() ? h.loader() : _$1.isEmpty(onlineCollection) && _$1.isEmpty(successfulCollection) && _$1.isEmpty(failedCollection) ? m$1('.w-container', m$1('.w-row.u-margintop-30.u-text-center', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-large.u-marginbottom-30', ['Você ainda não apoiou nenhum projeto no', m$1.trust('&nbsp;'), 'Catarse...']), m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', m$1('a.btn.btn-large[href=\'/pt/explore\']', {
+            message: 'Error loading projects.'
+        }) : ctrl.loader() ? h.loader() : _$1.isEmpty(onlineCollection) && _$1.isEmpty(successfulCollection) && _$1.isEmpty(failedCollection) ? m$1('.w-container', m$1('.w-row.u-margintop-30.u-text-center', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.fontsize-large.u-marginbottom-30', ['You have not yet supported any', m$1.trust('&nbsp;'), 'JVN...']), m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', m$1('a.btn.btn-large[href=\'/en/explore\']', {
             config: m$1.route,
             onclick: function onclick() {
                 m$1.route('/explore');
             }
         }, 'Apoie agora!')), m$1('.w-col.w-col-3')])]), m$1('.w-col.w-col-3')])) : [m$1.component(userContributedBox, {
-            title: 'Projetos em andamento',
+            title: 'Projects in progress',
             collection: onlineCollection,
             pagination: ctrl.onlinePages
         }), m$1.component(userContributedBox, {
-            title: 'Projetos bem-sucedidos',
+            title: 'Successful Projects',
             collection: successfulCollection,
             pagination: ctrl.successfulPages
         }), m$1.component(userContributedBox, {
-            title: 'Projetos não-financiados',
+            title: 'Non-funded projects',
             collection: failedCollection,
             pagination: ctrl.failedPages
         })]);
@@ -6749,7 +6749,7 @@ var userSettings = {
                 if (_$1.isArray(err.errors)) {
                     error(err.errors.join('<br>'));
                 } else {
-                    error('Erro ao atualizar informações.');
+                    error('Error updating information.');
                 }
 
                 showError(true);
@@ -6764,7 +6764,7 @@ var userSettings = {
             }
         },
             deleteAccount = function deleteAccount() {
-            if (window.confirm('Tem certeza que deseja desativar a sua conta?')) {
+            if (window.confirm('Are you sure you want to deactivate your account?')) {
                 deleteUser();
             }
 
@@ -6804,13 +6804,13 @@ var userSettings = {
         // TODO: this form validation should be abstracted/merged together with others
         onSubmit = function onSubmit() {
             if (!validateEmailConfirmation()) {
-                error('Confirmação de email está incorreta.');
+                error('Email confirmation is incorrect.');
                 showError(true);
             } else if (!validatePassword()) {
-                error('Nova senha está incorreta.');
+                error('New password is incorrect.');
                 showError(true);
             } else if (!validateDocument()) {
-                error('CPF/CNPJ inválido');
+                error('New password is incorrect....');
                 showError(true);
             } else {
                 updateUserData(user_id);
@@ -6862,24 +6862,24 @@ var userSettings = {
             fields = ctrl.fields;
 
         return m$1('[id=\'settings-tab\']', [ctrl.showSuccess() ? m$1.component(popNotification, {
-            message: 'As suas informações foram atualizadas'
+            message: 'Your information has been updated'
         }) : '', ctrl.showError() ? m$1.component(popNotification, {
             message: m$1.trust(ctrl.error()),
             error: true
         }) : '', m$1('form.w-form', {
             onsubmit: ctrl.onSubmit
-        }, [m$1('div', [m$1('.w-container', m$1('.w-col.w-col-10.w-col-push-1', m$1('.w-form.card.card-terciary.u-marginbottom-20', [m$1('.fontsize-base.fontweight-semibold', 'Email'), m$1('.fontsize-small.u-marginbottom-30', 'Mantenha esse email atualizado pois ele é o canal de comunicação entre você, a equipe do Catarse e a equipe dos projetos que você apoiou. '), m$1('.fontsize-base.u-marginbottom-40', [m$1('span.fontweight-semibold.card.u-radius', user.email), m$1('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
+        }, [m$1('div', [m$1('.w-container', m$1('.w-col.w-col-10.w-col-push-1', m$1('.w-form.card.card-terciary.u-marginbottom-20', [m$1('.fontsize-base.fontweight-semibold', 'Email'), m$1('.fontsize-small.u-marginbottom-30', 'Keep this email up to date as it is the communication channel between you, the JVN team and the team of projects you have supported. '), m$1('.fontsize-base.u-marginbottom-40', [m$1('span.fontweight-semibold.card.u-radius', user.email), m$1('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
             onclick: function onclick() {
                 ctrl.showEmailForm.toggle();
             }
-        }, 'Alterar email')]), m$1((ctrl.showEmailForm() ? '' : '.w-hidden') + '.u-marginbottom-20.w-row[id=\'email_update_form\']', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.field-label.fontweight-semibold', 'Novo email'), m$1('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
+        }, 'Change e-mail')]), m$1((ctrl.showEmailForm() ? '' : '.w-hidden') + '.u-marginbottom-20.w-row[id=\'email_update_form\']', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.field-label.fontweight-semibold', 'New email'), m$1('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
             class: ctrl.emailHasError() ? 'error' : '',
             value: fields.email(),
             onfocus: function onfocus() {
                 return ctrl.emailHasError(false);
             },
             onchange: m$1.withAttr('value', fields.email)
-        })]), m$1('.w-col.w-col-6', [m$1('label.field-label.fontweight-semibold', 'Confirmar novo email'), m$1('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
+        })]), m$1('.w-col.w-col-6', [m$1('label.field-label.fontweight-semibold', 'Confirm new email'), m$1('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
             class: ctrl.emailHasError() ? 'error' : '',
             value: fields.email_confirmation(),
             onfocus: function onfocus() {
@@ -6887,54 +6887,54 @@ var userSettings = {
             },
             onblur: ctrl.validateEmailConfirmation,
             onchange: m$1.withAttr('value', fields.email_confirmation)
-        })]), ctrl.emailHasError() ? m$1(inlineError, { message: 'Confirmação de email está incorreta.' }) : '']), m$1('.fontsize-base.fontweight-semibold', 'Nome'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-6.w-sub-col', m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_name\'][name=\'user[name]\'][type=\'text\']', {
+        })]), ctrl.emailHasError() ? m$1(inlineError, { message: 'Email confirmation is incorrect.' }) : '']), m$1('.fontsize-base.fontweight-semibold', 'Name'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-6.w-sub-col', m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_name\'][name=\'user[name]\'][type=\'text\']', {
             value: fields.name(),
             onchange: m$1.withAttr('value', fields.name)
         })), m$1('.w-col.w-col-6')]), m$1('.fontsize-base.fontweight-semibold', 'CPF / CNPJ'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-6.w-sub-col', m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_cpf\'][name=\'user[cpf]\'][type=\'tel\']', {
             value: fields.owner_document(),
             onchange: m$1.withAttr('value', ctrl.applyDocumentMask),
             onkeyup: m$1.withAttr('value', ctrl.applyDocumentMask)
-        })), m$1('.w-col.w-col-6')]), m$1('.divider.u-marginbottom-20'), m$1('.fontsize-base.fontweight-semibold', 'Endereço'), m$1('.fontsize-small.u-marginbottom-20', 'Esse é o endereço que foi informado ao realizar seu último apoio. Se você mudou de endereço, altere aqui e, caso você esteja aguardando alguma recompensa, avise por email ao realizador do projeto apoiado.'), m$1('.w-row', [m$1('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'País'), m$1('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
+        })), m$1('.w-col.w-col-6')]), m$1('.divider.u-marginbottom-20'), m$1('.fontsize-base.fontweight-semibold', 'Address'), m$1('.fontsize-small.u-marginbottom-20', 'This is the address you were informed when making your last support. If you have changed your address, change here and, if you are waiting for some reward, notify the director of the project supported by email.'), m$1('.w-row', [m$1('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'Parents'), m$1('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
             onchange: m$1.withAttr('value', fields.country_id)
         }, [m$1('option[value=\'\']'), !_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
             return m$1('option' + (country.id == fields.country_id() ? '[selected="selected"]' : ''), {
                 value: country.id
             }, country.name);
-        }) : ''])]), m$1('.w-col.w-col-6')]), m$1('.w-row', [m$1('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'Endereço'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
+        }) : ''])]), m$1('.w-col.w-col-6')]), m$1('.w-row', [m$1('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'Address'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
             value: fields.street(),
             onchange: m$1.withAttr('value', fields.street)
-        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_street\']', ' translation missing: pt.simple_form.validation_texts.user.address_street')]), m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.field-label', 'Número'), m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
+        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_street\']', ' translation missing: pt.simple_form.validation_texts.user.address_street')]), m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.field-label', 'Number'), m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
             value: fields.number(),
             onchange: m$1.withAttr('value', fields.number)
-        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_number\']', ' translation missing: pt.simple_form.validation_texts.user.address_number')]), m$1('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.field-label', 'Complemento'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
+        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_number\']', ' translation missing: pt.simple_form.validation_texts.user.address_number')]), m$1('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.field-label', 'Complement'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
             value: fields.complement(),
             onchange: m$1.withAttr('value', fields.complement)
-        })])]))]), m$1('.w-row', [m$1('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'Bairro'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
+        })])]))]), m$1('.w-row', [m$1('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'Neighborhood'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
             value: fields.neighbourhood(),
             onchange: m$1.withAttr('value', fields.neighbourhood)
-        })]), m$1('.input.string.optional.user_address_city.w-col.w-col-6', [m$1('label.field-label', 'Cidade'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
+        })]), m$1('.input.string.optional.user_address_city.w-col.w-col-6', [m$1('label.field-label', 'City'), m$1('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
             value: fields.city(),
             onchange: m$1.withAttr('value', fields.city)
-        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_city\']', ' translation missing: pt.simple_form.validation_texts.user.address_city')])]), m$1('.w-row', [m$1('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'Estado'), m$1('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
+        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_city\']', ' translation missing: pt.simple_form.validation_texts.user.address_city')])]), m$1('.w-row', [m$1('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m$1('label.field-label', 'state'), m$1('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
 
             onchange: m$1.withAttr('value', fields.state)
         }, [m$1('option[value=\'\']'), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
             return m$1('option[value=\'' + state.acronym + '\']' + (state.acronym == fields.state() ? '[selected="selected"]' : ''), {
                 value: state.acronym
             }, state.name);
-        }) : '', m$1('option[value=\'outro / other\']', 'Outro / Other')]), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_state\']', ' translation missing: pt.simple_form.validation_texts.user.address_state')]), m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.field-label', 'CEP'), m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
+        }) : '', m$1('option[value=\'Other / Other\']', 'Other / Other')]), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_state\']', ' translation missing: pt.simple_form.validation_texts.user.address_state')]), m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.field-label', 'CEP'), m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
             value: fields.zipcode(),
             onchange: m$1.withAttr('value', fields.zipcode)
-        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_zip_code\']', ' translation missing: pt.simple_form.validation_texts.user.address_zip_code')]), m$1('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.field-label', 'Telefone'), m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
+        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_zip_code\']', ' translation missing: pt.simple_form.validation_texts.user.address_zip_code')]), m$1('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.field-label', 'Phone'), m$1('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
             value: fields.phonenumber(),
             onchange: m$1.withAttr('value', fields.phonenumber),
             onkeyup: m$1.withAttr('value', function (value) {
                 return ctrl.applyPhoneMask(value);
             })
-        })])]))]), m$1('.divider.u-maginbottom-20'), m$1('.fontsize-base.fontweight-semibold', 'Alterar minha senha'), m$1('.fontsize-small.u-marginbottom-20', 'Para que a senha seja alterada você precisa confirmar a sua senha atual.'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.field-label.fontweight-semibold', ' Senha atual'), m$1('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
+        })])]))]), m$1('.divider.u-maginbottom-20'), m$1('.fontsize-base.fontweight-semibold', 'Change my password'), m$1('.fontsize-small.u-marginbottom-20', 'In order for the password to be changed you must confirm your current password.'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.field-label.fontweight-semibold', ' current password'), m$1('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
             value: fields.current_password(),
             onchange: m$1.withAttr('value', fields.current_password)
-        })]), m$1('.w-col.w-col-6', [m$1('label.field-label.fontweight-semibold', ' Nova senha'), m$1('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
+        })]), m$1('.w-col.w-col-6', [m$1('label.field-label.fontweight-semibold', ' New password'), m$1('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
             class: ctrl.passwordHasError() ? 'error' : '',
             value: fields.password(),
             onfocus: function onfocus() {
@@ -6942,9 +6942,9 @@ var userSettings = {
             },
             onblur: ctrl.validatePassword,
             onchange: m$1.withAttr('value', fields.password)
-        }), !ctrl.passwordHasError() ? '' : m$1(inlineError, { message: 'A sua nova senha deve ter no mínimo 6 caracteres.' })])]), m$1('.divider.u-marginbottom-20'), m$1('.fontweight-semibold.fontsize-smaller', 'Desativar minha conta'), m$1('.fontsize-smallest', 'Todos os seus apoios serão convertidos em apoios anônimos, seus dados não serão mais visíveis, você sairá automaticamente do sistema e sua conta será desativada permanentemente.'), m$1('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '\'][rel=\'nofollow\']', {
+        }), !ctrl.passwordHasError() ? '' : m$1(inlineError, { message: 'Your new password must be at least 6 characters long.' })])]), m$1('.divider.u-marginbottom-20'), m$1('.fontweight-semibold.fontsize-smaller', 'Disable my account'), m$1('.fontsize-smallest', 'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'), m$1('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '\'][rel=\'nofollow\']', {
             onclick: ctrl.deleteAccount
-        }, 'Desativar minha conta no Catarse')]))), m$1('div', m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', m$1('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Salvar\']')), m$1('.w-col.w-col-4')])))])]), m$1('form.w-hidden', { action: '/pt/users/' + user.id, method: 'post', config: ctrl.setDeleteForm }, [m$1('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m$1('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')])]);
+        }, 'Disable my JVN account')]))), m$1('div', m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', m$1('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'To save\']')), m$1('.w-col.w-col-4')])))])]), m$1('form.w-hidden', { action: '/en/users/' + user.id, method: 'post', config: ctrl.setDeleteForm }, [m$1('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m$1('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')])]);
     }
 };
 
@@ -6988,7 +6988,7 @@ var userBilling = {
             return;
         },
             confirmDelete = function confirmDelete(cardId) {
-            var r = confirm('você tem certeza?');
+            var r = confirm('are you sure?');
             if (r) {
                 return m$1.request({
                     method: 'DELETE',
@@ -7069,7 +7069,7 @@ var userBilling = {
                 if (_$1.isArray(err.errors)) {
                     error(err.errors.join('<br>'));
                 } else {
-                    error('Erro ao atualizar informações.');
+                    error('Error updating information.');
                 }
 
                 showError(true);
@@ -7135,21 +7135,21 @@ var userBilling = {
             bankAccount = ctrl.bankAccount();
 
         return m$1('[id=\'billing-tab\']', [ctrl.showSuccess() ? m$1.component(popNotification, {
-            message: 'As suas informações foram atualizadas'
+            message: 'Your information has been updated'
         }) : '', ctrl.showError() ? m$1.component(popNotification, {
             message: m$1.trust(ctrl.error()),
             error: true
-        }) : '', m$1('.w-row', m$1('.w-col.w-col-10.w-col-push-1', [m$1('.w-form.card.card-terciary.u-marginbottom-20', [m$1('.fontsize-base.fontweight-semibold', 'Cartões de crédito'), m$1('.fontsize-small.u-marginbottom-20', ['Caso algum projeto que você tenha apoiado ', m$1('b', 'com Cartão de Crédito'), ' não seja bem-sucedido, nós efetuaremos o reembolso ', m$1('b', 'automaticamente'), ' no cartão utilizado para efetuar o apoio. ']), m$1('.divider.u-marginbottom-20'), m$1('.w-row.w-hidden-tiny.card', [m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontsize-small.fontweight-semibold', 'Cartão')), m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontweight-semibold.fontsize-small', 'Operadora')), m$1('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
-            return m$1('.w-row.card', [m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontsize-small.fontweight-semibold', ['XXXX XXXX XXXX', m$1.trust('&nbsp;'), card.last_digits])), m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontsize-small.fontweight-semibold.u-marginbottom-10', card.card_brand.toUpperCase())), m$1('.w-col.w-col-2.w-col-small-2', m$1('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', { onclick: ctrl.deleteCard(card.id) }, 'Remover'))]);
-        }), m$1('form.w-hidden', { action: '/pt/users/' + user.id + '/credit_cards/' + ctrl.toDeleteCard(), method: 'POST', config: ctrl.setCardDeletionForm }, [m$1('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m$1('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'), m$1('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']')])]), m$1('form.simple_form.refund_bank_account_form', { onsubmit: ctrl.onSubmit }, [m$1('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'billing\']'), m$1('.w-form.card.card-terciary', [m$1('.fontsize-base.fontweight-semibold', 'Dados bancários'), m$1('.fontsize-small.u-marginbottom-20', ['Caso algum projeto que você tenha apoiado ', m$1('b', 'com Boleto Bancário'), ' não seja bem-sucedido, nós efetuaremos o reembolso de seu pagamento ', m$1('b', 'automaticamente'), ' na conta indicada abaixo.']), m$1('.divider.u-marginbottom-20'), m$1('.w-row', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', 'Nome do titular'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
+        }) : '', m$1('.w-row', m$1('.w-col.w-col-10.w-col-push-1', [m$1('.w-form.card.card-terciary.u-marginbottom-20', [m$1('.fontsize-base.fontweight-semibold', 'Credit cards'), m$1('.fontsize-small.u-marginbottom-20', ['If any project you have supported ', m$1('b', 'With credit card'), ' Is not successful, we will refund you', m$1('b', 'Automatically'), ' In the card used to make the support. ']), m$1('.divider.u-marginbottom-20'), m$1('.w-row.w-hidden-tiny.card', [m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontsize-small.fontweight-semibold', 'Card')), m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontweight-semibold.fontsize-small', 'Operator')), m$1('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
+            return m$1('.w-row.card', [m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontsize-small.fontweight-semibold', ['XXXX XXXX XXXX', m$1.trust('&nbsp;'), card.last_digits])), m$1('.w-col.w-col-5.w-col-small-5', m$1('.fontsize-small.fontweight-semibold.u-marginbottom-10', card.card_brand.toUpperCase())), m$1('.w-col.w-col-2.w-col-small-2', m$1('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', { onclick: ctrl.deleteCard(card.id) }, 'To remove'))]);
+        }), m$1('form.w-hidden', { action: '/en/users/' + user.id + '/credit_cards/' + ctrl.toDeleteCard(), method: 'POST', config: ctrl.setCardDeletionForm }, [m$1('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m$1('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'), m$1('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']')])]), m$1('form.simple_form.refund_bank_account_form', { onsubmit: ctrl.onSubmit }, [m$1('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'billing\']'), m$1('.w-form.card.card-terciary', [m$1('.fontsize-base.fontweight-semibold', 'Bank data'), m$1('.fontsize-small.u-marginbottom-20', ['If any project you have supported ', m$1('b', 'With Boleto Bancaria'), ' Is not successful, we will refund your payment ', m$1('b', 'Automatically'), ' In the account indicated below.']), m$1('.divider.u-marginbottom-20'), m$1('.w-row', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', 'Cardholder Name'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
             value: fields.owner_name(),
             name: 'user[bank_account_attributes][owner_name]',
             onchange: m$1.withAttr('value', fields.owner_name)
-        })]), m$1('.w-col.w-col-6', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'CPF / CNPJ do titular'), m$1('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+        })]), m$1('.w-col.w-col-6', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'CPF / CNPJ of the holder'), m$1('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
             value: fields.owner_document(),
             name: 'user[bank_account_attributes][owner_document]',
             onchange: m$1.withAttr('value', fields.owner_document)
-        })])]), m$1('.w-row', [m$1('.w-col.w-col-6.w-sub-col' + (ctrl.showOtherBanksInput() ? '.w-hidden' : '') + '[id=\'bank_select\']', m$1('.input.select.required.user_bank_account_bank_id', [m$1('label.field-label', 'Banco'), m$1('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
+        })])]), m$1('.w-row', [m$1('.w-col.w-col-6.w-sub-col' + (ctrl.showOtherBanksInput() ? '.w-hidden' : '') + '[id=\'bank_select\']', m$1('.input.select.required.user_bank_account_bank_id', [m$1('label.field-label', 'Bank'), m$1('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
             name: 'user[bank_account_attributes][bank_id]',
             onchange: function onchange(e) {
                 m$1.withAttr('value', ctrl.bankCode)(e);
@@ -7163,19 +7163,19 @@ var userBilling = {
             return bank.id === fields.bank_id();
         }) ? '' : m$1('option[value=\'' + fields.bank_id() + '\']', {
             selected: true
-        }, bankAccount.bank_code + ' . ' + bankAccount.bank_name), m$1('option[value=\'0\']', 'Outro')]), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']', ' Selecione um banco')])), ctrl.showOtherBanksInput() ? m$1('.w-col.w-col-6.w-sub-col', m$1('.w-row.u-marginbottom-20[id=\'bank_search\']', m$1('.w-col.w-col-12', [m$1('.input.string.optional.user_bank_account_input_bank_number', [m$1('label.field-label', 'Número do banco (3 números)'), m$1('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
+        }, bankAccount.bank_code + ' . ' + bankAccount.bank_name), m$1('option[value=\'0\']', 'Other')]), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']', ' Select a bank')])), ctrl.showOtherBanksInput() ? m$1('.w-col.w-col-6.w-sub-col', m$1('.w-row.u-marginbottom-20[id=\'bank_search\']', m$1('.w-col.w-col-12', [m$1('.input.string.optional.user_bank_account_input_bank_number', [m$1('label.field-label', 'Bank Number (3 numbers)'), m$1('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
             name: 'user[bank_account_attributes][input_bank_number]',
             value: ctrl.bankInput(),
             onchange: m$1.withAttr('value', ctrl.bankInput)
-        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_input_bank_number\']', ' Número do banco inválido')]), m$1('a.w-hidden-small.w-hidden-tiny.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
+        }), m$1('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_input_bank_number\']', 'Invalid bank number')]), m$1('a.w-hidden-small.w-hidden-tiny.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
             onclick: ctrl.showOtherBanks.toggle
-        }, ['Busca por nome  ', m$1.trust('&nbsp;'), m$1.trust('&gt;')]), m$1('a.w-hidden-main.w-hidden-medium.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
+        }, ['Search by name  ', m$1.trust('&nbsp;'), m$1.trust('&gt;')]), m$1('a.w-hidden-main.w-hidden-medium.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
             onclick: ctrl.showOtherBanks.toggle
-        }, ['Busca por nome  ', m$1.trust('&nbsp;'), m$1.trust('&gt;')])]))) : '', ctrl.showOtherBanks() ? m$1('.w-row[id=\'bank_search_list\']', m$1('.w-col.w-col-12', m$1('.select-bank-list[data-ix=\'height-0-on-load\']', {
+        }, ['Search by name  ', m$1.trust('&nbsp;'), m$1.trust('&gt;')])]))) : '', ctrl.showOtherBanks() ? m$1('.w-row[id=\'bank_search_list\']', m$1('.w-col.w-col-12', m$1('.select-bank-list[data-ix=\'height-0-on-load\']', {
             style: {
                 'height': '395px'
             }
-        }, m$1('.card.card-terciary', [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-10.u-text-center', 'Selecione o seu banco abaixo'), m$1('.fontsize-smaller', [m$1('.w-row.card.card-secondary.fontweight-semibold', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('div', 'Número')), m$1('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m$1('div', 'Nome'))]), !_$1.isEmpty(ctrl.banks()) ? _$1.map(ctrl.banks(), function (bank) {
+        }, m$1('.card.card-terciary', [m$1('.fontsize-small.fontweight-semibold.u-marginbottom-10.u-text-center', 'Select your bank below'), m$1('.fontsize-smaller', [m$1('.w-row.card.card-secondary.fontweight-semibold', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('div', 'Number')), m$1('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m$1('div', 'Name'))]), !_$1.isEmpty(ctrl.banks()) ? _$1.map(ctrl.banks(), function (bank) {
             return m$1('.w-row.card.fontsize-smallest', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('a.link-hidden.bank-resource-link[data-code=\'' + bank.code + '\'][data-id=\'' + bank.id + '\'][href=\'javascript:void(0)\']', {
                 onclick: function onclick() {
                     ctrl.bankInput(bank.code);
@@ -7187,26 +7187,26 @@ var userBilling = {
                     ctrl.showOtherBanks.toggle();
                 }
             }, bank.code + ' . ' + bank.name))]);
-        }) : ''])])))) : '', m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency\']', 'Agência'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_agency\'][type=\'text\']', {
+        }) : ''])])))) : '', m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency\']', 'Agency'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_agency\'][type=\'text\']', {
             value: fields.agency(),
             name: 'user[bank_account_attributes][agency]',
             onchange: m$1.withAttr('value', fields.agency)
-        })]), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']', 'Dígito agência'), m$1('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
+        })]), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']', 'Agency digit'), m$1('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
             value: fields.agency_digit(),
             name: 'user[bank_account_attributes][agency_digit]',
             onchange: m$1.withAttr('value', fields.agency_digit)
-        })])]))]), m$1('.w-row', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.field-label.fontweight-semibold', 'Tipo de conta'), m$1('p.fontsize-smaller.u-marginbottom-20', 'Só aceitamos conta corrente')]), m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']', 'No. da conta'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
+        })])]))]), m$1('.w-row', [m$1('.w-col.w-col-6.w-sub-col', [m$1('label.field-label.fontweight-semibold', 'Account Type'), m$1('p.fontsize-smaller.u-marginbottom-20', 'We only accept checking account')]), m$1('.w-col.w-col-6', m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']', 'Account No.'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
             value: fields.account(),
             onchange: m$1.withAttr('value', fields.account),
             name: 'user[bank_account_attributes][account]'
-        })]), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']', 'Dígito conta'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
+        })]), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']', 'Account Digit'), m$1('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
             value: fields.account_digit(),
             onchange: m$1.withAttr('value', fields.account_digit),
             name: 'user[bank_account_attributes][account_digit]'
         })])]))]), bankAccount.bank_account_id ? m$1('input[id=\'user_bank_account_attributes_id\'][type=\'hidden\']', {
             name: 'user[bank_account_attributes][id]',
             value: fields.bank_account_id()
-        }) : '']), m$1('.u-margintop-30', m$1('.w-container', m$1('.w-row', m$1('.w-col.w-col-4.w-col-push-4', m$1('input.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Salvar\']')))))])]))]);
+        }) : '']), m$1('.u-margintop-30', m$1('.w-container', m$1('.w-row', m$1('.w-col.w-col-4.w-col-push-4', m$1('input.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'To save\']')))))])]))]);
     }
 };
 
@@ -7241,22 +7241,22 @@ var userNotifications = {
             reminders = ctrl.projectReminders();
 
         return m$1('[id=\'notifications-tab\']', ctrl.error() ? m$1.component(inlineError, {
-            message: 'Erro ao carregar a página.'
-        }) : m$1('form.simple_form.edit_user[accept-charset=\'UTF-8\'][action=\'/pt/users/' + user.id + '\'][method=\'post\'][novalidate=\'novalidate\']', [m$1('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m$1('input[name=\'_method\'][type=\'hidden\'][value=\'patch\']'), m$1('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m$1('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'notifications\']'), m$1('.w-container', [m$1('.w-row', m$1('.w-col.w-col-10.w-col-push-1', m$1('.w-form.card.card-terciary', [m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Newsletters:')), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[newsletter]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.newsletter ? '[checked=\'checked\']' : '') + '[id=\'user_newsletter\'][name=user[newsletter]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-base.fontweight-semibold[for=\'checkbox\']', ' Newsletter do Catarse (semanal)'), m$1('div', ['Projetos em destaque e posts do nosso Blog', m$1.trust('&nbsp;')])]))]), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Projetos que você apoiou:')), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[subscribed_to_project_posts]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.subscribed_to_project_posts ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_project_posts\'][name=user[subscribed_to_project_posts]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-base.fontweight-semibold', ' Quero receber atualizações dos projetos'), m$1('.u-marginbottom-20', m$1('a.alt-link[href=\'javascript:void(0);\']', {
+            message: 'Error loading page.'
+        }) : m$1('form.simple_form.edit_user[accept-charset=\'UTF-8\'][action=\'/en/users/' + user.id + '\'][method=\'post\'][novalidate=\'novalidate\']', [m$1('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m$1('input[name=\'_method\'][type=\'hidden\'][value=\'patch\']'), m$1('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m$1('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'notifications\']'), m$1('.w-container', [m$1('.w-row', m$1('.w-col.w-col-10.w-col-push-1', m$1('.w-form.card.card-terciary', [m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Newsletters:')), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[newsletter]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.newsletter ? '[checked=\'checked\']' : '') + '[id=\'user_newsletter\'][name=user[newsletter]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-base.fontweight-semibold[for=\'checkbox\']', ' JVN Newsletter (weekly)'), m$1('div', ['Featured Projects and Blog Posts', m$1.trust('&nbsp;')])]))]), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Projects you have supported:')), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[subscribed_to_project_posts]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.subscribed_to_project_posts ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_project_posts\'][name=user[subscribed_to_project_posts]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-base.fontweight-semibold', ' I want to receive project updates'), m$1('.u-marginbottom-20', m$1('a.alt-link[href=\'javascript:void(0);\']', {
             onclick: ctrl.showNotifications.toggle
-        }, ' Gerenciar as notifica\xE7\xF5es de ' + user.total_contributed_projects + ' projetos')), ctrl.showNotifications() ? m$1('ul.w-list-unstyled.u-radius.card.card-secondary[id=\'notifications-box\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
+        }, ' Manage notifications from ' + user.total_contributed_projects + ' projects')), ctrl.showNotifications() ? m$1('ul.w-list-unstyled.u-radius.card.card-secondary[id=\'notifications-box\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
             return m$1('li', m$1('.w-checkbox.w-clearfix', [m$1('input[id=\'unsubscribes_' + project.project_id + '\'][type=\'hidden\'][value=\'\']', {
                 name: 'unsubscribes[' + project.project_id + ']'
             }), m$1('input.w-checkbox-input' + (project.unsubscribed ? '' : '[checked=\'checked\']') + '[type=\'checkbox\'][value=\'1\'][id=\'user_unsubscribes_' + project.project_id + '\']', {
                 name: 'unsubscribes[' + project.project_id + ']'
             }), m$1('label.w-form-label.fontsize-small', project.project_name)]));
-        }) : '']) : '']))]), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Social:')), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[subscribed_to_friends_contributions]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.subscribed_to_friends_contributions ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_friends_contributions\'][name=user[subscribed_to_friends_contributions]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-small', 'Um amigo apoiou ou lançou um projeto')])), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[subscribed_to_new_followers]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.subscribed_to_new_followers ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_new_followers\'][name=user[subscribed_to_new_followers]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-small', 'Um amigo começou a me seguir')]))]), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Lembretes de projetos:')), m$1('.w-col.w-col-8', [!_$1.isEmpty(reminders) ? _$1.map(reminders, function (reminder) {
+        }) : '']) : '']))]), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Social:')), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[subscribed_to_friends_contributions]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.subscribed_to_friends_contributions ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_friends_contributions\'][name=user[subscribed_to_friends_contributions]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-small', 'A friend supported or launched a project')])), m$1('.w-col.w-col-8', m$1('.w-checkbox.w-clearfix', [m$1('input[name=user[subscribed_to_new_followers]][type=\'hidden\'][value=\'0\']'), m$1('input.w-checkbox-input' + (user.subscribed_to_new_followers ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_new_followers\'][name=user[subscribed_to_new_followers]][type=\'checkbox\'][value=\'1\']'), m$1('label.w-form-label.fontsize-small', 'A friend started following me.')]))]), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4', m$1('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Project Reminders:')), m$1('.w-col.w-col-8', [!_$1.isEmpty(reminders) ? _$1.map(reminders, function (reminder) {
             return m$1('.w-checkbox.w-clearfix', [m$1('input[id=\'user_reminders_' + reminder.project_id + '\'][type=\'hidden\'][value=\'false\']', {
                 name: 'user[reminders][' + reminder.project_id + ']'
             }), m$1('input.w-checkbox-input[checked=\'checked\'][type=\'checkbox\'][value=\'1\'][id=\'user_reminders_' + reminder.project_id + '\']', {
                 name: 'user[reminders][' + reminder.project_id + ']'
             }), m$1('label.w-form-label.fontsize-small', reminder.project_name)]);
-        }) : ''])])]))), m$1('.u-margintop-30', m$1('.w-container', m$1('.w-row', m$1('.w-col.w-col-4.w-col-push-4', m$1('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'Salvar\']')))))])]));
+        }) : ''])])]))), m$1('.u-margintop-30', m$1('.w-container', m$1('.w-row', m$1('.w-col.w-col-4.w-col-push-4', m$1('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'To save\']')))))])]));
     }
 };
 
@@ -7887,11 +7887,11 @@ var paymentSlip = {
         };
     },
     view: function view(ctrl, args) {
-        return m$1('.w-row', m$1('.w-col.w-col-12', m$1('.u-margintop-30.u-marginbottom-60.u-radius.card-big.card', [m$1('.fontsize-small.u-marginbottom-20', ctrl.slipPaymentDate() ? 'Esse boleto banc\xE1rio vence no dia ' + h.momentify(ctrl.slipPaymentDate().slip_expiration_date) + '.' : 'carregando...'), m$1('.fontsize-small.u-marginbottom-40', 'Ao gerar o boleto, o realizador já está contando com o seu apoio. Pague até a data de vencimento pela internet, casas lotéricas, caixas eletrônicos ou agência bancária.'), m$1('.w-row', m$1('.w-col.w-col-8.w-col-push-2', [ctrl.loading() ? h.loader() : ctrl.completed() ? '' : m$1('input.btn.btn-large.u-marginbottom-20', {
+        return m$1('.w-row', m$1('.w-col.w-col-12', m$1('.u-margintop-30.u-marginbottom-60.u-radius.card-big.card', [m$1('.fontsize-small.u-marginbottom-20', ctrl.slipPaymentDate() ? 'This bank slip expires on ' + h.momentify(ctrl.slipPaymentDate().slip_expiration_date) + '.' : 'Loading...'), m$1('.fontsize-small.u-marginbottom-40', 'In generating the ticket, the director is already counting on his support. Pay through the internet due date, lottery houses, ATMs or bank branch.'), m$1('.w-row', m$1('.w-col.w-col-8.w-col-push-2', [ctrl.loading() ? h.loader() : ctrl.completed() ? '' : m$1('input.btn.btn-large.u-marginbottom-20', {
             onclick: ctrl.buildSlip,
-            value: 'Imprimir Boleto',
+            value: 'Print Ticket',
             type: 'submit'
-        }), ctrl.error() ? m$1.component(inlineError, { message: ctrl.error() }) : '', m$1('.fontsize-smallest.u-text-center.u-marginbottom-30', ['Ao apoiar, você concorda com os ', m$1('a.alt-link[href=\'/pt/terms-of-use\']', 'Termos de Uso '), 'e ', m$1('a.alt-link[href=\'/pt/privacy-policy\']', 'Política de Privacidade')])]))])));
+        }), ctrl.error() ? m$1.component(inlineError, { message: ctrl.error() }) : '', m$1('.fontsize-smallest.u-text-center.u-marginbottom-30', ['By supporting, you agree with the ', m$1('a.alt-link[href=\'/en/terms-of-use\']', 'Terms of use '), 'e ', m$1('a.alt-link[href=\'/en/privacy-policy\']', 'privacy policy')])]))])));
     }
 };
 
@@ -8456,10 +8456,10 @@ var paymentCreditCard = {
 
             if (document.length > 14) {
                 isValid = h.validateCnpj(document);
-                errorMessage = 'CNPJ inválido.';
+                errorMessage = 'Invalid CNPJ.';
             } else {
                 isValid = h.validateCpf(striped);
-                errorMessage = 'CPF inválido.';
+                errorMessage = 'Invalid CPF.';
             }
 
             handleValidity(isValid, { field: 'cardOwnerDocument', message: errorMessage });
@@ -8597,7 +8597,7 @@ var paymentCreditCard = {
                 onchange: m$1.withAttr('value', ctrl.selectedInstallment),
                 value: ctrl.selectedInstallment()
             }, _$1.map(ctrl.installments(), function (installment) {
-                return m$1('option[value="' + installment.number + '"]', installment.number + ' X R$ ' + installment.amount);
+                return m$1('option[value="' + installment.number + '"]', installment.number + ' X Rs ' + installment.amount);
             })))]]);
         })) : ctrl.loadingSavedCreditCards() ? m$1('.fontsize-small.u-marginbottom-40', I18n$1.t('credit_card.loading', ctrl.scope())) : '', !ctrl.showForm() ? '' : m$1('#credit-card-payment-form.u-marginbottom-40', [m$1('div#credit-card-name', [m$1('.w-row', [m$1(isInternational ? '.w-col.w-col-12' : '.w-col.w-col-6.w-col-tiny-6.w-sub-col-middle', [m$1('label.field-label.fontweight-semibold[for="credit-card-name"]', I18n$1.t('credit_card.name', ctrl.scope())), m$1('.fontsize-smallest.fontcolor-terciary.u-marginbottom-10.field-label-tip.u-marginbottom-10', I18n$1.t('credit_card.name_tip', ctrl.scope())), m$1('input.w-input.text-field[name="credit-card-name"][type="text"]', {
             onfocus: ctrl.vm.resetCreditCardFieldError('name'),
@@ -8643,7 +8643,7 @@ var paymentCreditCard = {
             onchange: m$1.withAttr('value', ctrl.selectedInstallment),
             value: ctrl.selectedInstallment()
         }, _$1.map(ctrl.installments(), function (installment) {
-            return m$1('option[value="' + installment.number + '"]', installment.number + ' X R$ ' + installment.amount);
+            return m$1('option[value="' + installment.number + '"]', installment.number + ' X Rs ' + installment.amount);
         }))]), m$1('.w-col.w-col-6')]), m$1('.w-checkbox.w-clearfix', [m$1('input#payment_save_card.w-checkbox-input[type="checkbox"][name="payment_save_card"]', {
             onchange: m$1.withAttr('checked', ctrl.creditCard.save),
             checked: ctrl.creditCard.save()
@@ -8685,7 +8685,7 @@ var paymentForm = {
                 return ctrl.isSlip(true);
             },
             class: ctrl.isSlip() ? 'selected' : ''
-        }, [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-20', 'Boleto bancário'), m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/57299c6ef96a6e44489a7a07_boleto.png\'][width=\'48\']')]) : m$1('.flex-column')]), !ctrl.isSlip() ? m$1('#credit-card-section', [m$1.component(paymentCreditCard, { vm: args.vm, contribution_id: args.contribution_id, project_id: args.project_id, user_id: args.user_id })]) : !args.vm.isInternational() ? m$1('#boleto-section', [m$1.component(paymentSlip, { vm: args.vm, contribution_id: args.contribution_id, project_id: args.project_id })]) : '']);
+        }, [m$1('.fontsize-base.fontweight-semibold.u-marginbottom-20', 'Bank slip'), m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/57299c6ef96a6e44489a7a07_boleto.png\'][width=\'48\']')]) : m$1('.flex-column')]), !ctrl.isSlip() ? m$1('#credit-card-section', [m$1.component(paymentCreditCard, { vm: args.vm, contribution_id: args.contribution_id, project_id: args.project_id, user_id: args.user_id })]) : !args.vm.isInternational() ? m$1('#boleto-section', [m$1.component(paymentSlip, { vm: args.vm, contribution_id: args.contribution_id, project_id: args.project_id })]) : '']);
     }
 };
 
@@ -9421,7 +9421,7 @@ var teamTotal = {
     },
     view: function view(ctrl, args) {
         return m$1('#team-total-static.w-section.section-one-column.section.u-margintop-40.u-text-center.u-marginbottom-20', [ctrl.vm.collection().map(function (teamTotal) {
-            return m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-2'), m$1('.w-col.w-col-8', [m$1('.fontsize-base.u-marginbottom-30', 'Hoje somos ' + teamTotal.member_count + ' pessoas espalhadas por ' + teamTotal.total_cities + ' cidades em ' + teamTotal.countries.length + ' países (' + teamTotal.countries.toString() + ')! O Catarse é independente, sem investidores, de código aberto e construído com amor. Nossa paixão é construir um ambiente onde cada vez mais projetos possam ganhar vida.'), m$1('.fontsize-larger.lineheight-tight.text-success', 'Nossa equipe, junta, já apoiou R$' + h.formatNumber(teamTotal.total_amount) + ' para ' + teamTotal.total_contributed_projects + ' projetos!')]), m$1('.w-col.w-col-2')])]);
+            return m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-2'), m$1('.w-col.w-col-8', [m$1('.fontsize-base.u-marginbottom-30', 'Today we are' + teamTotal.member_count + ' People scattered over ' + teamTotal.total_cities + ' Cities in ' + teamTotal.countries.length + ' Countries (' + teamTotal.countries.toString() + ')! JVN is independent, open-source, and built with love. Our passion is to build an environment where more and more projects can come to life.'), m$1('.fontsize-larger.lineheight-tight.text-success', 'Our team, together, has already Rs' + h.formatNumber(teamTotal.total_amount) + ' for ' + teamTotal.total_contributed_projects + ' Business!')]), m$1('.w-col.w-col-2')])]);
         })]);
     }
 };
@@ -9448,7 +9448,7 @@ var teamMembers = {
     view: function view(ctrl) {
         return m$1('#team-members-static.w-section.section', [m$1('.w-container', [_$1.map(ctrl.vm.collection(), function (group) {
             return m$1('.w-row.u-text-center', [_$1.map(group, function (member) {
-                return m$1('.team-member.w-col.w-col-3.w-col-small-3.w-col-tiny-6.u-marginbottom-40', [m$1('a.alt-link[href="/users/' + member.id + '"]', [m$1('img.thumb.big.u-round.u-marginbottom-10[src="' + member.img + '"]'), m$1('.fontweight-semibold.fontsize-base', member.name)]), m$1('.fontsize-smallest.fontcolor-secondary', 'Apoiou ' + member.total_contributed_projects + ' projetos')]);
+                return m$1('.team-member.w-col.w-col-3.w-col-small-3.w-col-tiny-6.u-marginbottom-40', [m$1('a.alt-link[href="/users/' + member.id + '"]', [m$1('img.thumb.big.u-round.u-marginbottom-10[src="' + member.img + '"]'), m$1('.fontweight-semibold.fontsize-base', member.name)]), m$1('.fontsize-smallest.fontcolor-secondary', 'Supported ' + member.total_contributed_projects + ' Business')]);
             })]);
         })])]);
     }
@@ -9501,7 +9501,7 @@ var userBalanceRequestModelContent = {
         var balance = args.balance;
 
         return ctrl.loadBankA() ? h.loader() : m$1('div', _$1.map(ctrl.bankAccounts(), function (item) {
-            return [m$1('.modal-dialog-header', [m$1('.fontsize-large.u-text-center', I18n$1.t('withdraw', I18nScope$34()))]), ctrl.displayDone() ? m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-large', I18n$1.t('sucess_message', I18nScope$34()))]) : m$1('.modal-dialog-content', [m$1('.fontsize-base.u-marginbottom-20', [m$1('span.fontweight-semibold', 'Valor:'), m$1.trust('&nbsp;'), m$1('span.text-success', 'R$ ' + h.formatNumber(balance.amount, 2, 3))]), m$1('.fontsize-base.u-marginbottom-10', [m$1('span', { style: { 'font-weight': ' 600' } }, I18n$1.t('bank.account', I18nScope$34()))]), m$1('.fontsize-small.u-marginbottom-10', [m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.name', I18nScope$34())), m$1.trust('&nbsp;'), item.owner_name]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.cpf_cnpj', I18nScope$34())), m$1.trust('&nbsp;'), item.owner_document]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.bank_name', I18nScope$34())), m$1.trust('&nbsp;'), item.bank_name]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.agency', I18nScope$34())), m$1.trust('&nbsp;'), item.agency + '-' + item.agency_digit]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.account', I18nScope$34())), m$1.trust('&nbsp;'), item.account + '-' + item.account_digit])])]), !ctrl.displayDone() ? m$1('.modal-dialog-nav-bottom', [m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [ctrl.requestLoader() ? h.loader() : m$1('a.btn.btn-large.btn-request-fund[href="js:void(0);"]', { onclick: ctrl.requestFund }, 'Solicitar saque')]), m$1('.w-col.w-col-3')])]) : ''];
+            return [m$1('.modal-dialog-header', [m$1('.fontsize-large.u-text-center', I18n$1.t('withdraw', I18nScope$34()))]), ctrl.displayDone() ? m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-large', I18n$1.t('sucess_message', I18nScope$34()))]) : m$1('.modal-dialog-content', [m$1('.fontsize-base.u-marginbottom-20', [m$1('span.fontweight-semibold', 'Value:'), m$1.trust('&nbsp;'), m$1('span.text-success', 'R$ ' + h.formatNumber(balance.amount, 2, 3))]), m$1('.fontsize-base.u-marginbottom-10', [m$1('span', { style: { 'font-weight': ' 600' } }, I18n$1.t('bank.account', I18nScope$34()))]), m$1('.fontsize-small.u-marginbottom-10', [m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.name', I18nScope$34())), m$1.trust('&nbsp;'), item.owner_name]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.cpf_cnpj', I18nScope$34())), m$1.trust('&nbsp;'), item.owner_document]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.bank_name', I18nScope$34())), m$1.trust('&nbsp;'), item.bank_name]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.agency', I18nScope$34())), m$1.trust('&nbsp;'), item.agency + '-' + item.agency_digit]), m$1('div', [m$1('span.fontcolor-secondary', I18n$1.t('bank.account', I18nScope$34())), m$1.trust('&nbsp;'), item.account + '-' + item.account_digit])])]), !ctrl.displayDone() ? m$1('.modal-dialog-nav-bottom', [m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [ctrl.requestLoader() ? h.loader() : m$1('a.btn.btn-large.btn-request-fund[href="js:void(0);"]', { onclick: ctrl.requestFund }, 'Request withdrawal')]), m$1('.w-col.w-col-3')])]) : ''];
         }));
     }
 };
@@ -9533,7 +9533,7 @@ var userBalance = {
         return m$1('.w-section.section.user-balance-section', [ctrl.displayModal() ? m$1.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: balanceRequestModalC
-        }) : '', m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-8.u-text-center-small-only.u-marginbottom-20', [m$1('.fontsize-larger', [I18n.t('totals', I18nScope$33()), m$1('span.text-success', 'R$ ' + h.formatNumber(balance.amount, 2, 3))])]), m$1('.w-col.w-col-4', [m$1('a[class="r-fund-btn w-button btn btn-medium u-marginbottom-10 ' + (balance.amount <= 0 ? 'btn-inactive' : '') + '"][href="js:void(0);"]', { onclick: balance.amount > 0 ? ctrl.displayModal.toggle : 'js:void(0);' }, I18n.t('withdraw_cta', I18nScope$33()))])])])]);
+        }) : '', m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-8.u-text-center-small-only.u-marginbottom-20', [m$1('.fontsize-larger', [I18n.t('totals', I18nScope$33()), m$1('span.text-success', 'Rs ' + h.formatNumber(balance.amount, 2, 3))])]), m$1('.w-col.w-col-4', [m$1('a[class="r-fund-btn w-button btn btn-medium u-marginbottom-10 ' + (balance.amount <= 0 ? 'btn-inactive' : '') + '"][href="js:void(0);"]', { onclick: balance.amount > 0 ? ctrl.displayModal.toggle : 'js:void(0);' }, I18n.t('withdraw_cta', I18nScope$33()))])])])]);
     }
 };
 
@@ -9555,10 +9555,10 @@ var userBalanceTrasactionRow = {
         var item = args.item,
             createdAt = h.momentFromString(item.created_at, 'YYYY-MM-DD');
 
-        return m$1('div[class=\'balance-card ' + (ctrl.expanded() ? 'card-detailed-open' : '') + '\']', m$1('.w-clearfix.card.card-clickable', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-tiny-2', [m$1('.fontsize-small.lineheight-tightest', createdAt.format('D MMM')), m$1('.fontsize-smallest.fontcolor-terciary', createdAt.format('YYYY'))]), m$1('.w-col.w-col-10.w-col-tiny-10', [m$1('.w-row', [m$1('.w-col.w-col-4', [m$1('div', [m$1('span.fontsize-smaller.fontcolor-secondary', I18n.t('debit', I18nScope$35())), m$1.trust('&nbsp;'), m$1('span.fontsize-base.text-error', 'R$ ' + h.formatNumber(Math.abs(item.debit), 2, 3))])]), m$1('.w-col.w-col-4', [m$1('div', [m$1('span.fontsize-smaller.fontcolor-secondary', I18n.t('credit', I18nScope$35())), m$1.trust('&nbsp;'), m$1('span.fontsize-base.text-success', 'R$ ' + h.formatNumber(item.credit, 2, 3))])]), m$1('.w-col.w-col-4', [m$1('div', [m$1('span.fontsize-smaller.fontcolor-secondary', I18n.t('totals', I18nScope$35())), m$1.trust('&nbsp;'), m$1('span.fontsize-base', 'R$ ' + h.formatNumber(item.total_amount, 2, 3))])])])])]), m$1('a.w-inline-block.arrow-admin.' + (ctrl.expanded() ? 'arrow-admin-opened' : '') + '.fa.fa-chevron-down.fontcolor-secondary[href="js:(void(0));"]', { onclick: ctrl.expanded.toggle })]), ctrl.expanded() ? m$1('.card', _.map(item.source, function (transaction) {
+        return m$1('div[class=\'balance-card ' + (ctrl.expanded() ? 'card-detailed-open' : '') + '\']', m$1('.w-clearfix.card.card-clickable', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-tiny-2', [m$1('.fontsize-small.lineheight-tightest', createdAt.format('D MMM')), m$1('.fontsize-smallest.fontcolor-terciary', createdAt.format('YYYY'))]), m$1('.w-col.w-col-10.w-col-tiny-10', [m$1('.w-row', [m$1('.w-col.w-col-4', [m$1('div', [m$1('span.fontsize-smaller.fontcolor-secondary', I18n.t('debit', I18nScope$35())), m$1.trust('&nbsp;'), m$1('span.fontsize-base.text-error', 'Rs ' + h.formatNumber(Math.abs(item.debit), 2, 3))])]), m$1('.w-col.w-col-4', [m$1('div', [m$1('span.fontsize-smaller.fontcolor-secondary', I18n.t('credit', I18nScope$35())), m$1.trust('&nbsp;'), m$1('span.fontsize-base.text-success', 'Rs ' + h.formatNumber(item.credit, 2, 3))])]), m$1('.w-col.w-col-4', [m$1('div', [m$1('span.fontsize-smaller.fontcolor-secondary', I18n.t('totals', I18nScope$35())), m$1.trust('&nbsp;'), m$1('span.fontsize-base', 'Rs ' + h.formatNumber(item.total_amount, 2, 3))])])])])]), m$1('a.w-inline-block.arrow-admin.' + (ctrl.expanded() ? 'arrow-admin-opened' : '') + '.fa.fa-chevron-down.fontcolor-secondary[href="js:(void(0));"]', { onclick: ctrl.expanded.toggle })]), ctrl.expanded() ? m$1('.card', _.map(item.source, function (transaction) {
             var pos = transaction.amount >= 0;
 
-            return m$1('div', [m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-2', [m$1('.text-' + (pos ? 'success' : 'error'), (pos ? '+' : '-') + ' R$ ' + h.formatNumber(Math.abs(transaction.amount), 2, 3))]), m$1('.w-col.w-col-10', [m$1('div', transaction.event_name + ' ' + transaction.origin_object.name)])]), m$1('.divider.u-marginbottom-10')]);
+            return m$1('div', [m$1('.w-row.fontsize-small.u-marginbottom-10', [m$1('.w-col.w-col-2', [m$1('.text-' + (pos ? 'success' : 'error'), (pos ? '+' : '-') + ' Rs ' + h.formatNumber(Math.abs(transaction.amount), 2, 3))]), m$1('.w-col.w-col-10', [m$1('div', transaction.event_name + ' ' + transaction.origin_object.name)])]), m$1('.divider.u-marginbottom-10')]);
         })) : '');
     }
 };
@@ -9578,7 +9578,7 @@ var userBalanceTransactions = {
             return m$1.component(userBalanceTrasactionRow, { item: item, index: index });
         })), m$1('.container', [m$1('.w-row.u-margintop-40', [m$1('.w-col.w-col-2.w-col-push-5', [!list.isLoading() ? list.isLastPage() ? '' : m$1('button#load-more.btn.btn-medium.btn-terciary', {
             onclick: list.nextPage
-        }, 'Carregar mais') : h.loader()])])])]);
+        }, 'Load more') : h.loader()])])])]);
     }
 };
 
@@ -9714,9 +9714,9 @@ var UserFollowBtn = {
                 onmouseout: function onmouseout() {
                     return ctrl.hover(false);
                 }
-            }, ctrl.hover() ? 'Deixar de seguir' : 'Seguindo');
+            }, ctrl.hover() ? 'Unfollow' : 'Following');
         } else {
-            return m$1('a.w-button.btn.btn-medium.btn-terciary.u-margintop-20', { onclick: ctrl.follow }, 'Seguir');
+            return m$1('a.w-button.btn.btn-medium.btn-terciary.u-margintop-20', { onclick: ctrl.follow }, 'follow');
         }
     }
 };
@@ -9739,7 +9739,7 @@ var UserFollowCard = {
   view: function view(ctrl, args) {
     var friend = ctrl.friend(),
         profile_img = _$1.isEmpty(friend.avatar) ? '/assets/catarse_bootstrap/user.jpg' : friend.avatar;
-    return m$1('.w-col.w-col-4', m$1('.card.card-backer.u-marginbottom-20.u-radius.u-text-center', [m$1('img.thumb.u-marginbottom-10.u-round[src=\'' + profile_img + '\']'), m$1('.fontsize-base.fontweight-semibold.lineheight-tight', m$1('a.link-hidden', { href: '/users/' + friend.friend_id }, friend.name)), m$1('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', _$1.isNull(friend.city) ? '' : m$1('.fontsize-smaller.fontcolor-secondary.u-marginbottom-10', friend.city + ', ' + friend.state)), m$1('.fontsize-smaller', [m$1('span.fontweight-semibold', friend.total_contributed_projects), ' apoiados ', m$1.trust('&nbsp;'), '| ', m$1.trust('&nbsp;'), m$1('span.fontweight-semibold', friend.total_published_projects), ' criados']), m$1('.btn-bottom-card.w-row', [m$1('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m$1('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', m$1.component(UserFollowBtn, { following: friend.following, follow_id: friend.friend_id })), m$1('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])]));
+    return m$1('.w-col.w-col-4', m$1('.card.card-backer.u-marginbottom-20.u-radius.u-text-center', [m$1('img.thumb.u-marginbottom-10.u-round[src=\'' + profile_img + '\']'), m$1('.fontsize-base.fontweight-semibold.lineheight-tight', m$1('a.link-hidden', { href: '/users/' + friend.friend_id }, friend.name)), m$1('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', _$1.isNull(friend.city) ? '' : m$1('.fontsize-smaller.fontcolor-secondary.u-marginbottom-10', friend.city + ', ' + friend.state)), m$1('.fontsize-smaller', [m$1('span.fontweight-semibold', friend.total_contributed_projects), ' Supported ', m$1.trust('&nbsp;'), '| ', m$1.trust('&nbsp;'), m$1('span.fontweight-semibold', friend.total_published_projects), ' Created']), m$1('.btn-bottom-card.w-row', [m$1('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m$1('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', m$1.component(UserFollowBtn, { following: friend.following, follow_id: friend.friend_id })), m$1('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])]));
   }
 };
 
@@ -9788,9 +9788,9 @@ var userFriends = {
     },
     view: function view(ctrl, args) {
         var listVM = ctrl.friendListVM;
-        return m$1('.w-section.bg-gray.before-footer.section', [m$1('.w-container', [m$1('.w-row.u-marginbottom-40.card.u-radius.card-terciary', [m$1('.w-col.w-col-7.w-col-small-6.w-col-tiny-6', [m$1('.fontsize-small', 'Comece agora! Siga todos os seus amigos ou somente alguns deles para descobrir projetos juntos!')]), m$1('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [ctrl.allLoading() ? h.loader() : m$1('a.w-button.btn.btn-medium', {
+        return m$1('.w-section.bg-gray.before-footer.section', [m$1('.w-container', [m$1('.w-row.u-marginbottom-40.card.u-radius.card-terciary', [m$1('.w-col.w-col-7.w-col-small-6.w-col-tiny-6', [m$1('.fontsize-small', 'Start now! Follow all your friends or just a few of them to discover projects together!')]), m$1('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [ctrl.allLoading() ? h.loader() : m$1('a.w-button.btn.btn-medium', {
             onclick: ctrl.followAll
-        }, 'Siga todos os seus ' + (listVM.total() ? listVM.total() : '') + ' amigos')])]), m$1('.w-row', [_$1.map(listVM.collection(), function (friend) {
+        }, 'Follow all your ' + (listVM.total() ? listVM.total() : '') + ' friends')])]), m$1('.w-row', [_$1.map(listVM.collection(), function (friend) {
             return m$1.component(UserFollowCard, { friend: friend });
         })]), m$1('.w-section.section.bg-gray', [m$1('.w-container', [m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-5', [m$1('.u-marginright-20')]), m$1.component(loadMoreBtn, { collection: listVM }), m$1('.w-col.w-col-5')])])])])]);
     }

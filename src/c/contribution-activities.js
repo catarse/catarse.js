@@ -74,7 +74,7 @@ const contributionActivities = {
                             m('img.thumb-author.u-round', {src: resource.project_thumbnail, width: 80, style: 'margin-right: 0;'}),
                         ])
                     ]),
-                    m('.fontsize-large', `${resource.name} apoiou`),
+                    m('.fontsize-large', `${resource.name} Supported`),
                     m('.fontsize-larger', [
                         m('a.link-hidden-white', {href: project_link}, resource.project_name)
                     ])

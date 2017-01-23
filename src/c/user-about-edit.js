@@ -28,7 +28,7 @@ const userAboutEdit = {
         const user = args.user || {};
         return m('#about-tab.content',
             m('form.simple_form.w-form', {
-                    action: `/pt/users/${user.id}`,
+                    action: `/en/users/${user.id}`,
                     novalidate: true,
                     enctype: 'multipart/form-data',
                     'accept-charset': 'UTF-8',
@@ -49,10 +49,10 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Imagem do perfil'
+                                                                '  Profile picture'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                                '  Essa imagem será utilizada como a miniatura de seu perfil (PNG, JPG tamanho 280 x 280)'
+                                                                ' This image will be used as your profile thumbnail (PNG, JPG size 280x280)'
                                                             )
                                                         ]
                                                     ),
@@ -61,7 +61,7 @@ const userAboutEdit = {
                                                             [
                                                                 m('label.field-label'),
                                                                 m('span.hint',
-                                                                    m(`img[alt="Avatar do Usuario"][src="${userVM.displayImage(user)}"]`)
+                                                                    m(`img[alt="User avatar"][src="${userVM.displayImage(user)}"]`)
                                                                 ),
                                                                 m('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', {name: 'user[uploaded_image]'})
                                                             ]
@@ -74,10 +74,10 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Imagem de capa do perfil'
+                                                                '  Profile Cover Image'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                                '  Essa imagem será utilizada como fundo do cabeçalho do seu perfil público (PNG ou JPG). Caso você não envie nenhum imagem aqui, utilizaremos sua imagem de perfil como alternativa.'
+                                                                '  This image will be used as the background of your public profile header (PNG or JPG). If you do not submit any images here, we will use your profile image as an alternative.'
                                                             )
                                                         ]
                                                     ),
@@ -101,10 +101,10 @@ const userAboutEdit = {
                                             m('.w-col.w-col-5.w-sub-col',
                                                 [
                                                     m('label.field-label.fontweight-semibold',
-                                                        'Endereço do seu perfil'
+                                                        'Address of your profile'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                        'Seu perfil público pode ter uma URL personalizada. Escolha uma fácil de guardar!    '
+                                                        'Your public profile may have a custom URL. Choose an easy to save!    '
                                                     )
                                                 ]
                                             ),
@@ -130,10 +130,10 @@ const userAboutEdit = {
                                             m('.w-col.w-col-5.w-sub-col',
                                                 [
                                                     m('label.field-label.fontweight-semibold',
-                                                        '  Nome'
+                                                        '  Name'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                        '  Esse é o nome que os usuários irão ver no seu perfil público'
+                                                        '  This is the name that users will see in your public profile'
                                                     )
                                                 ]
                                             ),
@@ -152,10 +152,10 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Perfil do facebook'
+                                                                '  Facebook profile'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                                '  Cole o link do seu perfil'
+                                                                '  Paste your profile link'
                                                             )
                                                         ]
                                                     ),
@@ -172,10 +172,10 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Perfil do twitter'
+                                                                '  Twitter profile'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                                '  Cole o link do seu perfil'
+                                                                '  Paste your profile link'
                                                             )
                                                         ]
                                                     ),
@@ -195,9 +195,9 @@ const userAboutEdit = {
                                                 m('.w-col.w-col-5.w-sub-col',
                                                     [
                                                         m('label.field-label.fontweight-semibold[for="name-8"]',
-                                                            ' Presença na internet'
+                                                            ' Presence on the internet'
                                                         ),
-                                                        m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Inclua links que ajudem outros usuários a te conhecer melhor. ')
+                                                        m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')
                                                     ]
                                                 ),
                                                 m('.w-col.w-col-7',
@@ -264,7 +264,7 @@ const userAboutEdit = {
                                                         'Sobre'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20',
-                                                        'Fale sobre você e tente fornecer as informações mais relevantes para que visitantes possam te conhecer melhor. '
+                                                        'Talk about yourself and try to provide the most relevant information so visitors can get to know you better. '
                                                     ),
                                                     m('.w-form',
                                                         m('.preview-container.u-marginbottom-40', h.redactor('user[about_html]', m.prop(user.about_html)))
@@ -284,7 +284,7 @@ const userAboutEdit = {
                             m('.w-col.w-col-4.w-col-push-4',
                                 [
                                     m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'),
-                                    m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Salvar"]')
+                                    m('input.btn.btn.btn-large[name="commit"][type="submit"][value="To save"]')
                                 ]
                             ),
                             m('.w-col.w-col-4')
