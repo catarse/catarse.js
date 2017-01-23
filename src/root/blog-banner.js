@@ -10,7 +10,6 @@ const blogBanner : Component = {
             error = m.prop(false);
 
         blogVM.getBlogPosts().then(posts).catch(error);
-
         return {posts, error};
     },
     view(ctrl, args) {
@@ -33,8 +32,7 @@ const blogBanner : Component = {
                     m('.w-row', _.map(ctrl.posts(), (post) => {
                         return m('.w-col.w-col-4.col-blog-post',
                             [
-                                m(`a.link-hidden.fontweight-semibold.fontsize-base.u-marginbottom-10[href="${post[2][1]}"][target=\'__blank\']`, post[0][1]),
-                                m('.fontsize-smaller.fontcolor-secondary.u-margintop-10', m.trust(post[1][1]))
+                                m(`a.link-hidden.fontweight-semibold.fontsize-base.u-marginbottom-10[href="${post[2][1]}"][target=\'__blank\']`, post[0][1])
                             ]
                         );
                     })),

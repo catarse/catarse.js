@@ -161,7 +161,7 @@ const start = {
                             m('p.fontsize-small.start-stats', I18n.t('header.people', I18nScope()))
                         ]),
                         m('.w-col.w-col-4', [
-                            m('.fontsize-largest.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' milhões'),
+                            m('.fontsize-largest.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'),
                             m('p.fontsize-small.start-stats', I18n.t('header.money', I18nScope()))
                         ]),
                         m('.w-col.w-col-4', [
@@ -358,10 +358,10 @@ const start = {
                                             }, I18n.t('submit', I18nScope()))
                                         ]),
                                         m('.w-col.w-col-7', [
-                                            m('.fontsize-megajumbo.fontcolor-negative', `R$ ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
-                                            m('.fontsize-large.u-marginbottom-20', 'Doados para projetos'),
+                                            m('.fontsize-megajumbo.fontcolor-negative', `Rs ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
+                                            m('.fontsize-large.u-marginbottom-20', 'Donated to projects'),
                                             m('.fontsize-megajumbo.fontcolor-negative', (category.successful_projects) ? category.successful_projects : '...'),
-                                            m('.fontsize-large.u-marginbottom-30', 'Projetos financiados'),
+                                            m('.fontsize-large.u-marginbottom-30', 'Projects financed'),
                                             !_.isEmpty(ctrl.featuredProjects()) ? _.map(ctrl.featuredProjects(), (project) => {
                                                 return !_.isUndefined(project) ? m('.w-row.u-marginbottom-10', [
                                                     m('.w-col.w-col-1', [
@@ -413,7 +413,7 @@ const start = {
             ]),
             m('#start-form.w-section.section-large.u-text-center.bg-purple.before-footer', [
                 m('.w-container', [
-                    m('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Crie o seu rascunho gratuitamente!'),
+                    m('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Create your sketch for free!'),
                     m('form[action="/projects/fallback_create"][method="GET"].w-row.w-form', {
                         onsubmit: (e) => {
                             h.analytics.oneTimeEvent({cat: 'project_create',act: 'create_form_submit'})(e);
@@ -435,7 +435,7 @@ const start = {
                                     m.withAttr('value', ctrl.projectName)(e);
                                 }
                             }),
-                            m('.fontsize-larger.fontcolor-negative.u-marginbottom-10', 'na categoria'),
+                            m('.fontsize-larger.fontcolor-negative.u-marginbottom-10', 'In category'),
                             m('select.w-select.text-field.medium.u-marginbottom-40', {
                                 name: 'project[category_id]',
                                 class: ctrl.projectCategoryError() ? 'error' : '',
@@ -457,7 +457,7 @@ const start = {
                                 m(`input[type="submit"][value="${I18n.t('form.submit', I18nScope())}"].w-button.btn.btn-large`)
                             ]),
                         ]),
-                        m('.w-row.u-marginbottom-80', (ctrl.projectNameError() || ctrl.projectCategoryError()) ? m.component(inlineError, {message: 'Por favor, verifique novamente os campos acima!'}) : '')
+                        m('.w-row.u-marginbottom-80', (ctrl.projectNameError() || ctrl.projectCategoryError()) ? m.component(inlineError, {message: 'Please check the fields above again!'}) : '')
                     ])
                 ])
             ])

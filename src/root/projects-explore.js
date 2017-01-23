@@ -57,16 +57,16 @@ const projectsExplore = {
                     hasHint = false;
                   if (currentFilter().keyName === 'all') {
                       hasHint = true;
-                      hintText = 'Ordenados por popularidade ';
-                      tooltipText = 'O nosso fator popularidade é uma mistura da seleção do time do Catarse com um valor que é calculado pela velocidade de arrecadação do projeto';
+                      hintText = 'Sorted by popularity ';
+                      tooltipText = 'Our popularity factor is a mix of JVN team`s selection with a value that is calculated by the speed of collection of the project';
                   }else if (currentFilter().keyName === 'finished') {
                       hasHint = true;
-                      hintText = 'Ordenados por R$ alcançado ';
-                      tooltipText = 'Os projetos com maior meta de arrecadação alcançada ficam no topo';
+                      hintText = 'Sorted by Rs achieved ';
+                      tooltipText = 'The projects with the highest collection goal achieved are at the top';
                   }else if (currentFilter().keyName === 'contributed_by_friends') {
                       hasHint = true;
-                      hintText = 'Projetos apoiados por amigos ';
-                      tooltipText = 'Projetos apoiados por amigos';
+                      hintText = 'Projects supported by friends ';
+                      tooltipText = 'Projects supported by friends';
                   }
 
                   return hasHint ? m('.fontsize-smaller.fontcolor-secondary', [hintText, buildTooltip(tooltipText)]) : '';
@@ -147,7 +147,7 @@ const projectsExplore = {
 
                   if (_.isString(search) && search.length > 0 && route === null) {
                       isSearch(true);
-                      title('Busca ' + search);
+                      title('Search ' + search);
                       projects(searchProjects());
                   } else if (currentFilter().keyName === 'finished') {
                       isSearch(false);
@@ -225,7 +225,7 @@ const projectsExplore = {
                     m('.u-text-center.u-marginbottom-40', [
                         m('a#explore-open.link-hidden-white.fontweight-light.fontsize-larger[href="javascript:void(0);"]',
                             {onclick: () => ctrl.toggleCategories.toggle()},
-                            ['Explore projetos incríveis ', m(`span#explore-btn.fa.fa-angle-down${ctrl.toggleCategories() ? '.opened' : ''}`, '')])
+                            [I18n.t('header_html', I18nScope()), m(`span#explore-btn.fa.fa-angle-down${ctrl.toggleCategories() ? '.opened' : ''}`, '')])
                     ]),
                     m(`#categories.category-slider${ctrl.toggleCategories() ? '.opened' : ''}`, [
                         m('.w-row.u-marginbottom-30', [
@@ -297,7 +297,7 @@ const projectsExplore = {
 
                             return (_.indexOf(widowProjects, idx) > -1 && !ctrl.projects().isLastPage()) ? '' : m.component(projectCard, {project: project, ref: ref, type: cardType, showFriends: isContributedByFriendsFilter});
                         })),
-                        ctrl.projects().isLoading() ? h.loader() : (_.isEmpty(projects_collection) && ctrl.hasFBAuth ? m('.fontsize-base.w-col.w-col-12', 'Nenhum projeto para mostrar.') : '')
+                        ctrl.projects().isLoading() ? h.loader() : (_.isEmpty(projects_collection) && ctrl.hasFBAuth ? m('.fontsize-base.w-col.w-col-12', 'No design to show.') : '')
                     ])
                 ])
             ]),
@@ -306,7 +306,7 @@ const projectsExplore = {
                 m('.w-container', [
                     m('.w-row', [
                         m('.w-col.w-col-2.w-col-push-5', [
-                          (ctrl.projects().isLastPage() || ctrl.projects().isLoading() || _.isEmpty(projects_collection)) ? '' : m('a.btn.btn-medium.btn-terciary[href=\'#loadMore\']', {onclick: () => { ctrl.projects().nextPage(); return false; }}, 'Carregar mais')
+                          (ctrl.projects().isLastPage() || ctrl.projects().isLoading() || _.isEmpty(projects_collection)) ? '' : m('a.btn.btn-medium.btn-terciary[href=\'#loadMore\']', {onclick: () => { ctrl.projects().nextPage(); return false; }}, 'Load more')
                         ]),
                     ])
                 ])
@@ -315,10 +315,10 @@ const projectsExplore = {
             m('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [
                 m('.w-container.u-text-center', [
                     m('img.u-marginbottom-20.icon-hero', {src: 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png'}),
-                    m('h2.fontsize-larger.u-marginbottom-60', 'Lance sua campanha no Catarse!'),
+                    m('h2.fontsize-larger.u-marginbottom-60', 'Launch your campaign on JVN!'),
                     m('.w-row', [
                         m('.w-col.w-col-4.w-col-push-4', [
-                            m('a.w-button.btn.btn-large', {href: '/start?ref=ctrse_explore'}, 'Aprenda como')
+                            m('a.w-button.btn.btn-large', {href: '/start?ref=ctrse_explore'}, 'Learn how')
                         ])
                     ])
                 ])

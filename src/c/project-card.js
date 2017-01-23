@@ -123,12 +123,12 @@ const projectCard = {
                                 m('.fontsize-base.fontweight-semibold', `${Math.floor(project.progress)}%`)
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-center-small-only', [
-                                m('.fontsize-smaller.fontweight-semibold', `R$ ${h.formatNumber(project.pledged)}`),
-                                m('.fontsize-smallest.lineheight-tightest', 'Levantados')
+                                m('.fontsize-smaller.fontweight-semibold', `Rs ${h.formatNumber(project.pledged)}`),
+                                m('.fontsize-smallest.lineheight-tightest', I18n.t('contributed', I18nScope()))
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', project.expires_at ? [
                                 m('.fontsize-smaller.fontweight-semibold', `${ctrl.remainingTextObj.total} ${ctrl.remainingTextObj.unit}`),
-                                m('.fontsize-smallest.lineheight-tightest', (ctrl.remainingTextObj.total > 1) ? 'Restantes' : 'Restante')
+                                m('.fontsize-smallest.lineheight-tightest', (ctrl.remainingTextObj.total > 1) ? I18n.t('remaining.other', I18nScope()) : I18n.t('remaining.one', I18nScope()))
                             ] : [
                                 m('.fontsize-smallest.lineheight-tight', ['Iniciado há',m('br'),`${ctrl.elapsedTextObj.total} ${ctrl.elapsedTextObj.unit}`])
                             ]),
