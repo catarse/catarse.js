@@ -49,60 +49,60 @@ const projectFiltersVM = () => {
 
         filters = {
             all: {
-              title: 'Todas as Categorias',
+              title: 'All categories',
               filter: all,
-              nicename: 'No ar',
+              nicename: 'Up in the air',
               isContextual: false,
               keyName: 'all'
           },
             score: {
-              title: 'Todas as Categorias',
+              title: 'All categories',
               filter: score,
               nicename: I18n.t('home.row_title', I18nScope()),
               isContextual: false,
               keyName: 'score'
           },
             contributed_by_friends: {
-              title: 'Amigos',
+              title: 'Friends',
               filter: contributed_by_friends,
-              nicename: 'Amigos',
+              nicename: 'Friends',
               isContextual: false,
               keyName: 'contributed_by_friends'
           },
             online: {
-              title: 'No ar',
+              title: 'Up in the air',
               filter: online,
               isContextual: false,
               keyName: 'online'
           },
             expiring: {
-              title: 'Reta final',
+              title: 'Final stretch',
               filter: expiring,
               isContextual: false,
               keyName: 'expiring'
           },
             successful: {
-              title: 'Todas as Categorias',
+              title: 'All categories',
               filter: successful,
-              nicename: 'Financiados',
+              nicename: 'Financed',
               isContextual: false,
               keyName: 'successful'
           },
             finished: {
-              title: 'Todas as Categorias',
+              title: 'All categories',
               filter: finished,
-              nicename: 'Finalizados',
+              nicename: 'Finalized',
               isContextual: false,
               keyName: 'finished'
           },
             recent: {
-              title: 'Recentes',
+              title: 'Recent',
               filter: recent,
               isContextual: false,
               keyName: 'recent'
           },
             near_me: {
-              title: 'Próximos a mim',
+              title: 'Next to me',
               filter: nearMe,
               isContextual: false,
               keyName: 'near_me'

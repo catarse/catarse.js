@@ -16,19 +16,16 @@ const footer = {
                                         m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.w-hidden-tiny',
                                             [
                                                 m('.footer-full-signature-text.fontsize-small',
-                                                    I18n.t('links.contact', I18nScope())
+                                                    I18n.t('titles.contact', I18nScope())
                                                 ),
                                                 m('a.link-footer[href=\'/how-it-works\']',
                                                     [
                                                         I18n.t('links.how_it_works', I18nScope()),
-                                                        m.trust('&nbsp;'),
-                                                        m('span.badge.badge-success',
-                                                            I18n.t('links.novelty', I18nScope())
-                                                        )
+                                                        m.trust('&nbsp;')
                                                     ]
                                                 ),
                                                 m('a.link-footer[href=\'https://www.catarse.me/pt/flex?ref=ctrse_footer\']',
-                                                    ' Catarse flex'
+                                                    ' JVN flex'
                                                 ),
                                                 m('a.link-footer[href=\'https://www.catarse.me/pt/team?ref=ctrse_footer\']',
                                                     [
@@ -68,10 +65,7 @@ const footer = {
                                                 m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
                                                     [
                                                         I18n.t('links.rate', I18nScope()),
-                                                        m.trust('&nbsp;'),
-                                                        m('span.badge.badge-success',
-                                                            I18n.t('links.novelty', I18nScope())
-                                                        )
+                                                        m.trust('&nbsp;')
                                                     ]
                                                 ),
                                                 m('a.link-footer[href=\'https://www.catarse.me/pt/press?ref=ctrse_footer\']',

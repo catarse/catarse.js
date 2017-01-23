@@ -2299,54 +2299,54 @@ var projectFiltersVM = function projectFiltersVM() {
         finished = filtersVM({}),
         filters = {
         all: {
-            title: 'Todas as Categorias',
+            title: 'All categories',
             filter: all,
-            nicename: 'No ar',
+            nicename: 'Up in the air',
             isContextual: false,
             keyName: 'all'
         },
         score: {
-            title: 'Todas as Categorias',
+            title: 'All categories',
             filter: score,
             nicename: I18n$1.t('home.row_title', I18nScope$3()),
             isContextual: false,
             keyName: 'score'
         },
         contributed_by_friends: {
-            title: 'Amigos',
+            title: 'Friends',
             filter: contributed_by_friends,
-            nicename: 'Amigos',
+            nicename: 'Friends',
             isContextual: false,
             keyName: 'contributed_by_friends'
         },
         online: {
-            title: 'No ar',
+            title: 'Up in the air',
             filter: online,
             isContextual: false,
             keyName: 'online'
         },
         expiring: {
-            title: 'Reta final',
+            title: 'Final stretch',
             filter: expiring,
             isContextual: false,
             keyName: 'expiring'
         },
         successful: {
-            title: 'Todas as Categorias',
+            title: 'All categories',
             filter: successful,
-            nicename: 'Financiados',
+            nicename: 'Financed',
             isContextual: false,
             keyName: 'successful'
         },
         finished: {
-            title: 'Todas as Categorias',
+            title: 'All categories',
             filter: finished,
-            nicename: 'Finalizados',
+            nicename: 'Finalized',
             isContextual: false,
             keyName: 'finished'
         },
         recent: {
-            title: 'Recentes',
+            title: 'Recent',
             filter: recent,
             isContextual: false,
             keyName: 'recent'
@@ -4620,16 +4620,16 @@ var projectsExplore = {
                 hasHint = false;
             if (currentFilter().keyName === 'all') {
                 hasHint = true;
-                hintText = 'Ordenados por popularidade ';
-                tooltipText = 'O nosso fator popularidade é uma mistura da seleção do time do Catarse com um valor que é calculado pela velocidade de arrecadação do projeto';
+                hintText = 'Sorted by popularity ';
+                tooltipText = 'Our popularity factor is a mix of JVN team`s selection with a value that is calculated by the speed of collection of the project';
             } else if (currentFilter().keyName === 'finished') {
                 hasHint = true;
-                hintText = 'Ordenados por R$ alcançado ';
-                tooltipText = 'Os projetos com maior meta de arrecadação alcançada ficam no topo';
+                hintText = 'Sorted by Rs achieved ';
+                tooltipText = 'The projects with the highest collection goal achieved are at the top';
             } else if (currentFilter().keyName === 'contributed_by_friends') {
                 hasHint = true;
-                hintText = 'Projetos apoiados por amigos ';
-                tooltipText = 'Projetos apoiados por amigos';
+                hintText = 'Projects supported by friends ';
+                tooltipText = 'Projects supported by friends';
             }
 
             return hasHint ? m$1('.fontsize-smaller.fontcolor-secondary', [hintText, buildTooltip(tooltipText)]) : '';
@@ -4713,7 +4713,7 @@ var projectsExplore = {
 
             if (_$1.isString(search$$1) && search$$1.length > 0 && route === null) {
                 isSearch(true);
-                title('Busca ' + search$$1);
+                title('Search ' + search$$1);
                 projects(searchProjects());
             } else if (currentFilter().keyName === 'finished') {
                 isSearch(false);
@@ -4785,7 +4785,7 @@ var projectsExplore = {
 
         return m$1('#explore', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$13())) }, [m$1('.w-section.hero-search', [m$1.component(search), m$1('.w-container.u-marginbottom-10', [m$1('.u-text-center.u-marginbottom-40', [m$1('a#explore-open.link-hidden-white.fontweight-light.fontsize-larger[href="javascript:void(0);"]', { onclick: function onclick() {
                 return ctrl.toggleCategories.toggle();
-            } }, ['Explore projetos incríveis ', m$1('span#explore-btn.fa.fa-angle-down' + (ctrl.toggleCategories() ? '.opened' : ''), '')])]), m$1('#categories.category-slider' + (ctrl.toggleCategories() ? '.opened' : ''), [m$1('.w-row.u-marginbottom-30', [_$1.map(ctrl.categories(), function (category) {
+            } }, [I18n$1.t('header_html', I18nScope$13()), m$1('span#explore-btn.fa.fa-angle-down' + (ctrl.toggleCategories() ? '.opened' : ''), '')])]), m$1('#categories.category-slider' + (ctrl.toggleCategories() ? '.opened' : ''), [m$1('.w-row.u-marginbottom-30', [_$1.map(ctrl.categories(), function (category) {
             return m$1.component(categoryButton, { category: category });
         })])])])]), m$1('.w-section', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-9.w-col-small-8.w-col-tiny-8', [m$1('.fontsize-larger', ctrl.title()), ctrl.hint()]), m$1('.w-col.w-col-3.w-col-small-4.w-col-tiny-4', !ctrl.isSearch() ? m$1('select.w-select.text-field.positive', { onchange: m$1.withAttr('value', ctrl.changeFilter) }, _$1.map(ctrl.projectFiltersVM.getContextFilters(), function (pageFilter, idx) {
             var projects = ctrl.projects(),
@@ -4823,9 +4823,9 @@ var projectsExplore = {
             }
 
             return _$1.indexOf(widowProjects, idx) > -1 && !ctrl.projects().isLastPage() ? '' : m$1.component(projectCard, { project: project, ref: ref, type: cardType, showFriends: isContributedByFriendsFilter });
-        })), ctrl.projects().isLoading() ? h.loader() : _$1.isEmpty(projects_collection) && ctrl.hasFBAuth ? m$1('.fontsize-base.w-col.w-col-12', 'Nenhum projeto para mostrar.') : ''])])]), m$1('.w-section.u-marginbottom-80', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-push-5', [ctrl.projects().isLastPage() || ctrl.projects().isLoading() || _$1.isEmpty(projects_collection) ? '' : m$1('a.btn.btn-medium.btn-terciary[href=\'#loadMore\']', { onclick: function onclick() {
+        })), ctrl.projects().isLoading() ? h.loader() : _$1.isEmpty(projects_collection) && ctrl.hasFBAuth ? m$1('.fontsize-base.w-col.w-col-12', 'No design to show.') : ''])])]), m$1('.w-section.u-marginbottom-80', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-push-5', [ctrl.projects().isLastPage() || ctrl.projects().isLoading() || _$1.isEmpty(projects_collection) ? '' : m$1('a.btn.btn-medium.btn-terciary[href=\'#loadMore\']', { onclick: function onclick() {
                 ctrl.projects().nextPage();return false;
-            } }, 'Carregar mais')])])])]), m$1('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [m$1('.w-container.u-text-center', [m$1('img.u-marginbottom-20.icon-hero', { src: 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png' }), m$1('h2.fontsize-larger.u-marginbottom-60', 'Lance sua campanha no Catarse!'), m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'Aprenda como')])])])])]);
+            } }, 'Load more')])])])]), m$1('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [m$1('.w-container.u-text-center', [m$1('img.u-marginbottom-20.icon-hero', { src: 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png' }), m$1('h2.fontsize-larger.u-marginbottom-60', 'Launch your campaign on JVN!'), m$1('.w-row', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'Learn how')])])])])]);
     }
 };
 
@@ -5080,14 +5080,14 @@ var blogBanner = {
 var I18nScope$21 = _.partial(h.i18nScope, 'layouts.footer');
 var footer = {
     view: function view() {
-        return m$1('footer.main-footer.main-footer-neg', [m$1('section.w-container', m$1('.w-row', [m$1('.w-col.w-col-9', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.w-hidden-tiny', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('links.contact', I18nScope$21())), m$1('a.link-footer[href=\'/how-it-works\']', [I18n$1.t('links.how_it_works', I18nScope$21()), m$1.trust('&nbsp;'), m$1('span.badge.badge-success', I18n$1.t('links.novelty', I18nScope$21()))]), m$1('a.link-footer[href=\'https://www.catarse.me/pt/flex?ref=ctrse_footer\']', ' Catarse flex'), m$1('a.link-footer[href=\'https://www.catarse.me/pt/team?ref=ctrse_footer\']', [I18n$1.t('links.team', I18nScope$21()), m$1.trust('&lt;'), '3']), m$1('a.link-footer[href=\'http://facebook.com/JVNepal\'][target=\'blank\']', ' Facebook'),
+        return m$1('footer.main-footer.main-footer-neg', [m$1('section.w-container', m$1('.w-row', [m$1('.w-col.w-col-9', m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.w-hidden-tiny', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.contact', I18nScope$21())), m$1('a.link-footer[href=\'/how-it-works\']', [I18n$1.t('links.how_it_works', I18nScope$21()), m$1.trust('&nbsp;')]), m$1('a.link-footer[href=\'https://www.catarse.me/pt/flex?ref=ctrse_footer\']', ' JVN flex'), m$1('a.link-footer[href=\'https://www.catarse.me/pt/team?ref=ctrse_footer\']', [I18n$1.t('links.team', I18nScope$21()), m$1.trust('&lt;'), '3']), m$1('a.link-footer[href=\'http://facebook.com/JVNepal\'][target=\'blank\']', ' Facebook'),
         // m('a.link-footer[href=\'http://twitter.com/catarse\']',
         //     ' Twitter'
         // ),
         // m('a.link-footer[href=\'http://instagram.com/catarse\']',
         //     ' Instagram'
         // ),
-        m$1('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']', ' Github'), m$1('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']', ' Blog'), m$1('a.link-footer[href=\'https://www.catarse.me/pt/jobs\']', I18n$1.t('links.jobs', I18nScope$21()))]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-firstcolumn', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.about', I18nScope$21())), m$1('a.link-footer[href=\'http://suporte.catarse.me/hc/pt-br/requests/new\'][target="_BLANK"]', I18n$1.t('links.contact', I18nScope$21())), m$1('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']', [I18n$1.t('links.rate', I18nScope$21()), m$1.trust('&nbsp;'), m$1('span.badge.badge-success', I18n$1.t('links.novelty', I18nScope$21()))]), m$1('a.link-footer[href=\'https://www.catarse.me/pt/press?ref=ctrse_footer\']', I18n$1.t('links.press', I18nScope$21())), m$1('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']', I18n$1.t('links.help_support', I18nScope$21())), m$1('a.link-footer[href=\'/pt/terms-of-use\']', I18n$1.t('links.terms', I18nScope$21())), m$1('a.link-footer[href=\'/pt/privacy-policy\']', I18n$1.t('links.privacy', I18nScope$21()))]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-lastcolumn', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.sitemap', I18nScope$21())), m$1('a.w-hidden-small.w-hidden-tiny.link-footer[href=\'/pt/start?ref=ctrse_footer\']', I18n$1.t('links.submit', I18nScope$21())), m$1('a.link-footer[href=\'/pt/explore?ref=ctrse_footer\']', I18n$1.t('links.discover', I18nScope$21())), m$1('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']', ' Blog'), m$1('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'https://equipecatarse.zendesk.com/account/dropboxes/20298537\']', I18n$1.t('links.contact', I18nScope$21())), m$1('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=score&ref=ctrse_footer\']', I18n$1.t('links.score', I18nScope$21())), m$1('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=online&ref=ctrse_footer\']', I18n$1.t('links.online', I18nScope$21())), m$1('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=finished&ref=ctrse_footer\']', I18n$1.t('links.finished', I18nScope$21()))])])), m$1('.w-col.w-col-3.column-social-media-footer', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.newsletter', I18nScope$21())), m$1('.w-form', m$1('form[accept-charset=\'UTF-8\'][action=\'' + h.getMailchimpUrl() + '\'][id=\'mailee-form\'][method=\'post\']', [m$1('.w-form.footer-newsletter', m$1('input.w-input.text-field.prefix[id=\'EMAIL\'][label=\'email\'][name=\'EMAIL\'][placeholder=\'' + I18n$1.t('texts.email', I18nScope$21()) + '\'][type=\'email\']')), m$1('button.w-inline-block.btn.btn-edit.postfix.btn-attached[style="padding:0;"]', m$1('img.footer-news-icon[alt=\'Icon newsletter\'][src=\'/assets/catarse_bootstrap/icon-newsletter.png\']'))])), m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.social', I18nScope$21())), m$1('.w-widget.w-widget-facebook.u-marginbottom-20', m$1('.facebook', m$1('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']'))),
+        m$1('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']', ' Github'), m$1('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']', ' Blog'), m$1('a.link-footer[href=\'https://www.catarse.me/pt/jobs\']', I18n$1.t('links.jobs', I18nScope$21()))]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-firstcolumn', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.about', I18nScope$21())), m$1('a.link-footer[href=\'http://suporte.catarse.me/hc/pt-br/requests/new\'][target="_BLANK"]', I18n$1.t('links.contact', I18nScope$21())), m$1('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']', [I18n$1.t('links.rate', I18nScope$21()), m$1.trust('&nbsp;')]), m$1('a.link-footer[href=\'https://www.catarse.me/pt/press?ref=ctrse_footer\']', I18n$1.t('links.press', I18nScope$21())), m$1('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']', I18n$1.t('links.help_support', I18nScope$21())), m$1('a.link-footer[href=\'/pt/terms-of-use\']', I18n$1.t('links.terms', I18nScope$21())), m$1('a.link-footer[href=\'/pt/privacy-policy\']', I18n$1.t('links.privacy', I18nScope$21()))]), m$1('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-lastcolumn', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.sitemap', I18nScope$21())), m$1('a.w-hidden-small.w-hidden-tiny.link-footer[href=\'/pt/start?ref=ctrse_footer\']', I18n$1.t('links.submit', I18nScope$21())), m$1('a.link-footer[href=\'/pt/explore?ref=ctrse_footer\']', I18n$1.t('links.discover', I18nScope$21())), m$1('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']', ' Blog'), m$1('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'https://equipecatarse.zendesk.com/account/dropboxes/20298537\']', I18n$1.t('links.contact', I18nScope$21())), m$1('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=score&ref=ctrse_footer\']', I18n$1.t('links.score', I18nScope$21())), m$1('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=online&ref=ctrse_footer\']', I18n$1.t('links.online', I18nScope$21())), m$1('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=finished&ref=ctrse_footer\']', I18n$1.t('links.finished', I18nScope$21()))])])), m$1('.w-col.w-col-3.column-social-media-footer', [m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.newsletter', I18nScope$21())), m$1('.w-form', m$1('form[accept-charset=\'UTF-8\'][action=\'' + h.getMailchimpUrl() + '\'][id=\'mailee-form\'][method=\'post\']', [m$1('.w-form.footer-newsletter', m$1('input.w-input.text-field.prefix[id=\'EMAIL\'][label=\'email\'][name=\'EMAIL\'][placeholder=\'' + I18n$1.t('texts.email', I18nScope$21()) + '\'][type=\'email\']')), m$1('button.w-inline-block.btn.btn-edit.postfix.btn-attached[style="padding:0;"]', m$1('img.footer-news-icon[alt=\'Icon newsletter\'][src=\'/assets/catarse_bootstrap/icon-newsletter.png\']'))])), m$1('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.social', I18nScope$21())), m$1('.w-widget.w-widget-facebook.u-marginbottom-20', m$1('.facebook', m$1('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']'))),
         // m('.w-widget.w-widget-twitter', [
         //     m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
         // ]),
@@ -9337,7 +9337,7 @@ var start = {
         return m$1('#start', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$32())) }, [m$1('.w-section.hero-full.hero-start', [m$1('.w-container.u-text-center', [m$1('.fontsize-megajumbo.fontweight-semibold.u-marginbottom-40', I18n$1.t('slogan', I18nScope$32())), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-4.w-col-push-4', [m$1('a.btn.btn-large.u-marginbottom-10[href="#start-form"]', {
             config: h.scrollTo(),
             onclick: h.analytics.event({ cat: 'project_start', act: 'start_btnstart_click' })
-        }, I18n$1.t('submit', I18nScope$32()))])]), m$1('.w-row', _$1.isEmpty(stats) ? '' : [m$1('.w-col.w-col-4', [m$1('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m$1('p.fontsize-small.start-stats', I18n$1.t('header.people', I18nScope$32()))]), m$1('.w-col.w-col-4', [m$1('.fontsize-largest.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' milhões'), m$1('p.fontsize-small.start-stats', I18n$1.t('header.money', I18nScope$32()))]), m$1('.w-col.w-col-4', [m$1('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m$1('p.fontsize-small.start-stats', I18n$1.t('header.success', I18nScope$32()))])])])]), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-10.w-col-push-1.u-text-center', [m$1('.fontsize-larger.u-marginbottom-10.fontweight-semibold', I18n$1.t('page-title', I18nScope$32())), m$1('.fontsize-small', I18n$1.t('page-subtitle', I18nScope$32()))])]), m$1('.w-clearfix.how-row', [m$1('.w-hidden-small.w-hidden-tiny.how-col-01', [m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.2', I18nScope$32()))]), m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.4', I18nScope$32()))])]), m$1('.how-col-02'), m$1('.how-col-03', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.5', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.6', I18nScope$32())), m$1('.fontweight-semibold.fontsize-large.u-margintop-30', I18n$1.t('banner.7', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.8', I18nScope$32()))]), m$1('.w-hidden-main.w-hidden-medium.how-col-01', [m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.2', I18nScope$32()))]), m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.4', I18nScope$32()))])])])])]), m$1('.w-section.divider'), m$1('.w-section.section-large', [m$1('.w-container.u-text-center.u-marginbottom-60', [m$1('div', [m$1('span.fontsize-largest.fontweight-semibold', I18n$1.t('features.title', I18nScope$32()))]), m$1('.w-hidden-small.w-hidden-tiny.fontsize-large.u-marginbottom-20', I18n$1.t('features.subtitle', I18nScope$32())), m$1('.w-hidden-main.w-hidden-medium.u-margintop-30', [m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_1', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_2', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_3', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_4', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_5', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_6', I18nScope$32()))])]), m$1('.w-container', [m$1('.w-tabs.w-hidden-small.w-hidden-tiny', [m$1('.w-tab-menu.w-col.w-col-4', _$1.map(ctrl.paneImages, function (pane, idx) {
+        }, I18n$1.t('submit', I18nScope$32()))])]), m$1('.w-row', _$1.isEmpty(stats) ? '' : [m$1('.w-col.w-col-4', [m$1('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m$1('p.fontsize-small.start-stats', I18n$1.t('header.people', I18nScope$32()))]), m$1('.w-col.w-col-4', [m$1('.fontsize-largest.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m$1('p.fontsize-small.start-stats', I18n$1.t('header.money', I18nScope$32()))]), m$1('.w-col.w-col-4', [m$1('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m$1('p.fontsize-small.start-stats', I18n$1.t('header.success', I18nScope$32()))])])])]), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-10.w-col-push-1.u-text-center', [m$1('.fontsize-larger.u-marginbottom-10.fontweight-semibold', I18n$1.t('page-title', I18nScope$32())), m$1('.fontsize-small', I18n$1.t('page-subtitle', I18nScope$32()))])]), m$1('.w-clearfix.how-row', [m$1('.w-hidden-small.w-hidden-tiny.how-col-01', [m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.2', I18nScope$32()))]), m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.4', I18nScope$32()))])]), m$1('.how-col-02'), m$1('.how-col-03', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.5', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.6', I18nScope$32())), m$1('.fontweight-semibold.fontsize-large.u-margintop-30', I18n$1.t('banner.7', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.8', I18nScope$32()))]), m$1('.w-hidden-main.w-hidden-medium.how-col-01', [m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.2', I18nScope$32()))]), m$1('.info-howworks-backers', [m$1('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$32())), m$1('.fontsize-base', I18n$1.t('banner.4', I18nScope$32()))])])])])]), m$1('.w-section.divider'), m$1('.w-section.section-large', [m$1('.w-container.u-text-center.u-marginbottom-60', [m$1('div', [m$1('span.fontsize-largest.fontweight-semibold', I18n$1.t('features.title', I18nScope$32()))]), m$1('.w-hidden-small.w-hidden-tiny.fontsize-large.u-marginbottom-20', I18n$1.t('features.subtitle', I18nScope$32())), m$1('.w-hidden-main.w-hidden-medium.u-margintop-30', [m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_1', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_2', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_3', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_4', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_5', I18nScope$32())), m$1('.fontsize-large.u-marginbottom-30', I18n$1.t('features.feature_6', I18nScope$32()))])]), m$1('.w-container', [m$1('.w-tabs.w-hidden-small.w-hidden-tiny', [m$1('.w-tab-menu.w-col.w-col-4', _$1.map(ctrl.paneImages, function (pane, idx) {
             return m$1('btn.w-tab-link.w-inline-block.tab-list-item' + (idx === ctrl.selectedPane() ? '.selected' : ''), {
                 onclick: h.analytics.event({ cat: 'project_start', act: 'start_solution_click', lbl: pane.label }, ctrl.selectPane(idx))
             }, pane.label);
@@ -9353,7 +9353,7 @@ var start = {
         })), m$1('.w-tab-content.u-margintop-40', [m$1('.w-tab-pane.w--tab-active', [m$1('.w-row', ctrl.selectedCategoryIdx() !== -1 ? _$1.map(ctrl.selectedCategory(), function (category) {
             return [m$1('.w-col.w-col-5', [m$1('.fontsize-jumbo.u-marginbottom-20', category.name), m$1('a.w-button.btn.btn-medium.btn-inline.btn-dark[href="#start-form"]', {
                 config: h.scrollTo()
-            }, I18n$1.t('submit', I18nScope$32()))]), m$1('.w-col.w-col-7', [m$1('.fontsize-megajumbo.fontcolor-negative', 'R$ ' + (category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...')), m$1('.fontsize-large.u-marginbottom-20', 'Doados para projetos'), m$1('.fontsize-megajumbo.fontcolor-negative', category.successful_projects ? category.successful_projects : '...'), m$1('.fontsize-large.u-marginbottom-30', 'Projetos financiados'), !_$1.isEmpty(ctrl.featuredProjects()) ? _$1.map(ctrl.featuredProjects(), function (project) {
+            }, I18n$1.t('submit', I18nScope$32()))]), m$1('.w-col.w-col-7', [m$1('.fontsize-megajumbo.fontcolor-negative', 'Rs ' + (category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...')), m$1('.fontsize-large.u-marginbottom-20', 'Donated to projects'), m$1('.fontsize-megajumbo.fontcolor-negative', category.successful_projects ? category.successful_projects : '...'), m$1('.fontsize-large.u-marginbottom-30', 'Projects financed'), !_$1.isEmpty(ctrl.featuredProjects()) ? _$1.map(ctrl.featuredProjects(), function (project) {
                 return !_$1.isUndefined(project) ? m$1('.w-row.u-marginbottom-10', [m$1('.w-col.w-col-1', [m$1('img.user-avatar[src="' + h.useAvatarOrDefault(project.userThumb) + '"]')]), m$1('.w-col.w-col-11', [m$1('.fontsize-base.fontweight-semibold', project.user.name), m$1('.fontsize-smallest', [I18n$1.t('categories.pledged', I18nScope$32({ pledged: h.formatNumber(project.pledged), contributors: project.total_contributors })), m$1('a.link-hidden[href="/' + project.permalink + '"]', project.name)])])]) : m$1('.fontsize-base', I18n$1.t('categories.loading_featured', I18nScope$32()));
             }) : ''])];
         }) : '')])])])])]), m$1.component(slider, {
@@ -9374,7 +9374,7 @@ var start = {
                 answer: question.answer,
                 onclick: h.analytics.event({ cat: 'project_start', act: 'start_qa_click', lbl: question.question })
             });
-        }))])]), m$1('#start-form.w-section.section-large.u-text-center.bg-purple.before-footer', [m$1('.w-container', [m$1('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Crie o seu rascunho gratuitamente!'), m$1('form[action="/projects/fallback_create"][method="GET"].w-row.w-form', {
+        }))])]), m$1('#start-form.w-section.section-large.u-text-center.bg-purple.before-footer', [m$1('.w-container', [m$1('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Create your sketch for free!'), m$1('form[action="/projects/fallback_create"][method="GET"].w-row.w-form', {
             onsubmit: function onsubmit(e) {
                 h.analytics.oneTimeEvent({ cat: 'project_create', act: 'create_form_submit' })(e);
                 return ctrl.validateProjectForm();
@@ -9389,7 +9389,7 @@ var start = {
                 h.analytics.oneTimeEvent({ cat: 'project_create', act: 'create_form_change', lbl: 'name' })(e);
                 m$1.withAttr('value', ctrl.projectName)(e);
             }
-        }), m$1('.fontsize-larger.fontcolor-negative.u-marginbottom-10', 'na categoria'), m$1('select.w-select.text-field.medium.u-marginbottom-40', {
+        }), m$1('.fontsize-larger.fontcolor-negative.u-marginbottom-10', 'In category'), m$1('select.w-select.text-field.medium.u-marginbottom-40', {
             name: 'project[category_id]',
             class: ctrl.projectCategoryError() ? 'error' : '',
             onfocus: function onfocus() {
@@ -9401,7 +9401,7 @@ var start = {
             }
         }, [m$1('option[value="-1"]', I18n$1.t('form.select_default', I18nScope$32())), _$1.map(ctrl.categories(), function (category) {
             return m$1('option[value="' + category.id + '"]', { selected: ctrl.projectCategory() === category.id }, category.name);
-        })])]), m$1('.w-col.w-col-2'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4.w-col-push-4.u-margintop-40', [m$1('input[type="submit"][value="' + I18n$1.t('form.submit', I18nScope$32()) + '"].w-button.btn.btn-large')])]), m$1('.w-row.u-marginbottom-80', ctrl.projectNameError() || ctrl.projectCategoryError() ? m$1.component(inlineError, { message: 'Por favor, verifique novamente os campos acima!' }) : '')])])])]);
+        })])]), m$1('.w-col.w-col-2'), m$1('.w-row.u-marginbottom-20', [m$1('.w-col.w-col-4.w-col-push-4.u-margintop-40', [m$1('input[type="submit"][value="' + I18n$1.t('form.submit', I18nScope$32()) + '"].w-button.btn.btn-large')])]), m$1('.w-row.u-marginbottom-80', ctrl.projectNameError() || ctrl.projectCategoryError() ? m$1.component(inlineError, { message: 'Please check the fields above again!' }) : '')])])])]);
     }
 };
 
