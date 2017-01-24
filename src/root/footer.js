@@ -30,7 +30,7 @@ const footer = {
                                                 m('a.link-footer[href=\'https://www.catarse.me/pt/team?ref=ctrse_footer\']',
                                                     [
                                                         I18n.t('links.team', I18nScope()),
-                                                        m.trust('&lt;'),
+                                                        m.trust(' &lt;'),
                                                         '3'
                                                     ]
                                                 ),

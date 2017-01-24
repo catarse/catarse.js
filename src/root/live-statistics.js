@@ -32,11 +32,11 @@ const liveStatistics = {
                 return [m('img.u-marginbottom-60[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/55ada5dd11b36a52616d97df_symbol-catarse.png"]'),
                     m('.fontcolor-negative.u-marginbottom-40', [
                         m('.fontsize-megajumbo.fontweight-semibold', 'Rs ' + h.formatNumber(stat.total_contributed, 2, 3)),
-                        m('.fontsize-large', 'Donated to projects published here')
+                        m('.fontsize-large', 'Donated to campaigns published here')
                     ]),
                     m('.fontcolor-negative.u-marginbottom-60', [
                         m('.fontsize-megajumbo.fontweight-semibold', stat.total_contributors),
-                        m('.fontsize-large', 'People have already supported at least 1 project in Catarse')
+                        m('.fontsize-large', 'People have already supported at least 1 campaign in JVN')
                     ])
                 ];
             })), (!_.isEmpty(data) ? m('.w-container', [
