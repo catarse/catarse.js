@@ -60,17 +60,17 @@ const usersShow = {
                   [
                     (!_.isEmpty(user) ? 
                      (user.is_owner_or_admin ?
-                      m(`a.dashboard-nav-link.dashboard[href=\'/pt/users/${user.id}/edit\']`,{config: m.route, onclick: () => {
+                      m(`a.dashboard-nav-link.dashboard[href=\'/en/users/${user.id}/edit\']`,{config: m.route, onclick: () => {
                               m.route("/users/edit/" + user.id, {user_id: user.id} );}},
                           [
                               m('span.fa.fa-cog'),
                               m.trust('&nbsp;'),
-                              ' Editar perfil'
+                              ' Edit profile'
                           ]
                       ) :'') : h.loader()),
                       m(`a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#contributed' ? 'selected' : '')}\']`,
                           [
-                              'Apoiados ',
+                              'Supported ',
                               m.trust('&nbsp;'),
                               m('span.badge',
                                   user.total_contributed_projects
@@ -79,7 +79,7 @@ const usersShow = {
                       ),
                       m(`a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#created' ? 'selected' : '')}\']`,
                           [
-                              'Criados ',
+                              'Created ',
                               m.trust('&nbsp;'),
                               m('span.badge',
                                   user.total_published_projects
@@ -87,7 +87,7 @@ const usersShow = {
                           ]
                       ),
                       m(`a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#about' ? 'selected' : '')}\']`,
-                          'Sobre'
+                          'About'
                       )
                   ]
               )

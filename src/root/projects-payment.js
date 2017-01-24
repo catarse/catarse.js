@@ -144,7 +144,7 @@ const projectsPayment = {
                     m('a.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary[href=\'#\']'),
                     m('.w-clearfix.u-marginbottom-20',
                         m('.fontsize-larger.text-success.u-left',
-                            `R$ ${Number(ctrl.value).toFixed()}`
+                            `Rs ${Number(ctrl.value).toFixed()}`
                         )
                     ),
                     m('.w-clearfix.back-payment-info-reward', {
@@ -193,8 +193,8 @@ const projectsPayment = {
                                          ]),
                                          m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [
                                              m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [
-                                                 'Dados do apoiador ',
-                                                 m(`a.alt-link[href="/not-my-account?project_id=${project.project_id}"]`, 'Não é você?')
+                                                 'Supporter data ',
+                                                 m(`a.alt-link[href="/not-my-account?project_id=${project.project_id}"]`, 'No, and you?')
                                              ]),m('.fontsize-base.fontweight-semibold', user.name),
                                              m('label.field-label', `CPF/CNPJ: ${user.owner_document}`)
                                          ])
@@ -203,7 +203,7 @@ const projectsPayment = {
                                 m('.w-row.u-marginbottom-30',[
                                     m('.w-col.w-col-7.w-sub-col', [
                                         m('label.field-label.fontweight-semibold[for=\'country\']',[
-                                            'País / ',
+                                            'Parents / ',
                                             m('em', 'Country'),
                                             ' *'
                                         ]),
@@ -234,7 +234,7 @@ const projectsPayment = {
                                             type: 'text',
                                             onchange: m.withAttr('value', ctrl.vm.fields.completeName),
                                             value: ctrl.vm.fields.completeName(),
-                                            placeholder: 'Nome Completo'
+                                            placeholder: 'Full name'
                                         }),
                                         ctrl.fieldHasError('completeName')
                                     ]),
@@ -285,7 +285,7 @@ const projectsPayment = {
                                     type: 'text',
                                     onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.street)),
                                     value: ctrl.vm.fields.street(),
-                                    placeholder: 'Rua Da Minha Casa'
+                                    placeholder: 'My Home Street'
                                 }),
                                 ctrl.fieldHasError('street'),
 
@@ -314,7 +314,7 @@ const projectsPayment = {
                                             type: 'text',
                                             onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.addressComplement)),
                                             value: ctrl.vm.fields.addressComplement(),
-                                            placeholder: 'Residencial 123'
+                                            placeholder: 'Residential 123'
                                         }),
                                         ctrl.fieldHasError('addressComplement')
                                     ]),
@@ -359,7 +359,7 @@ const projectsPayment = {
                                             type: 'text',
                                             onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.city)),
                                             value: ctrl.vm.fields.city(),
-                                            placeholder: 'Cidade'
+                                            placeholder: 'City'
                                         }),
                                         ctrl.fieldHasError('city')
                                     ]),
@@ -424,7 +424,7 @@ const projectsPayment = {
                             ),
                             m('.w-clearfix.u-marginbottom-20', [
                                 m('.fontsize-larger.text-success.u-left',
-                                    `R$ ${Number(ctrl.value).toFixed()}`
+                                    `Rs ${Number(ctrl.value).toFixed()}`
                                 ),
                                 m(`a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/${projectVM.currentProject().project_id}/contributions/new${ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '' }"]`,
                                     I18n.t(`selected_reward.edit`, ctrl.scope()))

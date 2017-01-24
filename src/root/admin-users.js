@@ -23,24 +23,24 @@ const adminUsers = {
                 component: filterMain,
                 data: {
                     vm: filterVM.full_text_index,
-                    placeholder: 'Busque por nome, e-mail, Ids do usuário...',
+                    placeholder: 'Search by name, email, user ids...',
                 },
             }, { //status
                 component: filterDropdown,
                 data: {
-                    label: 'Com o estado',
+                    label: 'With the state',
                     index: 'status',
                     name: 'deactivated_at',
                     vm: filterVM.deactivated_at,
                     options: [{
                         value: '',
-                        option: 'Qualquer um'
+                        option: 'Any'
                     }, {
                         value: null,
-                        option: 'ativo'
+                        option: 'active'
                     }, {
                         value: !null,
-                        option: 'desativado'
+                        option: 'disabled'
                     }]
                 }
             }],
@@ -62,7 +62,7 @@ const adminUsers = {
         };
     },
     view(ctrl) {
-        const label = 'Usuários';
+        const label = 'Users';
 
         return [
             m.component(adminFilter, {

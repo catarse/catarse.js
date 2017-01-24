@@ -6,7 +6,7 @@ const error = m.prop(''),
     rewards = m.prop([]),
     noReward = {
         id: -1,
-        description: 'Obrigado. Eu só quero ajudar o projeto.',
+        description: 'Thank you. I just want to help the project.',
         minimum_value: 10
     },
     contributionValue = m.prop(`${noReward.minimum_value},00`),

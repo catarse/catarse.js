@@ -31,12 +31,12 @@ const liveStatistics = {
             m('.w-container.u-text-center', _.map(ctrl.pageStatistics(), (stat) => {
                 return [m('img.u-marginbottom-60[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/55ada5dd11b36a52616d97df_symbol-catarse.png"]'),
                     m('.fontcolor-negative.u-marginbottom-40', [
-                        m('.fontsize-megajumbo.fontweight-semibold', 'R$ ' + h.formatNumber(stat.total_contributed, 2, 3)),
-                        m('.fontsize-large', 'Doados para projetos publicados por aqui')
+                        m('.fontsize-megajumbo.fontweight-semibold', 'Rs ' + h.formatNumber(stat.total_contributed, 2, 3)),
+                        m('.fontsize-large', 'Donated to projects published here')
                     ]),
                     m('.fontcolor-negative.u-marginbottom-60', [
                         m('.fontsize-megajumbo.fontweight-semibold', stat.total_contributors),
-                        m('.fontsize-large', 'Pessoas já apoiaram pelo menos 1 projeto no Catarse')
+                        m('.fontsize-large', 'People have already supported at least 1 project in Catarse')
                     ])
                 ];
             })), (!_.isEmpty(data) ? m('.w-container', [
@@ -54,7 +54,7 @@ const liveStatistics = {
                                 ])
                             ]),
                             m('.w-col.w-col-4.u-text-center.fontsize-base.u-margintop-20', [
-                                m('div', 'acabou de apoiar o')
+                                m('div', 'Just supported the')
                             ]),
                             m('.w-col.w-col-4', [
                                 m('.w-row', [
@@ -72,7 +72,7 @@ const liveStatistics = {
             ]) : ''),
             m('.u-text-center.fontsize-large.u-marginbottom-10.fontcolor-negative', [
                 m('a.link-hidden.fontcolor-negative[href="https://github.com/catarse"][target="_blank"]', [
-                    m('span.fa.fa-github', '.'), ' Open Source com orgulho! '
+                    m('span.fa.fa-github', '.'), ' Open Source with pride! '
                 ])
             ]),
         ]);

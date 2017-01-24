@@ -81,23 +81,23 @@ const usersEdit = {
                             }
                         },
                         m('.w-container', [
-                            m(`a.dashboard-nav-link${(ctrl.hash() === '#contributions' ? '.selected' : '')}[data-target='#dashboard_contributions'][href='#contributions'][id='dashboard_contributions_link']`, 'Apoiados'),
+                            m(`a.dashboard-nav-link${(ctrl.hash() === '#contributions' ? '.selected' : '')}[data-target='#dashboard_contributions'][href='#contributions'][id='dashboard_contributions_link']`, 'Supported'),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#projects' ? '.selected' : '')}[data-target='#dashboard_projects'][href='#projects'][id='dashboard_projects_link']`,
-                                'Criados'
+                                'Created'
                             ),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#about_me' ? '.selected' : '')}[data-target='#dashboard_about_me'][href='#about_me'][id='dashboard_about_me_link']`,
-                                'Sobre você'
+                                'About you'
                             ),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#settings' ? '.selected' : '')}[data-target='#dashboard_settings'][href='#settings'][id='dashboard_settings_link']`,
-                                'Dados e endereço'
+                                'Data and address'
                             ),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#notifications' ? '.selected' : '')}[data-target='#dashboard_notifications'][href='#notifications'][id='dashboard_notifications_link']`,
-                                'Notificações'
+                                'Notifications'
                             ),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#billing' ? '.selected' : '')}[data-target='#dashboard_billing'][href='#billing'][id='dashboard_billing_link']`,
-                                'Banco e cartões'
+                                'Bank and cards'
                             ),
-                            m(`a.dashboard-nav-link.u-right-big-only[href='/pt/users/${user.id}']`, {
+                            m(`a.dashboard-nav-link.u-right-big-only[href='/en/users/${user.id}']`, {
                                     config: m.route,
                                     onclick: () => {
                                         m.route("/users/" + user.id, {
@@ -105,7 +105,7 @@ const usersEdit = {
                                         });
                                     }
                                 },
-                                'Ir para o perfil público'
+                                'Go to the public profile'
                             )
                         ])
                     ),

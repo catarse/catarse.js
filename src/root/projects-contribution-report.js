@@ -19,27 +19,27 @@ const projectContributionReport = {
               rewards = m.prop([]),
               contributionStateOptions = m.prop([]),
               reloadSelectOptions = (project_state) => {
-                  let opts = [{value: '', option: 'Todos'}];
+                  let opts = [{value: '', option: 'All'}];
 
                   const options_map = {
                       'online': [
-                          {value: 'paid', option: 'Confirmado'},
-                          {value: 'pending', option: 'Iniciado'},
-                          {value: 'refunded,chargeback,deleted,pending_refund', option: 'Contestado'},
+                          {value: 'paid', option: 'Confirmed'},
+                          {value: 'pending', option: 'Started'},
+                          {value: 'refunded,chargeback,deleted,pending_refund', option: 'Contested'},
                       ],
                       'waiting_funds': [
-                          {value: 'paid', option: 'Confirmado'},
-                          {value: 'pending', option: 'Iniciado'},
-                          {value: 'refunded,chargeback,deleted,pending_refund', option: 'Contestado'},
+                          {value: 'paid', option: 'Confirmed'},
+                          {value: 'pending', option: 'Started'},
+                          {value: 'refunded,chargeback,deleted,pending_refund', option: 'Contested'},
                       ],
                       'failed': [
-                          {value: 'pending_refund', option: 'Reembolso em andamento'},
-                          {value: 'refunded', option: 'Reembolsado'},
-                          {value: 'paid', option: 'Reembolso não iniciado'},
+                          {value: 'pending_refund', option: 'Refund in progress'},
+                          {value: 'refunded', option: 'Refunded'},
+                          {value: 'paid', option: 'Refund not started'},
                       ],
                       'successful': [
-                          {value: 'paid', option: 'Confirmado'},
-                          {value: 'refunded,chargeback,deleted,pending_refund', option: 'Contestado'},
+                          {value: 'paid', option: 'Confirmed'},
+                          {value: 'refunded,chargeback,deleted,pending_refund', option: 'Contested'},
                       ]
                   };
 
@@ -54,13 +54,13 @@ const projectContributionReport = {
                           inputWrapperClass: '.w-input.text-field',
                           btnClass: '.btn.btn-medium',
                           vm: filterVM.full_text_index,
-                          placeholder: 'Busque por nome ou email do apoiador'
+                          placeholder: 'Search by name or email of the supporter'
                       }
                   }, {
                       label: 'reward_filter',
                       component: FilterDropdown,
                       data: {
-                          label: 'Recompensa',
+                          label: 'Reward',
                           name: 'reward_id',
                           vm: filterVM.reward_id,
                           wrapper_class: '.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle',
@@ -71,7 +71,7 @@ const projectContributionReport = {
                       component: FilterDropdown,
                       data: {
                           custom_label: [InfoProjectContributionStateLegend, {
-                              text: 'Status do apoio',
+                              text: 'Support Status',
                               project: project
                           }],
                           name: 'state',
@@ -108,19 +108,19 @@ const projectContributionReport = {
                 options = _.map(rewards(), (r) => {
                     return {
                         value: r.id,
-                        option: `R$ ${h.formatNumber(r.minimum_value, 2, 3)} - ${r.description.substring(0, 20)}`
+                        option: `Rs ${h.formatNumber(r.minimum_value, 2, 3)} - ${r.description.substring(0, 20)}`
                     };
                 });
             }
 
             options.unshift({
                 value: null,
-                option: 'Sem recompensa'
+                option: 'No reward'
             });
 
             options.unshift({
                 value: '',
-                option: 'Todas'
+                option: 'All'
             });
 
             return options;

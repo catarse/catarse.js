@@ -20,17 +20,17 @@ const adminContributions = {
                 component: filterMain,
                 data: {
                     vm: filterVM.full_text_index,
-                    placeholder: 'Busque por projeto, email, Ids do usuário e do apoio...'
+                    placeholder: 'Search by Design, Email, User and Support Ids...'
                 }
             }, { //state
                 component: filterDropdown,
                 data: {
-                    label: 'Com o estado',
+                    label: 'With the state',
                     name: 'state',
                     vm: filterVM.state,
                     options: [{
                         value: '',
-                        option: 'Qualquer um'
+                        option: 'Any'
                     }, {
                         value: 'paid',
                         option: 'paid'
@@ -62,7 +62,7 @@ const adminContributions = {
                     vm: filterVM.gateway,
                     options: [{
                         value: '',
-                        option: 'Qualquer um'
+                        option: 'Any'
                     }, {
                         value: 'Pagarme',
                         option: 'Pagarme'
@@ -74,20 +74,20 @@ const adminContributions = {
                         option: 'PayPal'
                     }, {
                         value: 'Credits',
-                        option: 'Créditos'
+                        option: 'Credits'
                     }]
                 }
             }, { //value
                 component: filterNumberRange,
                 data: {
-                    label: 'Valores entre',
+                    label: 'Values between',
                     first: filterVM.value.gte,
                     last: filterVM.value.lte
                 }
             }, { //created_at
                 component: filterDateRange,
                 data: {
-                    label: 'Período do apoio',
+                    label: 'Support period',
                     first: filterVM.created_at.gte,
                     last: filterVM.created_at.lte
                 }
@@ -108,7 +108,7 @@ const adminContributions = {
                 error: error
             },
             data: {
-                label: 'Apoios'
+                label: 'Support'
             },
             submit: submit
         };

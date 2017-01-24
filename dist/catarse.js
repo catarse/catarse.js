@@ -28,9 +28,9 @@ var selfOrEmpty = function selfOrEmpty(obj) {
     return obj ? obj : emptyState;
 };
 var setMomentifyLocale = function setMomentifyLocale() {
-    moment$1.locale('pt', {
-        months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
-        monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_')
+    moment$1.locale('en', {
+        months: 'January_Feburary_Marçh_April_May_June_July_August_September_October_November_December'.split('_'),
+        monthsShort: 'jan_feb_mar_apr_may_jun_jul_aug_sep_oct_nov_dec'.split('_')
     });
 };
 var existy = function existy(x) {
@@ -38,7 +38,7 @@ var existy = function existy(x) {
 };
 var momentify = function momentify(date, format) {
     format = format || 'DD/MM/YYYY';
-    return date ? moment$1(date).locale('pt').format(format) : 'no date';
+    return date ? moment$1(date).locale('en').format(format) : 'no date';
 };
 var storeAction = function storeAction(action, value) {
     if (!sessionStorage.getItem(action)) {
@@ -187,13 +187,13 @@ var validate = function validate() {
                 _$1.map(fields, function (field) {
                     if (field.rule === 'email') {
                         if (!validateEmail(field.prop())) {
-                            validationErrors().push({ field: field.prop, message: 'E-mail inválido.' });
+                            validationErrors().push({ field: field.prop, message: 'Invalid E-mail.' });
                         }
                     }
 
                     if (field.rule === 'text') {
                         if (field.prop().trim() === '') {
-                            validationErrors().push({ field: field.prop, message: 'O campo não pode ser vazio.' });
+                            validationErrors().push({ field: field.prop, message: 'The field can not be empty.' });
                         }
                     }
                 });
@@ -213,10 +213,10 @@ var momentFromString = function momentFromString(date, format) {
     return european.isValid() ? european : moment$1(date);
 };
 var translatedTimeUnits = {
-    days: 'dias',
-    minutes: 'minutos',
-    hours: 'horas',
-    seconds: 'segundos'
+    days: 'days',
+    minutes: 'minutes',
+    hours: 'hours',
+    seconds: 'seconds'
 };
 var translatedTime = function translatedTime(time) {
     var translatedTime = translatedTimeUnits,
@@ -390,7 +390,7 @@ var toAnchor = function toAnchor() {
     };
 };
 var navigateToDevise = function navigateToDevise() {
-    window.location.href = '/pt/login';
+    window.location.href = '/en/login';
     return false;
 };
 var navigateTo = function navigateTo(path) {
@@ -520,35 +520,35 @@ var projectStateTextClass = function projectStateTextClass(state) {
     var statusText = {
         online: {
             cssClass: 'text-success',
-            text: 'NO AR'
+            text: 'UP IN THE AIR'
         },
         successful: {
             cssClass: 'text-success',
-            text: 'FINANCIADO'
+            text: 'FINANCED'
         },
         failed: {
             cssClass: 'text-error',
-            text: 'NÃO FINANCIADO'
+            text: 'NOT FINANCED'
         },
         waiting_funds: {
             cssClass: 'text-waiting',
-            text: 'AGUARDANDO'
+            text: 'WAITING FOR'
         },
         rejected: {
             cssClass: 'text-error',
-            text: 'RECUSADO'
+            text: 'REFUSED'
         },
         draft: {
             cssClass: '',
-            text: 'RASCUNHO'
+            text: 'DRAFT'
         },
         in_analysis: {
             cssClass: '',
-            text: 'EM ANÁLISE'
+            text: 'IN ANALYSIS'
         },
         approved: {
             cssClass: 'text-success',
-            text: 'APROVADO'
+            text: 'APPROVED'
         }
     };
 
@@ -746,7 +746,7 @@ var projectFullPermalink = function projectFullPermalink(project) {
 var isHome = function isHome() {
     var path = window.location.pathname;
 
-    return path == '/pt' || path == '/';
+    return path == '/en' || path == '/';
 };
 var isProjectPage = function isProjectPage() {
     var path = window.location.pathname,
@@ -786,21 +786,21 @@ var redactorConfig = function redactorConfig(params) {
         formatting: ['p'],
         formattingAdd: [{
             tag: 'blockquote',
-            title: 'Citar',
+            title: 'To quote',
             class: 'fontsize-base quote',
             clear: true
         }, {
             tag: 'p',
-            title: 'Cabeçalho 1',
+            title: 'Header 1',
             class: 'fontsize-larger fontweight-semibold',
             clear: true
         }, {
             tag: 'p',
-            title: 'Cabeçalho 2',
+            title: 'Header 2',
             class: 'fontsize-large',
             clear: true
         }],
-        lang: 'pt_br',
+        lang: 'en_br',
         maxHeight: 800,
         minHeight: 300,
         convertVideoLinks: true,
@@ -1387,24 +1387,24 @@ var adminUsers = {
             component: filterMain,
             data: {
                 vm: filterVM.full_text_index,
-                placeholder: 'Busque por nome, e-mail, Ids do usuário...'
+                placeholder: 'Search by name, email, user ids...'
             }
         }, { //status
             component: filterDropdown,
             data: {
-                label: 'Com o estado',
+                label: 'With the state',
                 index: 'status',
                 name: 'deactivated_at',
                 vm: filterVM.deactivated_at,
                 options: [{
                     value: '',
-                    option: 'Qualquer um'
+                    option: 'Any'
                 }, {
                     value: null,
-                    option: 'ativo'
+                    option: 'active'
                 }, {
                     value: !null,
-                    option: 'desativado'
+                    option: 'disabled'
                 }]
             }
         }],
@@ -1426,7 +1426,7 @@ var adminUsers = {
         };
     },
     view: function view(ctrl) {
-        var label = 'Usuários';
+        var label = 'Users';
 
         return [m$1.component(adminFilter, {
             form: ctrl.filterVM.formDescriber,
@@ -2044,17 +2044,17 @@ var adminContributions = {
             component: filterMain,
             data: {
                 vm: filterVM.full_text_index,
-                placeholder: 'Busque por projeto, email, Ids do usuário e do apoio...'
+                placeholder: 'Search by Design, Email, User and Support Ids...'
             }
         }, { //state
             component: filterDropdown,
             data: {
-                label: 'Com o estado',
+                label: 'With the state',
                 name: 'state',
                 vm: filterVM.state,
                 options: [{
                     value: '',
-                    option: 'Qualquer um'
+                    option: 'Any'
                 }, {
                     value: 'paid',
                     option: 'paid'
@@ -2086,7 +2086,7 @@ var adminContributions = {
                 vm: filterVM.gateway,
                 options: [{
                     value: '',
-                    option: 'Qualquer um'
+                    option: 'Any'
                 }, {
                     value: 'Pagarme',
                     option: 'Pagarme'
@@ -2098,20 +2098,20 @@ var adminContributions = {
                     option: 'PayPal'
                 }, {
                     value: 'Credits',
-                    option: 'Créditos'
+                    option: 'Credits'
                 }]
             }
         }, { //value
             component: filterNumberRange,
             data: {
-                label: 'Valores entre',
+                label: 'Values between',
                 first: filterVM.value.gte,
                 last: filterVM.value.lte
             }
         }, { //created_at
             component: filterDateRange,
             data: {
-                label: 'Período do apoio',
+                label: 'Support period',
                 first: filterVM.created_at.gte,
                 last: filterVM.created_at.lte
             }
@@ -2132,7 +2132,7 @@ var adminContributions = {
                 error: error
             },
             data: {
-                label: 'Apoios'
+                label: 'Support'
             },
             submit: submit
         };
@@ -2201,7 +2201,7 @@ var error$1 = m.prop('');
 var rewards = m.prop([]);
 var noReward = {
     id: -1,
-    description: 'Obrigado. Eu só quero ajudar o projeto.',
+    description: 'Thank you. I just want to help the project.',
     minimum_value: 10
 };
 var contributionValue = m.prop(noReward.minimum_value + ',00');
@@ -2902,29 +2902,29 @@ var Flex = {
     view: function view(ctrl, args) {
         var stats = _.first(ctrl.stats());
 
-        return [m$1('.w-section.hero-full.hero-zelo', [m$1('.w-container.u-text-center', [m$1('img.logo-flex-home[src=\'/assets/logo-flex.png\'][width=\'359\']'), m$1('.w-row', [m$1('.w-col.fontsize-large.u-marginbottom-60.w-col-push-2.w-col-8', 'Vamos construir uma nova modalidade de crowdfunding! Cadastre seu email e saiba como inscrever o seu projeto no flex!')]), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1.component(landingSignup, {
+        return [m$1('.w-section.hero-full.hero-zelo', [m$1('.w-container.u-text-center', [m$1('img.logo-flex-home[src=\'/assets/logo-flex.png\'][width=\'359\']'), m$1('.w-row', [m$1('.w-col.fontsize-large.u-marginbottom-60.w-col-push-2.w-col-8', 'Let`s build a new mode of crowdfunding! Register your email and learn how to register your project on flex!')]), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1.component(landingSignup, {
             builder: ctrl.builder
-        }), m$1('.w-col.w-col-2')])])]), [m$1('.section', [m$1('.w-container', [m$1('.fontsize-largest.u-margintop-40.u-text-center', 'Pra quem será?'), m$1('.fontsize-base.u-text-center.u-marginbottom-60', 'Iniciaremos a fase de testes com categorias de projetos específicas'), m$1('div', [m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-6', [m$1('.u-text-center.u-marginbottom-20', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e393a01b66e250aca67cb_icon-zelo-com.png\'][width=\'210\']'), m$1('.fontsize-largest.lineheight-loose', 'Causas')]), m$1('p.fontsize-base', 'Flexibilidade para causas de impacto! Estaremos abertos a campanhas de organizações ou pessoas físicas para arrecadação de recursos para causas pessoais, projetos assistenciais, saúde, ajudas humanitárias, proteção aos animais, empreendedorismo socioambiental, ativismo ou qualquer coisa que una as pessoas para fazer o bem.')]), m$1('.w-col.w-col-6', [m$1('.u-text-center.u-marginbottom-20', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e3929a0daea230a5f12cd_icon-zelo-pessoal.png\'][width=\'210\']'), m$1('.fontsize-largest.lineheight-loose', 'Vaquinhas')]), m$1('p.fontsize-base', 'Campanhas simples que precisam de flexibilidade para arrecadar dinheiro com pessoas próximas. Estaremos abertos a uma variedade de campanhas pessoais que podem ir desde cobrir custos de estudos a ajudar quem precisa de tratamento médico. De juntar a grana para fazer aquela festa a comprar presentes para alguém com a ajuda da galera. ')])])])])]), m$1('.w-section.section.bg-greenlime.fontcolor-negative', [m$1('.w-container', [m$1('.fontsize-largest.u-margintop-40.u-marginbottom-60.u-text-center', 'Como funcionará?'), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39c578b284493e2a428a_zelo-money.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'Fique com quanto arrecadar'), m$1('p.u-text-center.fontsize-base', 'O flex é para impulsionar campanhas onde todo dinheiro é bem vindo! Você fica com tudo que conseguir arrecadar.')]), m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39d37c013d4a3ee687d2_icon-reward.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'Não precisa de recompensas'), m$1('p.u-text-center.fontsize-base', 'No flex oferecer recompensas é opcional. Você escolhe se oferecê-las faz sentido para o seu projeto e campanha.')])]), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39fb01b66e250aca67e3_icon-curad.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'Você mesmo publica seu projeto'), m$1('p.u-text-center.fontsize-base', 'Todos os projetos inscritos no flex entram no ar. Agilidade e facilidade para você captar recursos através da internet.')]), m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39e77c013d4a3ee687d4_icon-time.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'Encerre a campanha quando quiser'), m$1('p.u-text-center.fontsize-base', 'Não há limite de tempo de captação. Você escolhe  quando encerrar sua campanha e receber os valores arrecadados.')])])])]), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-editable.fontsize-larger.u-margintop-40.u-margin-bottom-40.u-text-center', 'Conheça alguns dos primeiros projetos flex'), ctrl.projectsLoader() ? h.loader() : m$1.component(projectRow, { collection: ctrl.projects, ref: 'ctrse_flex', wrapper: '.w-row.u-margintop-40' })])]), m$1('.w-section.divider'), m$1('.w-section.section', [m$1('.w-container', [m$1('.fontsize-larger.u-text-center.u-marginbottom-60.u-margintop-40', 'Dúvidas'), m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-6', [m$1.component(landingQA, {
-            question: 'Quais são as taxas da modalidade flexível? ',
-            answer: 'Como no Catarse, enviar um projeto não custa nada! A taxa cobrada no serviço Catarse flex é de 13% sobre o valor arrecadado.'
+        }), m$1('.w-col.w-col-2')])])]), [m$1('.section', [m$1('.w-container', [m$1('.fontsize-largest.u-margintop-40.u-text-center', 'Pra quem será?'), m$1('.fontsize-base.u-text-center.u-marginbottom-60', 'We will start the testing phase with specific project categories'), m$1('div', [m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-6', [m$1('.u-text-center.u-marginbottom-20', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e393a01b66e250aca67cb_icon-zelo-com.png\'][width=\'210\']'), m$1('.fontsize-largest.lineheight-loose', 'Causes')]), m$1('p.fontsize-base', 'Flexibility for causes of impact! We will be open to campaigns of organizations or individuals for the collection of resources for personal causes, assistance projects, health, humanitarian aid, animal protection, socio-environmental entrepreneurship, activism or anything that unites people to do good.')]), m$1('.w-col.w-col-6', [m$1('.u-text-center.u-marginbottom-20', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e3929a0daea230a5f12cd_icon-zelo-pessoal.png\'][width=\'210\']'), m$1('.fontsize-largest.lineheight-loose', 'Kitties')]), m$1('p.fontsize-base', 'Simple campaigns that need the flexibility to raise money with people close to you. We will be open to a variety of personal campaigns that can range from covering study costs to helping those in need of medical treatment. To collect the money to make that party buy presents for someone with the help of the galley.')])])])])]), m$1('.w-section.section.bg-greenlime.fontcolor-negative', [m$1('.w-container', [m$1('.fontsize-largest.u-margintop-40.u-marginbottom-60.u-text-center', 'Como funcionará?'), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39c578b284493e2a428a_zelo-money.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'Stay with how much to collect'), m$1('p.u-text-center.fontsize-base', 'Flex is to drive campaigns where all money is welcome! You get everything you can raise.')]), m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39d37c013d4a3ee687d2_icon-reward.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'No rewards required'), m$1('p.u-text-center.fontsize-base', 'No flex offering rewards is optional. You choose whether to offer them makes sense for your project and campaign.')])]), m$1('.w-row.u-marginbottom-40', [m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39fb01b66e250aca67e3_icon-curad.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'You publish your project yourself'), m$1('p.u-text-center.fontsize-base', 'All projects enrolled in the flex come on the air. Agility and ease for you to capture resources through the internet.')]), m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39e77c013d4a3ee687d4_icon-time.png\'][width=\'180\']')]), m$1('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'End the campaign anytime'), m$1('p.u-text-center.fontsize-base', 'There is no capitation time limit. You choose when to close your campaign and receive the amounts collected.')])])])]), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-editable.fontsize-larger.u-margintop-40.u-margin-bottom-40.u-text-center', 'Meet some of the first flex projects'), ctrl.projectsLoader() ? h.loader() : m$1.component(projectRow, { collection: ctrl.projects, ref: 'ctrse_flex', wrapper: '.w-row.u-margintop-40' })])]), m$1('.w-section.divider'), m$1('.w-section.section', [m$1('.w-container', [m$1('.fontsize-larger.u-text-center.u-marginbottom-60.u-margintop-40', 'Doubts'), m$1('.w-row.u-marginbottom-60', [m$1('.w-col.w-col-6', [m$1.component(landingQA, {
+            question: 'What are the flexible mode fees? ',
+            answer: 'Like in JVN, sending a project costs nothing! The fee charged on the JVN flex service is 13% on the amount collected.'
         }), m$1.component(landingQA, {
-            question: 'De onde vem o dinheiro do meu projeto?',
-            answer: 'Família, amigos, fãs e membros de comunidades que você faz parte são seus maiores colaboradores. São eles que irão divulgar sua campanha para as pessoas que eles conhecem, e assim o círculo de apoiadores vai aumentando e a sua campanha ganha força.'
+            question: 'Where does the money from my project come from?',
+            answer: 'Family, friends, fans and members of communities that you are part of are your greatest contributors. It is they who will spread their campaign to the people they know, and so the circle of supporters is increasing and your campaign is gaining strength.'
         }), m$1.component(landingQA, {
-            question: 'Qual a diferença entre o flexível e o "tudo ou nada"?',
-            answer: 'Atualmente o Catarse utiliza apenas o modelo "tudo ou nada", onde você só fica com o dinheiro se bater a meta de arrecadação dentro do prazo da campanha. O modelo flexível é diferente pois permite que o realizador fique com o que arrecadar, independente de atingir ou não a meta do projeto no prazo da campanha. Não haverá limite de tempo para as campanhas. Nosso sistema flexível será algo novo em relação aos modelos que existem atualmente no mercado.'
+            question: 'What is the difference between the flexible and the "all or nothing"?',
+            answer: 'Currently Catarse uses only the "all or nothing" model, where you only get the money if you beat the collection goal within the term of the campaign. The flexible model is different because it allows the director to keep what he has collected, regardless of whether or not he reaches the project goal within the term of the campaign. There will be no time limit for campaigns. Our flexible system will be something new compared to the models that currently exist in the market.'
         })]), m$1('.w-col.w-col-6', [m$1.component(landingQA, {
-            question: 'Posso inscrever projetos para a modalidade flexível já?',
-            answer: 'Sim. Cadastre seu email e saiba como inscrever o seu projeto no flex!'
+            question: 'Can I enter projects for flexible mode already?',
+            answer: 'Yes. Register your email and learn how to register your project on flex!'
         }), m$1.component(landingQA, {
-            question: 'Por quê vocês querem fazer o Catarse flex?',
-            answer: 'Acreditamos que o ambiente do crowdfunding brasileiro ainda tem espaço para muitas ações, testes e experimentações para entender de fato o que as pessoas precisam. Sonhamos com tornar o financiamento coletivo um hábito no Brasil. O Catarse flex é mais um passo nessa direção.'
+            question: 'Why do you want to do the Catarse flex?',
+            answer: 'We believe that the Brazilian crowdfunding environment still has room for many actions, tests and experiments to really understand what people need. We dream of making collective financing a habit in Brazil. Catarse flex is another step in this direction.'
         }), m$1.component(landingQA, {
-            question: 'Quando vocês irão lançar o Catarse flex?',
-            answer: 'Ainda não sabemos quando abriremos o flex para o público em geral, mas você pode cadastrar seu email nessa página e receber um material especial de como inscrever seu projeto.'
-        })])])])]), m$1('.w-section.section-large.u-text-center.bg-purple', [m$1('.w-container.fontcolor-negative', [m$1('.fontsize-largest', 'Inscreva seu projeto!'), m$1('.fontsize-base.u-marginbottom-60', 'Cadastre seu email e saiba como inscrever o seu projeto no flex!'), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1.component(landingSignup, {
+            question: 'When will you launch Catarse flex?',
+            answer: 'We still do not know when we will open flex for the general public, but you can register your email on this page and receive special material on how to submit your project.'
+        })])])])]), m$1('.w-section.section-large.u-text-center.bg-purple', [m$1('.w-container.fontcolor-negative', [m$1('.fontsize-largest', 'Inscreva seu projeto!'), m$1('.fontsize-base.u-marginbottom-60', 'Register your email and learn how to register your project on flex!'), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1.component(landingSignup, {
             builder: ctrl.builder
-        }), m$1('.w-col.w-col-2')])])]), m$1('.w-section.section-one-column.bg-catarse-zelo.section-large[style="min-height: 50vh;"]', [m$1('.w-container.u-text-center', [m$1('.w-editable.u-marginbottom-40.fontsize-larger.lineheight-tight.fontcolor-negative', 'O flex é um experimento e iniciativa do Catarse, maior plataforma de crowdfunding do Brasil.'), m$1('.w-row.u-text-center', ctrl.statsLoader() ? h.loader() : [m$1('.w-col.w-col-4', [m$1('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m$1('p.start-stats.fontsize-base.fontcolor-negative', 'Pessoas ja apoiaram pelo menos 01 projeto no Catarse')]), m$1('.w-col.w-col-4', [m$1('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m$1('p.start-stats.fontsize-base.fontcolor-negative', 'Projetos ja foram financiados no Catarse')]), m$1('.w-col.w-col-4', [m$1('.fontsize-jumbo.text-success.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' milhões'), m$1('p.start-stats.fontsize-base.fontcolor-negative', 'Foram investidos em ideias publicadas no Catarse')])])])]), m$1('.w-section.section.bg-blue-one.fontcolor-negative', [m$1('.w-container', [m$1('.fontsize-large.u-text-center.u-marginbottom-20', 'Recomende o Catarse flex para amigos! '), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1('.w-col.w-col-8', [m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('div', [m$1('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'), m$1('a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=https://www.catarse.me/flex?ref=facebook&title=' + encodeURIComponent('Conheça o novo Catarse Flex!') + '"][target="_blank"]', 'Compartilhar')])]), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('div', [m$1('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'), m$1('a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Vamos construir uma nova modalidade de crowdfunding para o Catarse! Junte-se a nós, inscreva seu email!') + 'https://www.catarse.me/flex?ref=twitter"][target="_blank"]', 'Tuitar')])])])]), m$1('.w-col.w-col-2')])])]), m$1('.w-section.section-large.bg-greenlime', [m$1('.w-container', [m$1('#participe-do-debate.u-text-center', { config: h.toAnchor() }, [m$1('h1.fontsize-largest.fontcolor-negative', 'Construa o flex conosco'), m$1('.fontsize-base.u-marginbottom-60.fontcolor-negative', 'Inicie uma conversa, pergunte, comente, critique e faça sugestões!')]), m$1('#disqus_thread.card.u-radius[style="min-height: 50vh;"]', {
+        }), m$1('.w-col.w-col-2')])])]), m$1('.w-section.section-one-column.bg-catarse-zelo.section-large[style="min-height: 50vh;"]', [m$1('.w-container.u-text-center', [m$1('.w-editable.u-marginbottom-40.fontsize-larger.lineheight-tight.fontcolor-negative', 'Flex is an experiment and initiative of JVN, Nepal`s largest crowdfunding platform.'), m$1('.w-row.u-text-center', ctrl.statsLoader() ? h.loader() : [m$1('.w-col.w-col-4', [m$1('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m$1('p.start-stats.fontsize-base.fontcolor-negative', 'People have already supported at least 01 project in JVN')]), m$1('.w-col.w-col-4', [m$1('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m$1('p.start-stats.fontsize-base.fontcolor-negative', 'Projects have already been funded in JVN')]), m$1('.w-col.w-col-4', [m$1('.fontsize-jumbo.text-success.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m$1('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in JVN')])])])]), m$1('.w-section.section.bg-blue-one.fontcolor-negative', [m$1('.w-container', [m$1('.fontsize-large.u-text-center.u-marginbottom-20', 'Recommend the Catarse flex for friends! '), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1('.w-col.w-col-8', [m$1('.w-row', [m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m$1('div', [m$1('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'), m$1('a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=https://www.catarse.me/flex?ref=facebook&title=' + encodeURIComponent('Meet the new JVN Flex!') + '"][target="_blank"]', 'To share')])]), m$1('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m$1('div', [m$1('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'), m$1('a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!') + 'https://www.catarse.me/flex?ref=twitter"][target="_blank"]', 'To tweet')])])])]), m$1('.w-col.w-col-2')])])]), m$1('.w-section.section-large.bg-greenlime', [m$1('.w-container', [m$1('#participe-do-debate.u-text-center', { config: h.toAnchor() }, [m$1('h1.fontsize-largest.fontcolor-negative', 'Build Flex with us'), m$1('.fontsize-base.u-marginbottom-60.fontcolor-negative', 'Start a conversation, ask, comment, critique and make suggestions!')]), m$1('#disqus_thread.card.u-radius[style="min-height: 50vh;"]', {
             config: ctrl.addDisqus
         })])])]];
     }
@@ -3997,7 +3997,7 @@ var insights = {
         var lContributionsPerDay = loader(models.projectContributionsPerDay.getRowOptions(filtersVM.parameters()));
         lContributionsPerDay.load().then(contributionsPerDay);
 
-        var contributionsPerLocationTable = [['Estado', 'Apoios', 'R$ apoiados (% do total)']];
+        var contributionsPerLocationTable = [['state', 'Support', 'Rs Supported (% Of total)']];
         var buildPerLocationTable = function buildPerLocationTable(contributions) {
             return !_$1.isEmpty(contributions) ? _$1.map(_$1.first(contributions).source, function (contribution) {
                 var column = [];
@@ -4005,7 +4005,7 @@ var insights = {
                 column.push(contribution.state_acronym || 'Outro/other');
                 column.push(contribution.total_contributions);
                 column.push([contribution.total_contributed, [//Adding row with custom comparator => read project-data-table description
-                m$1('input[type="hidden"][value="' + contribution.total_contributed + '"'), 'R$ ', h.formatNumber(contribution.total_contributed, 2, 3), m$1('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')]]);
+                m$1('input[type="hidden"][value="' + contribution.total_contributed + '"'), 'Rs ', h.formatNumber(contribution.total_contributed, 2, 3), m$1('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')]]);
                 return contributionsPerLocationTable.push(column);
             }) : [];
         };
@@ -4030,7 +4030,7 @@ var insights = {
 
                 column.push(contribution.referral_link ? I18n$1.t('referral.' + contribution.referral_link, I18nScope$4({ defaultValue: contribution.referral_link })) : I18n$1.t('referral.others', I18nScope$4()));
                 column.push(contribution.total);
-                column.push([contribution.total_amount, [m$1('input[type="hidden"][value="' + contribution.total_contributed + '"'), 'R$ ', h.formatNumber(contribution.total_amount, 2, 3), m$1('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')]]);
+                column.push([contribution.total_amount, [m$1('input[type="hidden"][value="' + contribution.total_contributed + '"'), 'Rs ', h.formatNumber(contribution.total_amount, 2, 3), m$1('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')]]);
                 return contributionsPerRefTable.push(column);
             }) : [];
         };
@@ -4054,19 +4054,19 @@ var insights = {
     view: function view(ctrl) {
         var project = _$1.first(ctrl.projectDetails()) || {
             user: {
-                name: 'Realizador'
+                name: 'Director'
             }
         },
             buildTooltip = function buildTooltip(el) {
             return m$1.component(tooltip, {
                 el: el,
-                text: ['Informa de onde vieram os apoios de seu projeto. Saiba como usar essa tabela e planejar melhor suas ações de comunicação ', m$1('a[href="' + I18n$1.t('ref_table.help_url', I18nScope$4()) + '"][target=\'_blank\']', 'aqui.')],
+                text: ['Tell us where the support came from your project. Learn how to use this table and better plan your communication actions', m$1('a[href="' + I18n$1.t('ref_table.help_url', I18nScope$4()) + '"][target=\'_blank\']', 'on here.')],
                 width: 380
             });
         };
 
         if (!ctrl.l()) {
-            project.user.name = project.user.name || 'Realizador';
+            project.user.name = project.user.name || 'Director';
         }
 
         return m$1('.project-insights', !ctrl.l() ? [project.is_owner_or_admin ? m$1.component(projectDashboardMenu, {
@@ -4147,8 +4147,8 @@ var liveStatistics = {
         var data = ctrl.notificationData();
 
         return m$1('.w-section.bg-stats.section.min-height-100', [m$1('.w-container.u-text-center', _$1.map(ctrl.pageStatistics(), function (stat) {
-            return [m$1('img.u-marginbottom-60[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/55ada5dd11b36a52616d97df_symbol-catarse.png"]'), m$1('.fontcolor-negative.u-marginbottom-40', [m$1('.fontsize-megajumbo.fontweight-semibold', 'R$ ' + h.formatNumber(stat.total_contributed, 2, 3)), m$1('.fontsize-large', 'Doados para projetos publicados por aqui')]), m$1('.fontcolor-negative.u-marginbottom-60', [m$1('.fontsize-megajumbo.fontweight-semibold', stat.total_contributors), m$1('.fontsize-large', 'Pessoas já apoiaram pelo menos 1 projeto no Catarse')])];
-        })), !_$1.isEmpty(data) ? m$1('.w-container', [m$1('div', [m$1('.card.u-radius.u-marginbottom-60.medium', [m$1('.w-row', [m$1('.w-col.w-col-4', [m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4', [m$1('img.thumb.u-round[src="' + h.useAvatarOrDefault(data.user_image) + '"]')]), m$1('.w-col.w-col-8.w-col-small-8', [m$1('.fontsize-large.lineheight-tight', data.user_name)])])]), m$1('.w-col.w-col-4.u-text-center.fontsize-base.u-margintop-20', [m$1('div', 'acabou de apoiar o')]), m$1('.w-col.w-col-4', [m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4', [m$1('img.thumb-project.u-radius[src="' + data.project_image + '"][width="75"]')]), m$1('.w-col.w-col-8.w-col-small-8', [m$1('.fontsize-large.lineheight-tight', data.project_name)])])])])])])]) : '', m$1('.u-text-center.fontsize-large.u-marginbottom-10.fontcolor-negative', [m$1('a.link-hidden.fontcolor-negative[href="https://github.com/catarse"][target="_blank"]', [m$1('span.fa.fa-github', '.'), ' Open Source com orgulho! '])])]);
+            return [m$1('img.u-marginbottom-60[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/55ada5dd11b36a52616d97df_symbol-catarse.png"]'), m$1('.fontcolor-negative.u-marginbottom-40', [m$1('.fontsize-megajumbo.fontweight-semibold', 'Rs ' + h.formatNumber(stat.total_contributed, 2, 3)), m$1('.fontsize-large', 'Donated to projects published here')]), m$1('.fontcolor-negative.u-marginbottom-60', [m$1('.fontsize-megajumbo.fontweight-semibold', stat.total_contributors), m$1('.fontsize-large', 'People have already supported at least 1 project in Catarse')])];
+        })), !_$1.isEmpty(data) ? m$1('.w-container', [m$1('div', [m$1('.card.u-radius.u-marginbottom-60.medium', [m$1('.w-row', [m$1('.w-col.w-col-4', [m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4', [m$1('img.thumb.u-round[src="' + h.useAvatarOrDefault(data.user_image) + '"]')]), m$1('.w-col.w-col-8.w-col-small-8', [m$1('.fontsize-large.lineheight-tight', data.user_name)])])]), m$1('.w-col.w-col-4.u-text-center.fontsize-base.u-margintop-20', [m$1('div', 'Just supported the')]), m$1('.w-col.w-col-4', [m$1('.w-row', [m$1('.w-col.w-col-4.w-col-small-4', [m$1('img.thumb-project.u-radius[src="' + data.project_image + '"][width="75"]')]), m$1('.w-col.w-col-8.w-col-small-8', [m$1('.fontsize-large.lineheight-tight', data.project_name)])])])])])])]) : '', m$1('.u-text-center.fontsize-large.u-marginbottom-10.fontcolor-negative', [m$1('a.link-hidden.fontcolor-negative[href="https://github.com/catarse"][target="_blank"]', [m$1('span.fa.fa-github', '.'), ' Open Source with pride! '])])]);
     }
 };
 
@@ -4365,13 +4365,13 @@ var projectContributionReport = {
             rewards = m$1.prop([]),
             contributionStateOptions = m$1.prop([]),
             reloadSelectOptions = function reloadSelectOptions(project_state) {
-            var opts = [{ value: '', option: 'Todos' }];
+            var opts = [{ value: '', option: 'All' }];
 
             var options_map = {
-                'online': [{ value: 'paid', option: 'Confirmado' }, { value: 'pending', option: 'Iniciado' }, { value: 'refunded,chargeback,deleted,pending_refund', option: 'Contestado' }],
-                'waiting_funds': [{ value: 'paid', option: 'Confirmado' }, { value: 'pending', option: 'Iniciado' }, { value: 'refunded,chargeback,deleted,pending_refund', option: 'Contestado' }],
-                'failed': [{ value: 'pending_refund', option: 'Reembolso em andamento' }, { value: 'refunded', option: 'Reembolsado' }, { value: 'paid', option: 'Reembolso não iniciado' }],
-                'successful': [{ value: 'paid', option: 'Confirmado' }, { value: 'refunded,chargeback,deleted,pending_refund', option: 'Contestado' }]
+                'online': [{ value: 'paid', option: 'Confirmed' }, { value: 'pending', option: 'Started' }, { value: 'refunded,chargeback,deleted,pending_refund', option: 'Contested' }],
+                'waiting_funds': [{ value: 'paid', option: 'Confirmed' }, { value: 'pending', option: 'Started' }, { value: 'refunded,chargeback,deleted,pending_refund', option: 'Contested' }],
+                'failed': [{ value: 'pending_refund', option: 'Refund in progress' }, { value: 'refunded', option: 'Refunded' }, { value: 'paid', option: 'Refund not started' }],
+                'successful': [{ value: 'paid', option: 'Confirmed' }, { value: 'refunded,chargeback,deleted,pending_refund', option: 'Contested' }]
             };
 
             opts = opts.concat(options_map[project_state] || []);
@@ -4384,13 +4384,13 @@ var projectContributionReport = {
                 inputWrapperClass: '.w-input.text-field',
                 btnClass: '.btn.btn-medium',
                 vm: filterVM.full_text_index,
-                placeholder: 'Busque por nome ou email do apoiador'
+                placeholder: 'Search by name or email of the supporter'
             }
         }, {
             label: 'reward_filter',
             component: filterDropdown,
             data: {
-                label: 'Recompensa',
+                label: 'Reward',
                 name: 'reward_id',
                 vm: filterVM.reward_id,
                 wrapper_class: '.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle',
@@ -4401,7 +4401,7 @@ var projectContributionReport = {
             component: filterDropdown,
             data: {
                 custom_label: [InfoProjectContributionStateLegend, {
-                    text: 'Status do apoio',
+                    text: 'Support Status',
                     project: project
                 }],
                 name: 'state',
@@ -4437,19 +4437,19 @@ var projectContributionReport = {
                 options = _$1.map(rewards(), function (r) {
                     return {
                         value: r.id,
-                        option: 'R$ ' + h.formatNumber(r.minimum_value, 2, 3) + ' - ' + r.description.substring(0, 20)
+                        option: 'Rs ' + h.formatNumber(r.minimum_value, 2, 3) + ' - ' + r.description.substring(0, 20)
                     };
                 });
             }
 
             options.unshift({
                 value: null,
-                option: 'Sem recompensa'
+                option: 'No reward'
             });
 
             options.unshift({
                 value: '',
-                option: 'Todas'
+                option: 'All'
             });
 
             return options;
@@ -4904,9 +4904,9 @@ var menu = {
     view: function view(ctrl, args) {
         return m$1('header.main-header', {
             class: ctrl.menuCss()
-        }, [m$1('.w-row', [m$1('.w-clearfix.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m$1('a.header-logo.w-inline-block[href=\'/?ref=ctrse_header\'][title=\'Catarse\']', ctrl.homeAttrs(), m$1('img[alt=\'Logo big\'][src=\'/assets/catarse_bootstrap/logo_big.png\']')), args.menuShort ? '' : m$1('div#menu-components', [m$1('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/start?ref=ctrse_header\']', { config: m$1.route }, I18n$1.t('header.submit', I18nScope$18())), m$1('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/explore?ref=ctrse_header\']', { config: m$1.route }, 'Explore'), m$1.component(menuSearch)])]), m$1('.text-align-right.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [ctrl.user ? m$1.component(menuProfile, { user: ctrl.user }) : m$1('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/pt/login?ref=ctrse_header\']', I18n$1.t('header.signin', I18nScope$18()))])]), args.menuShort ? '' : m$1('.header-controls-mobile.w-hidden-main.w-hidden-medium', [m$1('a.header-link.w-nav-link[href=\'/pt/start?ref=ctrse_header\']', { onclick: function onclick() {
+        }, [m$1('.w-row', [m$1('.w-clearfix.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m$1('a.header-logo.w-inline-block[href=\'/?ref=ctrse_header\'][title=\'JVN\']', ctrl.homeAttrs(), m$1('img[alt=\'Logo big\'][src=\'/assets/catarse_bootstrap/logo_big.png\']')), args.menuShort ? '' : m$1('div#menu-components', [m$1('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/start?ref=ctrse_header\']', { config: m$1.route }, I18n$1.t('header.submit', I18nScope$18())), m$1('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/explore?ref=ctrse_header\']', { config: m$1.route }, 'Explore'), m$1.component(menuSearch)])]), m$1('.text-align-right.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [ctrl.user ? m$1.component(menuProfile, { user: ctrl.user }) : m$1('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/en/login?ref=ctrse_header\']', I18n$1.t('header.signin', I18nScope$18()))])]), args.menuShort ? '' : m$1('.header-controls-mobile.w-hidden-main.w-hidden-medium', [m$1('a.header-link.w-nav-link[href=\'/en/start?ref=ctrse_header\']', { onclick: function onclick() {
                 return m$1.route('/start');
-            } }, I18n$1.t('header.submit', I18nScope$18())), m$1('a.header-link.w-nav-link[href=\'/pt/explore?ref=ctrse_header\']', { onclick: function onclick() {
+            } }, I18n$1.t('header.submit', I18nScope$18())), m$1('a.header-link.w-nav-link[href=\'/en/explore?ref=ctrse_header\']', { onclick: function onclick() {
                 return m$1.route('/explore');
             } }, 'Explore')])]);
     }
@@ -6481,9 +6481,9 @@ var usersShow = {
     view: function view(ctrl, args) {
         var user = ctrl.userDetails();
 
-        return m$1('div', [m$1.component(userHeader, { user: user }), m$1('nav.project-nav.u-text-center.u-marginbottom-30.profile', { style: { 'z-index': '10', 'position': 'relative' } }, m$1('.w-container[data-anchor=\'created\']', [!_$1.isEmpty(user) ? user.is_owner_or_admin ? m$1('a.dashboard-nav-link.dashboard[href=\'/pt/users/' + user.id + '/edit\']', { config: m$1.route, onclick: function onclick() {
+        return m$1('div', [m$1.component(userHeader, { user: user }), m$1('nav.project-nav.u-text-center.u-marginbottom-30.profile', { style: { 'z-index': '10', 'position': 'relative' } }, m$1('.w-container[data-anchor=\'created\']', [!_$1.isEmpty(user) ? user.is_owner_or_admin ? m$1('a.dashboard-nav-link.dashboard[href=\'/en/users/' + user.id + '/edit\']', { config: m$1.route, onclick: function onclick() {
                 m$1.route("/users/edit/" + user.id, { user_id: user.id });
-            } }, [m$1('span.fa.fa-cog'), m$1.trust('&nbsp;'), ' Editar perfil']) : '' : h.loader(), m$1('a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#contributed' ? 'selected' : '') + '\']', ['Apoiados ', m$1.trust('&nbsp;'), m$1('span.badge', user.total_contributed_projects)]), m$1('a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#created' ? 'selected' : '') + '\']', ['Criados ', m$1.trust('&nbsp;'), m$1('span.badge', user.total_published_projects)]), m$1('a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#about' ? 'selected' : '') + '\']', 'Sobre')])), m$1('section.section', m$1('.w-container', m$1('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))]);
+            } }, [m$1('span.fa.fa-cog'), m$1.trust('&nbsp;'), ' Edit profile']) : '' : h.loader(), m$1('a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#contributed' ? 'selected' : '') + '\']', ['Supported ', m$1.trust('&nbsp;'), m$1('span.badge', user.total_contributed_projects)]), m$1('a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#created' ? 'selected' : '') + '\']', ['Created ', m$1.trust('&nbsp;'), m$1('span.badge', user.total_published_projects)]), m$1('a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#about' ? 'selected' : '') + '\']', 'About')])), m$1('section.section', m$1('.w-container', m$1('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))]);
     }
 };
 
@@ -7324,14 +7324,14 @@ var usersEdit = {
                 'z-index': '10',
                 'position': 'relative'
             }
-        }, m$1('.w-container', [m$1('a.dashboard-nav-link' + (ctrl.hash() === '#contributions' ? '.selected' : '') + '[data-target=\'#dashboard_contributions\'][href=\'#contributions\'][id=\'dashboard_contributions_link\']', 'Apoiados'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#projects' ? '.selected' : '') + '[data-target=\'#dashboard_projects\'][href=\'#projects\'][id=\'dashboard_projects_link\']', 'Criados'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#about_me' ? '.selected' : '') + '[data-target=\'#dashboard_about_me\'][href=\'#about_me\'][id=\'dashboard_about_me_link\']', 'Sobre você'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#settings' ? '.selected' : '') + '[data-target=\'#dashboard_settings\'][href=\'#settings\'][id=\'dashboard_settings_link\']', 'Dados e endereço'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#notifications' ? '.selected' : '') + '[data-target=\'#dashboard_notifications\'][href=\'#notifications\'][id=\'dashboard_notifications_link\']', 'Notificações'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#billing' ? '.selected' : '') + '[data-target=\'#dashboard_billing\'][href=\'#billing\'][id=\'dashboard_billing_link\']', 'Banco e cartões'), m$1('a.dashboard-nav-link.u-right-big-only[href=\'/pt/users/' + user.id + '\']', {
+        }, m$1('.w-container', [m$1('a.dashboard-nav-link' + (ctrl.hash() === '#contributions' ? '.selected' : '') + '[data-target=\'#dashboard_contributions\'][href=\'#contributions\'][id=\'dashboard_contributions_link\']', 'Supported'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#projects' ? '.selected' : '') + '[data-target=\'#dashboard_projects\'][href=\'#projects\'][id=\'dashboard_projects_link\']', 'Created'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#about_me' ? '.selected' : '') + '[data-target=\'#dashboard_about_me\'][href=\'#about_me\'][id=\'dashboard_about_me_link\']', 'About you'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#settings' ? '.selected' : '') + '[data-target=\'#dashboard_settings\'][href=\'#settings\'][id=\'dashboard_settings_link\']', 'Data and address'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#notifications' ? '.selected' : '') + '[data-target=\'#dashboard_notifications\'][href=\'#notifications\'][id=\'dashboard_notifications_link\']', 'Notifications'), m$1('a.dashboard-nav-link' + (ctrl.hash() === '#billing' ? '.selected' : '') + '[data-target=\'#dashboard_billing\'][href=\'#billing\'][id=\'dashboard_billing_link\']', 'Bank and cards'), m$1('a.dashboard-nav-link.u-right-big-only[href=\'/en/users/' + user.id + '\']', {
             config: m$1.route,
             onclick: function onclick() {
                 m$1.route("/users/" + user.id, {
                     user_id: user.id
                 });
             }
-        }, 'Ir para o perfil público')])), m$1('section.section', m$1('.w-container', m$1('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))] : '']);
+        }, 'Go to the public profile')])), m$1('section.section', m$1('.w-container', m$1('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))] : '']);
     }
 };
 
@@ -7401,12 +7401,12 @@ var paymentVM = function paymentVM() {
     };
 
     var expMonthOptions = function expMonthOptions() {
-        return [[null, 'Mês'], [1, '01 - Janeiro'], [2, '02 - Fevereiro'], [3, '03 - Março'], [4, '04 - Abril'], [5, '05 - Maio'], [6, '06 - Junho'], [7, '07 - Julho'], [8, '08 - Agosto'], [9, '09 - Setembro'], [10, '10 - Outubro'], [11, '11 - Novembro'], [12, '12 - Dezembro']];
+        return [[null, 'Month'], [1, '01 - January'], [2, '02 - Feburary'], [3, '03 - March'], [4, '04 - April'], [5, '05 - May'], [6, '06 - June'], [7, '07 - July'], [8, '08 - August'], [9, '09 - September'], [10, '10 - October'], [11, '11 - November'], [12, '12 - December']];
     };
 
     var expYearOptions = function expYearOptions() {
         var currentYear = moment$1().year();
-        var yearsOptions = ['Ano'];
+        var yearsOptions = ['Year'];
         for (var i = currentYear; i <= currentYear + 25; i++) {
             yearsOptions.push(i);
         }
@@ -7422,7 +7422,7 @@ var paymentVM = function paymentVM() {
     };
 
     var getLocale = function getLocale() {
-        return isInternational() ? { locale: 'en' } : { locale: 'pt' };
+        return isInternational() ? { locale: 'en' } : { locale: 'en' };
     };
 
     var faq = function faq() {
@@ -7458,10 +7458,10 @@ var paymentVM = function paymentVM() {
 
         if (document.length > 14) {
             isValid = h.validateCnpj(document);
-            errorMessage = 'CNPJ inválido.';
+            errorMessage = 'invalid CNPJ.';
         } else {
             isValid = h.validateCpf(striped);
-            errorMessage = 'CPF inválido.';
+            errorMessage = 'invalid CPF.';
         }
 
         if (!isValid) {
@@ -7771,7 +7771,7 @@ var paymentVM = function paymentVM() {
         fields.userCountryId(countryId);
     });
     statesLoader.load().then(function (data) {
-        fields.states().push({ acronym: null, name: 'Estado' });
+        fields.states().push({ acronym: null, name: 'state' });
         _$1.map(data, function (state) {
             return fields.states().push(state);
         });
@@ -8822,13 +8822,13 @@ var projectsPayment = {
         var user = ctrl.user(),
             project = ctrl.project;
 
-        return m$1('#project-payment.w-section.w-clearfix.section', [m$1('.w-col', m$1('.w-clearfix.w-hidden-main.w-hidden-medium.card.u-radius.u-marginbottom-20', [m$1('.fontsize-smaller.fontweight-semibold', I18n$1.t('selected_reward.value', ctrl.scope())), m$1('a.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary[href=\'#\']'), m$1('.w-clearfix.u-marginbottom-20', m$1('.fontsize-larger.text-success.u-left', 'R$ ' + Number(ctrl.value).toFixed())), m$1('.w-clearfix.back-payment-info-reward', {
+        return m$1('#project-payment.w-section.w-clearfix.section', [m$1('.w-col', m$1('.w-clearfix.w-hidden-main.w-hidden-medium.card.u-radius.u-marginbottom-20', [m$1('.fontsize-smaller.fontweight-semibold', I18n$1.t('selected_reward.value', ctrl.scope())), m$1('a.w-inline-block.arrow-admin.fa.fa-chevron-down.fontcolor-secondary[href=\'#\']'), m$1('.w-clearfix.u-marginbottom-20', m$1('.fontsize-larger.text-success.u-left', 'Rs ' + Number(ctrl.value).toFixed())), m$1('.w-clearfix.back-payment-info-reward', {
             style: {
                 'display': 'none'
             }
         }, [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m$1('.fontsize-smallest', ctrl.reward().description ? ctrl.reward().description : m$1.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_.extend({ value: Number(ctrl.value).toFixed() }))))), m$1('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + project.project_id + '/contributions/new"]', I18n$1.t('selected_reward.edit', ctrl.scope()))])])), m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-8', [!_.isEmpty(ctrl.vm.fields.errors()) ? m$1('.card.card-error.u-radius.zindex-10.u-marginbottom-30.fontsize-smaller', m$1('.u-marginbottom-10.fontweight-bold', [I18n$1.t('errors.global', ctrl.scope()), m$1('.errors', _.map(ctrl.vm.fields.errors(), function (error) {
             return m$1('p', error.message);
-        }))])) : '', m$1('.w-form', [m$1('form.u-marginbottom-40', [m$1('.u-marginbottom-40.u-text-center-small-only', [m$1('.fontweight-semibold.lineheight-tight.fontsize-large', I18n$1.t('title', ctrl.scope())), m$1('.fontsize-smaller', I18n$1.t('required', ctrl.scope()))]), user.name && user.owner_document ? m$1('.card.card-terciary.u-radius.u-marginbottom-40', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m$1('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m$1('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m$1('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', ['Dados do apoiador ', m$1('a.alt-link[href="/not-my-account?project_id=' + project.project_id + '"]', 'Não é você?')]), m$1('.fontsize-base.fontweight-semibold', user.name), m$1('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]) : '', m$1('.w-row.u-marginbottom-30', [m$1('.w-col.w-col-7.w-sub-col', [m$1('label.field-label.fontweight-semibold[for=\'country\']', ['País / ', m$1('em', 'Country'), ' *']), m$1('select.w-select.text-field[id=\'country\']', {
+        }))])) : '', m$1('.w-form', [m$1('form.u-marginbottom-40', [m$1('.u-marginbottom-40.u-text-center-small-only', [m$1('.fontweight-semibold.lineheight-tight.fontsize-large', I18n$1.t('title', ctrl.scope())), m$1('.fontsize-smaller', I18n$1.t('required', ctrl.scope()))]), user.name && user.owner_document ? m$1('.card.card-terciary.u-radius.u-marginbottom-40', [m$1('.w-row', [m$1('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m$1('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m$1('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m$1('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', ['Supporter data ', m$1('a.alt-link[href="/not-my-account?project_id=' + project.project_id + '"]', 'No, and you?')]), m$1('.fontsize-base.fontweight-semibold', user.name), m$1('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]) : '', m$1('.w-row.u-marginbottom-30', [m$1('.w-col.w-col-7.w-sub-col', [m$1('label.field-label.fontweight-semibold[for=\'country\']', ['Parents / ', m$1('em', 'Country'), ' *']), m$1('select.w-select.text-field[id=\'country\']', {
             onfocus: ctrl.vm.resetFieldError('userCountryId'),
             class: ctrl.fieldHasError('userCountryId') ? 'error' : false,
             onchange: m$1.withAttr('value', ctrl.vm.fields.userCountryId),
@@ -8845,7 +8845,7 @@ var projectsPayment = {
             type: 'text',
             onchange: m$1.withAttr('value', ctrl.vm.fields.completeName),
             value: ctrl.vm.fields.completeName(),
-            placeholder: 'Nome Completo'
+            placeholder: 'Full name'
         }), ctrl.fieldHasError('completeName')]), m$1('.w-col.w-col-5', ctrl.vm.isInternational() ? '' : [m$1('label.field-label.fontweight-semibold[for=\'document\']', I18n$1.t('fields.owner_document', ctrl.scope())), m$1('input.w-input.text-field[id=\'document\']', {
             onfocus: ctrl.vm.resetFieldError('ownerDocument'),
             class: ctrl.fieldHasError('ownerDocument') ? 'error' : false,
@@ -8864,7 +8864,7 @@ var projectsPayment = {
             type: 'text',
             onchange: ctrl.addressChange(m$1.withAttr('value', ctrl.vm.fields.street)),
             value: ctrl.vm.fields.street(),
-            placeholder: 'Rua Da Minha Casa'
+            placeholder: 'My Home Street'
         }), ctrl.fieldHasError('street'), m$1('.w-row', ctrl.vm.isInternational() ? '' : [m$1('.w-col.w-col-4.w-sub-col', [m$1('label.field-label.fontweight-semibold[for=\'number\']', I18n$1.t('fields.street_number', ctrl.scope())), m$1('input.w-input.text-field[id=\'number\']', {
             onfocus: ctrl.vm.resetFieldError('number'),
             class: ctrl.fieldHasError('number') ? 'error' : false,
@@ -8878,7 +8878,7 @@ var projectsPayment = {
             type: 'text',
             onchange: ctrl.addressChange(m$1.withAttr('value', ctrl.vm.fields.addressComplement)),
             value: ctrl.vm.fields.addressComplement(),
-            placeholder: 'Residencial 123'
+            placeholder: 'Residential 123'
         }), ctrl.fieldHasError('addressComplement')]), m$1('.w-col.w-col-4', ctrl.vm.isInternational() ? '' : [m$1('label.field-label.fontweight-semibold[for=\'neighbourhood\']', I18n$1.t('fields.neighbourhood', ctrl.scope())), m$1('input.w-input.text-field[id=\'neighbourhood\']', {
             onfocus: ctrl.vm.resetFieldError('neighbourhood'),
             class: ctrl.fieldHasError('neighbourhood') ? 'error' : false,
@@ -8902,7 +8902,7 @@ var projectsPayment = {
             type: 'text',
             onchange: ctrl.addressChange(m$1.withAttr('value', ctrl.vm.fields.city)),
             value: ctrl.vm.fields.city(),
-            placeholder: 'Cidade'
+            placeholder: 'City'
         }), ctrl.fieldHasError('city')]), m$1('.w-col.w-col-4', [m$1('label.field-label.fontweight-semibold[for=\'state\']', I18n$1.t('fields.state', ctrl.scope())), ctrl.vm.isInternational() ? m$1('input.w-input.text-field[id=\'address-state\']', {
             onchange: ctrl.addressChange(m$1.withAttr('value', ctrl.vm.fields.userState)),
             class: ctrl.fieldHasError('userState') ? 'error' : false,
@@ -8932,7 +8932,7 @@ var projectsPayment = {
             contribution_id: ctrl.contribution().id,
             project_id: projectVM.currentProject().project_id,
             user_id: user.id
-        }) : '']), m$1('.w-col.w-col-4', [m$1('.w-hidden-small.w-hidden-tiny.card.u-radius.u-marginbottom-20', [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m$1('.w-clearfix.u-marginbottom-20', [m$1('.fontsize-larger.text-success.u-left', 'R$ ' + Number(ctrl.value).toFixed()), m$1('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', I18n$1.t('selected_reward.edit', ctrl.scope()))]), m$1('.back-payment-info-reward', [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m$1('.fontsize-smallest', ctrl.reward().description ? ctrl.reward().description : m$1.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_.extend({ value: Number(ctrl.value).toFixed() })))))])]), m$1.component(faqBox, {
+        }) : '']), m$1('.w-col.w-col-4', [m$1('.w-hidden-small.w-hidden-tiny.card.u-radius.u-marginbottom-20', [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m$1('.w-clearfix.u-marginbottom-20', [m$1('.fontsize-larger.text-success.u-left', 'Rs ' + Number(ctrl.value).toFixed()), m$1('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', I18n$1.t('selected_reward.edit', ctrl.scope()))]), m$1('.back-payment-info-reward', [m$1('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m$1('.fontsize-smallest', ctrl.reward().description ? ctrl.reward().description : m$1.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_.extend({ value: Number(ctrl.value).toFixed() })))))])]), m$1.component(faqBox, {
             mode: ctrl.mode,
             vm: ctrl.vm,
             faq: ctrl.vm.faq(),
@@ -8955,7 +8955,7 @@ var projectsReward = {
             var valueFloat = h.monetaryToFloat(vm.contributionValue);
 
             if (valueFloat < vm.selectedReward().minimum_value) {
-                vm.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + vm.selectedReward().minimum_value);
+                vm.error('The support amount for this reward must be at least Rs' + vm.selectedReward().minimum_value);
             } else {
                 if (!h.getUser()) {
                     h.storeObject(storeKey, { value: valueFloat, reward: vm.selectedReward() });
@@ -8997,7 +8997,7 @@ var projectsReward = {
     view: function view(ctrl, args) {
         var project = ctrl.project;
 
-        return m$1('#project-rewards', [m$1('.w-section.page-header.u-text-center', [m$1('.w-container', [m$1('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m$1('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['por ', project().user ? project().user.name : project().owner_name ? project().owner_name : ''])])]), m$1('.w-section.header-cont-new', m$1('.w-container', m$1('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', 'Escolha a recompensa e em seguida o valor do apoio'))), m$1('.section[id=\'new-contribution\']', m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-8', m$1('.w-form.back-reward-form', m$1('form.simple_form.new_contribution', {
+        return m$1('#project-rewards', [m$1('.w-section.page-header.u-text-center', [m$1('.w-container', [m$1('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m$1('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['per ', project().user ? project().user.name : project().owner_name ? project().owner_name : ''])])]), m$1('.w-section.header-cont-new', m$1('.w-container', m$1('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', 'Choose the reward and then the value of the support'))), m$1('.section[id=\'new-contribution\']', m$1('.w-container', m$1('.w-row', [m$1('.w-col.w-col-8', m$1('.w-form.back-reward-form', m$1('form.simple_form.new_contribution', {
             onsubmit: ctrl.submitContribution
         }, _$1.map(ctrl.rewards, function (reward, index) {
             var isSelected = ctrl.isSelected(reward),
@@ -9009,13 +9009,13 @@ var projectsReward = {
                 key: index
             }, m$1('label[for=\'contribution_reward_id_' + reward.id + '\']', [m$1('input.radio_buttons.optional.w-input.text-field.w-radio-input.back-reward-radio-button[id=\'contribution_reward_id_' + reward.id + '\'][name=\'contribution[reward_id]\'][type=\'radio\'][value=\'' + reward.id + '\']', {
                 checked: isSelected ? true : false
-            }), m$1('label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for=\'contribution_reward_' + reward.id + '\']', reward.id === -1 ? 'Não quero recompensa' : 'R$ ' + reward.minimum_value + ' ou mais'), isSelected ? m$1('.w-row.back-reward-money', [m$1('.w-col.w-col-8.w-col-small-8.w-col-tiny-8.w-sub-col-middle.w-clearfix', [m$1('.w-row', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('.back-reward-input-reward.placeholder', 'R$')), m$1('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m$1('input.user-reward-value.back-reward-input-reward[autocomplete=\'off\'][type=\'tel\']', {
+            }), m$1('label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for=\'contribution_reward_' + reward.id + '\']', reward.id === -1 ? 'I do not want any reward' : 'Rs ' + reward.minimum_value + ' or more'), isSelected ? m$1('.w-row.back-reward-money', [m$1('.w-col.w-col-8.w-col-small-8.w-col-tiny-8.w-sub-col-middle.w-clearfix', [m$1('.w-row', [m$1('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m$1('.back-reward-input-reward.placeholder', 'Rs')), m$1('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m$1('input.user-reward-value.back-reward-input-reward[autocomplete=\'off\'][type=\'tel\']', {
                 class: ctrl.error() ? 'error' : '',
                 min: monetaryMinimum,
                 placeholder: monetaryMinimum,
                 onkeyup: m$1.withAttr('value', ctrl.applyMask),
                 value: ctrl.contributionValue()
-            }))]), ctrl.error().length > 0 ? m$1('.text-error', [m$1('br'), m$1('span.fa.fa-exclamation-triangle'), ' ' + ctrl.error()]) : '']), m$1('.submit-form.w-col.w-col-4.w-col-small-4.w-col-tiny-4', m$1('button.btn.btn-large', ['Continuar  ', m$1('span.fa.fa-chevron-right')]))]) : '', m$1('.back-reward-reward-description', [m$1('.fontsize-smaller.u-marginbottom-10', reward.description), reward.deliver_at ? m$1('.fontsize-smallest.fontcolor-secondary', 'Estimativa de entrega: ' + h.momentify(reward.deliver_at, 'MMM/YYYY')) : ''])])); //End map return
+            }))]), ctrl.error().length > 0 ? m$1('.text-error', [m$1('br'), m$1('span.fa.fa-exclamation-triangle'), ' ' + ctrl.error()]) : '']), m$1('.submit-form.w-col.w-col-4.w-col-small-4.w-col-tiny-4', m$1('button.btn.btn-large', ['Continue  ', m$1('span.fa.fa-chevron-right')]))]) : '', m$1('.back-reward-reward-description', [m$1('.fontsize-smaller.u-marginbottom-10', reward.description), reward.deliver_at ? m$1('.fontsize-smallest.fontcolor-secondary', 'Estimated delivery: ' + h.momentify(reward.deliver_at, 'MMM/YYYY')) : ''])])); //End map return
         })))), m$1('.w-col.w-col-4', m$1.component(faqBox, { mode: ctrl.project().mode, faq: ctrl.faq }))])))]);
     }
 };
@@ -9076,21 +9076,21 @@ var publish = {
     var project = _$1.first(ctrl.projectDetails()),
         account = _$1.first(ctrl.projectAccount()),
         flexTerms = function flexTerms(project) {
-      return [m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m$1('span.fontweight-semibold', 'Regras da modalidade FLEX')]), m$1('div', 'Você escolheu a campanha flexível. Dessa maneira, você irá receber todos os recursos arrecadados junto aos apoiadores ao final do prazo da campanha (descontando a taxa do Catarse) e deverá cumprir com a execução do projeto e com a entrega das recompensas oferecidas independente do quanto arrecadar.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m$1('span.fontweight-semibold', 'Meta de arrecadação')]), m$1('div', 'A meta não poderá ser alterada após o publicação do projeto.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m$1('span.fontweight-semibold', 'Taxas')]), m$1('div', ['Ao final da campanha, cobraremos 13% sobre o ', m$1('span.fontweight-semibold', 'valor total arrecadado.')])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m$1('span.fontweight-semibold', 'Prazo da campanha')]), m$1('div', 'Uma vez definido, o prazo de encerramento não poderá ser alterado. Caso você tenha iniciado a campanha com o prazo em aberto, deverá defini-lo durante a campanha, podendo deixar a campanha aberta por no máximo 12 meses.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m$1('span.fontweight-semibold', 'Prazo para repasse')]), m$1('div', 'Quando o prazo do seu projeto chegar ao fim, você deverá confirmar seus dados bancários. Após essa confirmação, o Catarse depositará na sua conta corrente em até 10 dias úteis. O valor depositado já estará considerando o desconto de 13% da taxa.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m$1('span.fontweight-semibold', 'O que pode e não pode alterar na página do projeto a partir da publicação?')]), [m$1('div', [m$1('span.fontweight-semibold', 'Você não poderá:'), ' alterar o tipo de financiamento, nome do projeto, a URL (link) do projeto, a categoria escolhida, a meta de arrecadação, o prazo (caso já tenha definido), as recompensas onde existirem apoios já efetuados e a conta bancária registrada.\
-                    ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'Você poderá: '), 'editar o conteúdo da descrição do projeto, alterar o vídeo principal da campanha, a imagem do projeto, a frase de efeito, as recompensas onde não existirem apoios efetuados, além de adicionar novas recompensas durante a arrecadação.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m$1('span.fontweight-semibold', 'Responsabilidade do Catarse')]), [m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold', 'O Catarse é responsável:'), ' pelo desenvolvimento tecnológico da plataforma, atendimento de dúvidas e problemas (tanto de apoiadores quanto de realizadores), por hospedar o projeto na plataforma e por garantir a segurança das transações financeiras.\ ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'O Catarse não é responsável:'), ' pelo financiamento, divulgação e execução, nem pela entrega de recompensas dos projetos inscritos.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m$1('span.fontweight-semibold', 'Suas responsabilidades')]), m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold'), 'É sua responsabilidade tudo aquilo que diz respeito a formatação do projeto, planejamento e divulgação da campanha de arrecadação, mobilização de apoiadores, execução do projeto, produção e entrega de recompensas dentro do prazo estimado e comunicação com apoiadores.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Retiradas de projetos no ar')]), m$1('div', [m$1('span.fontweight-semibold'), 'O CATARSE reserva-se o direito de, a seu exclusivo critério e uma vez notificado a respeito, cancelar projetos e encerrar as contas de CRIADORES DE PROJETOS que violem nossas ', m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Regras do Jogo'), ' e ', m$1('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Termos de Uso'), '.'])])];
+      return [m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m$1('span.fontweight-semibold', 'FLEX Rules')]), m$1('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign term (discounting the JVN fee) and must comply with the execution of the project and with the delivery of the rewards offered regardless of how much to collect.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m$1('span.fontweight-semibold', 'Goal of collection')]), m$1('div', 'The goal can not be changed after the project has been published.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m$1('span.fontweight-semibold', 'Rates')]), m$1('div', ['At the end of the campaign, we will charge 13%', m$1('span.fontweight-semibold', 'Total amount collected. ')])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m$1('span.fontweight-semibold', 'Campaign deadline')]), m$1('div', 'Once set, the closing period can not be changed. If you started the campaign with the deadline, you must set it during the campaign, and you can leave the campaign open for a maximum of 12 months.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m$1('span.fontweight-semibold', 'Deadline for transfer')]), m$1('div', 'When the deadline for your project comes to an end, you should verify your bank details. After this confirmation, Catarse will deposit into your checking account within 10 business days. The amount deposited will already be considering the 13% discount of the fee.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m$1('span.fontweight-semibold', 'What can and can not change on the project page from publication?')]), [m$1('div', [m$1('span.fontweight-semibold', 'You may not:'), ' Change the type of funding, project name, project URL, category chosen, collection goal, deadline (if you have already defined it), rewards where existing support is available, and registered bank account.\
+                    ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'You will be able to: '), 'Edit the content of the project description, change the main campaign video, project image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m$1('span.fontweight-semibold', 'Responsibility of JVN')]), [m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold', 'Catarse is responsible for:'), ' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'Catarse is not responsible for:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m$1('span.fontweight-semibold', 'Your responsibilities')]), m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold'), 'It is your responsibility for all aspects of project formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the project, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from projects in the air')]), m$1('div', [m$1('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel projects and terminate the accounts of PROJECT CREATORS that violate our ', m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Game rules'), ' e ', m$1('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
     },
         terms = function terms(project) {
-      return [m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m$1('span.fontweight-semibold', 'Regras da modalidade Tudo-ou-nada')]), m$1('div', ['Você escolheu a campanha tudo-ou-nada. Dessa maneira, você só irá receber os recursos arrecadados ', m$1('span.fontweight-semibold', 'caso atinja ou supere a meta de arrecadação'), '. Caso contrário, todos seus apoiadores serão reembolsados. Você será responsável pela entrega das recompensas oferecidas se seu projeto alcançar a meta de arrecadação.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Meta de arrecadação')]), m$1('div', 'A meta não poderá ser alterada após o publicação do projeto.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Taxas')]), m$1('div', ['Cobramos 13% sobre o ', m$1('span.fontweight-semibold', 'valor total arrecadado'), ' pelo seu projeto caso ele atinja ou supere a meta dentro do prazo da campanha. Se o projeto não atingir a meta, nenhuma taxa será cobrada.', m$1('span.fontweight-semibold')])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Prazo da campanha')]), m$1('div', 'Seu projeto estar\xE1 em arrecada\xE7\xE3o no Catarse at\xE9 o dia ' + h.momentify(ctrl.expiresAt()) + ' \xE0s 23h59min59s. Este prazo n\xE3o poder\xE1 ser alterado ap\xF3s a publica\xE7\xE3o do projeto.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Regras do repasse e reembolso')]), m$1('div', ['Quando o prazo do seu projeto chegar ao fim, você deverá confirmar seus dados bancários. Após essa confirmação, o Catarse depositará o valor arrecadado, já com o desconto da taxa, na sua conta corrente em até 10 dias úteis. Caso o projeto não atinja 100% da meta dentro do prazo, o Catarse irá reembolsar os apoiadores. ', m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202365507\'][target=\'_blank\']', 'Saiba mais sobre o processo de reembolso'), '.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'O que pode e não pode alterar na página do projeto a partir da publicação?')]), [m$1('div', [m$1('span.fontweight-semibold', 'Você não poderá:'), ' alterar o nome do projeto, a URL (link) do projeto, a categoria escolhida, o tipo de financiamento, a conta bancária, a meta de arrecadação, o prazo escolhido e as recompensas onde existirem apoios já efetuados.\ ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'Você poderá: '), 'editar o conteúdo da descrição do projeto, alterar o vídeo principal da campanha, a imagem do projeto, a frase de efeito, as recompensas onde não existirem apoios efetuados, além de adicionar novas recompensas durante a arrecadação.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Responsabilidade do Catarse')]), [m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold', 'O Catarse é responsável:'), ' pelo desenvolvimento tecnológico da plataforma, atendimento de dúvidas e problemas (tanto de apoiadores quanto de realizadores), por hospedar o projeto na plataforma e por garantir a segurança das transações financeiras.\ ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'O Catarse não é responsável:'), ' pelo financiamento, divulgação e execução, nem pela entrega de recompensas dos projetos inscritos.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Suas responsabilidades')]), m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold'), 'É sua responsabilidade tudo aquilo que diz respeito a formatação do projeto, planejamento e divulgação da campanha de arrecadação, mobilização de apoiadores, execução do projeto, produção e entrega de recompensas dentro do prazo estimado e comunicação com apoiadores.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Retiradas de projetos no ar')]), m$1('div', [m$1('span.fontweight-semibold'), 'O CATARSE reserva-se o direito de, a seu exclusivo critério e uma vez notificado a respeito, cancelar projetos e encerrar as contas de CRIADORES DE PROJETOS que violem nossas ', m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Regras do Jogo'), ' e ', m$1('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Termos de Uso'), '.'])])];
+      return [m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m$1('span.fontweight-semibold', 'Rules of the All-or-nothing mode')]), m$1('div', ['You chose the all-or-nothing campaign. In this way, you will only receive the funds raised ', m$1('span.fontweight-semibold', 'If it reaches or exceeds the collection goal'), '. Otherwise, all of your supporters will be reimbursed. You will be responsible for delivering the rewards offered if your project reaches the collection goal.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Goal of collection')]), m$1('div', 'The goal can not be changed after the project has been published.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Rates')]), m$1('div', ['We charge 13% ', m$1('span.fontweight-semibold', 'Total amount collected'), ' For your project if it reaches or exceeds the target within the campaign deadline. If the project does not reach the goal, no fee will be charged.', m$1('span.fontweight-semibold')])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Campaign deadline')]), m$1('div', 'Your project will be in collection at the Catarse until the ' + h.momentify(ctrl.expiresAt()) + 'At 11:50 p.m. This deadline can not be changed after the project has been published.')]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Transfer and refund rules')]), m$1('div', ['When the deadline for your project comes to an end, you should verify your bank details. After this confirmation, JVN will deposit the amount collected, with the discount of the rate, into your checking account within 10 business days. If the project does not reach 100% of the target by the deadline, the JVN will reimburse the supporters. ', m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202365507\'][target=\'_blank\']', 'Learn more about the refund process'), '.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'What can and can not change on the project page from publication?')]), [m$1('div', [m$1('span.fontweight-semibold', 'You can not:'), ' Change the name of the project, the URL (link) of the project, the category chosen, the type of financing, the bank account, the collection goal, the term chosen and the rewards where existing support already exists.\ ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'You will be able to: '), 'Edit the content of the project description, change the main campaign video, project image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Responsibility of JVN')]), [m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold', 'JVN is responsible:'), ' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ', m$1('br'), m$1('br'), m$1('span.fontweight-semibold', 'JVN is not responsible for:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Your responsibilities')]), m$1('div', [m$1('span.fontweight-semibold'), m$1('span.fontweight-semibold'), 'It is your responsibility for all aspects of project formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the project, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])]), m$1('.w-col.w-col-11', [m$1('div', [m$1('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m$1('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from projects in the air')]), m$1('div', [m$1('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel projects and terminate the accounts of PROJECT CREATORS that violate our', m$1('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Game rules'), ' e ', m$1('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
     };
 
     return [!ctrl.l() && !ctrl.accountL() ? [project.is_owner_or_admin ? m$1.component(projectDashboardMenu, {
       project: m$1.prop(project),
       hidePublish: true
-    }) : '', m$1('.w-section.section-product.' + project.mode), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img.u-marginbottom-20[src=\'/assets/catarse_bootstrap/launch-icon.png\'][width=\'94\']'), m$1('.fontsize-large.fontweight-semibold.u-marginbottom-20', 'Pronto para lançar sua campanha?'), m$1('.fontsize-base.u-marginbottom-30', 'Preparamos uma lista com informações importantes para você checar antes de colocar seu projeto no ar!')])]), m$1('.w-col.w-col-3')])])]), m$1('.divider'), m$1('.w-section.section-one-column.bg-gray.section.before-footer', [m$1('.w-container', [m$1('.card.medium.u-marginbottom-60.card-terciary', [m$1('.w-row', [m$1('.w-col.w-col-6.w-clearfix', [m$1('img.card-project-thumb.u-right[src=' + project.large_image + ']')]), m$1('.w-col.w-col-6', [m$1('.u-marginbottom-30.fontsize-base', [m$1('div', [m$1('span.fontweight-semibold', 'Título: '), project.name]), m$1('div', [m$1('span.fontweight-semibold', 'Link: '), 'www.catarse.me/' + project.permalink]), m$1('div', [m$1('span.fontweight-semibold', 'Modalidade de financiamento: '), I18n$1.t(project.mode, I18nScope$31())]), m$1('div', [m$1('span.fontweight-semibold', 'Meta de arrecadação: '), 'R$ ' + h.formatNumber(project.goal, 2, 3)]), project.online_days !== null ? m$1('div', [m$1('span.fontweight-semibold', 'Prazo: ' + project.online_days + ' ' + (project.online_days > 1 ? 'dias' : 'dia'))]) : '', m$1('div', [m$1('span.fontweight-semibold', 'Responsável: '), account.owner_name]), m$1('div', [m$1('span.fontweight-semibold', 'CPF/CNPJ: '), account.owner_document])])])]), m$1('.u-text-center', [m$1('.w-row', [m$1('.w-col.w-col-1'), m$1('.w-col.w-col-10', [m$1('.divider.u-marginbottom-10'), m$1('.fontsize-small.fontcolor-secondary', 'Os dados acima não podem ser alterados após o projeto entrar no ar. Se você precisa fazer mudanças, navegue na barra lateral e volte aqui quando estiver tudo pronto!')]), m$1('.w-col.w-col-1')])])]), m$1('.card.medium.u-radius.u-marginbottom-60', [m$1('.u-text-center.u-marginbottom-60', [m$1('.fontsize-large.fontweight-semibold', 'Relembre nossas regras'), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1('.w-col.w-col-8', [m$1('.fontsize-small', ['Antes de publicar, clique nos círculos abaixo e confirme que você está ciente de como funciona o Catarse. Qualquer dúvida, ', m$1('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/requests/new"][target="_blank"]', 'entre em contato'), '!'])]), m$1('.w-col.w-col-2')])]), _$1.map(project.mode == 'flex' ? flexTerms(project) : terms(project), function (term, index) {
+    }) : '', m$1('.w-section.section-product.' + project.mode), m$1('.w-section.section', [m$1('.w-container', [m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.w-col.w-col-6', [m$1('.u-text-center', [m$1('img.u-marginbottom-20[src=\'/assets/catarse_bootstrap/launch-icon.png\'][width=\'94\']'), m$1('.fontsize-large.fontweight-semibold.u-marginbottom-20', 'Ready to launch your campaign?'), m$1('.fontsize-base.u-marginbottom-30', 'We`ve prepared a list with important information for you to check before putting your project on the air!')])]), m$1('.w-col.w-col-3')])])]), m$1('.divider'), m$1('.w-section.section-one-column.bg-gray.section.before-footer', [m$1('.w-container', [m$1('.card.medium.u-marginbottom-60.card-terciary', [m$1('.w-row', [m$1('.w-col.w-col-6.w-clearfix', [m$1('img.card-project-thumb.u-right[src=' + project.large_image + ']')]), m$1('.w-col.w-col-6', [m$1('.u-marginbottom-30.fontsize-base', [m$1('div', [m$1('span.fontweight-semibold', 'Title: '), project.name]), m$1('div', [m$1('span.fontweight-semibold', 'Link: '), 'www.catarse.me/' + project.permalink]), m$1('div', [m$1('span.fontweight-semibold', 'Method of financing: '), I18n$1.t(project.mode, I18nScope$31())]), m$1('div', [m$1('span.fontweight-semibold', 'Goal of collection: '), 'Rs ' + h.formatNumber(project.goal, 2, 3)]), project.online_days !== null ? m$1('div', [m$1('span.fontweight-semibold', 'Deadline: ' + project.online_days + ' ' + (project.online_days > 1 ? 'days' : 'days'))]) : '', m$1('div', [m$1('span.fontweight-semibold', 'Responsible: '), account.owner_name]), m$1('div', [m$1('span.fontweight-semibold', 'CPF/CNPJ: '), account.owner_document])])])]), m$1('.u-text-center', [m$1('.w-row', [m$1('.w-col.w-col-1'), m$1('.w-col.w-col-10', [m$1('.divider.u-marginbottom-10'), m$1('.fontsize-small.fontcolor-secondary', 'The above data can not be changed after the project goes live. If you need to make changes, navigate the sidebar and come back here when you`re done!')]), m$1('.w-col.w-col-1')])])]), m$1('.card.medium.u-radius.u-marginbottom-60', [m$1('.u-text-center.u-marginbottom-60', [m$1('.fontsize-large.fontweight-semibold', 'Relembre nossas regras'), m$1('.w-row', [m$1('.w-col.w-col-2'), m$1('.w-col.w-col-8', [m$1('.fontsize-small', ['Before posting, click on the circles below and confirm that you are aware of how JVN works. Any doubt, ', m$1('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/requests/new"][target="_blank"]', 'contact'), '!'])]), m$1('.w-col.w-col-2')])]), _$1.map(project.mode == 'flex' ? flexTerms(project) : terms(project), function (term, index) {
       return m$1('.u-marginbottom-30.fontsize-base' + (index == 0 ? '' : '.w-hidden.publish-rules'), [m$1('.w-row[id=\'rule-' + index + '\']', [m$1('.w-col.w-col-1.u-text-center', [m$1('div', [m$1((project.mode == 'flex' ? ctrl.flexAcceptTerm() : ctrl.acceptTerm())[index] ? 'a.w-inline-block.checkbox-big[href=\'#rule-' + (index + 1) + '\']' : 'a.w-inline-block.checkbox-big.checkbox--selected.fa.fa-check.fa-lg[href=\'#rule-' + (index + 1) + '\']', { onclick: function onclick() {
           return ctrl.showNextTerm(index, project.mode == 'flex' ? ctrl.flexAcceptTerm : ctrl.acceptTerm);
         } })])]), term])]);
-    })]), m$1('.w-row.publish-btn-section.w-hidden', [m$1('.w-col.w-col-4'), m$1('.w-col.w-col-4', [m$1('a.btn.btn-large.u-marginbottom-20[href=/' + (project.mode == 'flex' ? 'flexible_projects' : 'projects') + '/' + project.project_id + '/push_to_online]', 'Publicar agora!'), m$1('.u-text-center.fontsize-smaller', ['Ao publicar o seu projeto, você está aceitando os ', m$1('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Termos de Uso'), ' e ', m$1('a.alt-link[href=\'/privacy-policy\'][target=\'_blank\']', 'Politica de Privacidade')])]), m$1('.w-col.w-col-4')])])]), '\
+    })]), m$1('.w-row.publish-btn-section.w-hidden', [m$1('.w-col.w-col-4'), m$1('.w-col.w-col-4', [m$1('a.btn.btn-large.u-marginbottom-20[href=/' + (project.mode == 'flex' ? 'flexible_projects' : 'projects') + '/' + project.project_id + '/push_to_online]', 'Publish now!'), m$1('.u-text-center.fontsize-smaller', ['When you publish your project, you are accepting ', m$1('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'), ' and ', m$1('a.alt-link[href=\'/privacy-policy\'][target=\'_blank\']', 'Privacy policy')])]), m$1('.w-col.w-col-4')])])]), '\
     '] : h.loader()];
   }
 };
@@ -9943,7 +9943,7 @@ var FollowFoundFriends = {
         };
     },
     view: function view(ctrl, args) {
-        return [m$1('.w-section.dashboard-header', [m$1('.w-container', [m$1('.w-row.u-margintop-20.u-marginbottom-20', [m$1('.w-col.w-col-1'), m$1('.w-col.w-col-10.u-text-center', [m$1('.fontsize-larger.fontweight-semibold.u-marginbottom-10', 'Descubra projetos com seus amigos'), m$1('.fontsize-small', 'Siga os seus amigos e nós iremos te notificar sempre que eles lançarem ou apoiarem algum projeto')]), m$1('.w-col.w-col-1')])])]), [m$1('.divider.u-margintop-30'), m$1('.project-nav', m$1('.u-text-center.w-container', [m$1('a[id="creators-link"][class="dashboard-nav-link ' + (h.hashMatch('#creators') ? 'selected' : '') + '"] [href="#creators"]', 'Encontre realizadores'), m$1('a[id="friends-link"][class="dashboard-nav-link ' + (h.hashMatch('#friends') || h.hashMatch('') ? 'selected' : '') + '"] [href="#friends"]', 'Encontre amigos'), m$1('a[id="follows-link"][class="dashboard-nav-link ' + (h.hashMatch('#follows') ? 'selected' : '') + '"] [href="#follows"]', ['Seguindo', m$1.trust('&nbsp;'), m$1('span.w-hidden-small.w-hidden-tiny.badge', ctrl.user.follows_count)]), m$1('a[id="followers-link"][class="dashboard-nav-link ' + (h.hashMatch('#followers') ? 'selected' : '') + '"] [href="#followers"]', ['Seguidores', m$1.trust('&nbsp;'), m$1('span.w-hidden-small.w-hidden-tiny.badge', ctrl.user.followers_count)])]))], ctrl.displayTabContent()];
+        return [m$1('.w-section.dashboard-header', [m$1('.w-container', [m$1('.w-row.u-margintop-20.u-marginbottom-20', [m$1('.w-col.w-col-1'), m$1('.w-col.w-col-10.u-text-center', [m$1('.fontsize-larger.fontweight-semibold.u-marginbottom-10', 'Discover projects with your friends'), m$1('.fontsize-small', 'Follow your friends and we will notify you whenever they launch or support any project')]), m$1('.w-col.w-col-1')])])]), [m$1('.divider.u-margintop-30'), m$1('.project-nav', m$1('.u-text-center.w-container', [m$1('a[id="creators-link"][class="dashboard-nav-link ' + (h.hashMatch('#creators') ? 'selected' : '') + '"] [href="#creators"]', 'Find filmmakers'), m$1('a[id="friends-link"][class="dashboard-nav-link ' + (h.hashMatch('#friends') || h.hashMatch('') ? 'selected' : '') + '"] [href="#friends"]', 'Find friends'), m$1('a[id="follows-link"][class="dashboard-nav-link ' + (h.hashMatch('#follows') ? 'selected' : '') + '"] [href="#follows"]', ['Following', m$1.trust('&nbsp;'), m$1('span.w-hidden-small.w-hidden-tiny.badge', ctrl.user.follows_count)]), m$1('a[id="followers-link"][class="dashboard-nav-link ' + (h.hashMatch('#followers') ? 'selected' : '') + '"] [href="#followers"]', ['Followers', m$1.trust('&nbsp;'), m$1('span.w-hidden-small.w-hidden-tiny.badge', ctrl.user.followers_count)])]))], ctrl.displayTabContent()];
     }
 };
 
@@ -9981,11 +9981,11 @@ var thankYou = {
         return m$1('#thank-you', { config: ctrl.setEvents }, [m$1(".page-header.u-marginbottom-30", m$1(".w-container", m$1(".w-row", m$1(".w-col.w-col-10.w-col-push-1", [m$1(".u-marginbottom-20.u-text-center", m$1('img.big.thumb.u-round[src=\'' + args.contribution.project.user_thumb + '\']')), m$1("#thank-you.u-text-center", !ctrl.isSlip ? [m$1("#creditcard-thank-you.fontsize-larger.text-success.u-marginbottom-20", I18n$1.t('thank_you.thank_you', I18nScope$36())), m$1(".fontsize-base.u-marginbottom-40", m$1.trust(I18n$1.t('thank_you.thank_you_text_html', I18nScope$36({
             total: args.contribution.project.total_contributions,
             email: args.contribution.contribution_email,
-            link2: '/pt/users/' + h.getUser().user_id + '/edit#contributions',
-            link_email: '/pt/users/' + h.getUser().user_id + '/edit#settings'
-        })))), m$1(".fontsize-base.fontweight-semibold.u-marginbottom-20", "Compartilhe com seus amigos e ajude esse projeto a bater a meta!")] : [m$1('#slip-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n$1.t('thank_you_slip.thank_you', I18nScope$36())), m$1('.fontsize-base.u-marginbottom-40', m$1.trust(I18n$1.t('thank_you_slip.thank_you_text_html', I18nScope$36({
+            link2: '/en/users/' + h.getUser().user_id + '/edit#contributions',
+            link_email: '/en/users/' + h.getUser().user_id + '/edit#settings'
+        })))), m$1(".fontsize-base.fontweight-semibold.u-marginbottom-20", "Share with your friends and help this project hit the goal!")] : [m$1('#slip-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n$1.t('thank_you_slip.thank_you', I18nScope$36())), m$1('.fontsize-base.u-marginbottom-40', m$1.trust(I18n$1.t('thank_you_slip.thank_you_text_html', I18nScope$36({
             email: args.contribution.contribution_email,
-            link_email: '/pt/users/' + h.getUser().user_id + '/edit#settings'
+            link_email: '/en/users/' + h.getUser().user_id + '/edit#settings'
         }))))]), ctrl.isSlip ? '' : m$1(".w-row", [m$1(".w-hidden-small.w-hidden-tiny", [m$1('.w-sub-col.w-col.w-col-4', m$1.component(facebookButton, {
             url: 'https://www.catarse.me/' + args.contribution.project.permalink + '?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share',
             big: true
@@ -9995,7 +9995,7 @@ var thankYou = {
             url: 'https://www.catarse.me/' + args.contribution.project.permalink + '?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=messenger&utm_campaign=thanks_share'
         })), m$1('.w-col.w-col-4', m$1('a.btn.btn-large.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20' + args.contribution.project.name + '%20https://www.catarse.me/' + args.contribution.project.permalink + '%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]', [m$1('span.fa.fa-twitter'), ' Twitter']))]), m$1(".w-hidden-main.w-hidden-medium", [m$1('.u-marginbottom-30.u-text-center-small-only', m$1('button.btn.btn-large.btn-terciary.u-marginbottom-40', {
             onclick: ctrl.displayShareBox.toggle
-        }, 'Compartilhe')), ctrl.displayShareBox() ? m$1(projectShareBox, {
+        }, 'Share')), ctrl.displayShareBox() ? m$1(projectShareBox, {
             // Mocking a project m.prop
             project: m$1.prop({
                 permalink: args.contribution.project.permalink,
