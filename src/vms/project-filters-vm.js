@@ -51,7 +51,7 @@ const projectFiltersVM = () => {
             all: {
               title: 'All categories',
               filter: all,
-              nicename: 'Up in the air',
+              nicename: 'Online',
               isContextual: false,
               keyName: 'all'
           },
@@ -70,7 +70,7 @@ const projectFiltersVM = () => {
               keyName: 'contributed_by_friends'
           },
             online: {
-              title: 'Up in the air',
+              title: 'Online',
               filter: online,
               isContextual: false,
               keyName: 'online'

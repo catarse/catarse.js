@@ -520,7 +520,7 @@ var projectStateTextClass = function projectStateTextClass(state) {
     var statusText = {
         online: {
             cssClass: 'text-success',
-            text: 'UP IN THE AIR'
+            text: 'ONLINE'
         },
         successful: {
             cssClass: 'text-success',
@@ -2301,7 +2301,7 @@ var projectFiltersVM = function projectFiltersVM() {
         all: {
             title: 'All categories',
             filter: all,
-            nicename: 'Up in the air',
+            nicename: 'Online',
             isContextual: false,
             keyName: 'all'
         },
@@ -3147,7 +3147,7 @@ var adminProjectDetailsCard = {
  */
 var onlineSuccessModalContent = {
     view: function view(ctrl, args) {
-        return m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-larger.lineheight-tight', 'Your campaign is up in the air !!! Congratulations on that first big step. Good luck on this journey. ;)')]);
+        return m$1('.modal-dialog-content.u-text-center', [m$1('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m$1('p.fontsize-larger.lineheight-tight', 'Your campaign is online !!! Congratulations on that first big step. Good luck on this journey. ;)')]);
     }
 };
 

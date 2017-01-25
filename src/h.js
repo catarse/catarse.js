@@ -570,7 +570,7 @@ const
         const statusText = {
                 online: {
                     cssClass: 'text-success',
-                    text: 'UP IN THE AIR'
+                    text: 'ONLINE'
                 },
                 successful: {
                     cssClass: 'text-success',
