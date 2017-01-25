@@ -47,7 +47,7 @@ const projectContributions = {
         lContributionsPerDay.load().then(contributionsPerDay);
 
         let contributionsPerLocationTable = [
-            ['state', 'Support', 'Rs Supported (% Of total)']
+            ['state', 'Backed', 'Rs backed (% Of total)']
         ];
         const buildPerLocationTable = (contributions) => {
             return (!_.isEmpty(contributions)) ? _.map(_.first(contributions).source, (contribution) => {
@@ -159,7 +159,7 @@ const projectContributions = {
                             }, contribution.data.name),
                             m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', `${contribution.data.city},${contribution.data.state}`),
                             m('.fontsize-smaller', [
-                                m('span.fontweight-semibold', contribution.data.total_contributed_projects),' Supported  |  ',
+                                m('span.fontweight-semibold', contribution.data.total_contributed_projects),' Backed  |  ',
                                 m('span.fontweight-semibold', contribution.data.total_published_projects),' Created'
                             ]),
                             //m('.btn-bottom-card.w-row', [

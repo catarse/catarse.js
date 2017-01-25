@@ -26,7 +26,7 @@ const projectDeleteButton = {
                 m('a.btn.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button[href=\'javascript:void(0);\']', {onclick: ctrl.displayDeleteModal.toggle, style: {'transition': 'all 0.5s ease 0s'}},
                   [
                     m.trust('&nbsp;'),
-                    'Delete Project ',
+                    'Delete Campaign ',
                     m('span.fa.fa-trash', ''
                     )
                   ]

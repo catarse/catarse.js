@@ -171,7 +171,7 @@ const userNotifications = {
                         m('.w-container',
                             m('.w-row',
                                 m('.w-col.w-col-4.w-col-push-4',
-                                    m('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'To save\']')
+                                    m('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'Save\']')
                                 )
                             )
                         )

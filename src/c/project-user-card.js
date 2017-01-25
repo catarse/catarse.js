@@ -32,11 +32,11 @@ const projectUserCard = {
                         m('.fontsize-smallest', [
                             h.pluralize(userDetail.total_published_projects, ' Created', ' Created'),
                             m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'),
-                            h.pluralize(userDetail.total_contributed_projects, ' Supported', ' Supported')
+                            h.pluralize(userDetail.total_contributed_projects, ' Backed', ' Backed')
                         ]),
                         m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [
                             (!_.isEmpty(userDetail.facebook_link) ? m('li', [
-                                m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]',{onclick: h.analytics.event({cat: 'project_view',act: 'project_creator_fb',lbl: userDetail.facebook_link,project: project()})}, 'Facebook profile')
+                                m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]',{onclick: h.analytics.event({cat: 'project_view',act: 'project_creator_fb',lbl: userDetail.facebook_link,project: project()})}, 'Facebook Profile')
                             ]) : ''), (!_.isEmpty(userDetail.twitter_username) ? m('li', [
                                 m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]',{onclick: h.analytics.event({cat: 'project_view',act: 'project_creator_twitter',lbl: userDetail.twitter_username,project: project()})}, 'Twitter Profile')
                             ]) : ''),

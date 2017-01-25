@@ -35,7 +35,7 @@ const UserFollowCard = {
               m('.fontsize-smaller',
                 [
                   m('span.fontweight-semibold', friend.total_contributed_projects),
-                  ' Supported ',
+                  ' Backed ',
                   m.trust('&nbsp;'),
                   '| ',
                   m.trust('&nbsp;'),

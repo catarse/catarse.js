@@ -69,9 +69,7 @@ const userPrivateContributed = {
                     m('.w-col.w-col-3'),
                     m('.w-col.w-col-6', [
                         m('.fontsize-large.u-marginbottom-30', [
-                            'You have not yet supported any',
-                            m.trust('&nbsp;'),
-                            'JVN...'
+                            'You Have Not Backed Any Campaign'
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-3'),
@@ -82,7 +80,7 @@ const userPrivateContributed = {
                                             m.route('/explore');
                                         }
                                     },
-                                    'Apoie agora!'
+                                    'SUPPORT NOW!'
                                 )
                             ),
                             m('.w-col.w-col-3')

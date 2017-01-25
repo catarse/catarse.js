@@ -65,12 +65,12 @@ const usersShow = {
                           [
                               m('span.fa.fa-cog'),
                               m.trust('&nbsp;'),
-                              ' Edit profile'
+                              ' Edit Profile'
                           ]
                       ) :'') : h.loader()),
                       m(`a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#contributed' ? 'selected' : '')}\']`,
                           [
-                              'Supported ',
+                              'Backed ',
                               m.trust('&nbsp;'),
                               m('span.badge',
                                   user.total_contributed_projects

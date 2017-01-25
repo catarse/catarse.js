@@ -221,7 +221,7 @@ const userSettings = {
                                                 ctrl.showEmailForm.toggle()
                                             }
                                         },
-                                        'Change e-mail'
+                                        'Change'
                                     )
                                 ]),
                                 m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
@@ -434,7 +434,7 @@ const userSettings = {
                                 m('.w-row.u-marginbottom-20', [
                                     m('.w-col.w-col-6.w-sub-col', [
                                         m('label.field-label.fontweight-semibold',
-                                            ' current password'
+                                            ' Current Password'
                                         ),
                                         m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
                                             value: fields.current_password(),
@@ -443,7 +443,7 @@ const userSettings = {
                                     ]),
                                     m('.w-col.w-col-6', [
                                         m('label.field-label.fontweight-semibold',
-                                            ' New password'
+                                            ' New Password'
                                         ),
                                         m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
                                             class: ctrl.passwordHasError() ? 'error' : '',
@@ -474,7 +474,7 @@ const userSettings = {
                         m('.w-container',
                             m('.w-row', [
                                 m('.w-col.w-col-4.w-col-push-4',
-                                    m('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'To save\']')
+                                    m('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Save\']')
                                 ),
                                 m('.w-col.w-col-4')
                             ])

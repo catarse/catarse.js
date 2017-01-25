@@ -64,18 +64,7 @@ const userContributed = {
                                 m('.w-col.w-col-6',
                                     [
                                         m('.fontsize-large.u-marginbottom-30',
-                                                'Well, now ... you have not yet supported any project in JVN!'),
-                                        m('.w-row',
-                                            [
-                                                m('.w-col.w-col-3'),
-                                                m('.w-col.w-col-6',
-                                                    m('a.btn.btn-large[href=\'/explore\']',
-                                                        'How about supporting now?'
-                                                    )
-                                                ),
-                                                m('.w-col.w-col-3')
-                                            ]
-                                        )
+                                                'No campaigns backed yet')
                                     ]
                                 ),
                                 m('.w-col.w-col-3')

@@ -60,7 +60,7 @@ const deleteProjectModalContent = {
                 )),
                 m('form.modal-dialog-content',{onsubmit: ctrl.deleteProject},
                   (ctrl.deleteSuccess() ? [m('.fontsize-base.u-margintop-30', 'Project deleted successfully. Click the link below to return to the homepage.'),
-                      m(`a.btn.btn-inactive.btn-large.u-margintop-30[href='/en/users/${h.getUser().user_id}/edit#projects']`, 'Voltar')
+                      m(`a.btn.btn-inactive.btn-large.u-margintop-30[href='/en/users/${h.getUser().user_id}/edit#projects']`, 'Resume')
                   ] :
                   [
                     m('.fontsize-base.u-marginbottom-60',
@@ -73,7 +73,7 @@ const deleteProjectModalContent = {
                         'Confirm writing ',
                         'In the field below',
                         m('span.fontweight-semibold.text-error',
-                          'Delete-draft'
+                          ' Delete-draft'
                         )
                       ]
                     ),

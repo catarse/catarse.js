@@ -34,17 +34,17 @@ const userCard = {
                         user.address_city
                     ),
                     m('.fontsize-smallest',
-                        `${h.pluralize(user.total_published_projects, ' project', ' projects')} Created`
+                        `${h.pluralize(user.total_published_projects, ' campaign', ' campaigns')} Created`
                     ),
                     m('.fontsize-smallest',
-                        `Supported ${h.pluralize(user.total_contributed_projects, ' project', ' projects')}`
+                        `Backed ${h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns')}`
                     )
                 ])
             ]),
             m('.project-author-contacts', [
                 m('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [
                     (!_.isEmpty(user.facebook_link) ? m('li', [
-                        m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook profile')
+                        m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook Profile')
                     ]) : ''), (!_.isEmpty(user.twitter_username) ? m('li', [
                         m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')
                     ]) : ''),

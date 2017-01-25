@@ -49,10 +49,10 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Profile picture'
+                                                                '  Profile Picture'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                                ' This image will be used as your profile thumbnail (PNG, JPG size 280x280)'
+                                                                ' This image will be used as your profile picture (PNG, JPG size 280x280).'
                                                             )
                                                         ]
                                                     ),
@@ -101,7 +101,7 @@ const userAboutEdit = {
                                             m('.w-col.w-col-5.w-sub-col',
                                                 [
                                                     m('label.field-label.fontweight-semibold',
-                                                        'Address of your profile'
+                                                        'Address of your profile.'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary',
                                                         'Your public profile may have a custom URL. Choose an easy to save!    '
@@ -133,7 +133,7 @@ const userAboutEdit = {
                                                         '  Name'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                        '  This is the name that users will see in your public profile'
+                                                        '  This is the name that users will see in your public profile.'
                                                     )
                                                 ]
                                             ),
@@ -152,7 +152,7 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Facebook profile'
+                                                                '  Facebook Profile'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
                                                                 '  Paste your profile link'
@@ -172,7 +172,7 @@ const userAboutEdit = {
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
                                                             m('label.field-label.fontweight-semibold',
-                                                                '  Twitter profile'
+                                                                '  Twitter Profile'
                                                             ),
                                                             m('label.field-label.fontsize-smallest.fontcolor-secondary',
                                                                 '  Paste your profile link'
@@ -195,7 +195,7 @@ const userAboutEdit = {
                                                 m('.w-col.w-col-5.w-sub-col',
                                                     [
                                                         m('label.field-label.fontweight-semibold[for="name-8"]',
-                                                            ' Presence on the internet'
+                                                            ' Internet Presence'
                                                         ),
                                                         m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')
                                                     ]
@@ -261,7 +261,7 @@ const userAboutEdit = {
                                             m('.card.card-terciary.u-marginbottom-30',
                                                 [
                                                     m('label.field-label.fontweight-semibold',
-                                                        'Sobre'
+                                                        'About'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20',
                                                         'Talk about yourself and try to provide the most relevant information so visitors can get to know you better. '
@@ -284,7 +284,7 @@ const userAboutEdit = {
                             m('.w-col.w-col-4.w-col-push-4',
                                 [
                                     m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'),
-                                    m('input.btn.btn.btn-large[name="commit"][type="submit"][value="To save"]')
+                                    m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Save"]')
                                 ]
                             ),
                             m('.w-col.w-col-4')
