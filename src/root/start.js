@@ -359,9 +359,9 @@ const start = {
                                         ]),
                                         m('.w-col.w-col-7', [
                                             m('.fontsize-megajumbo.fontcolor-negative', `Rs ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
-                                            m('.fontsize-large.u-marginbottom-20', 'Donated to projects'),
+                                            m('.fontsize-large.u-marginbottom-20', 'Donated to campaigns'),
                                             m('.fontsize-megajumbo.fontcolor-negative', (category.successful_projects) ? category.successful_projects : '...'),
-                                            m('.fontsize-large.u-marginbottom-30', 'Projects financed'),
+                                            m('.fontsize-large.u-marginbottom-30', 'Campaigns financed'),
                                             !_.isEmpty(ctrl.featuredProjects()) ? _.map(ctrl.featuredProjects(), (project) => {
                                                 return !_.isUndefined(project) ? m('.w-row.u-marginbottom-10', [
                                                     m('.w-col.w-col-1', [

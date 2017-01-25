@@ -15,7 +15,7 @@ const projectRewardList = {
             const valueFloat = h.monetaryToFloat(vm.contributionValue);
 
             if (valueFloat < vm.selectedReward().minimum_value) {
-                vm.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${vm.selectedReward().minimum_value}`);
+                vm.error(`The support amount for this reward must be at least Rs${vm.selectedReward().minimum_value}`);
             } else {
                 vm.error('');
 
@@ -81,19 +81,19 @@ const projectRewardList = {
             }, [
                 reward.minimum_value >= 100 ? m('.tag-circle-installment', [
                     m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'),
-                    m('.fontsize-mini.lineheight-tightest', 's/ juros')
+                    m('.fontsize-mini.lineheight-tightest', 's/ interest')
                 ]) : '',
                 m('.u-marginbottom-20', [
-                    m('.fontsize-base.fontweight-semibold', 'Para R$ ' + h.formatNumber(reward.minimum_value) + ' ou mais'),
+                    m('.fontsize-base.fontweight-semibold', 'For Rs ' + h.formatNumber(reward.minimum_value) + ' or more'),
                     m('.fontsize-smaller.fontweight-semibold', h.pluralize(reward.paid_count, ' apoio', ' apoios')), (reward.maximum_contributions > 0 ? [
                         (reward.waiting_payment_count > 0 ? m('.maximum_contributions.in_time_to_confirm.clearfix', [
-                            m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' apoio em prazo de confirmação', ' apoios em prazo de confirmação.'))
+                            m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' Support in confirmation period', ' Support in confirmation period....'))
                         ]) : ''), (h.rewardSouldOut(reward) ? m('.u-margintop-10', [
-                            m('span.badge.badge-gone.fontsize-smaller', 'Esgotada')
+                            m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')
                         ]) : m('.u-margintop-10', [
                             m('span.badge.badge-attention.fontsize-smaller', [
                                 m('span.fontweight-bold', 'Limitada'),
-                                project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' de ' + reward.maximum_contributions + ' disponíveis)' : ''
+                                project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' in ' + reward.maximum_contributions + ' Available)' : ''
                             ])
                         ]))
                     ] : ''),
@@ -102,7 +102,7 @@ const projectRewardList = {
                 m('.fontsize-smaller.u-margintop-20', m.trust(h.simpleFormat(h.strip(reward.description)))),
                 (!_.isEmpty(reward.deliver_at) ?
                     m('.fontsize-smaller', [
-                        m('b', 'Estimativa de Entrega: '),
+                        m('b', 'Estimated Delivery: '),
                         h.momentify(reward.deliver_at, 'MMM/YYYY')
                     ]) :
                     ''),
@@ -113,12 +113,12 @@ const projectRewardList = {
                         }, [
                             m('.divider.u-marginbottom-20'),
                             m('.fontcolor-secondary.u-marginbottom-10',
-                                'Valor do apoio'
+                                'Value of support'
                             ),
                             m('.w-row.u-marginbottom-20', [
                                 m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
                                     m('.back-reward-input-reward.placeholder',
-                                        'R$'
+                                        'Rs'
                                     )
                                 ),
                                 m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
@@ -129,7 +129,7 @@ const projectRewardList = {
                                     })
                                 )
                             ]),
-                            m('input.w-button.btn.btn-medium[type="submit"][value="Continuar >"]'),
+                            m('input.w-button.btn.btn-medium[type="submit"][value="Continue >"]'),
                             ctrl.error().length > 0 ? m('.text-error', [
                                 m('br'),
                                 m('span.fa.fa-exclamation-triangle'),

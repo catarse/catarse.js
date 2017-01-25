@@ -76,60 +76,60 @@ const projectReport = {
                     [
                       m('.fontsize-small.u-marginbottom-20',
                         [
-                          'Este projeto desrespeita',
+                          'This project disrespects',
                           m.trust('&nbsp;'),
                           m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638\'][target=\'_blank\']',
-                            'nossas regras? '
+                            'our rules? '
                           )
                         ]
                       ),
                       ctrl.sendSuccess() ?
                        m('.w-form',
                         m('p',
-                          'Obrigado! A sua denúncia foi recebida.'
+                          'Thank you! Your report has been received.'
                         )
                       ) :
                       [
                         m('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']',{onclick: ctrl.checkLogin},
-                        'Denunciar este projeto'
+                        'Report this project'
                       ),
                       ctrl.displayForm() ? m('#report-form.u-margintop-30',
                         m('.w-form',
                           m('form', {onsubmit: ctrl.sendReport, config: ctrl.checkScroll},
                             [
                               m('.fontsize-small.fontweight-semibold.u-marginbottom-10',
-                                'Por que você está denunciando este projeto?'
+                                'Why are you denouncing this project?'
                               ),
                               m('select.w-select.text-field.positive[required=\'required\']', {onchange: m.withAttr('value', ctrl.reason)},
                                 [
                                   m('option[value=\'\']',
-                                    'Selecione um motivo'
+                                    'Select a reason'
                                   ),
-                                  m('option[value=\'Violação de propriedade intelectual\']',
-                                    'Violação de propriedade intelectual'
+                                  m('option[value=\'Intellectual Property infringement\']',
+                                    'Intellectual Property infringement'
                                   ),
-                                  m('option[value=\'Calúnia, injúria, difamação ou discriminação\']',
-                                    'Calúnia, injúria, difamação ou discriminação'
+                                  m('option[value=\'Slander, libel, defamation or discrimination\']',
+                                    'Slander, libel, defamation or discrimination'
                                   ),
-                                  m('option[value=\'Escopo de projeto proibido\']',
-                                    'Escopo de projeto proibido'
+                                  m('option[value=\'Prohibited project scope\']',
+                                    'Prohibited project scope'
                                   ),
-                                  m('option[value=\'Recompensas proibidas\']',
-                                    'Recompensas proibidas'
+                                  m('option[value=\'Forbidden Rewards\']',
+                                    'Forbidden Rewards'
                                   ),
-                                  m('option[value=\'Cenas de sexo explícitas e gratuitas\']',
-                                    'Cenas de sexo explícitas e gratuitas'
+                                  m('option[value=\'Explicit free sex scenes\']',
+                                    'Explicit free sex scenes'
                                   ),
-                                  m('option[value=\'Abuso de SPAM\']',
-                                    'Abuso de SPAM'
+                                  m('option[value=\'SPAM abuse\']',
+                                    'SPAM abuse'
                                   ),
-                                  m('option[value=\'Outros\']',
-                                    'Outros'
+                                  m('option[value=\'Others\']',
+                                    'Others'
                                   )
                                 ]
                               ),
-                              m('textarea.w-input.text-field.positive.u-marginbottom-30', {placeholder: 'Por favor, dê mais detalhes que nos ajudem a identificar o problema', onchange: m.withAttr('value', ctrl.details)}),
-                              m('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Enviar denúncia\']', {disabled: ctrl.submitDisabled()})
+                              m('textarea.w-input.text-field.positive.u-marginbottom-30', {placeholder: 'Please give more details to help us identify the problem', onchange: m.withAttr('value', ctrl.details)}),
+                              m('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Send Complaint\']', {disabled: ctrl.submitDisabled()})
                             ]
                           )
                         )

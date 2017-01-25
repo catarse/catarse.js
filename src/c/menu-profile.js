@@ -60,17 +60,17 @@ const menuProfile = {
                                         m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#contributions']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#contributions']`,
                                                         I18n.t('user.support_history', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                  m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#projects']`,
+                                                  m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#projects']`,
                                                       I18n.t('user.projects_created', I18nScope())
                                                    )
                                                  ),
                                                 m(`li.w-hidden-main.w-hidden-medium.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#projects']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#projects']`,
                                                         I18n.t('user.projects_created', I18nScope())
                                                     )
                                                 )
@@ -82,22 +82,22 @@ const menuProfile = {
                                         m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#about_me']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#about_me']`,
                                                         I18n.t('user.about_you', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#notifications']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#notifications']`,
                                                         I18n.t('user.notifications', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#settings']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
                                                         I18n.t('user.data_address', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#billing']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#billing']`,
                                                         I18n.t('user.bank_cards', I18nScope())
                                                     )
                                                 )
@@ -110,27 +110,27 @@ const menuProfile = {
                                         args.user.is_admin_role ? m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/new-admin#/users']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/new-admin#/users']`,
                                                         I18n.t('user.users', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/new-admin']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/new-admin']`,
                                                         I18n.t('user.support', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/admin/financials']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/admin/financials']`,
                                                         I18n.t('user.financial_rel', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/admin/projects']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/admin/projects']`,
                                                         I18n.t('user.admin_projects', I18nScope())
                                                     )
                                                 ),
                                                 m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/pt/dbhero']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/dbhero']`,
                                                         `Dataclips`
                                                     )
                                                 )
@@ -139,10 +139,10 @@ const menuProfile = {
                                         m('.fontsize-mini', I18n.t('user.email_text', I18nScope())),
                                         m('.fontsize-smallest.u-marginbottom-20', [
                                             m('span.fontweight-semibold',`${user.email} `),
-                                            m(`a.alt-link[href='/pt/users/${user.id}/edit#settings']`, I18n.t('user.change_email', I18nScope()))
+                                            m(`a.alt-link[href='/en/users/${user.id}/edit#settings']`, I18n.t('user.change_email', I18nScope()))
                                         ]),
                                         m('.divider.u-marginbottom-20'),
-                                        m(`a.alt-link[href='/pt/logout']`,
+                                        m(`a.alt-link[href='/en/logout']`,
                                             I18n.t('user.logout', I18nScope())
                                         )
                                     ]

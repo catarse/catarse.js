@@ -38,7 +38,7 @@ const adminNotificationHistory = {
     },
     view(ctrl) {
         return m('.w-col.w-col-4', [
-            m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Histórico de notificações'),
+            m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Notification history'),
             ctrl.notifications().map((cEvent) => {
                 return m('.w-row.fontsize-smallest.lineheight-looser.date-event', [
                     m('.w-col.w-col-24', [

@@ -62,7 +62,7 @@ const ownerMessageContent = {
     view(ctrl, args) {
         const successMessage = m('.modal-dialog-content.u-text-center', [
                 m('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'),
-                m('p.fontsize-large', `Sua mensagem foi enviada com sucesso para ${ctrl.userDetails().name}. Você vai receber uma cópia no seu email e pode seguir a conversa por lá!`)
+                m('p.fontsize-large', `Your message was successfully sent to ${ctrl.userDetails().name}. You will receive a copy in your email and you can follow the conversation there!`)
             ]),
             contactForm = [
                 m('.modal-dialog-content', [
@@ -95,12 +95,12 @@ const ownerMessageContent = {
                                     })
                                 ])
                             ]),
-                            m('label', 'Mensagem'),
+                            m('label', 'Message'),
                             m('textarea.w-input.text-field.height-small[required=\'required\']', {
                                 onchange: m.withAttr('value', ctrl.content),
                                 class: h.validate().hasError(ctrl.content) ? 'error' : ''
                             }),
-                            m('.u-marginbottom-10.fontsize-smallest.fontcolor-terciary', 'Você receberá uma cópia desta mensagem em seu email.'),
+                            m('.u-marginbottom-10.fontsize-smallest.fontcolor-terciary', 'You will receive a copy of this message in your email.'),
                             m('.w-row', h.validationErrors().length ? _.map(h.validationErrors(), errors => m('span.fontsize-smallest.text-error', [
                                 m('span.fa.fa-exclamation-triangle'),
                                 ` ${errors.message}`,
@@ -108,7 +108,7 @@ const ownerMessageContent = {
                             ])) : ''),
                             m('.modal-dialog-nav-bottom',
                                 m('.w-row',
-                                    m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Enviar mensagem"]', {
+                                    m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send message"]', {
                                         disabled: ctrl.submitDisabled()
                                     }) : h.loader())
                                 )
@@ -120,7 +120,7 @@ const ownerMessageContent = {
 
         return m('div', [
             m('.modal-dialog-header',
-                m('.fontsize-large.u-text-center', 'Enviar mensagem')
+                m('.fontsize-large.u-text-center', 'Send message')
             ),
             ctrl.sendSuccess() ? successMessage : contactForm
         ]);

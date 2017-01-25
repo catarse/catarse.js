@@ -48,12 +48,12 @@ const projectFriends = {
                           }).join(friendsCount > 2 ? ', ' : ' e ')
                          ),
                         (friendsCount > 2 ? [
-                          ' e ',
+                          ' and ',
                           m('span.fontweight-semibold',
-                            `mais ${friendsCount - ctrl.friendsSample().length}`
+                            `more ${friendsCount - ctrl.friendsSample().length}`
                         )] : ''),
                         (friendsCount > 1 ?
-                        ' apoiaram' : ' apoiou')
+                        ' Backed' : ' Backed')
                       ]
                     )
                   ]

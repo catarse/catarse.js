@@ -47,7 +47,7 @@ const projectContributions = {
         lContributionsPerDay.load().then(contributionsPerDay);
 
         let contributionsPerLocationTable = [
-            ['Estado', 'Apoios', 'R$ apoiados (% do total)']
+            ['state', 'Backed', 'Rs backed (% Of total)']
         ];
         const buildPerLocationTable = (contributions) => {
             return (!_.isEmpty(contributions)) ? _.map(_.first(contributions).source, (contribution) => {
@@ -57,7 +57,7 @@ const projectContributions = {
                 column.push(contribution.total_contributions);
                 column.push([contribution.total_contributed, [//Adding row with custom comparator => read project-data-table description
                     m(`input[type="hidden"][value="${contribution.total_contributed}"`),
-                    'R$ ',
+                    'Rs ',
                     h.formatNumber(contribution.total_contributed, 2, 3),
                     m('span.w-hidden-small.w-hidden-tiny', ' (' + contribution.total_on_percentage.toFixed(2) + '%)')
                 ]]);
@@ -97,7 +97,7 @@ const projectContributions = {
                           stats.total
                          ),
                         m('.fontsize-large',
-                          'pessoas apoiam este projeto'
+                          'People support this project'
                          )
                     ]),
                     m('.w-col.w-col-6',
@@ -105,25 +105,25 @@ const projectContributions = {
                         m('.w-row', [
                             m('.u-marginbottom-20.w-col.w-col-6.w-col-small-6', [
                                 m('.fontweight-semibold.u-marginbottom-10',
-                                  'Apoiadores novos'
+                                  'New supporters'
                                  ),
                                 m('.fontsize-largest.u-marginbottom-10',
                                   `${Math.floor(stats.new_percent)}%`
                                  ),
                                 m('.fontsize-smallest',
-                                  'apoiadores que nunca tinham apoiado um projeto no Catarse'
+                                  'Supporters who had never supported a project in JVN'
                                  )
                             ]),
                             m('.w-col.w-col-6.w-col-small-6', [
                                 m('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'),
                                 m('.fontweight-semibold.u-marginbottom-10',
-                                  'Apoiadores recorrentes'
+                                  'Recurring supporters'
                                  ),
                                 m('.fontsize-largest.u-marginbottom-10',
                                   `${Math.ceil(stats.returning_percent)}%`
                                  ),
                                 m('.fontsize-smallest',
-                                  'apoiadores que já tinham apoiado um projeto no Catarse'
+                                  'Supporters who had already supported a project in JVN'
                                  )
                             ])
                         ])
@@ -134,7 +134,7 @@ const projectContributions = {
              ),
             m('.divider.w-section'),
             m('.section.w-section', m('.w-container', [
-                m('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Apoiadores'),
+                m('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Supporters'),
                 m('.project-contributions.w-clearfix', _.map(groupedCollection, (group, idx) => m('.w-row', _.map(group, (contribution) => {
                     return m('.project-contribution-item.w-col.w-col-4', [
                         // here new card
@@ -159,8 +159,8 @@ const projectContributions = {
                             }, contribution.data.name),
                             m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', `${contribution.data.city},${contribution.data.state}`),
                             m('.fontsize-smaller', [
-                                m('span.fontweight-semibold', contribution.data.total_contributed_projects),' apoiados  |  ',
-                                m('span.fontweight-semibold', contribution.data.total_published_projects),' criado'
+                                m('span.fontweight-semibold', contribution.data.total_contributed_projects),' Backed  |  ',
+                                m('span.fontweight-semibold', contribution.data.total_published_projects),' Created'
                             ]),
                             //m('.btn-bottom-card.w-row', [
                             //    m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'),
@@ -177,7 +177,7 @@ const projectContributions = {
                     m('.w-col.w-col-2.w-col-push-5', [!list.isLoading() ?
                                                       list.isLastPage() ? '' : m('button#load-more.btn.btn-medium.btn-terciary', {
                                                           onclick: list.nextPage
-                                                      }, 'Carregar mais') : h.loader(),
+                                                      }, 'Load more') : h.loader(),
                                                      ])
                 ])
             ]))
@@ -190,15 +190,15 @@ const projectContributions = {
                              }
                          }, [!ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
                              collection: ctrl.contributionsPerDay,
-                             label: 'R$ arrecadados por dia',
+                             label: 'Rs Collected per day',
                              dataKey: 'total_amount',
                              xAxis: (item) => h.momentify(item.paid_at),
-                             emptyState: 'Apoios não contabilizados'
+                             emptyState: 'Unaccounted support'
                          }) : h.loader()]),
                      ]),
                      m('.w-row',
                        m('.w-col.w-col-12.u-text-center', [
-                           m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', 'De onde vem os apoios'),
+                           m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', 'Where does the support come from?'),
                            (!ctrl.lContributionsPerLocation() ? !_.isEmpty(_.rest(ctrl.contributionsPerLocationTable)) ? m.component(projectDataTable, {
                                table: ctrl.contributionsPerLocationTable,
                                defaultSortIndex: -2

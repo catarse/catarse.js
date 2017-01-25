@@ -34,19 +34,19 @@ const userCard = {
                         user.address_city
                     ),
                     m('.fontsize-smallest',
-                        `${h.pluralize(user.total_published_projects, ' projeto', ' projetos')} criados`
+                        `${h.pluralize(user.total_published_projects, ' campaign', ' campaigns')} Created`
                     ),
                     m('.fontsize-smallest',
-                        `apoiou ${h.pluralize(user.total_contributed_projects, ' projeto', ' projetos')}`
+                        `Backed ${h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns')}`
                     )
                 ])
             ]),
             m('.project-author-contacts', [
                 m('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [
                     (!_.isEmpty(user.facebook_link) ? m('li', [
-                        m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Perfil no Facebook')
+                        m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook Profile')
                     ]) : ''), (!_.isEmpty(user.twitter_username) ? m('li', [
-                        m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Perfil no Twitter')
+                        m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')
                     ]) : ''),
                     _.map(user.links, (link) => {
                         return m('li', [
@@ -59,7 +59,7 @@ const userCard = {
                 displayModal: ctrl.displayModal,
                 content: contactModalC
             }) : ''),
-            (!_.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', {onclick: ctrl.displayModal.toggle}, 'Enviar mensagem') : '')
+            (!_.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', {onclick: ctrl.displayModal.toggle}, 'Send message') : '')
         ]));
     }
 };

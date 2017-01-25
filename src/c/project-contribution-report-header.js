@@ -17,7 +17,7 @@ const projectContributionReportHeader = {
                 m('.w-row', [
                     m('.w-col.w-col-3'),
                     m('.w-col.w-col-6', [
-                        m('.fontsize-larger.u-text-center.fontweight-semibold.lineheight-looser.u-marginbottom-30', 'Relatório de apoios')]),
+                        m('.fontsize-larger.u-text-center.fontweight-semibold.lineheight-looser.u-marginbottom-30', 'Support report')]),
                     m('.w-col.w-col-3')
                 ]),
                 m('.w-form', [
@@ -37,7 +37,7 @@ const projectContributionReportHeader = {
                                     m('.w-col.w-col-4.w-clearfix.w-hidden-small.w-hidden-tiny', [
                                         m(`a.alt-link.u-right.fontsize-small.lineheight-looser[href="/projects/${project_id}/download_reports"]`, [
                                             m('span.fa.fa-download', '.'),
-                                            ' Baixar relatórios'
+                                            ' Download reports'
                                         ])
                                     ])
                                 ])

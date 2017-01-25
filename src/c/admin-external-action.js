@@ -69,7 +69,7 @@ const adminExternalAction = {
     },
     view(ctrl, args) {
         const data = args.data,
-            btnValue = (ctrl.l()) ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = (ctrl.l()) ? 'please wait...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
@@ -85,11 +85,11 @@ const adminExternalAction = {
                     m('input.w-button.btn.btn-small[type="submit"][value="' + btnValue + '"]')
                 ] : (!ctrl.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
-                        m('p', 'Requisição feita com sucesso.')
+                        m('p', 'Request successful.')
                     ])
                 ] : [
                     m('.w-form-error[style="display:block;"]', [
-                        m('p', 'Houve um problema na requisição.')
+                        m('p', 'There was a problem with the request.')
                     ])
                 ])
             ]) : ''

@@ -36,22 +36,22 @@ const userContributedBox = {
             m('.w-row.w-hidden-small.w-hidden-tiny.card.card-secondary', [
                 m('.w-col.w-col-3',
                     m('.fontsize-small.fontweight-semibold',
-                        'Projetos que apoiei'
+                        'Projects I supported'
                     )
                 ),
                 m('.w-col.w-col-2',
                     m('.fontsize-small.fontweight-semibold',
-                        'Valor do apoio'
+                        'Value of support'
                     )
                 ),
                 m('.w-col.w-col-3',
                     m('.fontsize-small.fontweight-semibold',
-                        'Status do apoio'
+                        'Support Status'
                     )
                 ),
                 m('.w-col.w-col-4',
                     m('.fontsize-small.fontweight-semibold',
-                        'Recompensa'
+                        'Reward'
                     )
                 )
             ]),
@@ -77,9 +77,9 @@ const userContributedBox = {
                     m('.w-col.w-col-2.u-marginbottom-10',
                         m('.fontsize-base.inline-block', [
                             m('span.w-hidden-main.w-hidden-medium.fontweight-semibold',
-                                'Valor do apoio'
+                                'Value of support'
                             ),
-                            ` R$ ${contribution.value}`
+                            ` Rs ${contribution.value}`
                         ])
                     ),
                     m('.w-col.w-col-3.u-marginbottom-10', [
@@ -103,17 +103,17 @@ const userContributedBox = {
 
                         (contributionVM.canShowReceipt(contribution) ?
                             m(`a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href='https://www.catarse.me/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/receipt'][target='__blank']`,
-                                'Ver recibo'
+                                'View Receipt'
                             ) : ''),
 
                         (contributionVM.canShowSlip(contribution) ?
                             m(`a.btn.btn-inline.btn-small.u-margintop-10[href='${contribution.gateway_data['boleto_url']}'][target='__blank']`,
-                                'Imprimir boleto'
+                                'Print Ticket'
                             ) : ''),
 
                         (contributionVM.canGenerateSlip(contribution) ?
                             m(`a.btn.btn-inline.btn-small.u-margintop-10[href='https://www.catarse.me/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/second_slip'][target='__blank']`,
-                                'Gerar 2a via'
+                                'Generate 2nd via'
                             ) : ''),
 
                         m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [
@@ -121,22 +121,22 @@ const userContributedBox = {
                                 onclick: () => ctrl.toggleAnonymous(contribution.project_id, contribution.contribution_id)
                             }),
                             m('label.w-form-label',
-                                'Quero que meu apoio não seja público'
+                                'I want my support not to be public'
                             )
                         ])
                     ]),
                     m('.w-col.w-col-4',
                         m('.fontsize-smallest', [
                             m('span.w-hidden-main.w-hidden-medium.fontweight-semibold',
-                                'Recompensa'
+                                'Reward'
                             ),
-                            (contribution.reward_id ? m.trust(h.simpleFormat(contribution.reward_description)) : ' Não selecionou recompensa')
+                            (contribution.reward_id ? m.trust(h.simpleFormat(contribution.reward_description)) : ' You have not selected a reward')
 
                         ]),
 
                         m('.fontsize-smallest.lineheight-looser', [
                             m('span.fontweight-semibold',
-                                'Estimativa de entrega: '
+                                'Estimated delivery: '
                             ),
                             h.momentify(contribution.deliver_at, 'MMMM/YYYY')
                         ])

@@ -77,10 +77,10 @@ const paymentCreditCard = {
 
             if (document.length > 14) {
                 isValid = h.validateCnpj(document);
-                errorMessage = 'CNPJ inválido.';
+                errorMessage = 'Invalid CNPJ.';
             } else {
                 isValid = h.validateCpf(striped);
-                errorMessage = 'CPF inválido.';
+                errorMessage = 'Invalid CPF.';
             }
 
             handleValidity(isValid, {field: 'cardOwnerDocument', message: errorMessage});
@@ -242,7 +242,7 @@ const paymentCreditCard = {
                                                     value: ctrl.selectedInstallment()
                                                 } ,_.map(ctrl.installments(), (installment) => {
                                                     return m(`option[value="${installment.number}"]`,
-                                                        `${installment.number} X R$ ${installment.amount}`
+                                                        `${installment.number} X Rs ${installment.amount}`
                                                     );
                                                 })
                                             )
@@ -368,7 +368,7 @@ const paymentCreditCard = {
                                 value: ctrl.selectedInstallment()
                             }, _.map(ctrl.installments(), (installment) => {
                                  return m(`option[value="${installment.number}"]`,
-                                     `${installment.number} X R$ ${installment.amount}`
+                                     `${installment.number} X Rs ${installment.amount}`
                                  );
                              }))
                          ]),

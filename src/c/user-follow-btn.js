@@ -61,11 +61,11 @@ const UserFollowBtn = {
                          onmouseover: () => ctrl.hover(true),
                          onmouseout: () => ctrl.hover(false)
                      },
-                     (ctrl.hover() ? 'Deixar de seguir' : 'Seguindo'));
+                     (ctrl.hover() ? 'Unfollow' : 'Following'));
         } else {
             return m('a.w-button.btn.btn-medium.btn-terciary.u-margintop-20',
                      {onclick: ctrl.follow},
-                     'Seguir');
+                     'follow');
         }
     }
 };

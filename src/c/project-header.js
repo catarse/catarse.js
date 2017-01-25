@@ -32,7 +32,7 @@ const projectHeader = {
                 m('.w-container', [
                     m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)),
                     m('h2.fontsize-base.lineheight-looser[itemprop="author"]', [
-                        'por ',
+                        'by ',
                         project().user ? project().user.name : project().owner_name ? project().owner_name : ''
                     ]),
                     !_.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20',
@@ -40,8 +40,8 @@ const projectHeader = {
                             m('.fontsize-small.u-text-center',
                                 [
                                     m('span.fa.fa-thumbs-up'),
-                                    ' Você é apoiador deste projeto! ',
-                                    m('a.alt-link[href=\'javascript:void(0);\']', {onclick: ctrl.showContributions.toggle}, 'Detalhes')
+                                    ' You are a supporter of this project! ',
+                                    m('a.alt-link[href=\'javascript:void(0);\']', {onclick: ctrl.showContributions.toggle}, 'Details')
                                 ]
                             ),
                             ctrl.showContributions() ? m('.card.u-margintop-20',

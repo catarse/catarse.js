@@ -12,7 +12,7 @@ const projectContributionReportContent = {
                     m('.w-col.w-col-9.w-col-small-6.w-col-tiny-6', [
                         m('.fontsize-base', [
                             m('span.fontweight-semibold', (list.isLoading() ? '' : list.total())),
-                            ' apoios'
+                            ' Supports'
                         ]),
                         //m(".fontsize-large.fontweight-semibold", "R$ 12.000,00")
                     ]),
@@ -44,7 +44,7 @@ const projectContributionReportContent = {
                             (!list.isLoading() ?
                              (list.isLastPage() ? '' : m('button#load-more.btn.btn-medium.btn-terciary', {
                                  onclick: list.nextPage
-                             }, 'Carregar mais')) : h.loader())
+                             }, 'Load more')) : h.loader())
                         ])
                     ])
 

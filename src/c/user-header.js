@@ -27,12 +27,12 @@ const userHeader = {
                           (hideDetails ? '' :
                           m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base',
                               [
-                                  `Chegou junto em ${h.momentify(user.created_at, 'MMMM [de] YYYY')}`,
+                                  `Joined on ${h.momentify(user.created_at, 'MMMM YYYY')}`,
                                   m('br'),
-                                  (user.total_contributed_projects == 0 ? 'Ainda não apoiou projetos' :
-                                  `Apoiou ${h.pluralize(user.total_contributed_projects, ' projeto', ' projetos')}`),
+                                  (user.total_contributed_projects == 0 ? 'Has not yet backed any campaigns' :
+                                  `Backed ${h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns')}`),
                                   (user.total_published_projects > 0 ?
-                                  ` e já criou ${h.pluralize(user.total_published_projects, ' projeto', ' projetos')}` : '')
+                                  ` And already created ${h.pluralize(user.total_published_projects, ' campaign', ' campaigns')}` : '')
                               ]
                           ))
                       ]
