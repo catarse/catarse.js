@@ -24,10 +24,10 @@ const footer = {
                                                         m.trust('&nbsp;')
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/flex?ref=ctrse_footer\']',
+                                                m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
                                                     ' JVN flex'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/team?ref=ctrse_footer\']',
+                                                m('a.link-footer[href=\'https://www.catarse.me/en/team?ref=ctrse_footer\']',
                                                     [
                                                         I18n.t('links.team', I18nScope()),
                                                         m.trust(' &lt;'),
@@ -74,10 +74,10 @@ const footer = {
                                                 m('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']',
                                                     I18n.t('links.help_support', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/pt/terms-of-use\']',
+                                                m('a.link-footer[href=\'/en/terms-of-use\']',
                                                     I18n.t('links.terms', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/pt/privacy-policy\']',
+                                                m('a.link-footer[href=\'/en/privacy-policy\']',
                                                     I18n.t('links.privacy', I18nScope())
                                                 )
                                             ]
@@ -87,10 +87,10 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.sitemap', I18nScope())
                                                 ),
-                                                m('a.w-hidden-small.w-hidden-tiny.link-footer[href=\'/pt/start?ref=ctrse_footer\']',
+                                                m('a.w-hidden-small.w-hidden-tiny.link-footer[href=\'/en/start?ref=ctrse_footer\']',
                                                     I18n.t('links.submit', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/pt/explore?ref=ctrse_footer\']',
+                                                m('a.link-footer[href=\'/en/explore?ref=ctrse_footer\']',
                                                     I18n.t('links.discover', I18nScope())
                                                 ),
                                                 m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']',
@@ -99,13 +99,13 @@ const footer = {
                                                 m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'https://equipecatarse.zendesk.com/account/dropboxes/20298537\']',
                                                     I18n.t('links.contact', I18nScope())
                                                 ),
-                                                m('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=score&ref=ctrse_footer\']',
+                                                m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=score&ref=ctrse_footer\']',
                                                     I18n.t('links.score', I18nScope())
                                                 ),
-                                                m('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=online&ref=ctrse_footer\']',
+                                                m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=online&ref=ctrse_footer\']',
                                                     I18n.t('links.online', I18nScope())
                                                 ),
-                                                m('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=finished&ref=ctrse_footer\']',
+                                                m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=finished&ref=ctrse_footer\']',
                                                     I18n.t('links.finished', I18nScope())
                                                 )
                                             ]
