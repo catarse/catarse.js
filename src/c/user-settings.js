@@ -221,7 +221,7 @@ const userSettings = {
                                                 ctrl.showEmailForm.toggle()
                                             }
                                         },
-                                        'Change e-mail'
+                                        'Change'
                                     )
                                 ]),
                                 m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [

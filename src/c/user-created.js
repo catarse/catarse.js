@@ -63,12 +63,12 @@ const userCreated = {
                             m('.w-col.w-col-3'),
                             m('.w-col.w-col-6', [
                                 m('.fontsize-large.u-marginbottom-30',
-                                    'What are you waiting for to get your project out of paper here at JVN?'),
+                                    'It`s Time To Fund Your Idea'),
                                 m('.w-row', [
                                     m('.w-col.w-col-3'),
                                     m('.w-col.w-col-6',
                                         m('a.btn.btn-large[href=\'/start\']',
-                                            'Start now!'
+                                            'GET STARTED FOR FREE'
                                         )
                                     ),
                                     m('.w-col.w-col-3')

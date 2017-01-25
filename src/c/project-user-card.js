@@ -32,7 +32,7 @@ const projectUserCard = {
                         m('.fontsize-smallest', [
                             h.pluralize(userDetail.total_published_projects, ' Created', ' Created'),
                             m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'),
-                            h.pluralize(userDetail.total_contributed_projects, ' Supported', ' Supported')
+                            h.pluralize(userDetail.total_contributed_projects, ' Backed', ' Backed')
                         ]),
                         m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [
                             (!_.isEmpty(userDetail.facebook_link) ? m('li', [

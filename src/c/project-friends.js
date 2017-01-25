@@ -53,7 +53,7 @@ const projectFriends = {
                             `more ${friendsCount - ctrl.friendsSample().length}`
                         )] : ''),
                         (friendsCount > 1 ?
-                        ' Supported' : ' Supported')
+                        ' Backed' : ' Backed')
                       ]
                     )
                   ]
