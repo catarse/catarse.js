@@ -857,7 +857,7 @@ const
                 class: 'fontsize-large',
                 clear: true
             }],
-          lang: 'en_br',
+          lang: 'en',
           maxHeight: 800,
           minHeight: 300,
           convertVideoLinks: true,
