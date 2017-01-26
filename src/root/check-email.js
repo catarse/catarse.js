@@ -54,10 +54,10 @@ const CheckEmail = {
                     m('.w-col.w-col-3', [
                         m('a.btn.btn-medium.btn-terciary.w-button[href="javacript:void(0);"]', {
                             onclick: ctrl.checkEmail
-                        }, 'Sim!')
+                        }, 'Yes!')
                     ]),
                     m('.w-col.w-col-3', [
-                        m(`a.btn.btn-medium.w-button[href="/users/${user.id}/edit#settings"]`,'Editar o email')
+                        m(`a.btn.btn-medium.w-button[href="/users/${user.id}/edit#settings"]`,'Edit email')
                     ]),
                     m('.w-col.w-col-3')
                 ])
