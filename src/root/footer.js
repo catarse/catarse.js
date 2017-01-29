@@ -27,7 +27,7 @@ const footer = {
                                                 m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
                                                     ' JVN flex'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/en/team?ref=ctrse_footer\']',
+                                                m('a.link-footer[href=\'/team\']',
                                                     [
                                                         I18n.t('links.team', I18nScope()),
                                                         m.trust(' &lt;'),
@@ -49,7 +49,7 @@ const footer = {
                                                 m('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']',
                                                     ' Blog'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/jobs\']',
+                                                m('a.link-footer[href=\'/jobs\']',
                                                     I18n.t('links.jobs', I18nScope())
                                                 )
                                             ]
@@ -68,7 +68,7 @@ const footer = {
                                                         m.trust('&nbsp;')
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/press?ref=ctrse_footer\']',
+                                                m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
                                                     I18n.t('links.press', I18nScope())
                                                 ),
                                                 m('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']',
