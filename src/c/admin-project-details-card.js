@@ -64,7 +64,7 @@ const adminProjectDetailsCard = {
                         ]),
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
                             (_.isNull(project.expires_at) ? [
-                                m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Started there'),
+                                m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Initiated'),
                                 m('.fontweight-semibold.fontsize-large.lineheight-tight', elapsedTextObj.total + ' ' + elapsedTextObj.unit)
                             ] : [
                                  m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Remain'),

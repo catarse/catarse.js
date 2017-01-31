@@ -130,7 +130,7 @@ const projectCard = {
                                 m('.fontsize-smaller.fontweight-semibold', `${ctrl.remainingTextObj.total} ${ctrl.remainingTextObj.unit}`),
                                 m('.fontsize-smallest.lineheight-tightest', (ctrl.remainingTextObj.total > 1) ? I18n.t('remaining.other', I18nScope()) : I18n.t('remaining.one', I18nScope()))
                             ] : [
-                                m('.fontsize-smallest.lineheight-tight', ['Started there',m('br'),`${ctrl.elapsedTextObj.total} ${ctrl.elapsedTextObj.unit}`])
+                                m('.fontsize-smallest.lineheight-tight', ['Initiated',m('br'),`${ctrl.elapsedTextObj.total} ${ctrl.elapsedTextObj.unit}`])
                             ]),
                         ])
                     ]),
