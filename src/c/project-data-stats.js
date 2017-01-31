@@ -42,7 +42,7 @@ const projectDataStats = {
                     m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
                         (_.isNull(project.expires_at) ? [
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', `${elapsedTextObj.total} ${elapsedTextObj.unit}`),
-                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Started there')
+                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Initiated')
                         ] : [
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', `${remainingTextObj.total}`),
                             m('.fontcolor-secondary.lineheight-tighter.fontsize-small', `${remainingTextObj.unit} ${(remainingTextObj.total > 0 ? 'remaining' : 'remaining')}`)

@@ -24,9 +24,9 @@ const footer = {
                                                         m.trust('&nbsp;')
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
-                                                    ' JVN flex'
-                                                ),
+                                                // m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
+                                                //     ' JVN flex'
+                                                // ),
                                                 m('a.link-footer[href=\'/team\']',
                                                     [
                                                         I18n.t('links.team', I18nScope()),
@@ -68,9 +68,9 @@ const footer = {
                                                         m.trust('&nbsp;')
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
-                                                    I18n.t('links.press', I18nScope())
-                                                ),
+                                                // m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
+                                                //     I18n.t('links.press', I18nScope())
+                                                // ),
                                                 m('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']',
                                                     I18n.t('links.help_support', I18nScope())
                                                 ),
