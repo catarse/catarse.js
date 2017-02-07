@@ -83,9 +83,10 @@ const menuProfile = {
                                             [
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#about_me']`,
-                                                        I18n.t('user.about_you', I18nScope())
+                                                        `Public Profile`
                                                     )
                                                 ),
+
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#notifications']`,
                                                         I18n.t('user.notifications', I18nScope())

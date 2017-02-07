@@ -9,13 +9,8 @@ import popNotification from './pop-notification';
 
 const userSettings = {
     controller(args) {
-        let deleteUser;
         const user = args.user,
             fields = {
-                email: m.prop(''),
-                email_confirmation: m.prop(''),
-                password: m.prop(''),
-                current_password: m.prop(''),
                 owner_document: m.prop(user.owner_document),
                 country_id: m.prop(user.address.country_id),
                 street: m.prop(user.address.street),
@@ -28,14 +23,11 @@ const userSettings = {
                 phonenumber: m.prop(user.address.phonenumber),
                 name: m.prop(user.name)
             },
-            emailHasError = m.prop(false),
-            passwordHasError = m.prop(false),
             user_id = args.userId,
             error = m.prop(''),
             countries = m.prop(),
             states = m.prop(),
             loader = m.prop(true),
-            showEmailForm = h.toggleProp(false, true),
             showSuccess = m.prop(false),
             showError = m.prop(false),
             countriesLoader = postgrest.loader(models.country.getPageOptions()),
@@ -53,7 +45,6 @@ const userSettings = {
             },
             updateUserData = (user_id) => {
                 const userData = {
-                    email: fields.email(),
                     country_id: fields.country_id(),
                     address_street: fields.street(),
                     address_number: fields.number(),
@@ -64,8 +55,6 @@ const userSettings = {
                     address_neighbourhood: fields.neighbourhood(),
                     phone_number: fields.phonenumber(),
                     owner_document: fields.owner_document(),
-                    current_password: fields.current_password(),
-                    password: fields.password(),
                     name: fields.name()
                 };
 
@@ -90,34 +79,7 @@ const userSettings = {
                     m.redraw();
                 });
             },
-            setDeleteForm = (el, isInit) => {
-                if (!isInit) {
-                    deleteUser = () => el.submit();
-                }
-            },
-            deleteAccount = () => {
-                if (window.confirm('Are you sure you want to deactivate your account?')) {
-                    deleteUser();
-                };
 
-                return false;
-            },
-            validateEmailConfirmation = () => {
-                if (fields.email() !== fields.email_confirmation()) {
-                    emailHasError(true);
-                } else {
-                    emailHasError(false);
-                }
-                return !emailHasError();
-            },
-            validatePassword = () => {
-                const pass = String(fields.password());
-                if (pass.length > 0 && pass.length <= 5) {
-                    passwordHasError(true);
-                }
-
-                return !passwordHasError();
-            },
             validateDocument = () => {
                 const document = fields.owner_document(),
                     striped = String(document).replace(/[\.|\-|\/]*/g,'');
@@ -133,14 +95,9 @@ const userSettings = {
             },
             // TODO: this form validation should be abstracted/merged together with others
             onSubmit = () => {
-                if (!validateEmailConfirmation()) {
-                    error('Email confirmation is incorrect.');
-                    showError(true);
-                } else if (!validatePassword()) {
-                    error('New password is incorrect.');
-                    showError(true);
-                } else if (!validateDocument()) {
-                    error('New password is incorrect....');
+
+                if (!validateDocument()) {
+                    error('Invalid CPF/CNPJ');
                     showError(true);
                 } else {
                     updateUserData(user_id);
@@ -169,22 +126,15 @@ const userSettings = {
             applyDocumentMask: applyDocumentMask,
             applyZipcodeMask: applyZipcodeMask,
             applyPhoneMask: applyPhoneMask,
-            deleteAccount: deleteAccount,
-            setDeleteForm: setDeleteForm,
             countries: countries,
             states: states,
             fields: fields,
             loader: loader,
             showSuccess: showSuccess,
             showError: showError,
-            showEmailForm: showEmailForm,
             user: user,
             onSubmit: onSubmit,
-            error: error,
-            emailHasError: emailHasError,
-            passwordHasError: passwordHasError,
-            validatePassword: validatePassword,
-            validateEmailConfirmation: validateEmailConfirmation
+            error: error
         };
     },
     view(ctrl, args) {
@@ -207,51 +157,6 @@ const userSettings = {
                         m('.w-col.w-col-10.w-col-push-1',
                             m('.w-form.card.card-terciary.u-marginbottom-20', [
                                 m('.fontsize-base.fontweight-semibold',
-                                    'Email'
-                                ),
-                                m('.fontsize-small.u-marginbottom-30',
-                                    'Keep this email up to date as it is the communication channel between you, the JVN team and the team of projects you have supported. '
-                                ),
-                                m('.fontsize-base.u-marginbottom-40', [
-                                    m('span.fontweight-semibold.card.u-radius',
-                                        user.email
-                                    ),
-                                    m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
-                                            onclick: () => {
-                                                ctrl.showEmailForm.toggle()
-                                            }
-                                        },
-                                        'Change'
-                                    )
-                                ]),
-                                m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
-                                    m('.w-col.w-col-6.w-sub-col', [
-                                        m('label.field-label.fontweight-semibold',
-                                            'New email'
-                                        ),
-                                        m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
-                                            class: ctrl.emailHasError() ? 'error' : '',
-                                            value: fields.email(),
-                                            onfocus: () => ctrl.emailHasError(false),
-                                            onchange: m.withAttr('value', fields.email)
-                                        })
-                                    ]),
-                                    m('.w-col.w-col-6', [
-                                        m('label.field-label.fontweight-semibold',
-                                            'Confirm new email'
-                                        ),
-                                        m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
-                                            class: ctrl.emailHasError() ? 'error' : '',
-                                            value: fields.email_confirmation(),
-                                            onfocus: () => ctrl.emailHasError(false),
-                                            onblur: ctrl.validateEmailConfirmation,
-                                            onchange: m.withAttr('value', fields.email_confirmation)
-                                        })
-                                    ]),
-                                    ctrl.emailHasError() ? m(inlineError, {message: 'Email confirmation is incorrect.'}) : ''
-                                ]),
-                                m('.fontsize-base.fontweight-semibold',
-                                    'Name'
                                 ),
                                 m('.w-row.u-marginbottom-20', [
                                     m('.w-col.w-col-6.w-sub-col',
@@ -424,49 +329,6 @@ const userSettings = {
                                         ])
                                     )
                                 ]),
-                                m('.divider.u-maginbottom-20'),
-                                m('.fontsize-base.fontweight-semibold',
-                                    'Change my password'
-                                ),
-                                m('.fontsize-small.u-marginbottom-20',
-                                    'In order for the password to be changed you must confirm your current password.'
-                                ),
-                                m('.w-row.u-marginbottom-20', [
-                                    m('.w-col.w-col-6.w-sub-col', [
-                                        m('label.field-label.fontweight-semibold',
-                                            ' Current Password'
-                                        ),
-                                        m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
-                                            value: fields.current_password(),
-                                            onchange: m.withAttr('value', fields.current_password)
-                                        })
-                                    ]),
-                                    m('.w-col.w-col-6', [
-                                        m('label.field-label.fontweight-semibold',
-                                            ' New Password'
-                                        ),
-                                        m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
-                                            class: ctrl.passwordHasError() ? 'error' : '',
-                                            value: fields.password(),
-                                            onfocus: () => ctrl.passwordHasError(false),
-                                            onblur: ctrl.validatePassword,
-                                            onchange: m.withAttr('value', fields.password)
-                                        }),
-                                        !ctrl.passwordHasError() ? '' : m(inlineError, {message: 'Your new password must be at least 6 characters long.'})
-                                    ])
-                                ]),
-                                m('.divider.u-marginbottom-20'),
-                                m('.fontweight-semibold.fontsize-smaller',
-                                    'Disable my account'
-                                ),
-                                m('.fontsize-smallest',
-                                    'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'
-                                ),
-                                m(`a.alt-link.fontsize-smaller[href=\'/en/users/${user.id}\'][rel=\'nofollow\']`,{
-                                        onclick: ctrl.deleteAccount,
-                                    },
-                                    'Disable my JVN account'
-                                )
                             ])
                         )
                     ),
