@@ -1,13 +1,13 @@
 {
-  "name": "catarse.js",
+  "name": "jvn.js",
   "version": "1.0.24",
-  "homepage": "https://github.com/catarse/catarse.js",
+  "homepage": "https://github.com/sushant12/catarse.js",
   "authors": [
     "Diogo Biazus <diogo@biazus.me>",
     "Vinícius Andrade <vchavesster@gmail.com>",
     "Sushant Bajracharya <sussyoung9@gmail.com>"
   ],
-  "description": "A set of components to use in Catarse interface",
+  "description": "A set of components to use in JVN interface",
   "main": "dist/catarse.js",
   "keywords": [
     "mithril",
