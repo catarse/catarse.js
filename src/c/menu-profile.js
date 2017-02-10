@@ -82,6 +82,12 @@ const menuProfile = {
                                         m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
                                                 m(`li.lineheight-looser`,
+                                                  m(`a.alt-link.fontsize-smaller[href='/connect-facebook/']`,
+                                                    `Find Friends`
+                                                   ),
+                                                  m.trust('&nbsp;')
+                                                 ),
+                                                m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#about_me']`,
                                                         `Public Profile`
                                                     )
@@ -195,5 +201,4 @@ const menuProfile = {
         );
     }
 };
-
 export default menuProfile;

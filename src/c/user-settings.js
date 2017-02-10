@@ -343,10 +343,6 @@ const userSettings = {
                         )
                     )
                 ])
-            ]),
-            m('form.w-hidden', {action: `/en/users/${user.id}`, method: 'post', config: ctrl.setDeleteForm}, [
-                m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
-                m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')
             ])
         ]);
     }

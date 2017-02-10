@@ -20,7 +20,7 @@ const userAboutEdit = {
                   facebook_link: m.prop(user.facebook_link),
                   twitter: m.prop(user.twitter_username),
                   links: m.prop(user.links||[]),
-                  about_html: m.prop(user.about_html),
+                  about_html: m.prop(user.about_html||''),
                   email_confirmation: m.prop('')
               },
               passwordHasError = m.prop(false),
@@ -54,7 +54,9 @@ const userAboutEdit = {
                         formData = new FormData();
 
                   formData.append('uploaded_image', userUploadedImageEl.files[0]);
-                  formData.append('cover_image', userCoverImageEl.files[0]);
+                  if(!args.hideCoverImg) {
+                      formData.append('cover_image', userCoverImageEl.files[0]);
+                  }
 
                   uploading(true);
                   m.redraw();
@@ -224,10 +226,10 @@ const userAboutEdit = {
                                             m('.w-col.w-col-5.w-sub-col',
                                                 [
                                                     m('label.field-label.fontweight-semibold',
-                                                        'Endereço do seu perfil'
+                                                        'Address'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                        'Seu perfil público pode ter uma URL personalizada. Escolha uma fácil de guardar!    '
+                                                        'Your public profile may have a custom URL. Choose an easy to save!    '
                                                     )
                                                 ]
                                             ),
@@ -242,7 +244,7 @@ const userAboutEdit = {
                                                             })
                                                         ),
                                                         m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover',
-                                                            m('.fontcolor-secondary.fontsize-smaller', '  .catarse.me')
+                                                            m('.fontcolor-secondary.fontsize-smaller', '  .myjvn.com/')
                                                         )
                                                     ]
                                                 )
@@ -255,7 +257,7 @@ const userAboutEdit = {
                                               'Email'
                                              ),
                                             m('.fontsize-small.u-marginbottom-30',
-                                              'Mantenha esse email atualizado pois ele é o canal de comunicação entre você, a equipe do Catarse e a equipe dos projetos que você apoiou. '
+                                              'Keep this email up to date as it is the communication channel between you, the JVN team and the team of campaigns you have supported. '
                                              ),
                                             m('.fontsize-base.u-marginbottom-40', [
                                                 m('span.fontweight-semibold.card.u-radius',
@@ -266,13 +268,13 @@ const userAboutEdit = {
                                                         ctrl.showEmailForm.toggle();
                                                     }
                                                 },
-                                                  'Alterar email'
+                                                  'Change email'
                                                  )
                                             ]),
                                             m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
                                                 m('.w-col.w-col-6.w-sub-col', [
                                                     m('label.field-label.fontweight-semibold',
-                                                      'Novo email'
+                                                      'New Email'
                                                      ),
                                                     m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
                                                         class: ctrl.emailHasError() ? 'error' : '',
@@ -283,7 +285,7 @@ const userAboutEdit = {
                                                 ]),
                                                 m('.w-col.w-col-6', [
                                                     m('label.field-label.fontweight-semibold',
-                                                      'Confirmar novo email'
+                                                      'Confirm Email'
                                                      ),
                                                     m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
                                                         class: ctrl.emailHasError() ? 'error' : '',
@@ -293,16 +295,16 @@ const userAboutEdit = {
                                                         onchange: m.withAttr('value', fields.email_confirmation)
                                                     })
                                                 ]),
-                                                ctrl.emailHasError() ? m(inlineError, {message: 'Confirmação de email está incorreta.'}) : ''
+                                                ctrl.emailHasError() ? m(inlineError, {message: 'Email confirmation is incorrect.'}) : ''
                                             ]) ]),
                                     m('.w-row.u-marginbottom-30.card.card-terciary', [
                                             m('.w-col.w-col-5.w-sub-col',
                                                 [
                                                     m('label.field-label.fontweight-semibold',
-                                                      '  Nome no perfil público'
+                                                      '  Name'
                                                     ),
                                                     m('label.field-label.fontsize-smallest.fontcolor-secondary',
-                                                      '  Esse é o nome que os usuários irão ver no seu perfil. Não poderá ser alterado após a realização de um apoio ou públicação de um projeto.'
+                                                      '  This is the name that users will see in your profile. It can not be changed after a campaign has been supported or published.'
                                                     )
                                                 ]
                                             ),
@@ -344,7 +346,7 @@ const userAboutEdit = {
                                                     )
                                                 ]
                                             ),
-                                            m('.w-row.u-marginbottom-30.card.card-terciary',
+                                            (args.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary',
                                                 [
                                                     m('.w-col.w-col-5.w-sub-col',
                                                         [
@@ -368,7 +370,7 @@ const userAboutEdit = {
                                                         )
                                                     )
                                                 ]
-                                            )
+                                                                       ))
                                         ]
                                     ),
                                     m('.w-row',
@@ -492,7 +494,7 @@ const userAboutEdit = {
                                             ]
                                         )
                                      ),
-                                    m('.w-form.card.card-terciary.u-marginbottom-30',
+                                    ( args.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
                                       m('.w-row.u-marginbottom-10', [
                                           m('.fontsize-base.fontweight-semibold',
                                             'Change my password'
@@ -526,8 +528,8 @@ const userAboutEdit = {
                                           ]),
 
                                       ])
-                                     ),
-                                    m('.w-form.card.card-terciary.u-marginbottom-30',
+                                                                      )),
+                                    ( args.hideDisableAcc ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
                                       m('.w-row.u-marginbottom-10', [
                                           m('.fontweight-semibold.fontsize-smaller',
                                             'Disable my account'
@@ -536,13 +538,17 @@ const userAboutEdit = {
                                             'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'
                                            ),
                                           m(`a.alt-link.fontsize-smaller[href=\'/en/users/${user.id}\'][rel=\'nofollow\']`,{
-                                              onclick: ctrl.deleteAccount,
+                                              onclick: ctrl.deleteAccount
                                           },
                                             'Disable my JVN account'
-                                           )
+                                           ),
+                                          m('form.w-hidden', {action: `/en/users/${user.id}`, method: 'post', config: ctrl.setDeleteForm}, [
+                                              m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
+                                              m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')
+                                          ])
 
                                       ])
-                                     )
+                                         ))
                                 ]
                              )
                          )
