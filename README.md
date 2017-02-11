@@ -1,18 +1,18 @@
-#catarse.js [![Circle CI](https://circleci.com/gh/catarse/catarse.js/tree/master.svg?style=svg)](https://circleci.com/gh/catarse/catarse.js/tree/master) [![Code Climate](https://codeclimate.com/github/catarse/catarse.js/badges/gpa.svg)](https://codeclimate.com/github/catarse/catarse.js)
+#jvn.js 
 
-# Mithril components for the Catarse world
+# Mithril components for JVN
 
-A set of mithril components to use accross [catarse](https://github.com/catarse/catarse).
+A set of mithril components to use accross [JVN](https://github.com/sushant12/jvn).
 
 ## Development
 
-To start developing components to catarse.js you'll first have to globally install [gulp](http://gulpjs.com/), [bower](http://bower.io/) and [npm](https://www.npmjs.com/). 
+To start developing components to jvn.js you'll first have to globally install [gulp](http://gulpjs.com/), [bower](http://bower.io/) and [npm](https://www.npmjs.com/). 
 
 Then, install all the project package dependencies by calling ```npm install && bower install```.
 
 Application build dependencies are described on `bower.json`, while dev dependencies are described on `package.json`.
 
-Catarse.js uses gulp as build tool. To start developing just run `gulp` and gulp will start watching your source files for changes and running build when those happen. 
+jvn.js uses gulp as build tool. To start developing just run `gulp` and gulp will start watching your source files for changes and running build when those happen. 
 
 To watch source files without running through testing tasks, run:
 ```gulp --notest```
@@ -23,9 +23,9 @@ To watch source files without running testing or linting tasks, run:
 To trigger a build cycle without watching files, run:
 ```gulp build```
 
-To link catarse.js with catarse, run:
+To link jvn.js with jvn, run:
 ```bower link```
-Then, in you catarse repository, run:
+Then, in you jvn repository, run:
 ```bower link catarse.js```
 
 ## Flowtype && ES6
