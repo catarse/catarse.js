@@ -1,6 +1,6 @@
 {
   "name": "jvn.js",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "homepage": "https://github.com/sushant12/catarse.js",
   "authors": [
     "Diogo Biazus <diogo@biazus.me>",
@@ -23,7 +23,7 @@
   ],
   "dependencies": {
     "mithril": "0.2.4",
-    "mithril-postgrest": "2.0.0",
+    "mithril-jvn-postgrest": "2.0.1",
     "moment": "~2.10.3",
     "replace-diacritics": "https://raw.githubusercontent.com/yvg/js-replace-diacritics/master/replace-diacritics.js",
     "moment-timezone": "~0.4.0",
