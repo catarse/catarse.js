@@ -88,15 +88,15 @@ const usersEdit = {
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#about_me' ? '.selected' : '')}[data-target='#dashboard_about_me'][href='#about_me'][id='dashboard_about_me_link']`,
                                 'About You'
                             ),
-                            m(`a.dashboard-nav-link${(ctrl.hash() === '#settings' ? '.selected' : '')}[data-target='#dashboard_settings'][href='#settings'][id='dashboard_settings_link']`,
-                                'Data & Address'
-                            ),
+                            // m(`a.dashboard-nav-link${(ctrl.hash() === '#settings' ? '.selected' : '')}[data-target='#dashboard_settings'][href='#settings'][id='dashboard_settings_link']`,
+                            //     'Data & Address'
+                            // ),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#notifications' ? '.selected' : '')}[data-target='#dashboard_notifications'][href='#notifications'][id='dashboard_notifications_link']`,
                                 'Notifications'
                             ),
-                            m(`a.dashboard-nav-link${(ctrl.hash() === '#billing' ? '.selected' : '')}[data-target='#dashboard_billing'][href='#billing'][id='dashboard_billing_link']`,
-                                'Bank and cards'
-                            ),
+                            // m(`a.dashboard-nav-link${(ctrl.hash() === '#billing' ? '.selected' : '')}[data-target='#dashboard_billing'][href='#billing'][id='dashboard_billing_link']`,
+                            //     'Bank and cards'
+                            // ),
                             m(`a.dashboard-nav-link.u-right-big-only[href='/en/users/${user.id}']`, {
                                     config: m.route,
                                     onclick: () => {

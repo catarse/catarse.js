@@ -6,7 +6,7 @@ import h from '../h';
 import I18n from 'i18n-js';
 import startVM from '../vms/start-vm';
 import youtubeLightbox from '../c/youtube-lightbox';
-import slider from '../c/slider';
+// import slider from '../c/slider';
 import landingQA from '../c/landing-qa';
 import inlineError from '../c/inline-error';
 
@@ -317,81 +317,81 @@ const start = {
                 )
             ),
 
-            m('.w-section.section-large.bg-blue-one', [
-                m('.w-container.u-text-center', [
-                    m('.fontsize-larger.lineheight-tight.fontcolor-negative.u-marginbottom-20', [
-                        I18n.t('video.title', I18nScope()),
-                        m('br'),
-                        I18n.t('video.subtitle', I18nScope())
-                    ]),
-                    m.component(youtubeLightbox, {
-                        src: I18n.t('video.src', I18nScope()),
-                        onclick: h.analytics.event({cat: 'project_start',act: 'start_video_play'})
-                    })
-                ])
-            ]),
-            m('.w-hidden-small.w-hidden-tiny.section-categories', [
-                m('.w-container', [
-                    m('.u-text-center', [
-                        m('.w-row', [
-                            m('.w-col.w-col-10.w-col-push-1', [
-                                m('.fontsize-large.u-marginbottom-40.fontcolor-negative', I18n.t('categories.title', I18nScope()))
-                            ])
-                        ])
-                    ]),
-                    m('.w-tabs', [
-                        m('.w-tab-menu.u-text-center', _.map(ctrl.categories(), (category) => {
-                            return m(`a.w-tab-link.w-inline-block.btn-category.small.btn-inline${(ctrl.selectedCategoryIdx() === category.id) ? '.w--current' : ''}`, {
-                                onclick: h.analytics.event({cat: 'project_start',act: 'start_category_click',lbl: category.name}, ctrl.selectCategory(category))
-                            }, [
-                                m('div', category.name)
-                            ]);
-                        })),
-                        m('.w-tab-content.u-margintop-40', [
-                            m('.w-tab-pane.w--tab-active', [
-                                m('.w-row', (ctrl.selectedCategoryIdx() !== -1) ? _.map(ctrl.selectedCategory(), (category) => {
-                                    return [
-                                        m('.w-col.w-col-5', [
-                                            m('.fontsize-jumbo.u-marginbottom-20', category.name),
-                                            m('a.w-button.btn.btn-medium.btn-inline.btn-dark[href="#start-form"]', {
-                                                config: h.scrollTo()
-                                            }, I18n.t('submit', I18nScope()))
-                                        ]),
-                                        m('.w-col.w-col-7', [
-                                            m('.fontsize-megajumbo.fontcolor-negative', `Rs ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
-                                            m('.fontsize-large.u-marginbottom-20', 'Donated to campaigns'),
-                                            m('.fontsize-megajumbo.fontcolor-negative', (category.successful_projects) ? category.successful_projects : '...'),
-                                            m('.fontsize-large.u-marginbottom-30', 'Campaigns financed'),
-                                            !_.isEmpty(ctrl.featuredProjects()) ? _.map(ctrl.featuredProjects(), (project) => {
-                                                return !_.isUndefined(project) ? m('.w-row.u-marginbottom-10', [
-                                                    m('.w-col.w-col-1', [
-                                                        m(`img.user-avatar[src="${h.useAvatarOrDefault(project.userThumb)}"]`)
-                                                    ]),
-                                                    m('.w-col.w-col-11', [
-                                                        m('.fontsize-base.fontweight-semibold', project.user.name),
-                                                        m('.fontsize-smallest', [
-                                                            I18n.t('categories.pledged', I18nScope({pledged: h.formatNumber(project.pledged), contributors: project.total_contributors})),
-                                                            m(`a.link-hidden[href="/${project.permalink}"]`, project.name)
-                                                        ])
-                                                    ])
-                                                ]) : m('.fontsize-base', I18n.t('categories.loading_featured', I18nScope()));
-                                            }) : '',
-                                        ])
-                                    ];
-                                }) : '')
-                            ])
-                        ])
-                    ])
-                ])
-            ]),
-            m.component(slider, {
-                slides: testimonials(),
-                title: I18n.t('testimonials_title', I18nScope()),
-                slideClass: 'slide-testimonials-content',
-                wrapperClass: 'slide-testimonials',
-                onchange: h.analytics.event({cat: 'project_start',act: 'start_testimonials_change'})
-            }),
-            m('.w-section.divider.u-margintop-30'),
+            // m('.w-section.section-large.bg-blue-one', [
+            //     m('.w-container.u-text-center', [
+            //         m('.fontsize-larger.lineheight-tight.fontcolor-negative.u-marginbottom-20', [
+            //             I18n.t('video.title', I18nScope()),
+            //             m('br'),
+            //             I18n.t('video.subtitle', I18nScope())
+            //         ]),
+            //         m.component(youtubeLightbox, {
+            //             src: I18n.t('video.src', I18nScope()),
+            //             onclick: h.analytics.event({cat: 'project_start',act: 'start_video_play'})
+            //         })
+            //     ])
+            // ]),
+            // m('.w-hidden-small.w-hidden-tiny.section-categories', [
+            //     m('.w-container', [
+            //         m('.u-text-center', [
+            //             m('.w-row', [
+            //                 m('.w-col.w-col-10.w-col-push-1', [
+            //                     m('.fontsize-large.u-marginbottom-40.fontcolor-negative', I18n.t('categories.title', I18nScope()))
+            //                 ])
+            //             ])
+            //         ]),
+            //         m('.w-tabs', [
+            //             m('.w-tab-menu.u-text-center', _.map(ctrl.categories(), (category) => {
+            //                 return m(`a.w-tab-link.w-inline-block.btn-category.small.btn-inline${(ctrl.selectedCategoryIdx() === category.id) ? '.w--current' : ''}`, {
+            //                     onclick: h.analytics.event({cat: 'project_start',act: 'start_category_click',lbl: category.name}, ctrl.selectCategory(category))
+            //                 }, [
+            //                     m('div', category.name)
+            //                 ]);
+            //             })),
+            //             m('.w-tab-content.u-margintop-40', [
+            //                 m('.w-tab-pane.w--tab-active', [
+            //                     m('.w-row', (ctrl.selectedCategoryIdx() !== -1) ? _.map(ctrl.selectedCategory(), (category) => {
+            //                         return [
+            //                             m('.w-col.w-col-5', [
+            //                                 m('.fontsize-jumbo.u-marginbottom-20', category.name),
+            //                                 m('a.w-button.btn.btn-medium.btn-inline.btn-dark[href="#start-form"]', {
+            //                                     config: h.scrollTo()
+            //                                 }, I18n.t('submit', I18nScope()))
+            //                             ]),
+            //                             m('.w-col.w-col-7', [
+            //                                 m('.fontsize-megajumbo.fontcolor-negative', `Rs ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
+            //                                 m('.fontsize-large.u-marginbottom-20', 'Donated to campaigns'),
+            //                                 m('.fontsize-megajumbo.fontcolor-negative', (category.successful_projects) ? category.successful_projects : '...'),
+            //                                 m('.fontsize-large.u-marginbottom-30', 'Campaigns financed'),
+            //                                 !_.isEmpty(ctrl.featuredProjects()) ? _.map(ctrl.featuredProjects(), (project) => {
+            //                                     return !_.isUndefined(project) ? m('.w-row.u-marginbottom-10', [
+            //                                         m('.w-col.w-col-1', [
+            //                                             m(`img.user-avatar[src="${h.useAvatarOrDefault(project.userThumb)}"]`)
+            //                                         ]),
+            //                                         m('.w-col.w-col-11', [
+            //                                             m('.fontsize-base.fontweight-semibold', project.user.name),
+            //                                             m('.fontsize-smallest', [
+            //                                                 I18n.t('categories.pledged', I18nScope({pledged: h.formatNumber(project.pledged), contributors: project.total_contributors})),
+            //                                                 m(`a.link-hidden[href="/${project.permalink}"]`, project.name)
+            //                                             ])
+            //                                         ])
+            //                                     ]) : m('.fontsize-base', I18n.t('categories.loading_featured', I18nScope()));
+            //                                 }) : '',
+            //                             ])
+            //                         ];
+            //                     }) : '')
+            //                 ])
+            //             ])
+            //         ])
+            //     ])
+            // ]),
+            // m.component(slider, {
+            //     slides: testimonials(),
+            //     title: I18n.t('testimonials_title', I18nScope()),
+            //     slideClass: 'slide-testimonials-content',
+            //     wrapperClass: 'slide-testimonials',
+            //     onchange: h.analytics.event({cat: 'project_start',act: 'start_testimonials_change'})
+            // }),
+            // m('.w-section.divider.u-margintop-30'),
             m('.w-container', [
                 m('.fontsize-larger.u-text-center.u-marginbottom-60.u-margintop-40', I18n.t('qa_title', I18nScope())),
                 m('.w-row.u-marginbottom-60', [

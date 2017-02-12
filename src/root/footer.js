@@ -62,12 +62,12 @@ const footer = {
                                                 m('a.link-footer[href=\'http://suporte.catarse.me/hc/pt-br/requests/new\'][target="_BLANK"]',
                                                     I18n.t('links.contact', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
-                                                    [
-                                                        I18n.t('links.rate', I18nScope()),
-                                                        m.trust('&nbsp;')
-                                                    ]
-                                                ),
+                                                // m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
+                                                //     [
+                                                //         I18n.t('links.rate', I18nScope()),
+                                                //         m.trust('&nbsp;')
+                                                //     ]
+                                                // ),
                                                 // m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
                                                 //     I18n.t('links.press', I18nScope())
                                                 // ),

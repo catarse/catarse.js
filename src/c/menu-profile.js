@@ -81,12 +81,12 @@ const menuProfile = {
                                         ),
                                         m(`ul.w-list-unstyled.u-marginbottom-20`,
                                             [
-                                                m(`li.lineheight-looser`,
-                                                  m(`a.alt-link.fontsize-smaller[href='/connect-facebook/']`,
-                                                    `Find Friends`
-                                                   ),
-                                                  m.trust('&nbsp;')
-                                                 ),
+                                                // m(`li.lineheight-looser`,
+                                                //   m(`a.alt-link.fontsize-smaller[href='/connect-facebook/']`,
+                                                //     `Find Friends`
+                                                //    ),
+                                                //   m.trust('&nbsp;')
+                                                //  ),
                                                 m(`li.lineheight-looser`,
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#about_me']`,
                                                         `Public Profile`
@@ -98,19 +98,19 @@ const menuProfile = {
                                                         I18n.t('user.notifications', I18nScope())
                                                     )
                                                 ),
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
-                                                        I18n.t('user.data_address', I18nScope())
-                                                    )
-                                                ),
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#billing']`,
-                                                        I18n.t('user.bank_cards', I18nScope())
-                                                    )
-                                                )
+                                                // m(`li.lineheight-looser`,
+                                                //     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
+                                                //         I18n.t('user.data_address', I18nScope())
+                                                //     )
+                                                // ),
+                                                // m(`li.lineheight-looser`,
+                                                //     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#billing']`,
+                                                //         I18n.t('user.bank_cards', I18nScope())
+                                                //     )
+                                                // )
                                             ]
                                         ),
-                                        m('.divider.u-marginbottom-20'),
+                                        // m('.divider.u-marginbottom-20'),
                                         args.user.is_admin_role ? m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
                                             `Admin`
                                         ) : '',
@@ -143,12 +143,12 @@ const menuProfile = {
                                                 )
                                             ]
                                         ) : '',
-                                        m('.fontsize-mini', I18n.t('user.email_text', I18nScope())),
-                                        m('.fontsize-smallest.u-marginbottom-20', [
-                                            m('span.fontweight-semibold',`${user.email} `),
-                                            m(`a.alt-link[href='/en/users/${user.id}/edit#settings']`, I18n.t('user.change_email', I18nScope()))
-                                        ]),
-                                        m('.divider.u-marginbottom-20'),
+                                        // m('.fontsize-mini', I18n.t('user.email_text', I18nScope())),
+                                        // m('.fontsize-smallest.u-marginbottom-20', [
+                                        //     m('span.fontweight-semibold',`${user.email} `),
+                                        //     m(`a.alt-link[href='/en/users/${user.id}/edit#settings']`, I18n.t('user.change_email', I18nScope()))
+                                        // ]),
+                                        // m('.divider.u-marginbottom-20'),
                                         m(`a.alt-link[href='/en/logout']`,
                                             I18n.t('user.logout', I18nScope())
                                         )
