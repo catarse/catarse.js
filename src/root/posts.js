@@ -19,6 +19,7 @@ const posts = {
             titleHasError = m.prop(false),
             commentHasError = m.prop(false),
             projectPosts = m.prop(),
+            loader = postgrest.loaderWithToken,
             errors = m.prop(''),
             fields = {
                 title: m.prop(''),
@@ -36,13 +37,13 @@ const posts = {
                     errors('Mensagem não pode ficar em branco.');
                     showError(true);
                 } else {
+                    h.scrollTop();
                     showPreview(true);
                 }
                 return false;
             },
             project_id = args.root.getAttribute('data-id'),
             projectDetails = m.prop([]),
-            loader = postgrest.loaderWithToken,
             validateComment = () => {
               const comment = String(fields.comment_html());
               if (comment.length == 0) {
@@ -59,18 +60,9 @@ const posts = {
 
               return !titleHasError();
             },
-            setProjectId = () => {
-                try {
-                    const project_id = m.route.param('project_id');
-
-                    filterVM.project_id(project_id);
-                } catch (e) {
-                    filterVM.project_id(args.root.getAttribute('data-id'));
-                }
-            },
             rewardText = (rewardId) => {
                 let reward = _.find(rewardVM.rewards(), (reward) => reward.id == rewardId);
-                return `Apoiadores da recompensa R$${reward.minimum_value} - ${reward.description.substring(0, 50) + '...'}`;
+                return `Apoiadores da recompensa R$${reward.minimum_value} - ${reward.description.substring(0, 70) + '...'}`;
             },
             showRecipientes = (post) => {
                 if (post.recipients == 'public') {
@@ -99,19 +91,20 @@ const posts = {
                 }
             };
 
+        models.projectPostDetail.pageSize(false);
         filterVM.project_id(project_id);
         const listVM = postgrest.loaderWithToken(models.projectPostDetail.getPageOptions(_.extend(filterVM.parameters(), {order: 'created_at.desc'} ))),
-            l = loader(models.projectDetail.getRowOptions(filterVM.parameters()));
+              l = loader(models.projectDetail.getRowOptions(filterVM.parameters()));
 
         listVM.load().then(projectPosts);
 
-        setProjectId();
 
         rewardVM.fetchRewards(project_id);
 
         l.load().then(projectDetails);
 
         return {
+            listVM: listVM,
             l: l,
             projectPosts: projectPosts,
             showRecipientes: showRecipientes,
@@ -132,7 +125,8 @@ const posts = {
         };
     },
     view(ctrl) {
-        const project = _.first(ctrl.projectDetails());
+        const project = _.first(ctrl.projectDetails()),
+              paidRewards = _.filter(rewardVM.rewards(), (reward) => {return reward.paid_count > 0;});
 
         return (project ? m('.project-posts',
             (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
@@ -172,7 +166,7 @@ const posts = {
                 ), m('.section', m('.w-container',
                     m('.w-row', [
                         m('.w-col.w-col-1'),
-                        m('.w-col.w-col-10.w-hidden-small.w-hidden-tiny', [
+                        m('.w-col.w-col-10', [
                             m('.u-marginbottom-60.u-text-center',
                                 m('._w-inline-block.card.fontsize-small.u-radius', [
                                     m('span.fa.fa-lightbulb-o',
@@ -200,9 +194,9 @@ const posts = {
                                         m('option[value=\'0\']',
                                             'Todos os apoiadores'
                                         ),
-                                        (_.map(rewardVM.rewards(), (reward) => {
+                                        (_.map(paidRewards, (reward) => {
                                             return m(`option[value='${reward.id}']`,
-                                                `Apoiadores da recompensa R$${reward.minimum_value} - ${reward.description.substring(0, 50) + '...'}`
+                                              ctrl.rewardText(reward.id)
                                             );
                                         }))
                                     ]),
@@ -219,7 +213,10 @@ const posts = {
                                     m('label.field-label.fontweight-semibold',
                                         'Texto'
                                     ),
-                                    m('.preview-container.u-marginbottom-40', h.redactor('posts[comment_html]', ctrl.fields.comment_html)),
+                                    m('.preview-container.u-marginbottom-40',{
+                                        class: ctrl.commentHasError() ? 'error' : '',
+                                        onclick: () => ctrl.commentHasError(false),
+                                    }, h.redactor('posts[comment_html]', ctrl.fields.comment_html)),
                                     m('.u-marginbottom-20.w-row', [
                                         m('.w-col.w-col-3'),
                                         m('._w-sub-col.w-col.w-col-6',
@@ -255,11 +252,11 @@ const posts = {
                                     ),
                                     m('.table-col.w-col.w-col-1')
                                 ]),
-                                (!_.isEmpty(ctrl.projectPosts()) ? m('.fontsize-small.table-inner', [
+                                ( ctrl.projectPosts() ? m('.fontsize-small.table-inner', [
                                     (_.map(ctrl.projectPosts(), (post) => {
                                         return m('.table-row.w-row', [
                                             m('.table-col.w-col.w-col-5', [
-                                                m(`a.alt-link.fontsize-base[href=\'/projects/${project.project_id}/posts/${post.id}#posts#\'][target=\'_blank\']`,
+                                                m(`a.alt-link.fontsize-base[href=\'/projects/${project.project_id}/posts/${post.id}#posts\'][target=\'_blank\']`,
                                                     post.title
                                                 ),
                                                 m('.fontcolor-secondary.fontsize-smallest', [

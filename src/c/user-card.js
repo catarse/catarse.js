@@ -4,6 +4,7 @@ import h from '../h';
 import userVM from '../vms/user-vm';
 import ownerMessageContent from './owner-message-content';
 import modalBox from './modal-box';
+import UserFollowBtn from './user-follow-btn';
 
 const userCard = {
     controller(args) {
@@ -59,7 +60,8 @@ const userCard = {
                 displayModal: ctrl.displayModal,
                 content: contactModalC
             }) : ''),
-            (!_.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', {onclick: ctrl.displayModal.toggle}, 'Send message') : '')
+            m(UserFollowBtn, { follow_id: user.id, following: user.follwing_this_user, enabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10', disabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10' }),
+            (!_.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', {onclick: ctrl.displayModal.toggle}, 'Send Message') : '')
         ]));
     }
 };

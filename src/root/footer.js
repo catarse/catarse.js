@@ -18,7 +18,7 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.contact', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/how-it-works\']',
+                                                m('a.link-footer[href=\'/how-it-works?ref=ctrse_footer\']',
                                                     [
                                                         I18n.t('links.how_it_works', I18nScope()),
                                                         m.trust('&nbsp;')
@@ -27,7 +27,7 @@ const footer = {
                                                 // m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
                                                 //     ' JVN flex'
                                                 // ),
-                                                m('a.link-footer[href=\'/team\']',
+                                                m('a.link-footer[href=\'/team?ref=ctrse_footer\']',
                                                     [
                                                         I18n.t('links.team', I18nScope()),
                                                         m.trust(' &lt;'),

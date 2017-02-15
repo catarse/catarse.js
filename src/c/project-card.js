@@ -58,7 +58,7 @@ const projectCard = {
         const cardMeter = () => {
             const failed = () => ((project.state === 'failed') || (project.state === 'waiting_funds')) ? 'card-secondary' : '';
 
-            return `.card-project-meter.${project.mode}.${project.state}.${progress}.${failed()}`;
+            return `.card-project-meter.${project.mode}.${project.state}.${progress > 100 ? 'complete' : 'incomplete'}.${failed()}`;
 
         };
 
@@ -91,7 +91,7 @@ const projectCard = {
                             },
                             project.project_name)
                         ]),
-                        m(ctrl.css().author, `${I18n.t('by', I18nScope())} ${project.owner_name}`),
+                        m(ctrl.css().author, `${I18n.t('by', I18nScope())} ${project.owner_public_name}`),
                         m(ctrl.css().headline, [
                             m(`a.link-hidden[href="/${project.permalink}?ref=${args.ref}"]`,{
                                 onclick: projectVM.routeToProject(project, args.ref)

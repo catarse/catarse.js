@@ -322,6 +322,10 @@ const
         return user == null || user.user_id == null ? null : user.user_id;
     },
 
+    userSignedIn = (): ?boolean => {
+        return !_.isNull(getUserID());
+    },
+
     getBlogPosts = (): ?Object => {
         if (_dataCache.blogPosts)
             return _dataCache.blogPosts;
@@ -546,6 +550,7 @@ const
                 scrolled = scrolled + dFrame;
             }, 1);
     },
+    scrollTop = () => window.scrollTo(0, 0),
     scrollTo = (): mConfig => {
         const setTrigger = (el: HTMLElement, anchorId: string): void => {
             el.onclick = (): boolean => {
@@ -958,6 +963,7 @@ export default {
     selfOrEmpty,
     animateScrollTo,
     scrollTo,
+    scrollTop,
     projectStateTextClass,
     validationErrors,
     validate,
@@ -980,5 +986,6 @@ export default {
     setPageTitle,
     rootUrl,
     redactor,
-    setCsrfToken
+    setCsrfToken,
+    userSignedIn
 };

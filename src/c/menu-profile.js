@@ -16,7 +16,7 @@ const menuProfile = {
             user_id = args.user.user_id;
 
         const userName = () => {
-            const name = userDetails().name;
+            const name = userDetails().public_name || userDetails().name;
             if (name && !_.isEmpty(name)) {
                 return _.first(name.split(' '));
             }

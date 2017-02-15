@@ -14,6 +14,12 @@ const projectPosts = {
                 project_id: 'eq',
                 id: 'eq'
             });
+        const scrollTo = (el, isInit) => {
+            if (!isInit && _.isNumber(args.post_id)) {
+                console.log('Will scroll to posts');
+                h.animateScrollTo(el);
+            }
+        };
 
         filterVM.project_id(args.project().project_id);
 
@@ -27,14 +33,15 @@ const projectPosts = {
 
         return {
             listVM: listVM,
-            filterVM: filterVM
+            filterVM: filterVM,
+            scrollTo: scrollTo
         };
     },
     view(ctrl, args) {
         const list = ctrl.listVM,
             project = args.project() || {};
 
-        return m('.project-posts.w-section', [
+        return m('#posts.project-posts.w-section',{config: ctrl.scrollTo},[
             m('.w-container.u-margintop-20', [
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
@@ -42,11 +49,9 @@ const projectPosts = {
                         m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in the Catarse is sent directly to the email of who has already supported his project and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')
                     ]) : '') : '',
                     m('.w-row.u-marginbottom-20', [
-                        m('.w-col.w-col-4'),
-                        m('.w-col.w-col-4', [
-                            m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/edit#posts']`, 'Writing novelty')
-                        ]),
-                        m('.w-col.w-col-4'),
+                        m('.w-col.w-col-4.w-col-push-4', [
+                            m(`a.btn.btn-edit.btn-small[href='/pt/projects/${project.project_id}/edit#posts']`, 'Writing novelty')
+                        ])
                     ])
                 ] : ''), (_.map(list.collection(), (post) => {
                     return m('.w-row', [

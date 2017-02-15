@@ -53,21 +53,25 @@ const UserFollowBtn = {
         };
     },
     view(ctrl, args) {
-        let disableClass = args.disabledClass || '.w-button.btn.btn-medium.btn-terciary.u-margintop-20',
-            enabledClass = args.enabledClass || '.w-button.btn.btn-medium.u-margintop-20';
-        if (ctrl.loading()) { return h.loader(); }
-        if (ctrl.following()) {
-            return m(`a${enabledClass}`,
-                     {
-                         onclick: ctrl.unfollow,
-                         onmouseover: () => ctrl.hover(true),
-                         onmouseout: () => ctrl.hover(false)
-                     },
-                     (ctrl.hover() ? 'Unfollow' : 'Following'));
+        if (h.userSignedIn() && h.getUserID() != args.follow_id) {
+            let disableClass = args.disabledClass || '.w-button.btn.btn-medium.btn-terciary.u-margintop-20',
+                enabledClass = args.enabledClass || '.w-button.btn.btn-medium.u-margintop-20';
+            if (ctrl.loading()) { return h.loader(); }
+            if (ctrl.following()) {
+                return m(`a${enabledClass}`,
+                         {
+                             onclick: ctrl.unfollow,
+                             onmouseover: () => ctrl.hover(true),
+                             onmouseout: () => ctrl.hover(false)
+                         },
+                         (ctrl.hover() ? 'Unfollow' : 'Following'));
+            } else {
+                return m(`a${disableClass}`,
+                         {onclick: ctrl.follow},
+                         'Follow');
+            }
         } else {
-            return m(`a${disableClass}`,
-                     {onclick: ctrl.follow},
-                     'follow');
+            return m('');
         }
     }
 };
