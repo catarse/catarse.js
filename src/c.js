@@ -1,3 +1,13 @@
+// @flow
+/**
+ * @module
+ *  c.js
+ * @description
+ *  This is the entry point to all components in our lib.
+ *  It exposes to the browser a global variable named `c` which carries with it our root components.
+ *  Only those root components can be used to mount entry points on the application using catarse.js
+**/
+
 import adminUsers from './root/admin-users';
 import adminContributions from './root/admin-contributions';
 import flex from './root/flex';
@@ -26,7 +36,7 @@ import CheckEmail from './root/check-email';
 import projectEditUserAbout from './root/project-edit-user-about';
 
 
-const c = {
+const c: Object = {
     root: {
         AdminUsers: adminUsers,
         AdminContributions: adminContributions,

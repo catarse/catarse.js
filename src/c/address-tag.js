@@ -1,3 +1,14 @@
+/**
+ * Receives a project prop and displays a little tag with ti's city and state address.
+ * @param project
+ * @module addressTag
+ *
+ * Example:
+ * import addressTag from './address-tag.js'
+ * ...
+ * m(addressTag, {project: project})
+ * ...
+**/
 import m from 'mithril';
 import h from '../h';
 
