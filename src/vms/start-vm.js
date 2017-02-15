@@ -2,20 +2,20 @@ import _ from 'underscore';
 
 const startVM = (I18n) => {
     const i18nStart = I18n.translations[I18n.currentLocale()].pages.start,
-        testimonials = i18nStart.testimonials,
+        // testimonials = i18nStart.testimonials,
         categoryProjects = i18nStart.categoryProjects,
         panes = i18nStart.panes,
         qa = i18nStart.qa;
 
     return {
-        testimonials: _.map(testimonials, (testimonial) => {
-            return {
-                thumbUrl: testimonial.thumb,
-                content: testimonial.content,
-                name: testimonial.name,
-                totals: testimonial.totals
-            };
-        }),
+        // testimonials: _.map(testimonials, (testimonial) => {
+        //     return {
+        //         thumbUrl: testimonial.thumb,
+        //         content: testimonial.content,
+        //         name: testimonial.name,
+        //         totals: testimonial.totals
+        //     };
+        // }),
         panes: _.map(panes, (pane) => {
             return {
                 label: pane.label,
