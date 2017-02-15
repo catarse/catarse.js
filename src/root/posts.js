@@ -293,7 +293,7 @@ const posts = {
                                         ]);
                                     })),
                                     m('form.w-hidden', {
-                                        action: `/pt/projects/${project.project_id}/posts/${ctrl.toDeletePost()}`,
+                                        action: `/en/projects/${project.project_id}/posts/${ctrl.toDeletePost()}`,
                                         method: 'POST',
                                         config: ctrl.setPostDeletionForm
                                     }, [

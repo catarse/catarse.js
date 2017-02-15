@@ -24,9 +24,7 @@ const setProject = (project_user_id) => (data) => {
 
 const init = (project_id, project_user_id) => {
     vm.project_id(project_id);
-
     const lProject = postgrest.loaderWithToken(models.projectDetail.getRowOptions(vm.parameters()));
-
     fetchParallelData(project_id, project_user_id);
 
     /*try {
@@ -49,7 +47,6 @@ const init = (project_id, project_user_id) => {
     } catch(e) {
         console.error(e);
     }*/
-
     return lProject.load().then(setProject(project_user_id));
 };
 
@@ -69,10 +66,8 @@ const fetchParallelData = (project_id, project_user_id) => {
 const getCurrentProject = () => {
     const root = document.getElementById('application'),
           data = root && root.getAttribute('data-parameters');
-
     if (data) {
         const {project_id, project_user_id} = currentProject(JSON.parse(data));
-
         m.redraw(true);
 
         init(project_id, project_user_id);
@@ -111,5 +106,4 @@ const projectVM = {
     setProjectPageTitle: setProjectPageTitle,
     init: init
 };
-
 export default projectVM;

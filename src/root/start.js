@@ -5,7 +5,7 @@ import models from '../models';
 import h from '../h';
 import I18n from 'i18n-js';
 import startVM from '../vms/start-vm';
-import youtubeLightbox from '../c/youtube-lightbox';
+// import youtubeLightbox from '../c/youtube-lightbox';
 // import slider from '../c/slider';
 import landingQA from '../c/landing-qa';
 import inlineError from '../c/inline-error';
@@ -101,7 +101,6 @@ const start = {
 
         statsLoader.load().then(stats);
         loadCategories();
-
         return {
             stats: stats,
             categories: categories,
@@ -413,7 +412,7 @@ const start = {
             ]),
             m('#start-form.w-section.section-large.u-text-center.bg-purple.before-footer', [
                 m('.w-container', [
-                    m('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Create your sketch for free!'),
+                    m('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Create your campaign for FREE!'),
                     m('form[action="/projects/fallback_create"][method="GET"].w-row.w-form', {
                         onsubmit: (e) => {
                             h.analytics.oneTimeEvent({cat: 'project_create',act: 'create_form_submit'})(e);

@@ -793,7 +793,7 @@ const
             permalink = project.permalink;
         }
 
-        return `https://www.catarse.me/${permalink}`;
+        return `https://www.myjvn.com/${permalink}`;
     },
     isHome = (): boolean => {
         const path = window.location.pathname;
