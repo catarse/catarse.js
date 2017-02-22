@@ -81,7 +81,7 @@ const projectDashboardMenu = {
                                 I18n.t('posts_tab', I18nScope()),
                                 project.posts_count > 0
                                 ? m('span.badge', project.posts_count)
-                                : m('span.badge.badge-attention', 'Nenhuma')
+                                : m('span.badge.badge-attention', 'None')
                             ])
                         ] : '')
                     ]),
@@ -98,7 +98,7 @@ const projectDashboardMenu = {
                                 ] : ''),
                                 m('a#description_link[class="' + editLinkClass + '"][href="' + editRoute + '#description' + '"]', I18n.t(`${project.mode}.description_tab`, linksScope())),
                                 m('a#video_link[class="' + editLinkClass + '"][href="' + editRoute + '#video' + '"]', [
-                                    'Video', m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')
+                                    'Video', m('span.fontsize-smallest.fontcolor-secondary', ' (optional)')
                                 ]),
                                 m('a#budget_link[class="' + editLinkClass + '"][href="' + editRoute + '#budget' + '"]', I18n.t(`${project.mode}.budget_tab`, linksScope())),
                                 m('a#card_link[class="' + editLinkClass + '"][href="' + editRoute + '#card' + '"]', I18n.t(`${project.mode}.card_tab`, linksScope())),

@@ -303,12 +303,6 @@ const start = {
                             [
                                 m('.fontsize-large.fontweight-semibold',
                                     I18n.t('mode.tax_info', I18nScope())
-                                ),
-                                m('.fontsize-smallest.fontcolor-secondary',
-                                    [
-                                        I18n.t('mode.failed_info', I18nScope()),
-                                        m.trust(I18n.t('mode.more_link', I18nScope()))
-                                    ]
                                 )
                             ]
                         )

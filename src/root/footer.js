@@ -18,7 +18,7 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.contact', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/how-it-works?ref=ctrse_footer\']',
+                                                m('a.link-footer[href=\'#?ref=ctrse_footer\']',
                                                     [
                                                         I18n.t('links.how_it_works', I18nScope()),
                                                         m.trust('&nbsp;')
@@ -59,7 +59,7 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.about', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'http://suporte.catarse.me/hc/pt-br/requests/new\'][target="_BLANK"]',
+                                                m('a.link-footer[href=\'#\'][target="_BLANK"]',
                                                     I18n.t('links.contact', I18nScope())
                                                 ),
                                                 // m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
@@ -71,7 +71,7 @@ const footer = {
                                                 // m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
                                                 //     I18n.t('links.press', I18nScope())
                                                 // ),
-                                                m('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']',
+                                                m('a.link-footer[href=\'#/\']',
                                                     I18n.t('links.help_support', I18nScope())
                                                 ),
                                                 m('a.link-footer[href=\'/en/terms-of-use\']',
@@ -96,7 +96,7 @@ const footer = {
                                                 m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']',
                                                     ' Blog'
                                                 ),
-                                                m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'https://equipecatarse.zendesk.com/account/dropboxes/20298537\']',
+                                                m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'#\']',
                                                     I18n.t('links.contact', I18nScope())
                                                 ),
                                                 m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=score&ref=ctrse_footer\']',
