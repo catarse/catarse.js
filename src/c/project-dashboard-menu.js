@@ -81,7 +81,7 @@ const projectDashboardMenu = {
                                 I18n.t('posts_tab', I18nScope()),
                                 project.posts_count > 0
                                 ? m('span.badge', project.posts_count)
-                                : m('span.badge.badge-attention', 'Nenhuma')
+                                : m('span.badge.badge-attention', 'None')
                             ])
                         ] : '')
                     ]),
@@ -98,7 +98,7 @@ const projectDashboardMenu = {
                                 ] : ''),
                                 m('a#description_link[class="' + editLinkClass + '"][href="' + editRoute + '#description' + '"]', I18n.t(`${project.mode}.description_tab`, linksScope())),
                                 m('a#video_link[class="' + editLinkClass + '"][href="' + editRoute + '#video' + '"]', [
-                                    'Video', m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')
+                                    'Video', m('span.fontsize-smallest.fontcolor-secondary', ' (optional)')
                                 ]),
                                 m('a#budget_link[class="' + editLinkClass + '"][href="' + editRoute + '#budget' + '"]', I18n.t(`${project.mode}.budget_tab`, linksScope())),
                                 m('a#card_link[class="' + editLinkClass + '"][href="' + editRoute + '#card' + '"]', I18n.t(`${project.mode}.card_tab`, linksScope())),
@@ -106,9 +106,7 @@ const projectDashboardMenu = {
                                     'Rewards', optionalOpt
                                 ]),
                                 m('a#dashboard_user_about_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_about' + '"]', I18n.t(`${project.mode}.about_you_tab`, linksScope())),
-                                ((project.is_published || project.state === 'draft') || project.is_admin_role ? [
-                                    m('a#dashboard_user_settings_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_settings' + '"]', I18n.t(`${project.mode}.account_tab`, linksScope())),
-                                ] : ''), (!project.is_published ? [
+                               (!project.is_published ? [
                                     m('a#dashboard_preview_link[class="' + editLinkClass + '"][href="' + editRoute + '#preview' + '"]', [
                                         m('span.fa.fa-fw.fa-eye.fa-lg'), I18n.t(`${project.mode}.preview_tab`, linksScope())
                                     ]),

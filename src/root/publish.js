@@ -68,7 +68,7 @@ const publish = {
                         ' ',
                       m('span.fontweight-semibold', 'FLEX Rules')
                     ]),
-                    m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign term (discounting the JVN fee) and must comply with the execution of the project and with the delivery of the rewards offered regardless of how much to collect.')
+                    m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign term (discounting the JVN fee) and must comply with the execution of the campaign and with the delivery of the rewards offered regardless of how much to collect.')
                   ]),
                   m('.w-col.w-col-11', [
                     m('div', [
@@ -76,7 +76,7 @@ const publish = {
                         ' ',
                       m('span.fontweight-semibold', 'Goal of collection')
                     ]),
-                    m('div', 'The goal can not be changed after the project has been published.')
+                    m('div', 'The goal can not be changed after the campaign has been published.')
                   ]),
                   m('.w-col.w-col-11', [
                     m('div', [
@@ -85,8 +85,8 @@ const publish = {
                       m('span.fontweight-semibold', 'Rates')
                     ]),
                     m('div', [
-                      'At the end of the campaign, we will charge 13%',
-                      m('span.fontweight-semibold', 'Total amount collected. ')
+                      'At the end of the campaign, we will charge 5% + online payment portal charge of',
+                      m('span.fontweight-semibold', 'total amount collected. ')
                     ])
                   ]),
                   m('.w-col.w-col-11', [
@@ -103,16 +103,16 @@ const publish = {
                         ' ',
                       m('span.fontweight-semibold', 'Deadline for transfer')
                     ]),
-                      m('div', 'When the deadline for your project comes to an end, you should verify your bank details. After this confirmation, Catarse will deposit into your checking account within 10 business days. The amount deposited will already be considering the 13% discount of the fee.')
+                      m('div', 'When the deadline for your campaign comes to an end, you should verify your bank details. After this confirmation, JVN will deposit into your checking account within 10 business days. The amount deposited will already be considering the 5% + online payment portal charge discount of the fee.')
                   ]),
                   m('.w-col.w-col-11', [
                     m('div', [
                         m('span.fontsize-smallest.fontcolor-secondary', '6/9'),
                         ' ',
-                      m('span.fontweight-semibold', 'What can and can not change on the project page from publication?')
+                      m('span.fontweight-semibold', 'What can and can not change on the campaign page from publication?')
                     ]),
-                  [m('div', [m('span.fontweight-semibold', 'You may not:'),' Change the type of funding, project name, project URL, category chosen, collection goal, deadline (if you have already defined it), rewards where existing support is available, and registered bank account.\
-                    '                          ,m('br'),m('br'),m('span.fontweight-semibold', 'You will be able to: '),'Edit the content of the project description, change the main campaign video, project image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]
+                  [m('div', [m('span.fontweight-semibold', 'You may not:'),' Change the type of funding, campaign name, campaign URL, category chosen, collection goal, deadline (if you have already defined it), rewards where existing support is available, and registered bank account.\
+                    '                          ,m('br'),m('br'),m('span.fontweight-semibold', 'You will be able to: '),'Edit the content of the campaign description, change the main campaign video, campaign image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]
                   ]),
                   m('.w-col.w-col-11', [
                     m('div', [
@@ -120,7 +120,7 @@ const publish = {
                         ' ',
                       m('span.fontweight-semibold', 'Responsibility of JVN')
                     ]),
-                  [m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold', 'Catarse is responsible for:'),' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ',m('br'),m('br'),m('span.fontweight-semibold', 'Catarse is not responsible for:'),' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]
+                  [m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold', 'JVN is responsible for:'),' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the campaign in the platform and by guaranteeing the security of the financial transactions.\ ',m('br'),m('br'),m('span.fontweight-semibold', 'JVN is not responsible for:'),' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]
                   ]),
                   m('.w-col.w-col-11', [
                     m('div', [
@@ -128,15 +128,15 @@ const publish = {
                         ' ',
                       m('span.fontweight-semibold', 'Your responsibilities')
                     ]),
-                    m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold'),'It is your responsibility for all aspects of project formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the project, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])
+                    m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold'),'It is your responsibility for all aspects of campaign formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the campaign, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])
                   ]),
                   m('.w-col.w-col-11', [
                     m('div', [
                       m('span.fontsize-smallest.fontcolor-secondary', '9/9'),
                       ' ',
-                      m('span', {style: {'font-weight': ' 600'}}, 'Withdrawals from projects in the air')
+                      m('span', {style: {'font-weight': ' 600'}}, 'Withdrawals from campaign in the air')
                     ]),
-                    m('div', [m('span.fontweight-semibold'),'JVN reserves the right, in its sole discretion and once notified, to cancel projects and terminate the accounts of PROJECT CREATORS that violate our ',m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Game rules'),' e ',m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'),'.'])
+                    m('div', [m('span.fontweight-semibold'),'JVN reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our ',m('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'),'.'])
                   ])
 
           ];
@@ -149,7 +149,7 @@ const publish = {
                         ' ',
                         m('span.fontweight-semibold', 'Rules of the All-or-nothing mode')
                       ]),
-                      m('div', ['You chose the all-or-nothing campaign. In this way, you will only receive the funds raised ',m('span.fontweight-semibold', 'If it reaches or exceeds the collection goal'),'. Otherwise, all of your supporters will be reimbursed. You will be responsible for delivering the rewards offered if your project reaches the collection goal.'])
+                      m('div', ['You chose the all-or-nothing campaign. In this way, you will only receive the funds raised ',m('span.fontweight-semibold', 'if it reaches or exceeds the collection goal'),'. Otherwise, all of your supporters will be reimbursed. You will be responsible for delivering the rewards offered if your project reaches the collection goal.'])
                     ]),
 
                     m('.w-col.w-col-11', [
@@ -158,7 +158,7 @@ const publish = {
                         ' ',
                         m('span', {style: {'font-weight': ' 600'}}, 'Goal of collection')
                       ]),
-                      m('div', 'The goal can not be changed after the project has been published.'),
+                      m('div', 'The goal can not be changed after the campaign has been published.'),
 
                     ]),
 
@@ -169,9 +169,9 @@ const publish = {
                         m('span', {style: {'font-weight': ' 600'}}, 'Rates')
                       ]),
                       m('div', [
-                        'We charge 13% ',
-                        m('span.fontweight-semibold', 'Total amount collected'),
-                        ' For your project if it reaches or exceeds the target within the campaign deadline. If the project does not reach the goal, no fee will be charged.',
+                        'We will charge 5% + online payment portal charge of ',
+                        m('span.fontweight-semibold', 'total amount collected'),
+                        ' for your campaign if it reaches or exceeds the target within the campaign deadline. If the campaign does not reach the goal, no fee will be charged.',
                         m('span.fontweight-semibold')
                       ])
                     ]),
@@ -182,7 +182,7 @@ const publish = {
                         ' ',
                         m('span', {style: {'font-weight': ' 600'}}, 'Campaign deadline')
                       ]),
-                      m('div', `Your project will be in collection at the Catarse until the ${h.momentify(ctrl.expiresAt())}At 11:50 p.m. This deadline can not be changed after the project has been published.`)
+                      m('div', `Your campaign will be in collection at JVN until ${h.momentify(ctrl.expiresAt())} 11:50 p.m. This deadline can not be changed after the campaign has been published.`)
                     ]),
 
                     m('.w-col.w-col-11', [
@@ -191,16 +191,16 @@ const publish = {
                         ' ',
                         m('span', {style: {'font-weight': ' 600'}}, 'Transfer and refund rules')
                       ]),
-                        m('div', ['When the deadline for your project comes to an end, you should verify your bank details. After this confirmation, JVN will deposit the amount collected, with the discount of the rate, into your checking account within 10 business days. If the project does not reach 100% of the target by the deadline, the JVN will reimburse the supporters. ',m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202365507\'][target=\'_blank\']', 'Learn more about the refund process'),'.'])
+                        m('div', ['When the deadline for your campaign comes to an end, you should verify your bank details. After this confirmation, JVN will deposit the amount collected, with the discount of the rate, into your checking account within 10 business days. If the campaign does not reach 100% of the target by the deadline, JVN will reimburse the supporters. '])
                     ]),
 
                     m('.w-col.w-col-11', [
                       m('div', [
                         m('span.fontsize-smallest.fontcolor-secondary', '6/9'),
                         ' ',
-                        m('span', {style: {'font-weight': ' 600'}}, 'What can and can not change on the project page from publication?')
+                        m('span', {style: {'font-weight': ' 600'}}, 'What can and can not change on the campaign page after publication?')
                       ]),
-                    [m('div', [m('span.fontweight-semibold', 'You can not:'),' Change the name of the project, the URL (link) of the project, the category chosen, the type of financing, the bank account, the collection goal, the term chosen and the rewards where existing support already exists.\ ',m('br'),m('br'),m('span.fontweight-semibold', 'You will be able to: '),'Edit the content of the project description, change the main campaign video, project image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]),
+                    [m('div', [m('span.fontweight-semibold', 'You can not:'),' Change the name of your campaign, the URL (link) of your campaign, the category chosen, the type of financing, the bank account, the collection goal, the term chosen and the rewards where existing support already exists.\ ',m('br'),m('br'),m('span.fontweight-semibold', 'You will be able to: '),'Edit the content of the campaign description, change the main campaign video, campaign image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]),
 
                     m('.w-col.w-col-11', [
                       m('div', [
@@ -208,7 +208,7 @@ const publish = {
                         ' ',
                         m('span', {style: {'font-weight': ' 600'}}, 'Responsibility of JVN')
                       ]),
-                    [m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold', 'JVN is responsible:'),' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ',m('br'),m('br'),m('span.fontweight-semibold', 'JVN is not responsible for:'),' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]]),
+                    [m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold', 'JVN is responsible:'),' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ',m('br'),m('br'),m('span.fontweight-semibold', 'JVN is not responsible for:'),' Financing, dissemination and execution, nor for the delivery of rewards of the campaigns registered.'])]]),
 
                     m('.w-col.w-col-11', [
                       m('div', [
@@ -216,7 +216,7 @@ const publish = {
                         ' ',
                         m('span', {style: {'font-weight': ' 600'}}, 'Your responsibilities')
                       ]),
-                      m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold'),'It is your responsibility for all aspects of project formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the project, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])
+                      m('div', [m('span.fontweight-semibold'),m('span.fontweight-semibold'),'It is your responsibility for all aspects of campaign formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the campaign, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])
                     ]),
 
                     m('.w-col.w-col-11', [
@@ -225,7 +225,7 @@ const publish = {
                         ' ',
                         m('span', {style: {'font-weight': ' 600'}}, 'Withdrawals from projects in the air')
                       ]),
-                      m('div', [m('span.fontweight-semibold'),'JVN reserves the right, in its sole discretion and once notified, to cancel projects and terminate the accounts of PROJECT CREATORS that violate our',m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Game rules'),' e ',m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'),'.'])
+                      m('div', [m('span.fontweight-semibold'),'JVN reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our',m('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'),'.'])
                     ])
 
               ];
@@ -266,9 +266,9 @@ const publish = {
                     m('div', [m('span.fontweight-semibold', 'Link: '),`www.catarse.me/${project.permalink}`]),
                     m('div', [m('span.fontweight-semibold', 'Method of financing: '), I18n.t(project.mode, I18nScope())]),
                     m('div', [m('span.fontweight-semibold', 'Goal of collection: '),`Rs ${h.formatNumber(project.goal, 2, 3)}`]),
-                    (project.online_days !== null) ? m('div', [m('span.fontweight-semibold', `Deadline: ${project.online_days} ${(project.online_days > 1) ? 'days' : 'days' }`)]) : '',
-                    m('div', [m('span.fontweight-semibold', 'Responsible: '), account.owner_name]),
-                    m('div', [m('span.fontweight-semibold', 'CPF/CNPJ: '), account.owner_document])
+                    (project.online_days !== null) ? m('div', [m('span.fontweight-semibold', `Deadline: ${project.online_days} ${(project.online_days > 1) ? 'days' : 'days' }`)]) : ''
+                    // m('div', [m('span.fontweight-semibold', 'Responsible: '), account.owner_name]),
+                    // m('div', [m('span.fontweight-semibold', 'CPF/CNPJ: '), account.owner_document])
                   ])
                 ])
               ]),
@@ -285,11 +285,11 @@ const publish = {
             ]),
             m('.card.medium.u-radius.u-marginbottom-60', [
               m('.u-text-center.u-marginbottom-60', [
-                m('.fontsize-large.fontweight-semibold', 'Relembre nossas regras'),
+                m('.fontsize-large.fontweight-semibold', 'Remember Our Rules'),
                 m('.w-row', [
                   m('.w-col.w-col-2'),
                   m('.w-col.w-col-8', [
-                    m('.fontsize-small', ['Before posting, click on the circles below and confirm that you are aware of how JVN works. Any doubt, ',m('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/requests/new"][target="_blank"]', 'contact'),'!'])
+                    m('.fontsize-small', ['Before posting, click on the circles below and confirm that you are aware of how JVN works.'])
                   ]),
                   m('.w-col.w-col-2')
                 ])
