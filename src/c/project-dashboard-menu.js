@@ -106,9 +106,7 @@ const projectDashboardMenu = {
                                     'Rewards', optionalOpt
                                 ]),
                                 m('a#dashboard_user_about_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_about' + '"]', I18n.t(`${project.mode}.about_you_tab`, linksScope())),
-                                ((project.is_published || project.state === 'draft') || project.is_admin_role ? [
-                                    m('a#dashboard_user_settings_link[class="' + editLinkClass + '"][href="' + editRoute + '#user_settings' + '"]', I18n.t(`${project.mode}.account_tab`, linksScope())),
-                                ] : ''), (!project.is_published ? [
+                               (!project.is_published ? [
                                     m('a#dashboard_preview_link[class="' + editLinkClass + '"][href="' + editRoute + '#preview' + '"]', [
                                         m('span.fa.fa-fw.fa-eye.fa-lg'), I18n.t(`${project.mode}.preview_tab`, linksScope())
                                     ]),
