@@ -145,7 +145,7 @@ const posts = {
             }) : [
 
                 (ctrl.showSuccess() ? m.component(popNotification, {
-                    message: 'Mensagem enviada com sucesso'
+                    message: 'Message sent successfully'
                 }) : ''),
                 (ctrl.showError() ? m.component(popNotification, {
                     message: ctrl.errors(),

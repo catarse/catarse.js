@@ -46,13 +46,8 @@ const projectPosts = {
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
                     (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [
-                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in the Catarse is sent directly to the email of who has already supported his project and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')
-                    ]) : '') : '',
-                    m('.w-row.u-marginbottom-20', [
-                        m('.w-col.w-col-4.w-col-push-4', [
-                            m(`a.btn.btn-edit.btn-small[href='/pt/projects/${project.project_id}/edit#posts']`, 'Writing novelty')
-                        ])
-                    ])
+                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of who has already supported his campaign and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')
+                    ]) : '') : ''
                 ] : ''), (_.map(list.collection(), (post) => {
                     return m('.w-row', [
                         m('.w-col.w-col-1'),

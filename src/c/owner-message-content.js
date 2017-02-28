@@ -81,14 +81,14 @@ const ownerMessageContent = {
                         }, [
                             m('.w-row', [
                                 m('.w-col.w-col-6.w-sub-col', [
-                                    m('label.fontsize-smaller', 'Seu nome'),
+                                    m('label.fontsize-smaller', 'Your Name'),
                                     m(`input.w-input.text-field[value='${ctrl.from_name()}'][type='text'][required='required']`, {
                                         onchange: m.withAttr('value', ctrl.from_name),
                                         class: h.validate().hasError(ctrl.from_name) ? 'error' : ''
                                     })
                                 ]),
                                 m('.w-col.w-col-6', [
-                                    m('label.fontsize-smaller', 'Seu email'),
+                                    m('label.fontsize-smaller', 'Your Email'),
                                     m(`input.w-input.text-field[value='${ctrl.from_email()}'][type='text'][required='required']`, {
                                         onchange: m.withAttr('value', ctrl.from_email),
                                         class: h.validate().hasError(ctrl.from_email) ? 'error' : ''

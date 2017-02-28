@@ -263,7 +263,7 @@ const publish = {
                 m('.w-col.w-col-6', [
                   m('.u-marginbottom-30.fontsize-base', [
                     m('div', [m('span.fontweight-semibold', 'Title: '), project.name]),
-                    m('div', [m('span.fontweight-semibold', 'Link: '),`www.catarse.me/${project.permalink}`]),
+                    m('div', [m('span.fontweight-semibold', 'Link: '),`www.myjvn.com/${project.permalink}`]),
                     m('div', [m('span.fontweight-semibold', 'Method of financing: '), I18n.t(project.mode, I18nScope())]),
                     m('div', [m('span.fontweight-semibold', 'Goal of collection: '),`Rs ${h.formatNumber(project.goal, 2, 3)}`]),
                     (project.online_days !== null) ? m('div', [m('span.fontweight-semibold', `Deadline: ${project.online_days} ${(project.online_days > 1) ? 'days' : 'days' }`)]) : ''

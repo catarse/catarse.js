@@ -34,7 +34,7 @@ const postsPreview = {
                     togglePreview();
                     m.redraw();
                 }).catch((err) => {
-                    args.errors('Erro ao enviar mensagem.'),
+                    args.errors('Error sending message.'),
                     args.showError(true);
                     m.redraw();
                 });
@@ -49,32 +49,32 @@ const postsPreview = {
             title = args.title(),
             recipientsText = args.reward_id > 1 ?
             m('.fontsize-small.u-marginbottom-30', [
-                'A novidade acima será enviada por email para os ',
+                'The news above will be sent by email to the ',
                 m('span.fontweight-semibold',
                     args.rewardText
                 ),
-                ' e ficará ',
+                ' And it will stay ',
                 m('span.fontweight-semibold',
-                'visível na plataforma somente para esses apoiadores.'
+                'Visible on the platform only for these supporters.'
                 )
             ]) :
             args.reward_id == '-1' ?
             m('.fontsize-small.u-marginbottom-30', [
-                'A novidade acima será  ',
+                'The news above will be  ',
                 m('span.fontweight-semibold',
-                    'enviada por email para todos'
+                    'sent by email to everyone'
                 ),
-                ' os apoiadores e ficará ',
+                ' and will be ',
                 m('span.fontweight-semibold',
-                    'visível publicamente '
+                    'publicly visible '
                 ),
-                'na plataforma.'
+                'on the platform.'
             ]) :
             m('.fontsize-small.u-marginbottom-30', [
-                m('span', ' A novidade acima será  '),
-                m('span.fontweight-semibold', 'enviada por email para todos os apoiadores'),
-                m('span', ' e ficará '),
-                m('span.fontweight-semibold' , 'visível somente para esses na plataforma.')
+                m('span', ' The news above will be  '),
+                m('span.fontweight-semibold', 'sent by email to all supporters'),
+                m('span', ' and it will stay '),
+                m('span.fontweight-semibold' , 'visible only to those on the platform.')
             ]);
 
         return m('div', [
@@ -85,7 +85,7 @@ const postsPreview = {
                         m('.w-col.w-col-3'),
                         m('.w-col.w-col-6',
                             m('.fontsize-larger.fontweight-semibold.lineheight-tight',
-                                'Revise sua novidade antes de enviar!'
+                                'Review your news before submitting!'
                             )
                         ),
                         m('.w-col.w-col-3')
@@ -126,14 +126,14 @@ const postsPreview = {
                             ),
                             ' ',
                             m.trust('&nbsp;'),
-                            'Enviar'
+                            'To send'
                         ])
                     ),
                     m('.w-col.w-col-2',
                         m('button.btn.btn-large.btn-terciary', {
                                 onclick: ctrl.togglePreview
                             },
-                            'Editar'
+                            'To edit'
                         )
                     ),
                     m('.w-col.w-col-3')

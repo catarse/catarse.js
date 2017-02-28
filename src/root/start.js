@@ -210,36 +210,36 @@ const start = {
                 ])
             ]),
             m('.w-section.divider'),
-            m('.w-section.section-large', [
-                m('.w-container.u-text-center.u-marginbottom-60', [
-                    m('div', [
-                        m('span.fontsize-largest.fontweight-semibold', I18n.t('features.title', I18nScope()))
-                    ]),
-                    m('.w-hidden-small.w-hidden-tiny.fontsize-large.u-marginbottom-20', I18n.t('features.subtitle', I18nScope())),
-                    m('.w-hidden-main.w-hidden-medium.u-margintop-30', [
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_1', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_2', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_3', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_4', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_5', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_6', I18nScope()))
-                    ])
-                ]),
-                m('.w-container', [
-                    m('.w-tabs.w-hidden-small.w-hidden-tiny', [
-                        m('.w-tab-menu.w-col.w-col-4', _.map(ctrl.paneImages, (pane, idx) => {
-                            return m(`btn.w-tab-link.w-inline-block.tab-list-item${(idx === ctrl.selectedPane()) ? '.selected' : ''}`, {
-                                onclick: h.analytics.event({cat: 'project_start',act: 'start_solution_click',lbl: pane.label},ctrl.selectPane(idx))
-                            }, pane.label);
-                        })),
-                        m('.w-tab-content.w-col.w-col-8', _.map(ctrl.paneImages, (pane, idx) => {
-                            return m('.w-tab-pane', [
-                                m(`img[src="${pane.src}"].pane-image${(idx === ctrl.selectedPane()) ? '.selected' : ''}`)
-                            ]);
-                        }))
-                    ])
-                ])
-            ]),
+            // m('.w-section.section-large', [
+            //     m('.w-container.u-text-center.u-marginbottom-60', [
+            //         m('div', [
+            //             m('span.fontsize-largest.fontweight-semibold', I18n.t('features.title', I18nScope()))
+            //         ]),
+            //         m('.w-hidden-small.w-hidden-tiny.fontsize-large.u-marginbottom-20', I18n.t('features.subtitle', I18nScope())),
+            //         m('.w-hidden-main.w-hidden-medium.u-margintop-30', [
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_1', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_2', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_3', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_4', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_5', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_6', I18nScope()))
+            //         ])
+            //     ]),
+            //     m('.w-container', [
+            //         m('.w-tabs.w-hidden-small.w-hidden-tiny', [
+            //             m('.w-tab-menu.w-col.w-col-4', _.map(ctrl.paneImages, (pane, idx) => {
+            //                 return m(`btn.w-tab-link.w-inline-block.tab-list-item${(idx === ctrl.selectedPane()) ? '.selected' : ''}`, {
+            //                     onclick: h.analytics.event({cat: 'project_start',act: 'start_solution_click',lbl: pane.label},ctrl.selectPane(idx))
+            //                 }, pane.label);
+            //             })),
+            //             m('.w-tab-content.w-col.w-col-8', _.map(ctrl.paneImages, (pane, idx) => {
+            //                 return m('.w-tab-pane', [
+            //                     m(`img[src="${pane.src}"].pane-image${(idx === ctrl.selectedPane()) ? '.selected' : ''}`)
+            //                 ]);
+            //             }))
+            //         ])
+            //     ])
+            // ]),
 
             m('.w-section.section-large.card-terciary',
                 m('.w-container',
@@ -270,7 +270,7 @@ const start = {
                                     m('.flex-column.card.u-radius.u-marginbottom-30',
                                         [
                                             m('.u-text-center.u-marginbottom-30',
-                                                m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/5632f334ec8a367d341b4bba_badge-aon.png\']')
+                                                m('img[src=\'/assets/aon-badge.png\']')
                                             ),
                                             m('.fontsize-large.flex-column.u-marginbottom-20',
                                                 [

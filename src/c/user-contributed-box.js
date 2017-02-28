@@ -96,7 +96,7 @@ const userContributedBox = {
                         ),
 
                         (contributionVM.canShowReceipt(contribution) ?
-                            m(`a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href='https://www.catarse.me/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/receipt'][target='__blank']`,
+                            m(`a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href='https://www.myjvn.com/en/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/receipt'][target='__blank']`,
                                 'View Receipt'
                             ) : ''),
 
@@ -106,7 +106,7 @@ const userContributedBox = {
                             ) : ''),
 
                         (contributionVM.canGenerateSlip(contribution) ?
-                            m(`a.btn.btn-inline.btn-small.u-margintop-10[href='https://www.catarse.me/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/second_slip'][target='__blank']`,
+                            m(`a.btn.btn-inline.btn-small.u-margintop-10[href='https://www.myjvn.com/en/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/second_slip'][target='__blank']`,
                                 'Generate 2nd via'
                             ) : ''),
 

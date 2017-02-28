@@ -14,7 +14,6 @@ const projectHighlight = {
     },
     view(ctrl, args) {
         const project = args.project;
-
         return m('#project-highlight', [
             (project().video_embed_url ? m('.w-embed.w-video.project-video', {
                 style: 'min-height: 240px;'
@@ -34,11 +33,11 @@ const projectHighlight = {
                         'To share:'
                     ),
                     project().permalink ? m.component(facebookButton, {
-                        url: `https://www.catarse.me/${project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`
+                        url: `http://www.myjvn.com/${project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`
                     }) : '',
                     project().permalink ? m.component(facebookButton, {
                         messenger: true,
-                        url: `https://www.catarse.me/${project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=messenger&utm_campaign=project_share`
+                        url: `http://www.myjvn.com/${project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=messenger&utm_campaign=project_share`
                     }) : '',
                     m('button#more-share.btn.btn-inline.btn-medium.btn-terciary', {
                         style: {

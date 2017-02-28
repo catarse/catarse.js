@@ -18,7 +18,7 @@ const projectComments = {
         return m('.w-row',
             [
               m('.w-col.w-col-7',
-                m('.fb-comments[data-href="http://www.catarse.me/' + project.permalink + '"][data-num-posts=50][data-width="610"]', {config: ctrl.loadComments()})
+                m('.fb-comments[data-href="http://www.myjvn.com/' + project.permalink + '"][data-num-posts=50][data-width="610"]', {config: ctrl.loadComments()})
               ),
               m('.w-col.w-col-5', m.component(projectReport))
             ]
