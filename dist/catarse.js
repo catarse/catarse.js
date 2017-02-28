@@ -3287,7 +3287,7 @@ var cancelProjectModalContent = {
             check = m$1.prop('');
 
         var showNextModal = function showNextModal() {
-            if (check() === 'cancelar-projeto') {
+            if (check() === 'cancel-campaign') {
                 args.displayModal.toggle();
                 document.getElementById('send-message').style.display = 'block';
             } else {
@@ -3303,7 +3303,7 @@ var cancelProjectModalContent = {
         };
     },
     view: function view(ctrl, args) {
-        return m$1('form.cancel-project-modal.modal-dialog-content', { onsubmit: ctrl.showNextModal }, [m$1('.fontsize-small.u-marginbottom-20', ['Após o cancelamento, sua campanha constará na plataforma como "não financiada" e os seus apoiadores serão imediatamente reembolsados. ', m$1('span.fontweight-semibold', 'Essa ação não poderá ser desfeita!'), m$1('br'), m$1('span.fontweight-semibold')]), m$1('.fontsize-small.u-marginbottom-10', ['Se você tem certeza que deseja cancelar seu projeto, confirme escrevendo ', m$1('span.fontweight-semibold.text-error', 'cancelar-projeto '), 'no campo abaixo. Em seguida te pediremos para escrever uma mensagem aos seus apoiadores e seu projeto será então cancelado.', m$1('span.fontweight-semibold.text-error')]), m$1('.w-form', [m$1('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: !ctrl.checkError() ? false : 'error', placeholder: 'cancelar-projeto', onchange: m$1.withAttr('value', ctrl.check) })]), m$1('div', m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.u-text-center.w-col.w-col-6', [m$1('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Próximo passo >\']'), m$1('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayModal.toggle }, 'Cancelar')]), m$1('.w-col.w-col-3')]))]);
+        return m$1('form.cancel-project-modal.modal-dialog-content', { onsubmit: ctrl.showNextModal }, [m$1('.fontsize-small.u-marginbottom-20', ['Upon cancellation, your campaign will appear on the platform as "non-funded" and your supporters will be immediately reimbursed. ', m$1('span.fontweight-semibold', 'This action can not be undone!'), m$1('br'), m$1('span.fontweight-semibold')]), m$1('.fontsize-small.u-marginbottom-10', ['If you are sure you want to cancel your campaign, please confirm by writing ', m$1('span.fontweight-semibold.text-error', 'cancel-campaign '), 'in the field below. Then we will ask you to write a message to your supporters and your campaign will then be canceled.', m$1('span.fontweight-semibold.text-error')]), m$1('.w-form', [m$1('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: !ctrl.checkError() ? false : 'error', placeholder: 'cancel-campaign', onchange: m$1.withAttr('value', ctrl.check) })]), m$1('div', m$1('.w-row', [m$1('.w-col.w-col-3'), m$1('.u-text-center.w-col.w-col-6', [m$1('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Next step >\']'), m$1('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayModal.toggle }, 'Cancel')]), m$1('.w-col.w-col-3')]))]);
     }
 };
 

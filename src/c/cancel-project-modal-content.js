@@ -14,7 +14,7 @@ const cancelProjectModalContent = {
             check = m.prop('');
 
         const showNextModal = () => {
-            if (check() === 'cancelar-projeto'){
+            if (check() === 'cancel-campaign'){
                 args.displayModal.toggle();
                 document.getElementById('send-message').style.display = 'block';
             } else {
@@ -35,9 +35,9 @@ const cancelProjectModalContent = {
                 [
                     m('.fontsize-small.u-marginbottom-20',
                         [
-                            'Após o cancelamento, sua campanha constará na plataforma como "não financiada" e os seus apoiadores serão imediatamente reembolsados. ',
+                            'Upon cancellation, your campaign will appear on the platform as "non-funded" and your supporters will be immediately reimbursed. ',
                             m('span.fontweight-semibold',
-                                'Essa ação não poderá ser desfeita!'
+                                'This action can not be undone!'
                             ),
                             m('br'),
                             m('span.fontweight-semibold')
@@ -45,17 +45,17 @@ const cancelProjectModalContent = {
                     ),
                     m('.fontsize-small.u-marginbottom-10',
                         [
-                            'Se você tem certeza que deseja cancelar seu projeto, confirme escrevendo ',
+                            'If you are sure you want to cancel your campaign, please confirm by writing ',
                             m('span.fontweight-semibold.text-error',
-                                'cancelar-projeto '
+                                'cancel-campaign '
                             ),
-                            'no campo abaixo. Em seguida te pediremos para escrever uma mensagem aos seus apoiadores e seu projeto será então cancelado.',
+                            'in the field below. Then we will ask you to write a message to your supporters and your campaign will then be canceled.',
                             m('span.fontweight-semibold.text-error')
                         ]
                     ),
                     m('.w-form',
                         [
-                            m('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', {class: !ctrl.checkError() ? false : 'error', placeholder: 'cancelar-projeto', onchange: m.withAttr('value', ctrl.check)})
+                            m('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', {class: !ctrl.checkError() ? false : 'error', placeholder: 'cancel-campaign', onchange: m.withAttr('value', ctrl.check)})
                         ]
                     ),
                     m('div',
@@ -64,9 +64,9 @@ const cancelProjectModalContent = {
                                 m('.w-col.w-col-3'),
                                 m('.u-text-center.w-col.w-col-6',
                                     [
-                                        m('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Próximo passo >\']'),
+                                        m('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Next step >\']'),
                                         m('a.fontsize-small.link-hidden-light[href=\'#\']', {onclick: args.displayModal.toggle},
-                                            'Cancelar'
+                                            'Cancel'
                                         )
                                     ]
                                 ),
