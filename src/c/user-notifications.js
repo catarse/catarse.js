@@ -1,12 +1,8 @@
 import m from 'mithril';
-import models from '../models';
-import postgrest from 'mithril-postgrest';
 import _ from 'underscore';
 import h from '../h';
 import userVM from '../vms/user-vm';
 import inlineError from './inline-error';
-import popNotification from './pop-notification';
-import projectCard from './project-card';
 
 const userNotifications = {
     controller(args) {
@@ -18,29 +14,29 @@ const userNotifications = {
 
         userVM.getUserProjectReminders(user_id).then(
             projectReminders
-        ).catch(err => {
+        ).catch((err) => {
             error(true);
             m.redraw();
         });
 
         userVM.getUserContributedProjects(user_id, null).then(
             contributedProjects
-        ).catch(err => {
+        ).catch((err) => {
             error(true);
             m.redraw();
         });
 
         return {
             projects: contributedProjects,
-            showNotifications: showNotifications,
-            projectReminders: projectReminders,
-            error: error
+            showNotifications,
+            projectReminders,
+            error
         };
     },
     view(ctrl, args) {
-        const user = args.user;
-        let projects_collection = ctrl.projects(),
+        const user = args.user,
             reminders = ctrl.projectReminders();
+        const projects_collection = ctrl.projects();
 
         return m('[id=\'notifications-tab\']', ctrl.error() ? m.component(inlineError, {
                 message: 'Error loading page.'
@@ -96,8 +92,7 @@ const userNotifications = {
                                             ),
                                             (ctrl.showNotifications() ?
                                                 m('ul.w-list-unstyled.u-radius.card.card-secondary[id=\'notifications-box\']', [
-                                                    (!_.isEmpty(projects_collection) ? _.map(projects_collection, (project) => {
-                                                        return m('li',
+                                                    (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m('li',
                                                             m('.w-checkbox.w-clearfix', [
                                                                 m(`input[id='unsubscribes_${project.project_id}'][type='hidden'][value='']`, {
                                                                     name: `unsubscribes[${project.project_id}]`
@@ -109,8 +104,7 @@ const userNotifications = {
                                                                     project.project_name
                                                                 )
                                                             ])
-                                                        );
-                                                    }) : '')
+                                                        )) : '')
                                                 ]) :
                                                 '')
                                         ])
@@ -125,7 +119,7 @@ const userNotifications = {
                                     m('.w-col.w-col-8',
                                         m('.w-checkbox.w-clearfix', [
                                             m('input[name=user[subscribed_to_friends_contributions]][type=\'hidden\'][value=\'0\']'),
-                                            m(`input.w-checkbox-input${user.subscribed_to_friends_contributions ? '[checked=\'checked\']' : '' }[id='user_subscribed_to_friends_contributions'][name=user[subscribed_to_friends_contributions]][type='checkbox'][value='1']`),
+                                            m(`input.w-checkbox-input${user.subscribed_to_friends_contributions ? '[checked=\'checked\']' : ''}[id='user_subscribed_to_friends_contributions'][name=user[subscribed_to_friends_contributions]][type='checkbox'][value='1']`),
                                             m('label.w-form-label.fontsize-small',
                                                 'A friend supported or launched a project'
                                             )
@@ -134,7 +128,7 @@ const userNotifications = {
                                     m('.w-col.w-col-8',
                                         m('.w-checkbox.w-clearfix', [
                                             m('input[name=user[subscribed_to_new_followers]][type=\'hidden\'][value=\'0\']'),
-                                            m(`input.w-checkbox-input${user.subscribed_to_new_followers ? '[checked=\'checked\']' : '' }[id='user_subscribed_to_new_followers'][name=user[subscribed_to_new_followers]][type='checkbox'][value='1']`),
+                                            m(`input.w-checkbox-input${user.subscribed_to_new_followers ? '[checked=\'checked\']' : ''}[id='user_subscribed_to_new_followers'][name=user[subscribed_to_new_followers]][type='checkbox'][value='1']`),
                                             m('label.w-form-label.fontsize-small',
                                                 'A friend started following me.'
                                             )
@@ -149,19 +143,17 @@ const userNotifications = {
                                     ),
                                     m('.w-col.w-col-8', [
 
-                                        (!_.isEmpty(reminders) ? _.map(reminders, (reminder) => {
-                                            return m('.w-checkbox.w-clearfix', [
-                                                m(`input[id='user_reminders_${reminder.project_id}'][type='hidden'][value='false']`, {
-                                                    name: `user[reminders][${reminder.project_id}]`
-                                                }),
-                                                m(`input.w-checkbox-input[checked='checked'][type='checkbox'][value='1'][id='user_reminders_${reminder.project_id}']`, {
-                                                    name: `user[reminders][${reminder.project_id}]`
-                                                }),
-                                                m('label.w-form-label.fontsize-small',
+                                        (!_.isEmpty(reminders) ? _.map(reminders, reminder => m('.w-checkbox.w-clearfix', [
+                                            m(`input[id='user_reminders_${reminder.project_id}'][type='hidden'][value='false']`, {
+                                                name: `user[reminders][${reminder.project_id}]`
+                                            }),
+                                            m(`input.w-checkbox-input[checked='checked'][type='checkbox'][value='1'][id='user_reminders_${reminder.project_id}']`, {
+                                                name: `user[reminders][${reminder.project_id}]`
+                                            }),
+                                            m('label.w-form-label.fontsize-small',
                                                     reminder.project_name
                                                 )
-                                            ]);
-                                        }) : '')
+                                        ])) : '')
                                     ])
                                 ])
                             ])

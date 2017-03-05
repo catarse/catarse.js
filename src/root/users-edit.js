@@ -57,9 +57,9 @@ const usersEdit = {
         h.redrawHashChange();
         userVM.fetchUser(userId, true, userDetails);
         return {
-            displayTabContent: displayTabContent,
-            hash: hash,
-            userDetails: userDetails,
+            displayTabContent,
+            hash,
+            userDetails,
         };
     },
 
@@ -75,11 +75,11 @@ const usersEdit = {
                 hideDetails: true
             }),
             (!_.isEmpty(user) ? [m('nav.dashboard-nav.u-text-center', {
-                            style: {
-                                'z-index': '10',
-                                'position': 'relative'
-                            }
-                        },
+                style: {
+                    'z-index': '10',
+                    position: 'relative'
+                }
+            },
                         m('.w-container', [
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#contributions' ? '.selected' : '')}[data-target='#dashboard_contributions'][href='#contributions'][id='dashboard_contributions_link']`, 'Backed'),
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#projects' ? '.selected' : '')}[data-target='#dashboard_projects'][href='#projects'][id='dashboard_projects_link']`,
@@ -94,32 +94,28 @@ const usersEdit = {
                             m(`a.dashboard-nav-link${(ctrl.hash() === '#notifications' ? '.selected' : '')}[data-target='#dashboard_notifications'][href='#notifications'][id='dashboard_notifications_link']`,
                                 'Notifications'
                             ),
-                            // m(`a.dashboard-nav-link${(ctrl.hash() === '#billing' ? '.selected' : '')}[data-target='#dashboard_billing'][href='#billing'][id='dashboard_billing_link']`,
-                            //     'Bank and cards'
-                            // ),
                             m(`a.dashboard-nav-link.u-right-big-only[href='/en/users/${user.id}']`, {
-                                    config: m.route,
-                                    onclick: () => {
-                                        m.route("/users/" + user.id, {
-                                            user_id: user.id
-                                        });
-                                    }
-                                },
+                                config: m.route,
+                                onclick: () => {
+                                    m.route(`/users/${user.id}`, {
+                                        user_id: user.id
+                                    });
+                                }
+                            },
                                 'Go to the public profile'
                             )
                         ])
                     ),
 
-                    m('section.section',
+                m('section.section',
                         m('.w-container',
                             m('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())
                         )
                     )
 
-                ] :
+            ] :
                 '')
         ]);
-
     }
 };
 

@@ -1,28 +1,33 @@
 import m from 'mithril';
 import _ from 'underscore';
+import I18n from 'i18n-js';
 import h from '../h';
 import contributionVM from '../vms/contribution-vm';
 import userVM from '../vms/user-vm';
 import loadMoreBtn from './load-more-btn';
+import rewardReceiver from './reward-receiver';
 
 const I18nScope = _.partial(h.i18nScope, 'payment.state');
 
 const userContributedBox = {
-    controller(args) {
-        const confirmDelivery = (projectId, contribution) => {
-                userVM.confirmDelivery(projectId, contribution).then(
-                    contribution.delivery_status = 'received' //so we don't have to reload the page
-                );
-            };
+    controller() {
+        const toggleDelivery = (projectId, contribution) => {
+            userVM.toggleDelivery(projectId, contribution).then(() => {
+                const lastStatus = contribution.reward_sent_at ? 'delivered' : 'undelivered';
+                contribution.delivery_status = contribution.delivery_status == 'received' ? lastStatus : 'received'; // so we don't have to reload the page
+            });
+        };
+
         return {
             toggleAnonymous: userVM.toggleAnonymous,
-            confirmDelivery: confirmDelivery
+            toggleDelivery
         };
     },
     view(ctrl, args) {
-        let collection = args.collection,
+        const collection = args.collection,
             pagination = args.pagination,
             title = args.title;
+
         return (!_.isEmpty(collection) ? m('.section-one-column.u-marginbottom-30', [
             m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center',
                 title
@@ -50,9 +55,8 @@ const userContributedBox = {
                 )
             ]),
 
-            _.map(collection, (contribution) => {
-                return m('.w-row.card', [
-                    m('.w-col.w-col-3',
+            _.map(collection, contribution => m('.w-row.card', [
+                m('.w-col.w-col-3',
                         m('.w-row', [
                             m('.w-col.w-col-4.u-marginbottom-10',
                                 m(`a[href='/${contribution.permalink}']`,
@@ -68,7 +72,7 @@ const userContributedBox = {
                             )
                         ])
                     ),
-                    m('.w-col.w-col-2.u-marginbottom-10',
+                m('.w-col.w-col-2.u-marginbottom-10',
                         m('.fontsize-base.inline-block', [
                             m('span.w-hidden-main.w-hidden-medium.fontweight-semibold',
                                 'Value of support'
@@ -76,23 +80,23 @@ const userContributedBox = {
                             ` Rs ${contribution.value}`
                         ])
                     ),
-                    m('.w-col.w-col-3.u-marginbottom-10', [
-                        m('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold',
+                m('.w-col.w-col-3.u-marginbottom-10', [
+                    m('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold',
                             'Status'
                         ),
 
-                        m('.fontsize-smaller.fontweight-semibold', [
-                            m('.lineheight-tighter'),
-                            m(`span.fa.fa-circle.fontsize-smallest.${contribution.state == 'paid' ? 'text-success' : contribution.state == 'pending' ? 'text-waiting' : 'text-error'}`,
+                    m('.fontsize-smaller.fontweight-semibold', [
+                        m('.lineheight-tighter'),
+                        m(`span.fa.fa-circle.fontsize-smallest.${contribution.state === 'paid' ? 'text-success' : contribution.state === 'pending' ? 'text-waiting' : 'text-error'}`,
                                 m.trust('&nbsp;')
                             ),
-                            I18n.t(contribution.state, I18nScope({
-                                date: h.momentify(contribution[contribution.state + '_at'])
-                            }))
-                        ]),
-                        m('.fontsize-smallest',
+                        I18n.t(contribution.state, I18nScope({
+                            date: h.momentify(contribution[`${contribution.state}_at`])
+                        }))
+                    ]),
+                    m('.fontsize-smallest',
                             (contribution.installments > 1 ? (`${contribution.installments} x R$ ${contribution.installment_value} `) : ''),
-                            (contribution.payment_method == 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito')
+                            (contribution.payment_method === 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito')
                         ),
 
                         (contributionVM.canShowReceipt(contribution) ?
@@ -101,7 +105,7 @@ const userContributedBox = {
                             ) : ''),
 
                         (contributionVM.canShowSlip(contribution) ?
-                            m(`a.btn.btn-inline.btn-small.u-margintop-10[href='${contribution.gateway_data['boleto_url']}'][target='__blank']`,
+                            m(`a.btn.btn-inline.btn-small.u-margintop-10[href='${contribution.gateway_data.boleto_url}'][target='__blank']`,
                                 'Print Ticket'
                             ) : ''),
 
@@ -109,17 +113,14 @@ const userContributedBox = {
                             m(`a.btn.btn-inline.btn-small.u-margintop-10[href='https://www.myjvn.com/en/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/second_slip'][target='__blank']`,
                                 'Generate 2nd via'
                             ) : ''),
-
-                        m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [
-                            m(`input.w-checkbox-input[id='anonymous'][name='anonymous'][type='checkbox']${contribution.anonymous ? '[checked=\'checked\']' : ''}[value='1']`, {
-                                onclick: () => ctrl.toggleAnonymous(contribution.project_id, contribution)
-                            }),
-                            m('label.w-form-label',
-                                'I want my support not to be public'
-                            )
-                        ])
-                    ]),
-                    m('.w-col.w-col-3',
+                    m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [
+                        m(`input.w-checkbox-input[id='anonymous'][name='anonymous'][type='checkbox']${contribution.anonymous ? '[checked=\'checked\']' : ''}[value='1']`, {
+                            onclick: () => ctrl.toggleAnonymous(contribution.project_id, contribution)
+                        }),
+                        m('label.w-form-label', 'I want my support not to be public')
+                    ])
+                ]),
+                m('.w-col.w-col-3',
                         m('.fontsize-smallest', [
                             m('span.w-hidden-main.w-hidden-medium.fontweight-semibold',
                                 'Reward'
@@ -127,29 +128,22 @@ const userContributedBox = {
                             (contribution.reward_id ? m.trust(h.simpleFormat(contribution.reward_description)) : ' You have not selected a reward')
 
                         ]),
-
-                        m('.fontsize-smallest.lineheight-looser', [
+                        contribution.deliver_at ? m('.fontsize-smallest.lineheight-looser', [
                             m('span.fontweight-semibold',
                                 'Estimated delivery: '
                             ),
                             h.momentify(contribution.deliver_at, 'MMMM/YYYY')
-                        ])
+                        ]) : '',
+                        contributionVM.canBeDelivered(contribution) ? m('.fontsize-smallest', [
+                            m('span.fontweight-semibold',
+                                'Status da entrega:'
+                            ),
+                            m.trust('&nbsp;'),
+                            h.contributionStatusBadge(contribution)
+                        ]) : ''
                     ),
-                    m('.u-text-center.w-col.w-col-1', {
-                        onclick: () => ctrl.confirmDelivery(contribution.project_id, contribution)
-                    }, [
-                        m('.fontsize-smallest',
-                            m(`a.checkbox-big${contribution.delivery_status == 'received' ? '.checkbox--selected.fa.fa-check.fa-lg' : ''}`,
-                                ''
-                            )
-                        ),
-                        m('.fontcolor-secondary.fontsize-smallest.lineheight-looser',
-                            'Recebi!'
-                        )
-                    ])
-
-                ]);
-            }),
+                m(rewardReceiver, { contribution })
+            ])),
             m('.w-row.u-marginbottom-40.u-margintop-30', [
                 m(loadMoreBtn, {
                     collection: pagination,

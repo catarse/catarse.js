@@ -1,11 +1,7 @@
 import m from 'mithril';
 import _ from 'underscore';
-import postgrest from 'mithril-postgrest';
 import userVM from '../vms/user-vm';
-import models from '../models';
 import h from '../h';
-import quickProjectList from '../c/quick-project-list';
-import I18n from 'i18n-js';
 
 const I18nScope = _.partial(h.i18nScope, 'layouts');
 const menuProfile = {
@@ -27,19 +23,19 @@ const menuProfile = {
         userVM.fetchUser(user_id, true, userDetails);
 
         return {
-            contributedProjects: contributedProjects,
-            latestProjects: latestProjects,
-            userDetails: userDetails,
-            userName: userName,
+            contributedProjects,
+            latestProjects,
+            userDetails,
+            userName,
             toggleMenu: h.toggleProp(false, true)
         };
     },
     view(ctrl, args) {
         const user = ctrl.userDetails();
 
-        return m(`.w-dropdown.user-profile`,
+        return m('.w-dropdown.user-profile',
             [
-                m(`a.w-dropdown-toggle.dropdown-toggle[href='javascript:void()'][id='user-menu']`,
+                m('a.w-dropdown-toggle.dropdown-toggle[href=\'javascript:void()\'][id=\'user-menu\']',
                     {
                         onclick: ctrl.toggleMenu.toggle
                     },
@@ -48,109 +44,109 @@ const menuProfile = {
                         m(`img.user-avatar[alt='Thumbnail - ${user.name}'][height='40'][src='${h.useAvatarOrDefault(user.profile_img_thumbnail)}'][width='40']`)
                     ]
                 ),
-                ctrl.toggleMenu() ? m(`nav.w-dropdown-list.dropdown-list.user-menu.w--open[id='user-menu-dropdown']`, {style: 'display:block;'},
+                ctrl.toggleMenu() ? m('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' },
                     [
-                        m(`.w-row`,
+                        m('.w-row',
                             [
-                                m(`.w-col.w-col-12`,
+                                m('.w-col.w-col-12',
                                     [
-                                        m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
-                                            I18n.t('user.my_history', I18nScope())
+                                        m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10',
+                                            'My History'
                                         ),
-                                        m(`ul.w-list-unstyled.u-marginbottom-20`,
+                                        m('ul.w-list-unstyled.u-marginbottom-20',
                                             [
-                                                m(`li.lineheight-looser`,
+                                                m('li.lineheight-looser',
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#contributions']`,
-                                                        I18n.t('user.support_history', I18nScope())
+                                                        'Support History'
                                                     )
                                                 ),
-                                                m(`li.lineheight-looser`,
+                                                m('li.lineheight-looser',
                                                   m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#projects']`,
-                                                      I18n.t('user.projects_created', I18nScope())
+                                                    'Projects Created'
                                                    )
                                                  ),
-                                                m(`li.w-hidden-main.w-hidden-medium.lineheight-looser`,
+                                                m('li.w-hidden-main.w-hidden-medium.lineheight-looser',
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#projects']`,
-                                                        I18n.t('user.projects_created', I18nScope())
+                                                        'Projects Created'
                                                     )
                                                 )
                                             ]
                                         ),
-                                        m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
-                                            I18n.t('user.settings', I18nScope())
+                                        m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10',
+                                            'Settings'
                                         ),
-                                        m(`ul.w-list-unstyled.u-marginbottom-20`,
+                                        m('ul.w-list-unstyled.u-marginbottom-20',
                                             [
-                                                // m(`li.lineheight-looser`,
-                                                //   m(`a.alt-link.fontsize-smaller[href='/connect-facebook/']`,
-                                                //     `Find Friends`
-                                                //    ),
-                                                //   m.trust('&nbsp;')
-                                                //  ),
-                                                m(`li.lineheight-looser`,
+                                                m('li.lineheight-looser',
+                                                  m('a.alt-link.fontsize-smaller[href=\'/connect-facebook/\']',
+                                                    'Find friends'
+                                                   )
+                                                  // m.trust('&nbsp;'),
+                                                  // m('span.badge.badge-success', 'Novidade')
+                                                 ),
+                                                m('li.lineheight-looser',
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#about_me']`,
-                                                        `Public Profile`
+                                                        'Public Profile'
                                                     )
                                                 ),
-
-                                                m(`li.lineheight-looser`,
+                                                m('li.lineheight-looser',
                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#notifications']`,
-                                                        I18n.t('user.notifications', I18nScope())
+                                                        'Notifications'
                                                     )
-                                                ),
-                                                // m(`li.lineheight-looser`,
+                                                )
+                                                // m('li.lineheight-looser',
                                                 //     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
-                                                //         I18n.t('user.data_address', I18nScope())
+                                                //         'Data and address'
                                                 //     )
                                                 // ),
-                                                // m(`li.lineheight-looser`,
+                                                // m('li.lineheight-looser',
                                                 //     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#billing']`,
-                                                //         I18n.t('user.bank_cards', I18nScope())
+                                                //         'Banco e cartões'
                                                 //     )
                                                 // )
                                             ]
                                         ),
-                                        // m('.divider.u-marginbottom-20'),
-                                        args.user.is_admin_role ? m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
-                                            `Admin`
+                                        m('.divider.u-marginbottom-20'),
+                                        args.user.is_admin_role ? m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10',
+                                            'Admin'
                                         ) : '',
-                                        args.user.is_admin_role ? m(`ul.w-list-unstyled.u-marginbottom-20`,
+                                        args.user.is_admin_role ? m('ul.w-list-unstyled.u-marginbottom-20',
                                             [
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/new-admin#/users']`,
-                                                        I18n.t('user.users', I18nScope())
+                                                m('li.lineheight-looser',
+                                                    m('a.alt-link.fontsize-smaller[href=\'/en/new-admin#/users\']',
+                                                        'Users'
                                                     )
                                                 ),
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/new-admin']`,
-                                                        I18n.t('user.support', I18nScope())
+                                                m('li.lineheight-looser',
+                                                    m('a.alt-link.fontsize-smaller[href=\'/en/new-admin\']',
+                                                        'Support'
                                                     )
                                                 ),
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/admin/financials']`,
-                                                        I18n.t('user.financial_rel', I18nScope())
+                                                m('li.lineheight-looser',
+                                                    m('a.alt-link.fontsize-smaller[href=\'/en/admin/financials\']',
+                                                        'Financial Relation'
                                                     )
                                                 ),
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/admin/projects']`,
-                                                        I18n.t('user.admin_projects', I18nScope())
+                                                m('li.lineheight-looser',
+                                                    m('a.alt-link.fontsize-smaller[href=\'/en/admin/projects\']',
+                                                        'Admin projects'
                                                     )
                                                 ),
-                                                m(`li.lineheight-looser`,
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/dbhero']`,
-                                                        `Dataclips`
+                                                m('li.lineheight-looser',
+                                                    m('a.alt-link.fontsize-smaller[href=\'/en/dbhero\']',
+                                                        'Dataclips'
                                                     )
                                                 )
                                             ]
                                         ) : '',
-                                        // m('.fontsize-mini', I18n.t('user.email_text', I18nScope())),
+                                        // m('.fontsize-mini', 'Seu e-mail de cadastro é: '),
                                         // m('.fontsize-smallest.u-marginbottom-20', [
-                                        //     m('span.fontweight-semibold',`${user.email} `),
-                                        //     m(`a.alt-link[href='/en/users/${user.id}/edit#settings']`, I18n.t('user.change_email', I18nScope()))
+                                        //     m('span.fontweight-semibold', `${user.email} `),
+                                        //     m(`a.alt-link[href='/pt/users/${user.id}/edit#about_me']`, 'alterar e-mail')
                                         // ]),
                                         // m('.divider.u-marginbottom-20'),
-                                        m(`a.alt-link[href='/en/logout']`,
-                                            I18n.t('user.logout', I18nScope())
+                                        m('a.alt-link[href=\'/en/logout\']',
+                                            'Logout'
                                         )
                                     ]
                                 ),

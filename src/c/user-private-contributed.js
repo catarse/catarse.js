@@ -10,16 +10,15 @@ import userContributedBox from './user-contributed-box';
 const userPrivateContributed = {
     controller(args) {
         const user_id = args.userId,
-            online = postgrest.paginationVM(models.project),
             onlinePages = postgrest.paginationVM(models.userContribution),
             successfulPages = postgrest.paginationVM(models.userContribution),
             failedPages = postgrest.paginationVM(models.userContribution),
             error = m.prop(false),
             loader = m.prop(true),
             handleError = () => {
-              error(true);
-              loader(false);
-              m.redraw();
+                error(true);
+                loader(false);
+                m.redraw();
             },
             contextVM = postgrest.filtersVM({
                 user_id: 'eq',
@@ -48,15 +47,15 @@ const userPrivateContributed = {
         }).catch(handleError);
 
         return {
-            onlinePages: onlinePages,
-            successfulPages: successfulPages,
-            failedPages: failedPages,
-            error: error,
-            loader: loader
+            onlinePages,
+            successfulPages,
+            failedPages,
+            error,
+            loader
         };
     },
     view(ctrl, args) {
-        let onlineCollection = ctrl.onlinePages.collection(),
+        const onlineCollection = ctrl.onlinePages.collection(),
             successfulCollection = ctrl.successfulPages.collection(),
             failedCollection = ctrl.failedPages.collection();
 

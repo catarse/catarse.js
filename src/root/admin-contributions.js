@@ -13,16 +13,39 @@ import filterDateRange from '../c/filter-date-range';
 
 const adminContributions = {
     controller() {
-        var listVM = contributionListVM,
+        let listVM = contributionListVM,
             filterVM = contributionFilterVM,
             error = m.prop(''),
-            filterBuilder = [{ //full_text_index
+            filterBuilder = [{ // full_text_index
                 component: filterMain,
                 data: {
                     vm: filterVM.full_text_index,
                     placeholder: 'Search by Design, Email, User and Support Ids...'
                 }
-            }, { //state
+            }, { // delivery_status
+                component: filterDropdown,
+                data: {
+                    label: 'Status da entrega',
+                    name: 'delivery_status',
+                    vm: filterVM.delivery_status,
+                    options: [{
+                        value: '',
+                        option: 'Qualquer um'
+                    }, {
+                        value: 'delivered',
+                        option: 'delivered'
+                    }, {
+                        value: 'undelivered',
+                        option: 'undelivered'
+                    }, {
+                        value: 'error',
+                        option: 'error'
+                    }, {
+                        value: 'received',
+                        option: 'received'
+                    }]
+                }
+            }, { // state
                 component: filterDropdown,
                 data: {
                     label: 'With the state',
@@ -54,7 +77,7 @@ const adminContributions = {
                         option: 'deleted'
                     }]
                 }
-            }, { //gateway
+            }, { // gateway
                 component: filterDropdown,
                 data: {
                     label: 'gateway',
@@ -77,14 +100,14 @@ const adminContributions = {
                         option: 'Credits'
                     }]
                 }
-            }, { //value
+            }, { // value
                 component: filterNumberRange,
                 data: {
                     label: 'Values between',
                     first: filterVM.value.gte,
                     last: filterVM.value.lte
                 }
-            }, { //created_at
+            }, { // created_at
                 component: filterDateRange,
                 data: {
                     label: 'Support period',
@@ -101,16 +124,16 @@ const adminContributions = {
             };
 
         return {
-            filterVM: filterVM,
-            filterBuilder: filterBuilder,
+            filterVM,
+            filterBuilder,
             listVM: {
                 list: listVM,
-                error: error
+                error
             },
             data: {
                 label: 'Support'
             },
-            submit: submit
+            submit
         };
     },
 

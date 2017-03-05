@@ -1,11 +1,12 @@
 import m from 'mithril';
 import _ from 'underscore';
+import $ from 'jquery';
 import h from '../h';
 
 const projectContributionReportContentCard = {
     controller(args) {
         const project = args.project(),
-            checked = (contribution) =>  _.contains(args.selectedContributions(), contribution.id),
+            checked = contribution => _.contains(args.selectedContributions(), contribution.id),
             selectContribution = (contribution) => {
                 const anyChecked = $('input:checkbox').is(':checked');
 
@@ -20,32 +21,32 @@ const projectContributionReportContentCard = {
             stateClass = (state) => {
                 const classes = {
                     online: {
-                        'paid': 'text-success.fa-circle',
-                        'refunded': 'text-error.fa-circle',
-                        'pending_refund': 'text-error.fa-circle',
-                        'pending': 'text-waiting.fa-circle',
-                        'refused': 'text-error.fa-circle'
+                        paid: 'text-success.fa-circle',
+                        refunded: 'text-error.fa-circle',
+                        pending_refund: 'text-error.fa-circle',
+                        pending: 'text-waiting.fa-circle',
+                        refused: 'text-error.fa-circle'
                     },
                     failed: {
-                        'paid': 'text-error.fa-circle-o',
-                        'refunded': 'text-refunded.fa-circle',
-                        'pending_refund': 'text-refunded.fa-circle-o',
-                        'pending': 'text-refunded',
-                        'refused': 'text-refunded'
+                        paid: 'text-error.fa-circle-o',
+                        refunded: 'text-refunded.fa-circle',
+                        pending_refund: 'text-refunded.fa-circle-o',
+                        pending: 'text-refunded',
+                        refused: 'text-refunded'
                     },
                     waiting_funds: {
-                        'paid': 'text-success.fa-circle',
-                        'refunded': 'text-error.fa-circle',
-                        'pending_refund': 'text-error.fa-circle',
-                        'pending': 'text-waiting.fa-circle',
-                        'refused': 'text-error.fa-circle'
+                        paid: 'text-success.fa-circle',
+                        refunded: 'text-error.fa-circle',
+                        pending_refund: 'text-error.fa-circle',
+                        pending: 'text-waiting.fa-circle',
+                        refused: 'text-error.fa-circle'
                     },
                     successful: {
-                        'paid': 'text-success.fa-circle',
-                        'refunded': 'text-error.fa-circle',
-                        'pending_refund': 'text-error.fa-circle',
-                        'pending': 'text-waiting.fa-circle',
-                        'refused': 'text-error.fa-circle'
+                        paid: 'text-success.fa-circle',
+                        refunded: 'text-error.fa-circle',
+                        pending_refund: 'text-error.fa-circle',
+                        pending: 'text-waiting.fa-circle',
+                        refused: 'text-error.fa-circle'
                     }
                 };
 
@@ -53,32 +54,38 @@ const projectContributionReportContentCard = {
             };
 
         return {
-            stateClass: stateClass,
-            checked: checked,
-            selectContribution: selectContribution
+            stateClass,
+            checked,
+            selectContribution
         };
     },
     view(ctrl, args) {
-        let contribution = args.contribution(),
-            profile_img = (_.isEmpty(contribution.profile_img_thumbnail) ? '/assets/catarse_bootstrap/user.jpg' : contribution.profile_img_thumbnail),
-            reward = contribution.reward || {minimum_value: 0, description: 'No reward selected'};
+        const contribution = args.contribution(),
+            project = args.project(),
+            profileImg = (_.isEmpty(contribution.profile_img_thumbnail) ? '/assets/catarse_bootstrap/user.jpg' : contribution.profile_img_thumbnail),
+            reward = contribution.reward || {
+                minimum_value: 0,
+                description: 'No reward selected'
+            };
+
         return m(`.w-clearfix.card${ctrl.checked(contribution) ? '.card-alert' : ''}`, [
             m('.w-row', [
                 m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1',
                     m('.w-inline-block',
                         m('.w-checkbox.w-clearfix',
-                            m(`input.w-checkbox-input[type='checkbox']`, {
+                            (contribution.delivery_status !== 'received' && project.state !== 'failed' ?
+                            m('input.w-checkbox-input[type=\'checkbox\']', {
                                 checked: ctrl.checked(contribution),
                                 value: contribution.id,
                                 onclick: () => ctrl.selectContribution(contribution)
-                            })
+                            }) : '')
                         )
                     )
                 ),
                 m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11',
                     m('.w-row', [
                         m('.w-col.w-col-1.w-col-tiny-1', [
-                            m(`img.user-avatar.u-marginbottom-10[src='${profile_img}']`)
+                            m(`img.user-avatar.u-marginbottom-10[src='${profileImg}']`)
                         ]),
                         m('.w-col.w-col-11.w-col-tiny-11', [
                             m('.w-row', [
@@ -102,13 +109,13 @@ const projectContributionReportContentCard = {
                                 ]),
                                 m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [
                                     m('div',
-                                        (contribution.delivery_status == 'error' ?
+                                        (contribution.delivery_status === 'error' ?
                                             m('span.badge.badge-attention.fontsize-smaller',
                                                 'Error sending'
-                                            ) : contribution.delivery_status == 'delivered' ?
+                                            ) : contribution.delivery_status === 'delivered' ?
                                             m('span.badge.badge-success.fontsize-smaller',
                                                 'Sent'
-                                            ) : contribution.delivery_status == 'received' ?
+                                            ) : contribution.delivery_status === 'received' ?
                                             m('span.fontsize-smaller.badge.badge-success', [
                                                 m('span.fa.fa-check-circle',
                                                     ''
@@ -117,7 +124,7 @@ const projectContributionReportContentCard = {
                                             ]) : '')
                                     ),
                                     m('.fontsize-smallest.fontweight-semibold', `Reward: Rs ${h.formatNumber(reward.minimum_value, 2, 3)}`),
-                                    m('.fontsize-smallest', reward.description.substring(0, 80) + '...')
+                                    m('.fontsize-smallest', `${reward.description.substring(0, 80)}...`)
                                 ])
                             ])
                         ])

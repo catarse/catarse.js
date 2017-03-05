@@ -36,11 +36,11 @@ const Flex = {
         projectsLoader.load().then(_.compose(projects, sample3));
 
         return {
-            addDisqus: addDisqus,
-            builder: builder,
-            statsLoader: statsLoader,
-            stats: stats,
-            projectsLoader: projectsLoader,
+            addDisqus,
+            builder,
+            statsLoader,
+            stats,
+            projectsLoader,
             projects: {
                 loader: projectsLoader,
                 collection: projects
@@ -48,7 +48,7 @@ const Flex = {
         };
     },
     view(ctrl, args) {
-        let stats = _.first(ctrl.stats());
+        const stats = _.first(ctrl.stats());
 
         return [
             m('.w-section.hero-full.hero-zelo', [
@@ -110,7 +110,7 @@ const Flex = {
                 m('.w-section.section', [
                     m('.w-container', [
                         m('.w-editable.fontsize-larger.u-margintop-40.u-margin-bottom-40.u-text-center', 'Meet some of the first flex projects'),
-                        ctrl.projectsLoader() ? h.loader() : m.component(projectRow, {collection: ctrl.projects, ref: 'ctrse_flex', wrapper: '.w-row.u-margintop-40'})
+                        ctrl.projectsLoader() ? h.loader() : m.component(projectRow, { collection: ctrl.projects, ref: 'ctrse_flex', wrapper: '.w-row.u-margintop-40' })
                     ])
                 ]),
                 m('.w-section.divider'),
@@ -168,7 +168,7 @@ const Flex = {
                                 m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'Projects have already been funded in JVN')
                             ]),
                             m('.w-col.w-col-4', [
-                                m('.fontsize-jumbo.text-success.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in JVN')
+                                m('.fontsize-jumbo.text-success.lineheight-loose', `${stats.total_contributed.toString().slice(0, 2)} millions`), m('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in JVN')
                             ])
                         ])
                     ])
@@ -183,13 +183,13 @@ const Flex = {
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [
                                         m('div', [
                                             m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'),
-                                            m('a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=https://www.myjvn.com/flex?ref=facebook&title=' + encodeURIComponent('Meet the new JVN Flex!') + '"][target="_blank"]', 'To share')
+                                            m(`a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.myjvn.com/flex?ref=facebook&title=${encodeURIComponent('Meet the new JVN Flex!')}"][target="_blank"]`, 'To share')
                                         ])
                                     ]),
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                         m('div', [
                                             m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'),
-                                            m('a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!') + 'https://www.myjvn.com/flex?ref=twitter"][target="_blank"]', 'To tweet')
+                                            m(`a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!')}http://www.myjvn.com/flex?ref=twitter"][target="_blank"]`, 'To tweet')
                                         ])
                                     ])
                                 ])
@@ -199,8 +199,8 @@ const Flex = {
                     ])
                 ]), m('.w-section.section-large.bg-greenlime', [
                     m('.w-container', [
-                        m('#participe-do-debate.u-text-center', {config: h.toAnchor()}, [
-                            m('h1.fontsize-largest.fontcolor-negative','Build Flex with us'), m('.fontsize-base.u-marginbottom-60.fontcolor-negative', 'Start a conversation, ask, comment, critique and make suggestions!')
+                        m('#participe-do-debate.u-text-center', { config: h.toAnchor() }, [
+                            m('h1.fontsize-largest.fontcolor-negative', 'Build Flex with us'), m('.fontsize-base.u-marginbottom-60.fontcolor-negative', 'Start a conversation, ask, comment, critique and make suggestions!')
                         ]),
                         m('#disqus_thread.card.u-radius[style="min-height: 50vh;"]', {
                             config: ctrl.addDisqus

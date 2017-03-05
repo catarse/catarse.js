@@ -15,8 +15,7 @@ const projectPosts = {
                 id: 'eq'
             });
         const scrollTo = (el, isInit) => {
-            if (!isInit && _.isNumber(args.post_id)) {
-                console.log('Will scroll to posts');
+            if (!isInit) {
                 h.animateScrollTo(el);
             }
         };
@@ -32,40 +31,43 @@ const projectPosts = {
         }
 
         return {
-            listVM: listVM,
-            filterVM: filterVM,
-            scrollTo: scrollTo
+            listVM,
+            filterVM,
+            scrollTo
         };
     },
     view(ctrl, args) {
         const list = ctrl.listVM,
             project = args.project() || {};
 
-        return m('#posts.project-posts.w-section',{config: ctrl.scrollTo},[
+        return m('#posts.project-posts.w-section', { config: ctrl.scrollTo }, [
             m('.w-container.u-margintop-20', [
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
                     (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [
                         m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of who has already supported his campaign and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')
                     ]) : '') : ''
-                ] : ''), (_.map(list.collection(), (post) => {
-                    return m('.w-row', [
-                        m('.w-col.w-col-1'),
-                        m('.w-col.w-col-10', [
-                            m('.post', [
-                                m('.u-marginbottom-60 .w-clearfix', [
-                                    m('.fontsize-small.fontcolor-secondary.u-text-center', h.momentify(post.created_at)),
-                                    m('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [
-                                        m(`a.link-hidden[href="/projects/${post.project_id}/posts/${post.id}#posts"]`, post.title)
-                                    ]),
-                                    (!_.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Exclusive post for supporters.'))
+                    // m('.w-row.u-marginbottom-20', [
+                    //     m('.w-col.w-col-4.w-col-push-4', [
+                    //         m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/edit#posts']`, 'Edit Post')
+                    //     ])
+                    // ])
+                ] : ''), (_.map(list.collection(), post => m('.w-row', [
+                    m('.w-col.w-col-1'),
+                    m('.w-col.w-col-10', [
+                        m('.post', [
+                            m('.u-marginbottom-60 .w-clearfix', [
+                                m('.fontsize-small.fontcolor-secondary.u-text-center', h.momentify(post.created_at)),
+                                m('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [
+                                    m(`a.link-hidden[href="/projects/${post.project_id}/posts/${post.id}#posts"]`, post.title)
                                 ]),
-                                m('.divider.u-marginbottom-60')
-                            ])
-                        ]),
-                        m('.w-col.w-col-1')
-                    ]);
-                })),
+                                    (!_.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Post exclusivo para apoiadores.'))
+                            ]),
+                            m('.divider.u-marginbottom-60')
+                        ])
+                    ]),
+                    m('.w-col.w-col-1')
+                ]))),
                 m('.w-row', [
                     (!_.isUndefined(args.post_id) ? '' :
                         (!list.isLoading() ?
