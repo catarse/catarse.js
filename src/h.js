@@ -246,7 +246,7 @@ const
             num = number.toFixed(Math.max(0, ~~n));
         return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), `$&${s || ','}`);
     },
-    formatNumber = generateFormatNumber('.', ','),
+    formatNumber = generateFormatNumber(',', '.'),
 
     toggleProp = (defaultState: any, alternateState: any): Function => {
         const p = m.prop(defaultState);

@@ -77,9 +77,9 @@ const projectRewardList = {
                 }
             }, ctrl.selectReward(reward))
         }, [
-            reward.minimum_value >= 100 ? m('.tag-circle-installment', [
-                m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'),
-                m('.fontsize-mini.lineheight-tightest', 's/ interest')
+            reward.minimum_value >= 1000 ? m('.tag-circle-installment', [
+                m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x')
+                // m('.fontsize-mini.lineheight-tightest', 's/ interest')
             ]) : '',
             m('.u-marginbottom-20', [
                 m('.fontsize-base.fontweight-semibold', `For Rs ${h.formatNumber(reward.minimum_value)} or more`),
@@ -90,7 +90,7 @@ const projectRewardList = {
                             m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')
                         ]) : m('.u-margintop-10', [
                             m('span.badge.badge-attention.fontsize-smaller', [
-                                m('span.fontweight-bold', 'Limitada'),
+                                m('span.fontweight-bold', 'Limited'),
                                 project.open_for_contributions ? ` (${h.rewardRemaning(reward)} in ${reward.maximum_contributions} availabe)` : ''
                             ])
                         ]))
