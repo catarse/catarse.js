@@ -60,7 +60,6 @@ const userAboutEdit = {
 
                 uploading(true);
                 m.redraw();
-
                 return m.request({
                     method: 'POST',
                     url: `/users/${user.id}/upload_image.json`,
@@ -75,7 +74,7 @@ const userAboutEdit = {
                     if (_.isArray(err.errors)) {
                         errorsArray(errorsArray().concat(err.errors));
                     } else {
-                        errors('Erro ao atualizar informações.');
+                        errors('Error updating info.');
                     }
                     pushErrosMessage();
                     showError(true);
@@ -115,7 +114,7 @@ const userAboutEdit = {
                     if (_.isArray(err.errors)) {
                         errorsArray(errorsArray().concat(err.errors));
                     } else {
-                        errors('Erro ao atualizar informações.');
+                        errors('Error updating info.');
                     }
 
                     pushErrosMessage();
@@ -156,7 +155,7 @@ const userAboutEdit = {
                 }
             },
             deleteAccount = () => {
-                if (window.confirm('Tem certeza que deseja desativar a sua conta?')) {
+                if (window.confirm('Are you sure you want to deactivate your account??')) {
                     deleteUser();
                 }
 
@@ -165,10 +164,10 @@ const userAboutEdit = {
             onSubmit = (e) => {
                 e.preventDefault();
                 if (!validateEmailConfirmation()) {
-                    errors('Confirmação de email está incorreta.');
+                    errors('Email confirmation is incorrect.');
                     showError(true);
                 } else if (!validatePassword()) {
-                    errors('Nova senha está incorreta.');
+                    errors('New password is incorrect.');
                     showError(true);
                 } else {
                     updateUser();
@@ -201,7 +200,6 @@ const userAboutEdit = {
     view(ctrl, args) {
         const user = args.user || {},
             fields = ctrl.fields;
-
         return m('#about-tab.content', [
             (ctrl.showSuccess() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
                 message: 'Your information has been updated'
