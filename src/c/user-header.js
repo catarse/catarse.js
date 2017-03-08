@@ -6,22 +6,22 @@ import userVM from '../vms/user-vm';
 const userHeader = {
     view(ctrl, args) {
         const user = args.user,
-              hideDetails = args.hideDetails,
-              profileImage = userVM.displayImage(user),
-              coverImage = userVM.displayCover(user);
+            hideDetails = args.hideDetails,
+            profileImage = userVM.displayImage(user),
+            coverImage = userVM.displayCover(user);
 
         return m(`.hero-${hideDetails ? 'small' : 'half'}`, [
             m('.w-container.content-hero-profile',
               m('.w-row.u-text-center',
                 m('.w-col.w-col-8.w-col-push-2',
-                  [
+                    [
                       (hideDetails ? '' :
                        m('.u-marginbottom-20',
                          m('.avatar_wrapper',
                            m(`img.thumb.big.u-round[alt='User'][src='${profileImage}']`)
                           )
                         )),
-                      m('.fontsize-larger.fontweight-semibold.u-marginbottom-20',
+                        m('.fontsize-larger.fontweight-semibold.u-marginbottom-20',
                         (user.public_name || user.name)
                        ),
                       (hideDetails ? '' :
@@ -35,11 +35,11 @@ const userHeader = {
                               ` And already created ${h.pluralize(user.total_published_projects, ' campaign', ' campaigns')}` : '')
                          ]
                         ))
-                  ]
+                    ]
                  )
                )
              ),
-            m('.hero-profile', {style: `background-image:url('${coverImage}');`})
+            m('.hero-profile', { style: `background-image:url('${coverImage}');` })
         ]
                 );
     }

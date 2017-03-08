@@ -1,7 +1,5 @@
 import m from 'mithril';
-import _ from 'underscore';
 import h from '../h';
-import userVM from '../vms/user-vm';
 
 const postsPreview = {
     controller(args) {
@@ -40,7 +38,7 @@ const postsPreview = {
                 });
             };
         return {
-            sendNotification: sendNotification,
+            sendNotification,
             togglePreview
         };
     },
@@ -58,7 +56,7 @@ const postsPreview = {
                 'Visible on the platform only for these supporters.'
                 )
             ]) :
-            args.reward_id == '-1' ?
+            args.reward_id === '-1' ?
             m('.fontsize-small.u-marginbottom-30', [
                 'The news above will be  ',
                 m('span.fontweight-semibold',

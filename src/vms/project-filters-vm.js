@@ -49,86 +49,84 @@ const projectFiltersVM = () => {
 
         filters = {
             all: {
-              title: 'All categories',
-              filter: all,
-              nicename: 'Online',
-              isContextual: false,
-              keyName: 'all'
-          },
+                title: 'All categories',
+                filter: all,
+                nicename: 'Online',
+                isContextual: false,
+                keyName: 'all'
+            },
             score: {
-              title: 'All categories',
-              filter: score,
-              nicename: I18n.t('home.row_title', I18nScope()),
-              isContextual: false,
-              keyName: 'score'
-          },
+                title: 'All categories',
+                filter: score,
+                nicename: 'Most Popular',
+                isContextual: false,
+                keyName: 'score'
+            },
             contributed_by_friends: {
-              title: 'Friends',
-              filter: contributed_by_friends,
-              nicename: 'Friends',
-              isContextual: false,
-              keyName: 'contributed_by_friends'
-          },
+                title: 'Friends',
+                filter: contributed_by_friends,
+                nicename: 'Friends',
+                isContextual: false,
+                keyName: 'contributed_by_friends'
+            },
             online: {
-              title: 'Online',
-              filter: online,
-              isContextual: false,
-              keyName: 'online'
-          },
+                title: 'Online',
+                filter: online,
+                isContextual: false,
+                keyName: 'online'
+            },
             expiring: {
-              title: 'Final stretch',
-              filter: expiring,
-              isContextual: false,
-              keyName: 'expiring'
-          },
+                title: 'Expiring',
+                filter: expiring,
+                isContextual: false,
+                keyName: 'expiring'
+            },
             successful: {
-              title: 'All categories',
-              filter: successful,
-              nicename: 'Financed',
-              isContextual: false,
-              keyName: 'successful'
-          },
+                title: 'All categories',
+                filter: successful,
+                nicename: 'Financed',
+                isContextual: false,
+                keyName: 'successful'
+            },
             finished: {
-              title: 'All categories',
-              filter: finished,
-              nicename: 'Finalized',
-              isContextual: false,
-              keyName: 'finished'
-          },
+                title: 'All categories',
+                filter: finished,
+                nicename: 'Finished',
+                isContextual: false,
+                keyName: 'finished'
+            },
             recent: {
-              title: 'Recent',
-              filter: recent,
-              isContextual: false,
-              keyName: 'recent'
-          },
+                title: 'Recent',
+                filter: recent,
+                isContextual: false,
+                keyName: 'recent'
+            },
             near_me: {
-              title: 'Next to me',
-              filter: nearMe,
-              isContextual: false,
-              keyName: 'near_me'
-          }
+                title: 'Near me',
+                filter: nearMe,
+                isContextual: false,
+                keyName: 'near_me'
+            }
         };
 
     const setContextFilters = (contextFilters) => {
-        _.map(contextFilters, (filterKey) => filters[filterKey].isContextual = true);
+            _.map(contextFilters, filterKey => filters[filterKey].isContextual = true);
 
-        return filters;
-    },
-            getContextFilters = () => {
-                return _.filter(filters, (filter) => filter.isContextual);
-            },
-            removeContextFilter = (filter) => {
-                filters[filter.keyName].isContextual = false;
+            return filters;
+        },
+        getContextFilters = () => _.filter(filters, filter => filter.isContextual),
+        removeContextFilter = (filter) => {
+            filters[filter.keyName].isContextual = false;
 
-                return filters;
-            };
+            return filters;
+        };
 
     return {
-            filters: filters,
-            setContextFilters: setContextFilters,
-            getContextFilters: getContextFilters,
-            removeContextFilter: removeContextFilter
-        };
+        filters,
+        setContextFilters,
+        getContextFilters,
+        removeContextFilter
+    };
 };
 
 export default projectFiltersVM;

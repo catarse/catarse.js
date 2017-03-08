@@ -12,29 +12,29 @@ const menu = {
         const user = h.getUser(),
             menuCss = () => {
                 let dynamicClasses;
+                console.log(args.withAlert);
 
-                return `${args.menuTransparency ? 'overlayer' : ''} ${args.withAlert ? 'with-global-alert' : ''}`;
+                return `${args.menuTransparency ? 'overlayer' : ''} ${(args.withAlert || args.withFixedAlert) ? 'with-global-alert' : ''}`;
             },
             homeAttrs = () => {
                 if (args.absoluteHome) {
                     return {
                         href: h.rootUrl()
                     };
-                } else {
-                    return {
-                        config: m.route
-                    };
                 }
+                return {
+                    config: m.route
+                };
             };
 
         return {
-            user: user,
-            menuCss: menuCss,
-            homeAttrs: homeAttrs
+            user,
+            menuCss,
+            homeAttrs
         };
     },
     view(ctrl, args) {
-        return m('header.main-header',{
+        return m('header.main-header', {
             class: ctrl.menuCss()
         }, [
             m('.w-row', [
@@ -59,11 +59,11 @@ const menu = {
             args.menuShort ? '' : m('.header-controls-mobile.w-hidden-main.w-hidden-medium',
                 [
                     m('a.header-link.w-nav-link[href=\'/en/start?ref=ctrse_header\']',
-                        {onclick: () => m.route('/start')},
+                        { onclick: () => m.route('/start') },
                         I18n.t('header.submit', I18nScope())
                     ),
                     m('a.header-link.w-nav-link[href=\'/en/explore?ref=ctrse_header\']',
-                        {onclick: () => m.route('/explore')},
+                        { onclick: () => m.route('/explore') },
                         'Explore'
                     )
                 ]

@@ -49,7 +49,7 @@ const footer = {
                                                 m('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']',
                                                     ' Blog'
                                                 ),
-                                                m('a.link-footer[href=\'/jobs\']',
+                                                m('a.link-footer[href=\'/jobs?ref=ctrse_footer\']',
                                                     I18n.t('links.jobs', I18nScope())
                                                 )
                                             ]
@@ -74,10 +74,10 @@ const footer = {
                                                 m('a.link-footer[href=\'#/\']',
                                                     I18n.t('links.help_support', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/en/terms-of-use\']',
+                                                m('a.link-footer[href=\'/en/terms-of-use?ref=ctrse_footer\']',
                                                     I18n.t('links.terms', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'/en/privacy-policy\']',
+                                                m('a.link-footer[href=\'/en/privacy-policy?ref=ctrse_footer\']',
                                                     I18n.t('links.privacy', I18nScope())
                                                 )
                                             ]

@@ -1,4 +1,6 @@
 import m from 'mithril';
+import _ from 'underscore';
+import moment from 'moment';
 import h from '../h';
 import projectRewardList from './project-reward-list';
 import projectReport from './project-report';
@@ -8,17 +10,15 @@ const projectAbout = {
     view(ctrl, args) {
         const project = args.project() || {},
             onlineDays = () => {
-                let diff = moment(project.zone_online_date).diff(moment(project.zone_expires_at)),
+                const diff = moment(project.zone_online_date).diff(moment(project.zone_expires_at)),
                     duration = moment.duration(diff);
 
                 return -Math.ceil(duration.asDays());
             };
-        let fundingPeriod = () => {
-            return (project.is_published && h.existy(project.zone_expires_at)) ? m('.funding-period', [
-                m('.fontsize-small.fontweight-semibold.u-text-center-small-only', 'Campaign period'),
-                m('.fontsize-small.u-text-center-small-only', `${h.momentify(project.zone_online_date)} - ${h.momentify(project.zone_expires_at)} (${onlineDays()} days)`)
-            ]) : '';
-        };
+        const fundingPeriod = () => (project.is_published && h.existy(project.zone_expires_at)) ? m('.funding-period', [
+            m('.fontsize-small.fontweight-semibold.u-text-center-small-only', 'Campaign period'),
+            m('.fontsize-small.u-text-center-small-only', `${h.momentify(project.zone_online_date)} - ${h.momentify(project.zone_expires_at)} (${onlineDays()} days)`)
+        ]) : '';
 
         return m('#project-about', [
             m('.project-about.w-col.w-col-8', {

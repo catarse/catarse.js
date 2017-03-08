@@ -26,7 +26,7 @@ const projectRewardList = {
                 //     return h.navigateToDevise('/' + projectVM.currentProject().permalink);
                 // } else {
                 // vm.contributionValue(valueFloat);
-                //h.navigateTo(`/projects/${projectVM.currentproject().project_id}/contributions/new?reward_id=${vm.selectedReward().id}`);
+                // h.navigateTo(`/projects/${projectVM.currentproject().project_id}/contributions/new?reward_id=${vm.selectedReward().id}`);
                 h.navigateTo(`/projects/${projectVM.currentProject().project_id}/contributions/fallback_create?contribution%5Breward_id%5D=${vm.selectedReward().id}&contribution%5Bvalue%5D=${valueFloat}`);
                 // m.route(`/projects/${projectVM.currentproject().project_id}/payment`, {
                 //    project_user_id: projectVM.currentProject().user_id
@@ -45,61 +45,60 @@ const projectRewardList = {
 
             h.removeStoredObject(storeKey);
             vm.selectedReward(reward);
-            vm.contributionValue(h.applyMonetaryMask(`${value},00`));
+            // vm.contributionValue(h.applyMonetaryMask(`${value},00`));
+            vm.contributionValue(`${value}`);
             submitContribution();
         }
 
         return {
             applyMask: vm.applyMask,
             error: vm.error,
-            submitContribution: submitContribution,
+            submitContribution,
             openedReward: vm.selectedReward,
             selectReward: vm.selectReward,
             contributionValue: vm.contributionValue,
-            setInput: setInput
+            setInput
         };
     },
     view(ctrl, args) {
-        //FIXME: MISSING ADJUSTS
+        // FIXME: MISSING ADJUSTS
         // - add draft admin modifications
         const project = args.project() || {
             open_for_contributions: false
         };
-        return m('#rewards.u-marginbottom-30', _.map(args.rewardDetails(), (reward) => {
-
-            return m('div[class="' + (h.rewardSouldOut(reward) ? 'card-gone' : 'card-reward ' + (project.open_for_contributions ? 'clickable' : '')) + ' card card-secondary u-marginbottom-10"]', {
-                onclick: h.analytics.event({
-                    cat: 'contribution_create',
-                    act: 'contribution_reward_click',
-                    lbl: reward.minimum_value,
-                    project: project,
-                    extraData: {
-                        reward_id: reward.id,
-                        reward_value: reward.minimum_value
-                    }
-                }, ctrl.selectReward(reward))
-            }, [
-                reward.minimum_value >= 100 ? m('.tag-circle-installment', [
-                    m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'),
-                    m('.fontsize-mini.lineheight-tightest', 's/ interest')
-                ]) : '',
-                m('.u-marginbottom-20', [
-                    m('.fontsize-base.fontweight-semibold', 'For Rs ' + h.formatNumber(reward.minimum_value) + ' or more'),
-                    m('.fontsize-smaller.fontweight-semibold', h.pluralize(reward.paid_count, ' apoio', ' apoios')), (reward.maximum_contributions > 0 ? [
+        return m('#rewards.u-marginbottom-30', _.map(args.rewardDetails(), reward => m(`div[class="${h.rewardSouldOut(reward) ? 'card-gone' : `card-reward ${project.open_for_contributions ? 'clickable' : ''}`} card card-secondary u-marginbottom-10"]`, {
+            onclick: h.analytics.event({
+                cat: 'contribution_create',
+                act: 'contribution_reward_click',
+                lbl: reward.minimum_value,
+                project,
+                extraData: {
+                    reward_id: reward.id,
+                    reward_value: reward.minimum_value
+                }
+            }, ctrl.selectReward(reward))
+        }, [
+            reward.minimum_value >= 1000 ? m('.tag-circle-installment', [
+                m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x')
+                // m('.fontsize-mini.lineheight-tightest', 's/ interest')
+            ]) : '',
+            m('.u-marginbottom-20', [
+                m('.fontsize-base.fontweight-semibold', `For Rs ${h.formatNumber(reward.minimum_value)} or more`),
+                m('.fontsize-smaller.fontweight-semibold', h.pluralize(reward.paid_count, ' support', ' supports')), (reward.maximum_contributions > 0 ? [
                         (reward.waiting_payment_count > 0 ? m('.maximum_contributions.in_time_to_confirm.clearfix', [
                             m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' Support in confirmation period', ' Support in confirmation period....'))
                         ]) : ''), (h.rewardSouldOut(reward) ? m('.u-margintop-10', [
                             m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')
                         ]) : m('.u-margintop-10', [
                             m('span.badge.badge-attention.fontsize-smaller', [
-                                m('span.fontweight-bold', 'Limitada'),
-                                project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' in ' + reward.maximum_contributions + ' Available)' : ''
+                                m('span.fontweight-bold', 'Limited'),
+                                project.open_for_contributions ? ` (${h.rewardRemaning(reward)} in ${reward.maximum_contributions} availabe)` : ''
                             ])
                         ]))
-                    ] : ''),
-                ]),
+                ] : ''),
+            ]),
 
-                m('.fontsize-smaller.u-margintop-20', m.trust(h.simpleFormat(h.strip(reward.description)))),
+            m('.fontsize-smaller.u-margintop-20', m.trust(h.simpleFormat(h.strip(reward.description)))),
                 (!_.isEmpty(reward.deliver_at) ?
                     m('.fontsize-smaller', [
                         m('b', 'Estimated Delivery: '),
@@ -124,7 +123,7 @@ const projectRewardList = {
                                 m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
                                     m('input.w-input.back-reward-input-reward[type="tel"]', {
                                         config: ctrl.setInput,
-                                        onkeyup: m.withAttr('value', ctrl.applyMask),
+                                        onkeyup: m.withAttr('value'),
                                         value: ctrl.contributionValue()
                                     })
                                 )
@@ -141,8 +140,7 @@ const projectRewardList = {
                     //     m('.project-reward-box-select-text.u-text-center', 'Selecione essa recompensa')
                     // ])
                 ] : '')
-            ]);
-        }));
+        ])));
     }
 };
 

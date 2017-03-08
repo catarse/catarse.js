@@ -11,9 +11,8 @@ const UnsignedFriendFacebookConnect = {
             largeBg: (() => {
                 if (_.isUndefined(args)) {
                     return false;
-                } else {
-                    return (_.isUndefined(args.largeBg) ? false : args.largeBg);
                 }
+                return (_.isUndefined(args.largeBg) ? false : args.largeBg);
             })()
         };
     },

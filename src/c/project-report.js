@@ -32,10 +32,10 @@ const projectReport = {
             },
             sendReport = () => {
                 submitDisabled(true);
-                let loaderOpts = models.projectReport.postOptions({
+                const loaderOpts = models.projectReport.postOptions({
                     email: email(),
                     details: details(),
-                    reason: reason() ,
+                    reason: reason(),
                     project_id: project.project_id
                 });
                 l = postgrest.loaderWithToken(loaderOpts);
@@ -56,16 +56,16 @@ const projectReport = {
         }
 
         return {
-            checkScroll: checkScroll,
-            checkLogin: checkLogin,
-            displayForm: displayForm,
-            sendSuccess: sendSuccess,
-            submitDisabled: submitDisabled,
-            sendReport: sendReport,
-            user: user,
-            email: email,
-            details: details,
-            reason: reason
+            checkScroll,
+            checkLogin,
+            displayForm,
+            sendSuccess,
+            submitDisabled,
+            sendReport,
+            user,
+            email,
+            details,
+            reason
         };
     },
 
@@ -73,69 +73,69 @@ const projectReport = {
         const user = ctrl.user;
 
         return m('.card.card-terciary.u-radius',
+            [
+                m('.fontsize-small.u-marginbottom-20',
                     [
-                      m('.fontsize-small.u-marginbottom-20',
-                        [
-                          'This project disrespects',
-                          m.trust('&nbsp;'),
-                          m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638\'][target=\'_blank\']',
-                            'our rules? '
+                        'This project disrespects',
+                        m.trust('&nbsp;'),
+                        m('a.alt-link[href=\'http://www.myjvn.com/rules\'][target=\'_blank\']',
+                            ' our rules? '
                           )
-                        ]
+                    ]
                       ),
-                      ctrl.sendSuccess() ?
+                ctrl.sendSuccess() ?
                        m('.w-form',
                         m('p',
                           'Thank you! Your report has been received.'
                         )
                       ) :
-                      [
-                        m('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']',{onclick: ctrl.checkLogin},
+                [
+                    m('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']', { onclick: ctrl.checkLogin },
                         'Report this project'
                       ),
-                      ctrl.displayForm() ? m('#report-form.u-margintop-30',
+                    ctrl.displayForm() ? m('#report-form.u-margintop-30',
                         m('.w-form',
-                          m('form', {onsubmit: ctrl.sendReport, config: ctrl.checkScroll},
-                            [
-                              m('.fontsize-small.fontweight-semibold.u-marginbottom-10',
+                          m('form', { onsubmit: ctrl.sendReport, config: ctrl.checkScroll },
+                              [
+                                  m('.fontsize-small.fontweight-semibold.u-marginbottom-10',
                                 'Why are you denouncing this project?'
                               ),
-                              m('select.w-select.text-field.positive[required=\'required\']', {onchange: m.withAttr('value', ctrl.reason)},
-                                [
-                                  m('option[value=\'\']',
-                                    'Select a reason'
-                                  ),
-                                  m('option[value=\'Intellectual Property infringement\']',
-                                    'Intellectual Property infringement'
-                                  ),
-                                  m('option[value=\'Slander, libel, defamation or discrimination\']',
-                                    'Slander, libel, defamation or discrimination'
-                                  ),
-                                  m('option[value=\'Prohibited project scope\']',
-                                    'Prohibited project scope'
-                                  ),
-                                  m('option[value=\'Forbidden Rewards\']',
-                                    'Forbidden Rewards'
-                                  ),
-                                  m('option[value=\'Explicit free sex scenes\']',
-                                    'Explicit free sex scenes'
-                                  ),
-                                  m('option[value=\'SPAM abuse\']',
-                                    'SPAM abuse'
-                                  ),
-                                  m('option[value=\'Others\']',
-                                    'Others'
-                                  )
-                                ]
+                                  m('select.w-select.text-field.positive[required=\'required\']', { onchange: m.withAttr('value', ctrl.reason) },
+                                      [
+                                          m('option[value=\'\']',
+                                              'Select a reason'
+                                          ),
+                                          m('option[value=\'Intellectual Property infringement\']',
+                                              'Intellectual Property infringement'
+                                          ),
+                                          m('option[value=\'Slander, libel, defamation or discrimination\']',
+                                              'Slander, libel, defamation or discrimination'
+                                          ),
+                                          m('option[value=\'Prohibited project scope\']',
+                                              'Prohibited project scope'
+                                          ),
+                                          m('option[value=\'Forbidden Rewards\']',
+                                              'Forbidden Rewards'
+                                          ),
+                                          m('option[value=\'Explicit free sex scenes\']',
+                                              'Explicit free sex scenes'
+                                          ),
+                                          m('option[value=\'SPAM abuse\']',
+                                              'SPAM abuse'
+                                          ),
+                                          m('option[value=\'Others\']',
+                                              'Others'
+                                            )
+                                      ]
                               ),
-                              m('textarea.w-input.text-field.positive.u-marginbottom-30', {placeholder: 'Please give more details to help us identify the problem', onchange: m.withAttr('value', ctrl.details)}),
-                              m('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Send Complaint\']', {disabled: ctrl.submitDisabled()})
-                            ]
+                                  m('textarea.w-input.text-field.positive.u-marginbottom-30', { placeholder: 'Please give more details to help us identify the problem', onchange: m.withAttr('value', ctrl.details) }),
+                                  m('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Send Complaint\']', { disabled: ctrl.submitDisabled() })
+                              ]
                           )
                         )
                       ) : '']
 
-                    ]
+            ]
                   );
     }
 };
