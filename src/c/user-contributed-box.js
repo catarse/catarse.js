@@ -95,7 +95,7 @@ const userContributedBox = {
                         }))
                     ]),
                     m('.fontsize-smallest',
-                            (contribution.installments > 1 ? (`${contribution.installments} x R$ ${contribution.installment_value} `) : ''),
+                            (contribution.installments > 1 ? (`${contribution.installments} x Rs ${contribution.installment_value} `) : ''),
                             (contribution.payment_method === 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito')
                         ),
 

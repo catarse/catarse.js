@@ -9,9 +9,11 @@ const error = m.prop(''),
     noReward = {
         id: -1,
         description: 'Thank you. I just want to help the project.',
-        minimum_value: 10
+        minimum_value: 100
     },
-    contributionValue = m.prop(`${noReward.minimum_value},00`),
+
+    // contributionValue = m.prop(`${noReward.minimum_value},00`),
+    contributionValue = m.prop(`${noReward.minimum_value}`),
     selectedReward = m.prop(noReward),
     vm = postgrest.filtersVM({
         project_id: 'eq'
@@ -44,7 +46,8 @@ const selectReward = reward => () => {
     if (rewardVM.selectedReward() !== reward) {
         rewardVM.selectedReward(reward);
 
-        contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
+        // contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
+        contributionValue(`${reward.minimum_value}`);
     }
 };
 

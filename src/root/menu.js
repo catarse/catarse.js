@@ -12,8 +12,9 @@ const menu = {
         const user = h.getUser(),
             menuCss = () => {
                 let dynamicClasses;
+                console.log(args.withAlert);
 
-                return `${args.menuTransparency ? 'overlayer' : ''} ${args.withAlert ? 'with-global-alert' : ''}`;
+                return `${args.menuTransparency ? 'overlayer' : ''} ${(args.withAlert || args.withFixedAlert) ? 'with-global-alert' : ''}`;
             },
             homeAttrs = () => {
                 if (args.absoluteHome) {

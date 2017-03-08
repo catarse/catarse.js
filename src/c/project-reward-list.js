@@ -45,7 +45,8 @@ const projectRewardList = {
 
             h.removeStoredObject(storeKey);
             vm.selectedReward(reward);
-            vm.contributionValue(h.applyMonetaryMask(`${value},00`));
+            // vm.contributionValue(h.applyMonetaryMask(`${value},00`));
+            vm.contributionValue(`${value}`);
             submitContribution();
         }
 
@@ -122,7 +123,7 @@ const projectRewardList = {
                                 m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
                                     m('input.w-input.back-reward-input-reward[type="tel"]', {
                                         config: ctrl.setInput,
-                                        onkeyup: m.withAttr('value', ctrl.applyMask),
+                                        onkeyup: m.withAttr('value'),
                                         value: ctrl.contributionValue()
                                     })
                                 )
