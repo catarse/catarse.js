@@ -59,7 +59,7 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.about', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'#\'][target="_BLANK"]',
+                                                m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/requests/new\'][target="_BLANK"]',
                                                     I18n.t('links.contact', I18nScope())
                                                 ),
                                                 // m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
@@ -71,7 +71,7 @@ const footer = {
                                                 // m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
                                                 //     I18n.t('links.press', I18nScope())
                                                 // ),
-                                                m('a.link-footer[href=\'#/\']',
+                                                m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/\'][target="_BLANK"]',
                                                     I18n.t('links.help_support', I18nScope())
                                                 ),
                                                 m('a.link-footer[href=\'/en/terms-of-use?ref=ctrse_footer\']',
