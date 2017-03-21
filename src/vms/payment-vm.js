@@ -174,7 +174,6 @@ const paymentVM = (mode = 'aon') => {
             checkDocument();
             checkPhone();
         }
-
         return _.isEmpty(fields.errors());
     };
 

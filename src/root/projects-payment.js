@@ -204,7 +204,7 @@ const projectsPayment = {
                                                 value: country.id,
                                                 key: idx,
                                                 selected: country.id === ctrl.vm.fields.userCountryId()
-                                            }, country.name_en))
+                                            }, country.name))
                                         ),
                                         ctrl.fieldHasError('userCountryId')
                                     ]),
