@@ -31,6 +31,8 @@ const
         return date ? moment(date).locale('en').format(format) : 'no date';
     },
 
+    getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min,
+
     storeAction = (action: string, value: string) => {
         if (!sessionStorage.getItem(action)) {
             return sessionStorage.setItem(action, String(value));
@@ -55,6 +57,8 @@ const
         }
         return null;
     },
+
+    capitalize = (string: string): ?string => string.charAt(0).toUpperCase() + string.slice(1),
 
     discuss = (page: Object, identifier: string) => {
         const d = document,
@@ -346,7 +350,7 @@ const
             try {
                 window.FB.XFBML.parse();
             } catch (e) {
-                console.log(e);
+                //console.log(e);
             }
         };
 
@@ -603,7 +607,7 @@ const
                 if (!eventObj.user) { eventObj.user = getUser(); }
                 CatarseAnalytics.event(eventObj);
             } catch (e) {
-                console.error('[h.analyticsEvent] error:', e);
+                //console.error('[h.analyticsEvent] error:', e);
             }
             fn();
         };
@@ -904,6 +908,7 @@ export default {
     callStoredAction,
     UIHelper,
     toAnchor,
+    capitalize,
     paramByName,
     i18nScope,
     RDTracker,
@@ -911,6 +916,7 @@ export default {
     animateScrollTo,
     scrollTo,
     scrollTop,
+    getRandomInt,
     projectStateTextClass,
     validationErrors,
     validate,

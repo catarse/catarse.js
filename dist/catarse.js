@@ -58,6 +58,7 @@ var models = {
     userFollower: postgrest$1.model('user_followers'),
     creatorSuggestion: postgrest$1.model('creator_suggestions'),
     userContribution: postgrest$1.model('user_contributions'),
+    shippingFee: postgrest$1.model('shipping_fees'),
     deleteProject: postgrest$1.model('rpc/delete_project'),
     cancelProject: postgrest$1.model('rpc/cancel_project')
 };
@@ -165,6 +166,9 @@ var momentify = function momentify(date, format) {
     format = format || 'DD/MM/YYYY';
     return date ? moment(date).locale('en').format(format) : 'no date';
 };
+var getRandomInt = function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 var storeAction = function storeAction(action, value) {
     if (!sessionStorage.getItem(action)) {
         return sessionStorage.setItem(action, String(value));
@@ -187,6 +191,9 @@ var callStoredAction = function callStoredAction(action) {
         return item;
     }
     return null;
+};
+var capitalize = function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };
 var discuss = function discuss(page, identifier) {
     var d = document,
@@ -471,7 +478,7 @@ var fbParse = function fbParse() {
         try {
             window.FB.XFBML.parse();
         } catch (e) {
-            console.log(e);
+            //console.log(e);
         }
     };
 
@@ -732,7 +739,7 @@ var analyticsEvent = function analyticsEvent(eventObj) {
             }
             CatarseAnalytics$1.event(eventObj);
         } catch (e) {
-            console.error('[h.analyticsEvent] error:', e);
+            //console.error('[h.analyticsEvent] error:', e);
         }
         fn();
     };
@@ -1054,6 +1061,7 @@ var h = {
     callStoredAction: callStoredAction,
     UIHelper: UIHelper,
     toAnchor: toAnchor,
+    capitalize: capitalize,
     paramByName: paramByName,
     i18nScope: i18nScope,
     RDTracker: RDTracker,
@@ -1061,6 +1069,7 @@ var h = {
     animateScrollTo: animateScrollTo,
     scrollTo: scrollTo,
     scrollTop: scrollTop,
+    getRandomInt: getRandomInt,
     projectStateTextClass: projectStateTextClass,
     validationErrors: validationErrors,
     validate: validate,
@@ -2385,8 +2394,24 @@ var selectReward = function selectReward(reward) {
 
 var applyMask$1 = _$1.compose(contributionValue, h.applyMonetaryMask);
 
+var getFees = function getFees(reward) {
+    var feesFilter = postgrest$1.filtersVM({
+        reward_id: 'eq'
+    });
+
+    feesFilter.reward_id(reward.id || 0);
+    var feesLoader = postgrest$1.loader(models.shippingFee.getPageOptions(feesFilter.parameters()));
+    return feesLoader;
+};
+
+var getStates = function getStates() {
+    return postgrest$1.loader(models.state.getPageOptions());
+};
+
 var rewardVM = {
     error: error$1,
+    getStates: getStates,
+    getFees: getFees,
     rewards: rewards,
     applyMask: applyMask$1,
     noReward: noReward,
@@ -2645,6 +2670,11 @@ var getCurrentUser = function getCurrentUser() {
     return currentUser;
 };
 
+var displayName = function displayName(user) {
+    var u = user || { name: 'no name' };
+    return _$1.isEmpty(u.public_name) ? u.name : u.public_name;
+};
+
 var displayImage = function displayImage(user) {
     var defaultImg = 'https://catarse.me/assets/catarse_bootstrap/user.jpg';
 
@@ -2728,6 +2758,7 @@ var userVM = {
     getPublicUserContributedProjects: getPublicUserContributedProjects,
     displayImage: displayImage,
     displayCover: displayCover,
+    displayName: displayName,
     fetchUser: fetchUser,
     getCurrentUser: getCurrentUser
 };
@@ -2966,7 +2997,7 @@ var projectCard = {
             }
         }), m(ctrl.css().descriptionWrapper, [m(ctrl.css().description, [m(ctrl.css().title, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref)
-        }, project.project_name)]), m(ctrl.css().author, I18n$1.t('by', I18nScope$2()) + ' ' + project.owner_public_name), m(ctrl.css().headline, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
+        }, project.project_name)]), m(ctrl.css().author, I18n$1.t('by', I18nScope$2()) + ' ' + (_$1.isEmpty(project.owner_public_name) ? project.owner_name : project.owner_public_name)), m(ctrl.css().headline, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref)
         }, project.headline)])]), m(ctrl.css().city, [m('.fontsize-smallest.fontcolor-secondary', [m('span.fa.fa-map-marker.fa-1', ' '), ' ' + (project.city_name ? project.city_name : '') + ', ' + (project.state_acronym ? project.state_acronym : '')])]), m(ctrl.cardMeter(), [ctrl.isFinished(project) ? m('div', project.state === 'successful' && ctrl.progress < 100 ? I18n$1.t('display_status.flex_successful', I18nScope$2()) : I18n$1.t('display_status.' + project.state, I18nScope$2())) : m('.meter', [m('.meter-fill', {
             style: {
@@ -3828,7 +3859,9 @@ var parseAccountData = function parseAccountData(account, transfer) {
 var insightVM = {
     content: function content(state, data) {
         var translations = I18n$1.translations[I18n$1.currentLocale()].projects.successful_onboard[state],
-            translationContext = state === 'finished' ? {} : parseAccountData(_$1.first(data.account()), _$1.first(data.transfer()));
+            translationContext = state === 'finished' ? {
+            link_news: '/projects/' + _$1.first(data.account()).project_id + '/posts'
+        } : parseAccountData(_$1.first(data.account()), _$1.first(data.transfer()));
         var contentObj = {};
 
         _$1.map(translations, function (translation, translationKey) {
@@ -4024,9 +4057,9 @@ var facebookButton = {
 };
 
 var popNotification = {
-    controller: function controller() {
+    controller: function controller(args) {
         return {
-            displayNotification: h.toggleProp(true, false)
+            displayNotification: args.toggleOpt || h.toggleProp(true, false)
         };
     },
     view: function view(ctrl, args) {
@@ -5509,7 +5542,7 @@ var projectsExplore = {
                 ctrl.projects().nextPage();return false;
             } }, 'Load more')])])])]), m('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [m('.w-container.u-text-center', [m('img.u-marginbottom-20.icon-hero', {
             src: hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].icon : 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png'
-        }), m('h2.fontsize-larger.u-marginbottom-60', hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [hasSpecialFooter ? m('a.w-button.btn.btn-large', { href: ctrl.externalLinkCategories[categoryId()].link }, ctrl.externalLinkCategories[categoryId()].cta) : m('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'LEARN HOW')])])])])]);
+        }), m('h2.fontsize-larger.u-marginbottom-60', hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [hasSpecialFooter ? m('a.w-button.btn.btn-large', { href: ctrl.externalLinkCategories[categoryId()].link + '?ref=ctrse_explore' }, ctrl.externalLinkCategories[categoryId()].cta) : m('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'Learn how')])])])])]);
     }
 };
 
@@ -5955,7 +5988,7 @@ var ownerMessageContent = {
             name: '',
             email: ''
         },
-            from_name = m.prop(user.public_name),
+            from_name = m.prop(userVM.displayName(user)),
             from_email = m.prop(user.email),
             content = m.prop('');
 
@@ -6134,7 +6167,7 @@ var projectUserCard = {
             onclick: function onclick() {
                 m.route('/users/' + userDetail.id, { user_id: userDetail.id });
                 h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
-            } }, userDetail.public_name || userDetail.name)]), m('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' Created', ' Created'), m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' Backed', ' Backed')]), m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Facebook Profile')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Twitter Profile')]) : '', _$1.map(userDetail.links, function (link) {
+            } }, userVM.displayName(userDetail))]), m('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' Created', ' Created'), m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' Backed', ' Backed')]), m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Facebook Profile')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Twitter Profile')]) : '', _$1.map(userDetail.links, function (link) {
             var parsedLink = h.parseUrl(link.link);
 
             return !_$1.isEmpty(parsedLink.hostname) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_otherlinks', lbl: link.link, project: project() }) }, parsedLink.hostname)]) : '';
@@ -6314,7 +6347,7 @@ var projectHeader = {
         var project = args.project,
             rewardDetails = args.rewardDetails;
 
-        return !_$1.isUndefined(project()) ? m('#project-header', [m('.w-section.section-product.' + project().mode), m('.w-section.page-header.u-text-center', [m('.w-container', [m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['by ', project().user ? project().user.public_name : project().owner_public_name ? project().owner_name : '']), !_$1.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20', [m('.fontsize-small.u-text-center', [m('span.fa.fa-thumbs-up'), ' You are a supporter of this project! ', m('a.alt-link[href=\'javascript:void(0);\']', { onclick: ctrl.showContributions.toggle }, 'Details')]), ctrl.showContributions() ? m('.card.u-margintop-20', m('.w-row', _$1.map(ctrl.projectContributions(), function (contribution) {
+        return !_$1.isUndefined(project()) ? m('#project-header', [m('.w-section.section-product.' + project().mode), m('.w-section.page-header.u-text-center', [m('.w-container', [m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['by ', project().user ? userVM.displayName(project().user) : project().owner_public_name ? project().owner_name : '']), !_$1.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20', [m('.fontsize-small.u-text-center', [m('span.fa.fa-thumbs-up'), ' You are a supporter of this project! ', m('a.alt-link[href=\'javascript:void(0);\']', { onclick: ctrl.showContributions.toggle }, 'Details')]), ctrl.showContributions() ? m('.card.u-margintop-20', m('.w-row', _$1.map(ctrl.projectContributions(), function (contribution) {
             return m.component(userContributionDetail, { contribution: contribution, rewardDetails: rewardDetails });
         }))) : '']) : ''])]), m('.w-section.project-main', [m('.w-container', [m('.w-row.project-main', [m('.w-col.w-col-8.project-highlight', m.component(projectHighlight, {
             project: project
@@ -6611,7 +6644,7 @@ var projectContributions$1 = {
                         lbl: contribution.user_id,
                         project: args.project()
                     })
-                }, contribution.data.public_name || contribution.data.name), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', h.selfOrEmpty(contribution.data.city) + ', ' + h.selfOrEmpty(contribution.data.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', contribution.data.total_contributed_projects), ' Supported  |  ', m('span.fontweight-semibold', contribution.data.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', [m(UserFollowBtn, { follow_id: contribution.user_id, following: contribution.is_follow })]), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])])
+                }, userVM.displayName(contribution.data)), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', h.selfOrEmpty(contribution.data.city) + ', ' + h.selfOrEmpty(contribution.data.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', contribution.data.total_contributed_projects), ' Supported  |  ', m('span.fontweight-semibold', contribution.data.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', [m(UserFollowBtn, { follow_id: contribution.user_id, following: contribution.is_follow })]), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])])
                 // new card
                 ]);
             }));
@@ -6897,7 +6930,7 @@ var userHeader = {
             profileImage = userVM.displayImage(user),
             coverImage = userVM.displayCover(user);
 
-        return m('.hero-' + (hideDetails ? 'small' : 'half'), [m('.w-container.content-hero-profile', m('.w-row.u-text-center', m('.w-col.w-col-8.w-col-push-2', [hideDetails ? '' : m('.u-marginbottom-20', m('.avatar_wrapper', m('img.thumb.big.u-round[alt=\'User\'][src=\'' + profileImage + '\']'))), m('.fontsize-larger.fontweight-semibold.u-marginbottom-20', user.public_name || user.name), hideDetails ? '' : m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base', ['Joined on ' + h.momentify(user.created_at, 'MMMM YYYY'), m('br'), user.total_contributed_projects == 0 ? 'Has not yet backed any campaigns' : 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'), user.total_published_projects > 0 ? ' And already created ' + h.pluralize(user.total_published_projects, ' campaign', ' campaigns') : ''])]))), m('.hero-profile', { style: 'background-image:url(\'' + coverImage + '\');' })]);
+        return m('.hero-' + (hideDetails ? 'small' : 'half'), [m('.w-container.content-hero-profile', m('.w-row.u-text-center', m('.w-col.w-col-8.w-col-push-2', [hideDetails ? '' : m('.u-marginbottom-20', m('.avatar_wrapper', m('img.thumb.big.u-round[alt=\'User\'][src=\'' + profileImage + '\']'))), m('.fontsize-larger.fontweight-semibold.u-marginbottom-20', userVM.displayName(user)), hideDetails ? '' : m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base', ['Joined on ' + h.momentify(user.created_at, 'MMMM YYYY'), m('br'), user.total_contributed_projects == 0 ? 'Has not yet backed any campaigns' : 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'), user.total_published_projects > 0 ? ' And already created ' + h.pluralize(user.total_published_projects, ' campaign', ' campaigns') : ''])]))), m('.hero-profile', { style: 'background-image:url(\'' + coverImage + '\');' })]);
     }
 };
 
@@ -7047,7 +7080,7 @@ var userCard = {
             contactModalC = [ownerMessageContent, ctrl.userDetails],
             profileImage = userVM.displayImage(user);
 
-        return m('#user-card', m('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [m('.w-row', [m('.w-col.w-col-4.w.col-small-4.w-col-tiny-4.w-clearfix', m('img.thumb.u-round[itemprop=\'image\'][src=\'' + profileImage + '\'][width=\'100\']')), m('.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m('.fontsize-small.fontweight-semibold.lineheight-tighter[itemprop=\'name\']', m('a.link-hidden[href="/users/' + user.id + '"]', user.public_name || user.name)), m('.fontsize-smallest.lineheight-looser[itemprop=\'address\']', user.address_city), m('.fontsize-smallest', h.pluralize(user.total_published_projects, ' campaign', ' campaigns') + ' Created'), m('.fontsize-smallest', 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'))])]), m('.project-author-contacts', [m('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [!_$1.isEmpty(user.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook Profile')]) : '', !_$1.isEmpty(user.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')]) : '', _$1.map(user.links, function (link) {
+        return m('#user-card', m('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [m('.w-row', [m('.w-col.w-col-4.w.col-small-4.w-col-tiny-4.w-clearfix', m('img.thumb.u-round[itemprop=\'image\'][src=\'' + profileImage + '\'][width=\'100\']')), m('.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m('.fontsize-small.fontweight-semibold.lineheight-tighter[itemprop=\'name\']', m('a.link-hidden[href="/users/' + user.id + '"]', userVM.displayName(user))), m('.fontsize-smallest.lineheight-looser[itemprop=\'address\']', user.address_city), m('.fontsize-smallest', h.pluralize(user.total_published_projects, ' campaign', ' campaigns') + ' Created'), m('.fontsize-smallest', 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'))])]), m('.project-author-contacts', [m('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [!_$1.isEmpty(user.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook Profile')]) : '', !_$1.isEmpty(user.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')]) : '', _$1.map(user.links, function (link) {
             return m('li', [m('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', link.link)]);
         })])]), ctrl.displayModal() ? m.component(modalBox, {
             displayModal: ctrl.displayModal,
@@ -7133,8 +7166,137 @@ var usersShow = {
     }
 };
 
+// TODO: Define error pattern that comes from server-side and allow the lib
+// to define what fields are coming with errors from the back-end
+var fields$1 = m.prop([]);
+var submissionError = m.prop(false);
+var submissionErrorMsg = m.prop('');
+var fieldIdxValue = function fieldIdxValue(fieldName, idx, initialValue) {
+    return _$1.reduce(fields$1(), function (memo, field) {
+        return field[0] === fieldName ? field[idx] : memo;
+    }, initialValue);
+};
+
+var setError = function setError(fieldName, flag) {
+    var updated = _$1.map(fields$1(), function (field) {
+        return field[0] === fieldName ? [field[0], field[1], flag] : field;
+    });
+
+    fields$1(updated);
+};
+
+var hasError = function hasError(fieldName) {
+    return fieldIdxValue(fieldName, 2, false);
+};
+
+var getErrorMsg = function getErrorMsg(fieldName) {
+    return fieldIdxValue(fieldName, 1, '');
+};
+
+var e$1 = function e(fieldOrArray) {
+    var errorMessage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    if (Array.isArray(fieldOrArray)) {
+        _$1.map(fieldOrArray, function (field) {
+            field.push(false);
+            console.log('Will push: ', field);
+            return fields$1().push(field);
+        });
+    } else {
+        fields$1().push([fieldOrArray, errorMessage, false]);
+    }
+};
+
+e$1.fields = fields$1;
+e$1.setSubmissionError = submissionErrorMsg;
+e$1.hasSubmissionError = function () {
+    return submissionError() === true;
+};
+e$1.displaySubmissionError = function () {
+    if (submissionError()) {
+        return m('.card.card-error.u-radius.zindex-10.u-marginbottom-30.fontsize-smaller', m('.u-marginbottom-10.fontweight-bold', m.trust(submissionErrorMsg())));
+    }
+
+    return null;
+};
+e$1.submissionError = function (flag) {
+    if (_$1.isUndefined(flag)) {
+        return e$1.displaySubmissionError();
+    }
+
+    submissionError(flag);
+};
+
+e$1.hasError = hasError;
+e$1.inlineError = function (field, flag) {
+    if (_$1.isUndefined(flag)) {
+        if (hasError(field)) {
+            return m(inlineError, { message: getErrorMsg(field) });
+        }
+
+        return null;
+    }
+    setError(field, flag);
+};
+
+e$1.resetFieldErrors = function () {
+    return _$1.map(fields$1(), function (field) {
+        return field[2] = false;
+    });
+};
+
+e$1.resetErrors = function () {
+    e$1.resetFieldErrors();
+    submissionError(false);
+};
+
+var fields = {
+    password: m.prop(''),
+    current_password: m.prop(''),
+    uploaded_image: m.prop(''),
+    cover_image: m.prop(''),
+    email: m.prop(''),
+    permalink: m.prop(''),
+    public_name: m.prop(''),
+    facebook_link: m.prop(''),
+    twitter: m.prop(''),
+    links: m.prop([]),
+    about_html: m.prop(''),
+    email_confirmation: m.prop('')
+};
+
+var mapRailsErrors = function mapRailsErrors(rails_errors) {
+    var parsedErrors = void 0;
+    try {
+        parsedErrors = JSON.parse(rails_errors);
+    } catch (e$1) {
+        parsedErrors = {};
+    }
+    var extractAndSetErrorMsg = function extractAndSetErrorMsg(label, fieldArray) {
+        var value = _$1.first(_$1.compact(_$1.map(fieldArray, function (field) {
+            return _$1.first(parsedErrors[field]);
+        })));
+
+        if (value) {
+            e$1(label, value);
+            e$1.inlineError(label, true);
+        }
+    };
+
+    //extractAndSetErrorMsg("about_html", ["user.about_html", "about_html"]);
+    //extractAndSetErrorMsg("public_name", ["user.public_name", "public_name"]);
+
+    return e$1;
+};
+
+var userAboutVM = {
+    fields: fields,
+    mapRailsErrors: mapRailsErrors
+};
+
 var userAboutEdit = {
     controller: function controller(args) {
+        var parsedErrors = userAboutVM.mapRailsErrors(args.rails_errors);
         var deleteUser = void 0;
         var user = args.user || {},
             fields = {
@@ -7181,35 +7343,41 @@ var userAboutEdit = {
                 userCoverImageEl = window.document.getElementById('user_cover_image'),
                 formData = new FormData();
 
-            formData.append('uploaded_image', userUploadedImageEl.files[0]);
-            if (!args.hideCoverImg) {
-                formData.append('cover_image', userCoverImageEl.files[0]);
+            if (userUploadedImageEl.files[0] || !args.hideCoverImg && userCoverImageEl.files[0]) {
+
+                formData.append('uploaded_image', userUploadedImageEl.files[0]);
+                if (!args.hideCoverImg) {
+                    formData.append('cover_image', userCoverImageEl.files[0]);
+                }
+
+                uploading(true);
+                m.redraw();
+
+                return m.request({
+                    method: 'POST',
+                    url: '/users/' + user.id + '/upload_image.json',
+                    data: formData,
+                    config: h.setCsrfToken,
+                    serialize: function serialize(data) {
+                        return data;
+                    }
+                }).then(function (data) {
+                    fields.uploaded_image(data.uploaded_image);
+                    fields.cover_image(data.cover_image);
+                    uploading(false);
+                }).catch(function (err) {
+                    if (_$1.isArray(err.errors)) {
+                        errorsArray(errorsArray().concat(err.errors));
+                    } else {
+                        errors('Erro ao atualizar informações.');
+                    }
+                    pushErrosMessage();
+                    showError(true);
+                    uploading(false);
+                });
             }
 
-            uploading(true);
-            m.redraw();
-            return m.request({
-                method: 'POST',
-                url: '/users/' + user.id + '/upload_image.json',
-                data: formData,
-                config: h.setCsrfToken,
-                serialize: function serialize(data) {
-                    return data;
-                }
-            }).then(function (data) {
-                fields.uploaded_image(data.uploaded_image);
-                fields.cover_image(data.cover_image);
-                uploading(false);
-            }).catch(function (err) {
-                if (_$1.isArray(err.errors)) {
-                    errorsArray(errorsArray().concat(err.errors));
-                } else {
-                    errors('Error updating info.');
-                }
-                pushErrosMessage();
-                showError(true);
-                uploading(false);
-            });
+            return void 0;
         },
             updateUser = function updateUser() {
             var userData = {
@@ -7224,6 +7392,9 @@ var userAboutEdit = {
                 links_attributes: linkAttributes()
             };
 
+            if (args.publishingUserAbout) {
+                userData["publishing_user_about"] = true;
+            }
             loading(true);
             uploadImage();
 
@@ -7240,13 +7411,12 @@ var userAboutEdit = {
                 loading(false);
                 m.redraw();
             }).catch(function (err) {
-                if (_$1.isArray(err.errors)) {
-                    errorsArray(errorsArray().concat(err.errors));
-                } else {
-                    errors('Error updating info.');
+                if (parsedErrors) {
+                    parsedErrors.resetFieldErrors();
                 }
+                parsedErrors = userAboutVM.mapRailsErrors(err.errors_json);
+                errors('Erro ao atualizar informações.');
 
-                pushErrosMessage();
                 showError(true);
                 loading(false);
                 m.redraw();
@@ -7292,7 +7462,7 @@ var userAboutEdit = {
             }
         },
             deleteAccount = function deleteAccount() {
-            if (window.confirm('Are you sure you want to deactivate your account??')) {
+            if (window.confirm('Tem certeza que deseja desativar a sua conta?')) {
                 deleteUser();
             }
 
@@ -7301,10 +7471,10 @@ var userAboutEdit = {
             onSubmit = function onSubmit(e) {
             e.preventDefault();
             if (!validateEmailConfirmation()) {
-                errors('Email confirmation is incorrect.');
+                errors('Confirmação de email está incorreta.');
                 showError(true);
             } else if (!validatePassword()) {
-                errors('New password is incorrect.');
+                errors('Nova senha está incorreta.');
                 showError(true);
             } else {
                 updateUser();
@@ -7331,7 +7501,8 @@ var userAboutEdit = {
             passwordHasError: passwordHasError,
             validatePassword: validatePassword,
             deleteAccount: deleteAccount,
-            setDeleteForm: setDeleteForm
+            setDeleteForm: setDeleteForm,
+            parsedErrors: parsedErrors
         };
     },
     view: function view(ctrl, args) {
@@ -7342,22 +7513,22 @@ var userAboutEdit = {
         }) : '', ctrl.showError() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
             message: m.trust(ctrl.errors()),
             error: true
-        }) : '', m('form.simple_form.w-form', { onsubmit: ctrl.onSubmit }, [m('input[name="utf8"][type="hidden"][value="✓"]'), m('input[name="_method"][type="hidden"][value="patch"]'), m('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m('div', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', [!user.is_admin ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', 'Address'), m('label.field-label.fontsize-smallest.fontcolor-secondary', 'Your public profile may have a custom URL. Choose an easy to save!    ')]), m('.w-col.w-col-7', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', m('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
+        }) : '', m('form.simple_form.w-form', { onsubmit: ctrl.onSubmit }, [m('input[name="utf8"][type="hidden"][value="✓"]'), m('input[name="_method"][type="hidden"][value="patch"]'), m('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m('div', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', [!user.is_admin ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', 'Endereço do seu perfil'), m('label.field-label.fontsize-smallest.fontcolor-secondary', 'Seu perfil público pode ter uma URL personalizada. Escolha uma fácil de guardar!    ')]), m('.w-col.w-col-7', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', m('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
             name: 'user[permalink]',
             value: fields.permalink(),
             onchange: m.withAttr('value', fields.permalink)
-        })), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover', m('.fontcolor-secondary.fontsize-smaller', '  .myjvn.com/'))]))]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Email'), m('.fontsize-small.u-marginbottom-30', 'Keep this email up to date as it is the communication channel between you, the JVN team and the team of campaigns you have supported. '), m('.fontsize-base.u-marginbottom-40', [m('span.fontweight-semibold.card.u-radius', user.email), m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
+        })), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover', m('.fontcolor-secondary.fontsize-smaller', '  .catarse.me'))]))]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Email'), m('.fontsize-small.u-marginbottom-30', 'Mantenha esse email atualizado pois ele é o canal de comunicação entre você, a equipe do Catarse e a equipe dos projetos que você apoiou. '), m('.fontsize-base.u-marginbottom-40', [m('span.fontweight-semibold.card.u-radius', user.email), m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
             onclick: function onclick() {
                 ctrl.showEmailForm.toggle();
             }
-        }, 'Change email')]), m((ctrl.showEmailForm() ? '' : '.w-hidden') + '.u-marginbottom-20.w-row[id=\'email_update_form\']', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'New Email'), m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
+        }, 'Alterar email')]), m((ctrl.showEmailForm() ? '' : '.w-hidden') + '.u-marginbottom-20.w-row[id=\'email_update_form\']', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'Novo email'), m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
             class: ctrl.emailHasError() ? 'error' : '',
             value: fields.email(),
             onfocus: function onfocus() {
                 return ctrl.emailHasError(false);
             },
             onchange: m.withAttr('value', fields.email)
-        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', 'Confirm Email'), m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
+        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', 'Confirmar novo email'), m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
             class: ctrl.emailHasError() ? 'error' : '',
             value: fields.email_confirmation(),
             onfocus: function onfocus() {
@@ -7365,21 +7536,25 @@ var userAboutEdit = {
             },
             onblur: ctrl.validateEmailConfirmation,
             onchange: m.withAttr('value', fields.email_confirmation)
-        })]), ctrl.emailHasError() ? m(inlineError, { message: 'Email confirmation is incorrect.' }) : ''])]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Name'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  This is the name that users will see in your profile. It can not be changed after a campaign has been supported or published.')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[id="user_public_name"][type="text"]', {
+        })]), ctrl.emailHasError() ? m(inlineError, { message: 'Confirmação de email está incorreta.' }) : ''])]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Nome no perfil público'), m('label.field-label.fontsize-smallest.fontcolor-secondary', 'Esse é o nome que os usuários irão ver no seu perfil.')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[id="user_public_name"][type="text"]', {
             name: 'user[public_name]',
+            class: ctrl.parsedErrors.hasError('public_name') ? 'error' : false,
             value: fields.public_name(),
             onchange: m.withAttr('value', fields.public_name)
-        }))]), m('.w-form', [m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Profile Picture'), m('label.field-label.fontsize-smallest.fontcolor-secondary', ' This image will be used as your profile picture (PNG, JPG size 280x280).')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_uploaded_image.field_with_hint', [m('label.field-label'), m('span.hint', m('img[alt="User avatar"][src="' + fields.uploaded_image() + '"]')), m('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', {
-            name: 'user[uploaded_image]'
-        })]))]), args.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Profile Cover Image'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  This image will be used as the background of your public profile header (PNG or JPG). If you do not submit any images here, we will use your profile image as an alternative.')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_cover_image', [m('label.field-label'), m('span.hint', user.profile_cover_image ? m('img', { src: fields.cover_image() }) : ''), m('input.file.optional.w-input.text-field[id="user_cover_image"][type="file"]', { name: 'user[cover_image]' })]))])]), m('.w-row', m('.w-col', m('.card.card-terciary.u-marginbottom-30', [m('label.field-label.fontweight-semibold', 'About'), m('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20', 'Talk about yourself and try to provide the most relevant information so visitors can get to know you better.'), m('.w-form', m('.preview-container.u-marginbottom-40', h.redactor('user[about_html]', fields.about_html)))]))), m('.w-form.card.card-terciary.u-marginbottom-30', [m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Facebook Profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Paste your profile link')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
+        }), ctrl.parsedErrors.inlineError("public_name"))]), m('.w-form', [m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Imagem do perfil'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Essa imagem será utilizada como a miniatura de seu perfil (PNG, JPG tamanho 280 x 280)')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_uploaded_image.field_with_hint', [m('label.field-label'), m('span.hint', m('img[alt="Avatar do Usuario"][src="' + fields.uploaded_image() + '"]')), m('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', {
+            name: 'user[uploaded_image]',
+            class: ctrl.parsedErrors.hasError('uploaded_image') ? 'error' : false
+        }), ctrl.parsedErrors.inlineError("uploaded_image")]))]), args.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Imagem de capa do perfil'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Essa imagem será utilizada como fundo do cabeçalho do seu perfil público (PNG ou JPG). Caso você não envie nenhum imagem aqui, utilizaremos sua imagem de perfil como alternativa.')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_cover_image', [m('label.field-label'), m('span.hint', user.profile_cover_image ? m('img', { src: fields.cover_image() }) : ''), m('input.file.optional.w-input.text-field[id="user_cover_image"][type="file"]', { name: 'user[cover_image]' })]))])]), m('.w-row', m('.w-col', m('.card.card-terciary.u-marginbottom-30', [m('label.field-label.fontweight-semibold', 'Sobre'), m('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20', 'Fale sobre você e tente fornecer as informações mais relevantes para que visitantes possam te conhecer melhor. '), m('.w-form', m('.preview-container.u-marginbottom-40', {
+            class: ctrl.parsedErrors.hasError('about_html') ? 'error' : false
+        }, h.redactor('user[about_html]', fields.about_html)), ctrl.parsedErrors.inlineError("about_html"))]))), m('.w-form.card.card-terciary.u-marginbottom-30', [m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Perfil do facebook'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Cole o link do seu perfil')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
             name: 'user[facebook_link]',
             value: fields.facebook_link(),
             onchange: m.withAttr('value', fields.facebook_link)
-        }))]), m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Twitter Profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Paste your profile link')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
+        }))]), m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Perfil do twitter'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Cole o link do seu perfil')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
             name: 'user[twitter]',
             value: fields.twitter(),
             onchange: m.withAttr('value', fields.twitter)
-        }))])]), m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold[for="name-8"]', ' Internet Presence'), m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')]), m('.w-col.w-col-7', [m('.w-row', [fields.links() && fields.links().length <= 0 ? '' : m('.link', _$1.map(fields.links(), function (link, idx) {
+        }))])]), m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold[for="name-8"]', ' Presença na internet'), m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Inclua links que ajudem outros usuários a te conhecer melhor. ')]), m('.w-col.w-col-7', [m('.w-row', [fields.links() && fields.links().length <= 0 ? '' : m('.link', _$1.map(fields.links(), function (link, idx) {
             var toRemove = link._destroy;
 
             return m('div', {
@@ -7394,10 +7569,10 @@ var userAboutEdit = {
             })), m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m('a.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border', {
                 onclick: ctrl.removeLink(link.id, idx)
             })])]);
-        }))]), m('.w-row', [m('.w-col.w-col-6.w-col-push-6', m('a.btn.btn-small.btn-terciary', { onclick: ctrl.addLink }, m('span.translation_missing', 'Add Link')))])])])), args.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontsize-base.fontweight-semibold', 'Change my password'), m('.fontsize-small.u-marginbottom-20', 'In order for the password to be changed you must confirm your current password.'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', ' Current Password'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
+        }))]), m('.w-row', [m('.w-col.w-col-6.w-col-push-6', m('a.btn.btn-small.btn-terciary', { onclick: ctrl.addLink }, m('span.translation_missing', 'Add Link')))])])])), args.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontsize-base.fontweight-semibold', 'Alterar minha senha'), m('.fontsize-small.u-marginbottom-20', 'Para que a senha seja alterada você precisa confirmar a sua senha atual.'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', ' Senha atual'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
             value: fields.current_password(),
             onchange: m.withAttr('value', fields.current_password)
-        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', ' New Password'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
+        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', ' Nova senha'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
             class: ctrl.passwordHasError() ? 'error' : '',
             value: fields.password(),
             onfocus: function onfocus() {
@@ -7405,9 +7580,9 @@ var userAboutEdit = {
             },
             onblur: ctrl.validatePassword,
             onchange: m.withAttr('value', fields.password)
-        }), !ctrl.passwordHasError() ? '' : m(inlineError, { message: 'Your new password must be at least 6 characters long.' })])])])), args.hideDisableAcc ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontweight-semibold.fontsize-smaller', 'Disable my account'), m('.fontsize-smallest', 'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'), m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '\'][rel=\'nofollow\']', {
+        }), !ctrl.passwordHasError() ? '' : m(inlineError, { message: 'A sua nova senha deve ter no mínimo 6 caracteres.' })])])])), args.hideDisableAcc || user.total_published_projects > 0 ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontweight-semibold.fontsize-smaller', 'Desativar minha conta'), m('.fontsize-smallest', 'Todos os seus apoios serão convertidos em apoios anônimos, seus dados não serão mais visíveis, você sairá automaticamente do sistema e sua conta será desativada permanentemente.'), m('a.alt-link.fontsize-smaller[href=\'/pt/users/' + user.id + '\'][rel=\'nofollow\']', {
             onclick: ctrl.deleteAccount
-        }, 'Disable my JVN account'), m('form.w-hidden', { action: '/en/users/' + user.id, method: 'post', config: ctrl.setDeleteForm }, [m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')])]))])))), m('div', m('.w-container' + (args.useFloatBtn ? '.w-section.save-draft-btn-section' : ''), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'), !ctrl.loading() && !ctrl.uploading() ? m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Save"]', {
+        }, 'Desativar minha conta no Catarse'), m('form.w-hidden', { action: '/pt/users/' + user.id, method: 'post', config: ctrl.setDeleteForm }, [m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')])]))])))), m('div', m('.w-container' + (args.useFloatBtn ? '.w-section.save-draft-btn-section' : ''), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'), !ctrl.loading() && !ctrl.uploading() ? m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Salvar"]', {
             onclick: ctrl.onSubmit
         }) : h.loader()]), m('.w-col.w-col-4')])))])]);
     }
@@ -7533,14 +7708,85 @@ var UserOwnerBox = {
     }
 };
 
+var fields$2 = {
+    owner_document: m.prop(''),
+    country_id: m.prop(''),
+    street: m.prop(''),
+    number: m.prop(''),
+    city: m.prop(''),
+    zipcode: m.prop(''),
+    complement: m.prop(''),
+    neighbourhood: m.prop(''),
+    state: m.prop(''),
+    phonenumber: m.prop(''),
+    name: m.prop(''),
+    agency: m.prop(''),
+    bank_id: m.prop(''),
+    agency_digit: m.prop(''),
+    account: m.prop(''),
+    account_digit: m.prop(''),
+    bank_account_id: m.prop(''),
+    state_inscription: m.prop(''),
+    birth_date: m.prop(''),
+    account_type: m.prop(''),
+    bank_account_type: m.prop('')
+};
+
+var mapRailsErrors$1 = function mapRailsErrors(rails_errors) {
+    var parsedErrors = void 0;
+    try {
+        parsedErrors = JSON.parse(rails_errors);
+    } catch (e$1) {
+        parsedErrors = {};
+    }
+    var extractAndSetErrorMsg = function extractAndSetErrorMsg(label, fieldArray) {
+        var value = _$1.first(_$1.compact(_$1.map(fieldArray, function (field) {
+            return _$1.first(parsedErrors[field]);
+        })));
+
+        if (value) {
+            e$1(label, value);
+            e$1.inlineError(label, true);
+        }
+    };
+
+    extractAndSetErrorMsg("owner_document", ["user.cpf", "cpf"]);
+    extractAndSetErrorMsg("country_id", ["user.country_id", "country_id"]);
+    extractAndSetErrorMsg("street", ["user.address_street", "address_street"]);
+    extractAndSetErrorMsg("number", ["user.address_number", "address_number"]);
+    extractAndSetErrorMsg("city", ["user.address_city", "address_city"]);
+    extractAndSetErrorMsg("zipcode", ["user.address_zip_code", "address_zip_code"]);
+    extractAndSetErrorMsg("complement", ["user.address_complement", "address_complement"]);
+    extractAndSetErrorMsg("neighbourhood", ["user.address_neighbourhood", "address_neighbourhood"]);
+    extractAndSetErrorMsg("state", ["user.address_state", "address_state"]);
+    extractAndSetErrorMsg("phonenumber", ["user.phone_number", "phone_number"]);
+    extractAndSetErrorMsg("name", ["user.name", "name"]);
+    extractAndSetErrorMsg("agency", ["user.bank_account.agency", "bank_account.agency"]);
+    extractAndSetErrorMsg("agency_digit", ["user.bank_account.agency_digit", "bank_account.agency_digit"]);
+    extractAndSetErrorMsg("account", ["user.bank_account.account", "bank_account.account"]);
+    extractAndSetErrorMsg("account_digit", ["user.bank_account.account_digit", "bank_account.account_digit"]);
+    extractAndSetErrorMsg("bank_account_type", ["user.bank_account.account_type", "bank_account.account_type"]);
+    extractAndSetErrorMsg("bank_id", ["user.bank_account.bank", "bank_account.bank"]);
+    extractAndSetErrorMsg("birth_date", ["user.birth_date", "birth_date"]);
+    extractAndSetErrorMsg("account_type", ["user.account_type", "account_type"]);
+
+    return e$1;
+};
+
+var userSettingsVM = {
+    fields: fields$2,
+    mapRailsErrors: mapRailsErrors$1
+};
+
 var userSettings = {
     controller: function controller(args) {
+        var parsedErrors = userSettingsVM.mapRailsErrors(args.rails_errors);
         var deleteFormSubmit = void 0;
         var user = args.user,
             bankAccount = m.prop({}),
             fields = {
             owner_document: m.prop(user.owner_document || ''),
-            country_id: m.prop(user.address.country_id || ''),
+            country_id: m.prop(user.address.country_id || 36),
             street: m.prop(user.address.street || ''),
             number: m.prop(user.address.number || ''),
             city: m.prop(user.address.city || ''),
@@ -7559,17 +7805,7 @@ var userSettings = {
             state_inscription: m.prop(''),
             birth_date: m.prop(user.birth_date ? h.momentify(user.birth_date) : ''),
             account_type: m.prop(user.account_type || ''),
-            errors: m.prop([]),
             bank_account_type: m.prop('')
-        },
-            fieldHasError = function fieldHasError(fieldName) {
-            var fieldWithError = _$1.findWhere(fields.errors(), {
-                field: fieldName
-            });
-
-            return fieldWithError ? m.component(inlineError, {
-                message: fieldWithError.message
-            }) : '';
         },
             loading = m.prop(false),
             user_id = args.userId,
@@ -7577,8 +7813,8 @@ var userSettings = {
             countries = m.prop(),
             states = m.prop(),
             loader = m.prop(true),
-            showSuccess = m.prop(false),
-            showError = m.prop(false),
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
             countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
             statesLoader = postgrest$1.loader(models.state.getPageOptions()),
             phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
@@ -7586,7 +7822,6 @@ var userSettings = {
             documentCompanyMask = _$1.partial(h.mask, '99.999.999/9999-99'),
             zipcodeMask = _$1.partial(h.mask, '99999-999'),
             birthDayMask = _$1.partial(h.mask, '99/99/9999'),
-            isCnpj = m.prop(false),
             creditCards = m.prop(),
             toDeleteCard = m.prop(-1),
             bankInput = m.prop(''),
@@ -7650,8 +7885,15 @@ var userSettings = {
                 cpf: fields.owner_document(),
                 name: fields.name(),
                 account_type: fields.account_type(),
-                birth_date: fields.birth_date(),
-                bank_account_attributes: {
+                birth_date: fields.birth_date()
+            };
+
+            if (args.publishingUserSettings) {
+                userData["publishing_user_settings"] = true;
+            }
+
+            if (args.publishingUserSettings || !_$1.isEmpty(fields.account()) || !_$1.isEmpty(fields.account_digit()) || !_$1.isEmpty(bankCode()) && bankCode() != '-1' || !_$1.isEmpty(fields.agency())) {
+                userData["bank_account_attributes"] = {
                     owner_name: fields.name(),
                     owner_document: fields.owner_document(),
                     bank_id: bankCode(),
@@ -7661,11 +7903,11 @@ var userSettings = {
                     account: fields.account(),
                     account_digit: fields.account_digit(),
                     account_type: fields.bank_account_type()
-                }
-            };
+                };
 
-            if (fields.bank_account_id()) {
-                userData.bank_account_attributes['id'] = fields.bank_account_id().toString();
+                if (fields.bank_account_id()) {
+                    userData.bank_account_attributes['id'] = fields.bank_account_id().toString();
+                }
             }
 
             return m.request({
@@ -7676,43 +7918,31 @@ var userSettings = {
                 },
                 config: h.setCsrfToken
             }).then(function () {
-                loading(false);
-                showSuccess(true);
-                m.redraw();
-            }).catch(function (err) {
-                if (_$1.isArray(err.errors)) {
-                    error(err.errors.join('<br>'));
-                } else {
-                    error('Error updating information.');
+                if (parsedErrors) {
+                    parsedErrors.resetFieldErrors();
                 }
                 loading(false);
-                showError(true);
-                m.redraw();
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+            }).catch(function (err) {
+                if (parsedErrors) {
+                    parsedErrors.resetFieldErrors();
+                }
+                parsedErrors = userSettingsVM.mapRailsErrors(err.errors_json);
+                error('Erro ao atualizar informações.');
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
             });
         },
-            validateDocument = function validateDocument() {
-            var document = fields.owner_document(),
-                striped = String(document).replace(/[\.|\-|\/]*/g, '');
-            var isValid = false,
-                errorMessage = '';
-
-            if (document.length > 14) {
-                return h.validateCnpj(document);
-            } else if (document.length > 0) {
-                return h.validateCpf(striped);
-            }
-            return void 0;
-        },
             onSubmit = function onSubmit() {
-            // TODO: this form validation should be abstracted/merged together with others
-            if (!validateDocument()) {
-                fields.errors().push({ field: 'owner_document', message: 'CPF/CNPJ inválido' });
-                error('CPF/CNPJ inválido');
-                showError(true);
-            } else {
-                loading(true);
-                updateUserData(user_id);
-            }
+            loading(true);
+            updateUserData(user_id);
 
             m.redraw();
             return false;
@@ -7721,11 +7951,9 @@ var userSettings = {
             applyBirthDateMask = _$1.compose(fields.birth_date, birthDayMask),
             applyPhoneMask = _$1.compose(fields.phonenumber, phoneMask),
             applyDocumentMask = function applyDocumentMask(value) {
-            if (value.length > 14) {
-                isCnpj(true);
+            if (fields.account_type() != 'pf') {
                 fields.owner_document(documentCompanyMask(value));
             } else {
-                isCnpj(false);
                 fields.owner_document(documentMask(value));
             }
 
@@ -7748,6 +7976,8 @@ var userSettings = {
                 fields.bank_id(bankAccount().bank_id);
                 fields.bank_account_type(bankAccount().account_type);
                 bankCode(bankAccount().bank_id);
+            } else {
+                fields.bank_account_type('conta_corrente');
             }
         }).catch(handleError);
 
@@ -7757,6 +7987,10 @@ var userSettings = {
             return countries(_$1.sortBy(data, 'name_en'));
         });
         statesLoader.load().then(states);
+
+        if (parsedErrors.hasError('country_id')) {
+            parsedErrors.inlineError('country_id', false);
+        }
 
         return {
             handleError: handleError,
@@ -7785,49 +8019,59 @@ var userSettings = {
             popularBanks: popularBanks,
             applyBirthDateMask: applyBirthDateMask,
             loading: loading,
-            fieldHasError: fieldHasError
+            parsedErrors: parsedErrors
         };
     },
     view: function view(ctrl, args) {
         var user = ctrl.user,
             bankAccount = ctrl.bankAccount(),
-            fields = ctrl.fields;
-
-        console.log(fields.bank_account_type());
+            fields = ctrl.fields,
+            hasContributedOrPublished = user.total_contributed_projects >= 1 || user.total_published_projects >= 1,
+            disableFields = user.is_admin_role ? false : hasContributedOrPublished && !_$1.isEmpty(user.name) && !_$1.isEmpty(user.owner_document);
 
         return m('[id=\'settings-tab\']', [ctrl.showSuccess() ? m.component(popNotification, {
-            message: 'Your information has been updated'
+            message: 'Your information has been updated',
+            toggleOpt: ctrl.showSuccess
         }) : '', ctrl.showError() ? m.component(popNotification, {
             message: m.trust(ctrl.error()),
+            toggleOpt: ctrl.showError,
             error: true
         }) : '', m('form.w-form', {
             onsubmit: ctrl.onSubmit
         }, [m('div', [m('.w-container', m('.w-col.w-col-10.w-col-push-1',
         //( _.isEmpty(fields.name()) && _.isEmpty(fields.owner_document()) ? '' : m(UserOwnerBox, {user: user}) ),
-        m('.w-form.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Financial data'), m('.fontsize-small.u-marginbottom-20', ['This will be the information for transferring funds raised on the platform or reimbursement of support made via bank wire for non-funded projects.']), m('.divider.u-marginbottom-20'), m('.w-row', [m('.w-col.w-col-6.w-sub-col', m('.input.select.required.user_bank_account_bank_id', [m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
+        m('.w-form.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Financial data'), m('.fontsize-small.u-marginbottom-20', [m.trust('This will be the information we will use for bank transfers. <strong>Importante:</strong> Full name / Corporate name and CPF / CNPJ can not be modified after the publication of a project or confirmation of a support.')]), m('.divider.u-marginbottom-20'), m('.w-row', [m('.w-col.w-col-6.w-sub-col', m('.input.select.required.user_bank_account_bank_id', [m('select.select.required.w-input.text-field.bank-select.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_bank_id\']', {
             name: 'user[bank_account_attributes][bank_id]',
-            onchange: m.withAttr('value', fields.account_type)
-        }, [m('option[value=\'pf\']', { selected: fields.account_type() === 'pf' }, 'Pessoa fisica'), m('option[value=\'pj\']', { selected: fields.account_type() === 'pj' }, 'Pessoa juririca'), m('option[value=\'mei\']', { selected: fields.account_type() === 'mei' }, 'Pessoa juridica - MEI')])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', 'Full name' + (fields.account_type() == 'pf' ? '' : '/Razão Social')), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
+            onchange: m.withAttr('value', fields.account_type),
+            disabled: disableFields
+        }, [m('option[value=\'pf\']', { selected: fields.account_type() === 'pf' }, 'Pessoa Física'), m('option[value=\'pj\']', { selected: fields.account_type() === 'pj' }, 'Pessoa Jurídica'), m('option[value=\'mei\']', { selected: fields.account_type() === 'mei' }, 'Pessoa Jurídica (Micro Empreendedor Individual - MEI)')])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', 'Full name' + (fields.account_type() == 'pf' ? '' : '/Razão Social')), m('input.string.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
             value: fields.name(),
             name: 'user[name]',
-            onchange: m.withAttr('value', fields.name)
-        })]), m('.w-col.w-col-6', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', '' + (fields.account_type() == 'pf' ? 'CPF' : 'CNPJ')), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+            class: ctrl.parsedErrors.hasError('name') ? 'error' : false,
+            onchange: m.withAttr('value', fields.name),
+            disabled: disableFields
+        }), ctrl.parsedErrors.inlineError("name")]), m('.w-col.w-col-6', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', '' + (fields.account_type() == 'pf' ? 'CPF' : 'CNPJ')), m('input.string.tel.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
             value: fields.owner_document(),
-            class: ctrl.fieldHasError('owner_document') ? 'error' : false,
+            class: ctrl.parsedErrors.hasError('owner_document') ? 'error' : false,
+            disabled: disableFields,
             name: 'user[cpf]',
             onchange: m.withAttr('value', ctrl.applyDocumentMask),
             onkeyup: m.withAttr('value', ctrl.applyDocumentMask)
-        }), ctrl.fieldHasError('owner_document')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', fields.account_type() == 'pf' ? [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'Date of birth'), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+        }), ctrl.parsedErrors.inlineError("owner_document")]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', fields.account_type() == 'pf' ? [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'Date of birth'), m('input.string.tel.required.w-input.text-field.positive' + (disableFields && !_$1.isEmpty(user.birth_date) ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
             value: fields.birth_date(),
             name: 'user[birth_date]',
+            class: ctrl.parsedErrors.hasError('birth_date') ? 'error' : false,
+            disabled: disableFields && !_$1.isEmpty(user.birth_date),
             onchange: m.withAttr('value', ctrl.applyBirthDateMask),
             onkeyup: m.withAttr('value', ctrl.applyBirthDateMask)
-        })] : [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'State Registration'), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+        }), ctrl.parsedErrors.inlineError("birth_date")] : [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'State Registration'), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
             value: fields.state_inscription(),
+            class: ctrl.parsedErrors.hasError('state_inscription') ? 'error' : false,
             name: 'user[state_inscription]',
             onchange: m.withAttr('value', fields.state_inscription)
-        })])])])]), m('.w-row', [m('.w-col.w-col-6.w-sub-col' + (ctrl.showOtherBanksInput() ? '.w-hidden' : '') + '[id=\'bank_select\']', m('.input.select.required.user_bank_account_bank_id', [m('label.field-label', 'Bank'), m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
+        }), ctrl.parsedErrors.inlineError("state_inscription")])])])]), m('.w-row', [m('.w-col.w-col-6.w-sub-col' + (ctrl.showOtherBanksInput() ? '.w-hidden' : '') + '[id=\'bank_select\']', m('.input.select.required.user_bank_account_bank_id', [m('label.field-label', 'Bank'), m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
             name: 'user[bank_account_attributes][bank_id]',
+            class: ctrl.parsedErrors.hasError('bank_id') ? 'error' : false,
             onchange: function onchange(e) {
                 m.withAttr('value', ctrl.bankCode)(e);
                 ctrl.showOtherBanksInput(ctrl.bankCode() == '0');
@@ -7840,7 +8084,7 @@ var userSettings = {
             return bank.id === fields.bank_id();
         }) ? '' : m('option[value=\'' + fields.bank_id() + '\']', {
             selected: true
-        }, bankAccount.bank_code + ' . ' + bankAccount.bank_name), m('option[value=\'0\']', 'Other')]), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']', ' Select a bank')])), ctrl.showOtherBanksInput() ? m('.w-col.w-col-6.w-sub-col', m('.w-row.u-marginbottom-20[id=\'bank_search\']', m('.w-col.w-col-12', [m('.input.string.optional.user_bank_account_input_bank_number', [m('label.field-label', 'Bank Number (3 numbers)'), m('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
+        }, bankAccount.bank_code + ' . ' + bankAccount.bank_name), m('option[value=\'0\']', 'Other')]), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']', ' Select a bank'), ctrl.parsedErrors.inlineError("bank_id")])), ctrl.showOtherBanksInput() ? m('.w-col.w-col-6.w-sub-col', m('.w-row.u-marginbottom-20[id=\'bank_search\']', m('.w-col.w-col-12', [m('.input.string.optional.user_bank_account_input_bank_number', [m('label.field-label', 'Bank Number (3 numbers)'), m('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
             name: 'user[bank_account_attributes][input_bank_number]',
             value: ctrl.bankInput(),
             onchange: m.withAttr('value', ctrl.bankInput)
@@ -7866,64 +8110,77 @@ var userSettings = {
             }, bank.code + ' . ' + bank.name))]);
         }) : ''])])))) : '', m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency\']', 'Agência'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_agency\'][type=\'text\']', {
             value: fields.agency(),
+            class: ctrl.parsedErrors.hasError('agency') ? 'error' : false,
             name: 'user[bank_account_attributes][agency]',
             onchange: m.withAttr('value', fields.agency)
-        })]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']', 'Dígito agência'), m('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
+        }), ctrl.parsedErrors.inlineError("agency")]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']', 'Dígito agência'), m('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
             value: fields.agency_digit(),
+            class: ctrl.parsedErrors.hasError('agency_digit') ? 'error' : false,
             name: 'user[bank_account_attributes][agency_digit]',
             onchange: m.withAttr('value', fields.agency_digit)
-        })])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'Tipo de conta'), m('.input.select.required.user_bank_account_account_type', [m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_account_type\']', {
+        }), ctrl.parsedErrors.inlineError("agency_digit")])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'Tipo de conta'), m('.input.select.required.user_bank_account_account_type', [m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_account_type\']', {
             name: 'user[bank_account_attributes][account_type]',
+            class: ctrl.parsedErrors.hasError('account_type') ? 'error' : false,
             onchange: m.withAttr('value', fields.bank_account_type)
-        }, [m('option[value=\'conta_corrente\']', { selected: fields.bank_account_type() === 'conta_corrente' }, 'Conta corrente'), m('option[value=\'conta_poupanca\']', { Selected: fields.bank_account_type() === 'conta_poupanca' }, 'Conta poupança'), m('option[value=\'conta_corrente_conjunta\']', { selected: fields.bank_account_type() === 'conta_corrente_conjunta' }, 'Conta corrente conjunta'), m('option[value=\'conta_poupanca_conjunta\']', { Selected: fields.bank_account_type() === 'conta_poupanca_conjunta' }, 'Conta poupança conjunta')])])]), m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']', 'No. da conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
+        }, [m('option[value=\'conta_corrente\']', { selected: fields.bank_account_type() === 'conta_corrente' }, 'Conta corrente'), m('option[value=\'conta_poupanca\']', { Selected: fields.bank_account_type() === 'conta_poupanca' }, 'Conta poupança'), m('option[value=\'conta_corrente_conjunta\']', { selected: fields.bank_account_type() === 'conta_corrente_conjunta' }, 'Conta corrente conjunta'), m('option[value=\'conta_poupanca_conjunta\']', { selected: fields.bank_account_type() === 'conta_poupanca_conjunta' }, 'Conta poupança conjunta')]), ctrl.parsedErrors.inlineError("account_type")])]), m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']', 'No. da conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
             value: fields.account(),
+            class: ctrl.parsedErrors.hasError('account') ? 'error' : false,
             onchange: m.withAttr('value', fields.account),
             name: 'user[bank_account_attributes][account]'
-        })]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']', 'Dígito conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
+        }), ctrl.parsedErrors.inlineError("account")]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']', 'Dígito conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
             value: fields.account_digit(),
+            class: ctrl.parsedErrors.hasError('account_digit') ? 'error' : false,
             onchange: m.withAttr('value', fields.account_digit),
             name: 'user[bank_account_attributes][account_digit]'
-        })])]))]), bankAccount.bank_account_id ? m('input[id=\'user_bank_account_attributes_id\'][type=\'hidden\']', {
+        }), ctrl.parsedErrors.inlineError("account_digit")])]))]), bankAccount.bank_account_id ? m('input[id=\'user_bank_account_attributes_id\'][type=\'hidden\']', {
             name: 'user[bank_account_attributes][id]',
             value: fields.bank_account_id()
-        }) : '']), m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Endereço'), m('.w-row', [m('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m('label.field-label', 'País'), m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
-            onchange: m.withAttr('value', fields.country_id)
+        }) : '']), m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Endereço'), m('.fontsize-small.u-marginbottom-20.u-marginbottom-20', ['Os dados abaixo serão utilizados para envio de recompensas e para emissão de Nota Fiscal, caso aplicável.']), m('.w-row', [m('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m('label.field-label', 'País'), m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
+            onchange: m.withAttr('value', fields.country_id),
+            class: ctrl.parsedErrors.hasError('country_id') ? 'error' : false
         }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
             return m('option' + (country.id == fields.country_id() ? '[selected="selected"]' : ''), {
                 value: country.id
             }, country.name_en);
-        }) : ''])]), m('.w-col.w-col-6')]), m('.w-row', [m('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Endereço'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
+        }) : '']), ctrl.parsedErrors.inlineError("country_id")]), m('.w-col.w-col-6')]), m('.w-row', [m('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Endereço'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
             value: fields.street(),
+            class: ctrl.parsedErrors.hasError('street') ? 'error' : false,
             onchange: m.withAttr('value', fields.street)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_street\']', ' translation missing: pt.simple_form.validation_texts.user.address_street')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'Número'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
+        }), ctrl.parsedErrors.inlineError("street")]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'Número'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
             value: fields.number(),
+            class: ctrl.parsedErrors.hasError('number') ? 'error' : false,
             onchange: m.withAttr('value', fields.number)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_number\']', ' translation missing: pt.simple_form.validation_texts.user.address_number')]), m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Complemento'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
+        }), ctrl.parsedErrors.inlineError("number")]), m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Complemento'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
             value: fields.complement(),
+            class: ctrl.parsedErrors.hasError('complement') ? 'error' : false,
             onchange: m.withAttr('value', fields.complement)
-        })])]))]), m('.w-row', [m('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Bairro'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
+        }), ctrl.parsedErrors.inlineError("complement")])]))]), m('.w-row', [m('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Bairro'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
             value: fields.neighbourhood(),
+            class: ctrl.parsedErrors.hasError('neighbourhood') ? 'error' : false,
             onchange: m.withAttr('value', fields.neighbourhood)
-        })]), m('.input.string.optional.user_address_city.w-col.w-col-6', [m('label.field-label', 'Cidade'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
+        }), ctrl.parsedErrors.inlineError("neighbourhood")]), m('.input.string.optional.user_address_city.w-col.w-col-6', [m('label.field-label', 'Cidade'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
             value: fields.city(),
+            class: ctrl.parsedErrors.hasError('city') ? 'error' : false,
             onchange: m.withAttr('value', fields.city)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_city\']', ' translation missing: pt.simple_form.validation_texts.user.address_city')])]), m('.w-row', [m('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Estado'), m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
-
+        }), ctrl.parsedErrors.inlineError("city")])]), m('.w-row', [m('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Estado'), m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
+            class: ctrl.parsedErrors.hasError('state') ? 'error' : false,
             onchange: m.withAttr('value', fields.state)
         }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
             return m('option[value=\'' + state.acronym + '\']' + (state.acronym == fields.state() ? '[selected="selected"]' : ''), {
                 value: state.acronym
             }, state.name);
-        }) : '', m('option[value=\'outro / other\']', 'Outro / Other')]), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_state\']', ' translation missing: pt.simple_form.validation_texts.user.address_state')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'CEP'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
+        }) : '', m('option[value=\'outro / other\']', 'Outro / Other')]), ctrl.parsedErrors.inlineError("state")]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'CEP'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
             value: fields.zipcode(),
+            class: ctrl.parsedErrors.hasError('zipcode') ? 'error' : false,
             onchange: m.withAttr('value', fields.zipcode)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_zip_code\']', ' translation missing: pt.simple_form.validation_texts.user.address_zip_code')]), m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Telefone'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
+        }), ctrl.parsedErrors.inlineError("zipcode")]), m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Telefone'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
             value: fields.phonenumber(),
             onchange: m.withAttr('value', fields.phonenumber),
+            class: ctrl.parsedErrors.hasError('phonenumber') ? 'error' : false,
             onkeyup: m.withAttr('value', function (value) {
                 return ctrl.applyPhoneMask(value);
             })
-        })])]))])]), args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Cartões de crédito'), m('.fontsize-small.u-marginbottom-20', ['Caso algum projeto que você tenha apoiado ', m('b', 'com Cartão de Crédito'), ' não seja bem-sucedido, nós efetuaremos o reembolso ', m('b', 'automaticamente'), ' no cartão utilizado para efetuar o apoio. ']), m('.divider.u-marginbottom-20'), m('.w-row.w-hidden-tiny.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', 'Cartão')), m('.w-col.w-col-5.w-col-small-5', m('.fontweight-semibold.fontsize-small', 'Operadora')), m('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
+        }), ctrl.parsedErrors.inlineError("phonenumber")])]))])]), args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Cartões de crédito'), m('.fontsize-small.u-marginbottom-20', ['Caso algum projeto que você tenha apoiado ', m('b', 'com Cartão de Crédito'), ' não seja bem-sucedido, nós efetuaremos o reembolso ', m('b', 'automaticamente'), ' no cartão utilizado para efetuar o apoio. ']), m('.divider.u-marginbottom-20'), m('.w-row.w-hidden-tiny.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', 'Cartão')), m('.w-col.w-col-5.w-col-small-5', m('.fontweight-semibold.fontsize-small', 'Operadora')), m('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
             return m('.w-row.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', ['XXXX XXXX XXXX', m.trust('&nbsp;'), card.last_digits])), m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold.u-marginbottom-10', card.card_brand.toUpperCase())), m('.w-col.w-col-2.w-col-small-2', m('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', { onclick: ctrl.deleteCard(card.id) }, 'Remover'))]);
         }), m('form.w-hidden', { action: '/pt/users/' + user.id + '/credit_cards/' + ctrl.toDeleteCard(), method: 'POST', config: ctrl.setCardDeletionForm }, [m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'), m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']')])]))), m('div', m('.w-container' + (args.useFloatBtn ? '.w-section.save-draft-btn-section' : ''), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', ctrl.loading() ? h.loader() : m('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Salvar\']')), m('.w-col.w-col-4')])))])])]);
     }
@@ -9801,11 +10058,10 @@ var publish = {
         var project = _$1.first(ctrl.projectDetails()),
             account = _$1.first(ctrl.projectAccount()),
             flexTerms = function flexTerms(project) {
-            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span.fontweight-semibold', 'Regras da modalidade FLEX')]), m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign term (discounting the JVN fee) and must comply with the execution of the campaign and with the delivery of the rewards offered regardless of how much to collect.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span.fontweight-semibold', 'Goal of collection')]), m('div', 'The goal can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span.fontweight-semibold', 'Rates')]), m('div', ['At the end of the campaign, we will charge 5% + online payment portal charge of ', m('span.fontweight-semibold', 'total amount collected.')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span.fontweight-semibold', 'Campaign deadline')]), m('div', 'Once set, the closing period can not be changed. If you started the campaign with the deadline, you must set it during the campaign, and you can leave the campaign open for a maximum of 12 months.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span.fontweight-semibold', 'Deadline for transfer')]), m('div', 'When the deadline for your campaign comes to an end, you should verify your bank details. After this confirmation, JVN will deposit into your checking account within 10 business days. The amount deposited will already be considering the 5% + online payment portal charge discount of the fee.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span.fontweight-semibold', 'What can and can not change on the campaign page from publication?')]), [m('div', [m('span.fontweight-semibold', 'You may not:'), ' Change the type of funding, campaign name, campaign URL, category chosen, collection goal, deadline (if you have already defined it), rewards where existing support is available, and registered bank account.\
-                    ', m('br'), m('br'), m('span.fontweight-semibold', 'You may: '), 'Edit the content of the campaign description, change the main campaign video, campaign image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span.fontweight-semibold', 'Responsibility of JVN')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible for:'), ' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the campaign in the platform and by guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible for:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span.fontweight-semibold', 'Your responsibilities')]), m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold'), 'It is your responsibility for all aspects of campaign formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the campaign, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawing online campaign')]), m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our ', m('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
+            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span.fontweight-semibold', 'O que pode e não pode alterar na página do projeto a partir da publicação?')]), m('div', [m('span.fontweight-semibold', 'Você não poderá alterar'), ': a identidade do responsável pelo projeto (Nome / CPF ou Razão Social / CNPJ), a Modalidade de financiamento, o título do projeto, a URL (link) do projeto, a categoria do projeto, a meta de arrecadação,  o prazo (caso já tenha definido), e as recompensas onde existirem apoios já efetuados.', m('br'), m('br'), m('span.fontweight-semibold', 'Você poderá alterar'), ': o vídeo principal da campanha, o conteúdo da descrição, a imagem do projeto, a frase de efeito, as recompensas onde não existirem apoios efetuados, além de adicionar novas recompensas durante a arrecadação'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span.fontweight-semibold', 'Regras da modalidade FLEX')]), m('div', 'Você escolheu a campanha flexível. Dessa maneira, você irá receber todos os recursos arrecadados junto aos apoiadores ao final do prazo da campanha (descontando a taxa do Catarse) e deverá cumprir com a execução do projeto e com a entrega das recompensas oferecidas independente do quanto arrecadar.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span.fontweight-semibold', 'Meta de arrecadação')]), m('div', 'A meta não poderá ser alterada após o publicação do projeto.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span.fontweight-semibold', 'Taxas')]), m('div', ['Ao final da campanha, cobraremos 13% sobre o ', m('span.fontweight-semibold', 'valor total arrecadado.')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span.fontweight-semibold', 'Prazo da campanha')]), m('div', 'Uma vez definido, o prazo de encerramento não poderá ser alterado. Caso você tenha iniciado a campanha com o prazo em aberto, deverá defini-lo durante a campanha, podendo deixar a campanha aberta por no máximo 12 meses.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span.fontweight-semibold', 'Prazo para repasse')]), m('div', m.trust('Quando o prazo do seu projeto chegar ao fim, você deverá confirmar seus dados bancários. Você poderá alterar o Banco, Conta e a Agência <strong>somente se a nova conta cadastrada for de sua titularidade</strong>. Após a confirmação, o Catarse depositará na sua conta corrente em até 10 dias úteis. O valor depositado já estará considerando o desconto de 13% da taxa.'))]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span.fontweight-semibold', 'Responsabilidade do Catarse')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'O Catarse é responsável:'), ' pelo desenvolvimento tecnológico da plataforma, atendimento de dúvidas e problemas (tanto de apoiadores quanto de realizadores), por hospedar o projeto na plataforma e por garantir a segurança das transações financeiras.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'O Catarse não é responsável:'), ' pelo financiamento, divulgação e execução, nem pela entrega de recompensas dos projetos inscritos.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span.fontweight-semibold', 'Suas responsabilidades')]), m('div', 'É sua responsabilidade o recebimento do dinheiro da campanha e tudo aquilo que diz respeito a formatação do projeto, planejamento e divulgação da campanha de arrecadação, mobilização de apoiadores, execução do projeto, comunicação com apoiadores e produção e entrega de recompensas dentro do prazo estimado.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Retiradas de projetos no ar')]), m('div', [m('span.fontweight-semibold'), 'O CATARSE reserva-se o direito de, a seu exclusivo critério e uma vez notificado a respeito, cancelar projetos e encerrar as contas de CRIADORES DE PROJETOS que violem nossas ', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Regras do Jogo'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Termos de Uso'), '.'])])];
         },
             terms = function terms(project) {
-            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span.fontweight-semibold', 'Rules of the All-or-nothing mode')]), m('div', ['You chose the all-or-nothing campaign. In this way, you will only receive the funds raised ', m('span.fontweight-semibold', 'if it reaches or exceeds the collection goal'), '. Otherwise, all of your supporters will be reimbursed. You will be responsible for delivering the rewards offered if your project reaches the collection goal.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Goal of collection')]), m('div', 'The goal can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Rates')]), m('div', ['We will charge 5% + online payment portal charge of ', m('span.fontweight-semibold', 'total amount collected'), ' for your campaign if it reaches or exceeds the target within the campaign deadline. If the campaign does not reach the goal, no fee will be charged.', m('span.fontweight-semibold')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Campaign deadline')]), m('div', 'Your campaign will be in collection in JVN until the day ' + h.momentify(ctrl.expiresAt()) + ' at 11:50 p.m. This deadline can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Transfer and refund rules')]), m('div', ['When the deadline for your campaign comes to an end, you should verify your bank details. After this confirmation, JVN will deposit the amount collected, with the discount of the rate, into your checking account within 10 business days. If the campaign does not reach 100% of the target by the deadline, JVN will reimburse the supporters. '])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'What can and can not change on the campaign page after publication?')]), [m('div', [m('span.fontweight-semibold', 'You can not:'), ' Change the name of your campaign, the URL (link) of your campaign, the category chosen, the type of financing, the bank account, the collection goal, the term chosen and the rewards where existing support already exists.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'You will be able to: '), 'Edit the content of the campaign description, change the main campaign video, campaign image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Responsibility of JVN')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible:'), ' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible for:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the campaigns registered.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Your responsibilities')]), m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold'), 'It is your responsibility for all aspects of campaign formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the campaign, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawing online campaing')]), m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
+            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'O que pode e não pode alterar na página do projeto a partir da publicação?')]), m('div', [m('span.fontweight-semibold', 'Você não poderá alterar'), ': a identidade do responsável pelo projeto (Nome / CPF ou Razão Social / CNPJ), a Modalidade de financiamento, o título do projeto, a URL (link) do projeto, a categoria do projeto, a meta de arrecadação, prazo escolhido e as recompensas onde existirem apoios já efetuados. ', m('br'), m('br'), m('span.fontweight-semibold', 'Você poderá alterar'), ': o vídeo principal da campanha, o conteúdo da descrição, a imagem do projeto, a frase de efeito, as recompensas onde não existirem apoios efetuados, além de adicionar novas recompensas durante a arrecadação'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span.fontweight-semibold', 'Regras da modalidade Tudo-ou-nada')]), m('div', ['Você escolheu a campanha tudo-ou-nada. Dessa maneira, você só irá receber os recursos arrecadados ', m('span.fontweight-semibold', 'caso atinja ou supere a meta de arrecadação'), '. Caso contrário, todos seus apoiadores serão reembolsados. Você será responsável pela entrega das recompensas oferecidas se seu projeto alcançar a meta de arrecadação.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Meta de arrecadação')]), m('div', 'A meta não poderá ser alterada após o publicação do projeto.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Taxas')]), m('div', ['Cobramos 13% sobre o ', m('span.fontweight-semibold', 'valor total arrecadado'), ' pelo seu projeto caso ele atinja ou supere a meta dentro do prazo da campanha. Se o projeto não atingir a meta, nenhuma taxa será cobrada.', m('span.fontweight-semibold')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Prazo da campanha')]), m('div', 'Seu projeto estar\xE1 em arrecada\xE7\xE3o no Catarse at\xE9 o dia ' + h.momentify(ctrl.expiresAt()) + ' \xE0s 23h59min59s. Este prazo n\xE3o poder\xE1 ser alterado ap\xF3s a publica\xE7\xE3o do projeto.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Regras do repasse e reembolso'), m('div', [m.trust('Quando o prazo do seu projeto chegar ao fim, você deverá confirmar seus dados bancários. Você poderá alterar o Banco, Conta e a Agência <strong>somente se a nova conta cadastrada for de sua titularidade</strong>. Após essa confirmação, o Catarse depositará o valor arrecadado, já descontada a taxa, na sua conta em 10 dias úteis. Caso o projeto não atinja 100% da meta dentro do prazo, o Catarse irá reembolsar os apoiadores. <a href="http://suporte.catarse.me/hc/pt-br/articles/202365507" target="blank">Saiba mais sobre o processo de reembolso</a>')])]), m('div', '')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Responsabilidade do Catarse')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'O Catarse é responsável:'), ' pelo desenvolvimento tecnológico da plataforma, atendimento de dúvidas e problemas (tanto de apoiadores quanto de realizadores), por hospedar o projeto na plataforma e por garantir a segurança das transações financeiras.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'O Catarse não é responsável:'), ' pelo financiamento, divulgação e execução, nem pela entrega de recompensas dos projetos inscritos.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Suas responsabilidades')]), m('div', 'É sua responsabilidade o recebimento do dinheiro da campanha e tudo aquilo que diz respeito a formatação do projeto, planejamento e divulgação da campanha de arrecadação, mobilização de apoiadores, execução do projeto, comunicação com apoiadores e produção e entrega de recompensas dentro do prazo estimado.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Retiradas de projetos no ar')]), m('div', [m('span.fontweight-semibold'), 'O CATARSE reserva-se o direito de, a seu exclusivo critério e uma vez notificado a respeito, cancelar projetos e encerrar as contas de CRIADORES DE PROJETOS que violem nossas ', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Regras do Jogo'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Termos de Uso'), '.'])])];
         };
 
         return [!ctrl.l() && !ctrl.accountL() ? [project.is_owner_or_admin ? m.component(projectDashboardMenu, {
@@ -9915,7 +10171,7 @@ var start = {
         },
             linkToExternal = function linkToExternal(category) {
             var externalLinkCategories = I18n$1.translations[I18n$1.currentLocale()].projects.index.explore_categories;
-            return _$1.isUndefined(externalLinkCategories[category.id]) ? null : externalLinkCategories[category.id].link;
+            return _$1.isUndefined(externalLinkCategories[category.id]) ? null : externalLinkCategories[category.id].link + '?ref=ctrse_start';
         },
             loadCategoryProjects = function loadCategoryProjects(category) {
             selectedCategory(category);
@@ -10415,7 +10671,7 @@ var menuProfile = {
             user_id = args.user.user_id;
 
         var userName = function userName() {
-            var name = userDetails().public_name || userDetails().name;
+            var name = userVM.displayName(userDetails());
             if (name && !_$1.isEmpty(name)) {
                 return _$1.first(name.split(' '));
             }
@@ -10441,7 +10697,7 @@ var menuProfile = {
         }, [m('.user-name-menu', ctrl.userName()), m('img.user-avatar[alt=\'Thumbnail - ' + user.name + '\'][height=\'40\'][src=\'' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '\'][width=\'40\']')]), ctrl.toggleMenu() ? m('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' }, [m('.w-row', [m('.w-col.w-col-12', [m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', 'My History'), m('ul.w-list-unstyled.u-marginbottom-20', [m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#contributions\']', 'Support History')), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#projects\']', 'Projects Created')), m('li.w-hidden-main.w-hidden-medium.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#projects\']', 'Projects Created'))]), m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', 'Settings'), m('ul.w-list-unstyled.u-marginbottom-20', [m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/connect-facebook/\']', 'Find friends')
         // m.trust('&nbsp;'),
         // m('span.badge.badge-success', 'Novidade')
-        ), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#about_me\']', 'Public Profile')), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#notifications\']', 'Notifications'))
+        ), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#about_me\']', 'Public Profile')), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#settings\']', 'Notifications'))
         //                                                 m('li.lineheight-looser',
         //                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
         //                                                         `Dados financeiros`
@@ -10476,7 +10732,6 @@ var menu = {
         var user = h.getUser(),
             menuCss = function menuCss() {
             var dynamicClasses = void 0;
-            console.log(args.withAlert);
 
             return (args.menuTransparency ? 'overlayer' : '') + ' ' + (args.withAlert || args.withFixedAlert ? 'with-global-alert' : '');
         },
@@ -10558,7 +10813,7 @@ var UserFollowCard = {
     view: function view(ctrl, args) {
         var friend = ctrl.friend(),
             profile_img = _$1.isEmpty(friend.avatar) ? '/assets/catarse_bootstrap/user.jpg' : friend.avatar;
-        return m('.w-col.w-col-4', m('.card.card-backer.u-marginbottom-20.u-radius.u-text-center', [m('img.thumb.u-marginbottom-10.u-round[src=\'' + profile_img + '\']'), m('.fontsize-base.fontweight-semibold.lineheight-tight', m('a.link-hidden', { href: '/users/' + friend.friend_id }, friend.public_name || friend.name)), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', _$1.isNull(friend.city) ? '' : m('.fontsize-smaller.fontcolor-secondary.u-marginbottom-10', friend.city + ', ' + friend.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', friend.total_contributed_projects), ' Backed ', m.trust('&nbsp;'), '| ', m.trust('&nbsp;'), m('span.fontweight-semibold', friend.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', m.component(UserFollowBtn, { following: friend.following, follow_id: friend.friend_id })), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])]));
+        return m('.w-col.w-col-4', m('.card.card-backer.u-marginbottom-20.u-radius.u-text-center', [m('img.thumb.u-marginbottom-10.u-round[src=\'' + profile_img + '\']'), m('.fontsize-base.fontweight-semibold.lineheight-tight', m('a.link-hidden', { href: '/users/' + friend.friend_id }, userVM.displayName(friend))), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', _$1.isNull(friend.city) ? '' : m('.fontsize-smaller.fontcolor-secondary.u-marginbottom-10', friend.city + ', ' + friend.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', friend.total_contributed_projects), ' Backed ', m.trust('&nbsp;'), '| ', m.trust('&nbsp;'), m('span.fontweight-semibold', friend.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', m.component(UserFollowBtn, { following: friend.following, follow_id: friend.friend_id })), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])]));
     }
 };
 
@@ -10838,7 +11093,6 @@ var CheckEmail = {
                     window.setTimeout(function () {
                         hideAlert(true);
                         m.redraw(true);
-                        console.log(data);
                     }, 4000);
                 });
             }
@@ -10871,8 +11125,259 @@ var projectEditUserAbout = {
             useFloatBtn: true,
             hideDisableAcc: true,
             hideCoverImg: true,
-            hidePasswordChange: true
+            hidePasswordChange: true,
+            rails_errors: args.rails_errors,
+            publishingUserAbout: true
         }) : m('div', h.loader());
+    }
+};
+
+var shippingFeeInput = {
+    controller: function controller(args) {
+        var fee = args.fee,
+            feeIndex = args.feeIndex,
+            feeValue = m.prop(fee.value),
+            feeDestination = m.prop(fee.destination),
+            index = args.index,
+            states = args.states;
+        return {
+            fee: fee,
+            feeValue: feeValue,
+            feeDestination: feeDestination,
+            feeIndex: feeIndex,
+            index: index,
+            states: states
+        };
+    },
+    view: function view(ctrl) {
+        var feeIndex = ctrl.feeIndex,
+            index = ctrl.index,
+            states = ctrl.states;
+
+        return m('div', [m('.u-marginbottom-10.w-row', [m('.w-col.w-col-6', m('select.fontsize-smallest.text-field-light.w-select[id=\'project_rewards_shipping_fees_attributes_' + index + '_destination\']', {
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][' + feeIndex + '][destination]',
+            value: ctrl.feeDestination(),
+            onchange: m.withAttr('value', ctrl.feeDestination)
+        }, [_$1.map(states(), function (state) {
+            return m('option[value=\'' + state.acronym + '\']', state.name);
+        })])), m('.w-col.w-col-1'), m('.w-col.w-col-4', m('.w-row', [m('.no-hover.positive.prefix.text-field.w-col.w-col-3', m('.fontcolor-secondary.fontsize-mini.u-text-center', 'R$')), m('.w-col.w-col-9', m("input.positive.postfix.text-field.w-input[type='text']", {
+            value: ctrl.feeValue(),
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][' + feeIndex + '][value]',
+            onchange: m.withAttr('value', ctrl.feeValue)
+        }))])), m('.w-col.w-col-1', [m('input[id=\'project_rewards_shipping_fees_attributes_' + index + '__destroy\'][type=\'hidden\'][value=\'false\']', {
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][' + feeIndex + '][_destroy]'
+        }), m("a.remove_fields.existing.btn.btn-no-border.btn-small.btn-terciary.fa.fa-1.fa-trash[data-confirm='Tem certeza?'][href='#']")])]), m('.divider.u-marginbottom-10')]);
+    }
+};
+
+var editRewardCard = {
+    controller: function controller(args) {
+        var shipping_options = m.prop(args.reward.shipping_options),
+            showHelp = h.toggleProp(false, true),
+            reward = args.reward,
+            otherFeeValue = m.prop(),
+            internationalFeeValue = m.prop(),
+            minimumValue = m.prop(args.reward.minimum_value || 0),
+            description = m.prop(args.reward.description || ''),
+            maximumContributions = m.prop(args.reward.maximum_contributions),
+            index = args.index,
+            states = m.prop([]),
+            fees = m.prop(),
+            newFees = m.prop([]),
+            feesLoader = rewardVM.getFees(args.reward),
+            statesLoader = rewardVM.getStates(),
+            newFee = {
+            value: null,
+            destination: null
+        };
+
+        var otherFee = void 0,
+            internationalFee = void 0;
+
+        statesLoader.load().then(function (data) {
+            states(data);
+            states().unshift({
+                acronym: null,
+                name: 'Estado'
+            });
+        });
+
+        feesLoader.load().then(function (data) {
+            fees(data);
+            otherFee = _$1.findWhere(fees(), {
+                destination: 'others'
+            });
+            internationalFee = _$1.findWhere(fees(), {
+                destination: 'international'
+            });
+            otherFeeValue(otherFee ? otherFee.value : null);
+            internationalFeeValue(internationalFee ? internationalFee.value : null);
+        });
+
+        return {
+            showHelp: showHelp,
+            otherFeeValue: otherFeeValue,
+            internationalFeeValue: internationalFeeValue,
+            minimumValue: minimumValue,
+            description: description,
+            maximumContributions: maximumContributions,
+            newFee: newFee,
+            newFees: newFees,
+            shipping_options: shipping_options,
+            states: states,
+            reward: reward,
+            index: index,
+            fees: fees
+        };
+    },
+    view: function view(ctrl) {
+        var reward = ctrl.reward,
+            index = ctrl.index,
+            fees = _$1.filter(ctrl.fees(), function (fee) {
+            return fee.destination !== 'others' && fee.destination !== 'international';
+        });
+
+        return m('.w-row.card.card-terciary.u-marginbottom-20.card-edition.medium', [m('.w-col.w-col-5.w-sub-col', [m('.fontweight-semibold.fontsize-smallest.u-marginbottom-10', ['Editar recompensa', m.trust('&nbsp;'), m("a.link-edit.fa.fa-question-circle[href='javascript:void(0);']", { onclick: function onclick() {
+                return ctrl.showHelp.toggle();
+            } })]), ctrl.showHelp() ? m('.fontsize-smallest.fontcolor-secondary.reward-explanation.u-marginbottom-20', 'Descreva o valor da recompensa e coloque uma previsão de data de entrega real para os apoiadores. Você também pode limitar uma recompensa e quando o limite é atingido ela aparece como ESGOTADA. Se quiser mudar a ordem que as recompensas aparecem em seu projeto, basta fazer isso arrastando-as para cima ou para baixo.') : '']), m('.w-col.w-col-7', m('.card', m('.w-form', [m('.w-row.u-marginbottom-20', [m('.w-col.w-col-5', m('label.fontsize-smaller', 'Valor mínimo:')), m('.w-col.w-col-7', [m('.w-row', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3.text-field.positive.prefix.no-hover', m('.fontsize-smallest.fontcolor-secondary.u-text-center', 'R$')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.string.tel.required.w-input.text-field.project-edit-reward.positive.postfix[aria-required=\'true\'][autocomplete=\'off\'][required=\'required\'][type=\'tel\'][id=\'project_rewards_attributes_' + index + '_minimum_value\']', {
+            name: 'project[rewards_attributes][' + index + '][minimum_value]',
+            value: ctrl.minimumValue(),
+            onchange: m.withAttr('value', ctrl.minimumValue)
+        }))]), m(".fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for='reward_minimum_value']", 'Informe um valor mínimo maior ou igual a 10')])]), m('.w-row', [m('.w-col.w-col-5', m('label.fontsize-smaller', 'Previsão de entrega:')), m('.w-col.w-col-7', m('.w-row', m('.w-col.w-col-12', m('.w-row', [m('input[id=\'project_rewards_attributes_' + index + '_deliver_at_3i\'][type=\'hidden\'][value=\'1\']', {
+            name: 'project[rewards_attributes][' + index + '][deliver_at(3i)]'
+        }), m('select.date.required.w-input.text-field.w-col-6.positive[aria-required=\'true\'][discard_day=\'true\'][required=\'required\'][use_short_month=\'true\'][id=\'project_rewards_attributes_' + index + '_deliver_at_2i\']', {
+            name: 'project[rewards_attributes][' + index + '][deliver_at(2i)]'
+        }, [_$1.map(moment.monthsShort(), function (month, monthIndex) {
+            var selectedMonth = reward.deliver_at ? moment(reward.deliver_at).format('MMM') : moment.monthsShort()[moment().month()];
+            return m('option[value=\'' + (monthIndex + 1) + '\']' + (selectedMonth === month ? "[selected='selected']" : ''), h.capitalize(month));
+        })]), m('select.date.required.w-input.text-field.w-col-6.positive[aria-required=\'true\'][discard_day=\'true\'][required=\'required\'][use_short_month=\'true\'][id=\'project_rewards_attributes_' + index + '_deliver_at_1i\']', {
+            name: 'project[rewards_attributes][' + index + '][deliver_at(1i)]'
+        }, [_$1.map(_$1.range(moment().year(), moment().year() + 6), function (year) {
+            return m('option[value=\'' + year + '\']' + (moment(reward.deliver_at).format('YYYY') === String(year) ? "[selected='selected']" : ''), year);
+        })])]))))]), m('.w-row', m('label.fontsize-smaller', 'Descrição:')), m('.w-row', [m('textarea.text.required.w-input.text-field.positive.height-medium[aria-required=\'true\'][placeholder=\'Descreva sua recompensa\'][required=\'required\'][id=\'project_rewards_attributes_' + index + '_description\']', {
+            name: 'project[rewards_attributes][' + index + '][description]',
+            onchange: m.withAttr('value', ctrl.description)
+        }, ctrl.description()), m(".fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for='reward_description']", 'Informe uma descrição para a recompensa')]), m('.w-row', [m('.w-col.w-col-5', m('.w-checkbox', [m('.w-checkbox-input', m('input.limit_reward[type=\'checkbox\'][id=\'limit_reward\']', {
+            checked: reward.limited(),
+            onclick: function onclick() {
+                reward.limited.toggle();
+            }
+        })), m('label.w-form-label', 'Limitar recompensa')])), reward.limited() ? m('.w-col.w-col-7.reward_maximum_contributions', m('input.string.tel.optional.w-input.text-field.u-marginbottom-30.positive[placeholder=\'Quantidade dispon\xEDvel\'][type=\'tel\'][id=\'project_rewards_attributes_' + index + '_maximum_contributions\']', {
+            name: 'project[rewards_attributes][' + index + '][maximum_contributions]',
+            value: ctrl.maximumContributions(),
+            onchange: m.withAttr('value', ctrl.maximumContributions)
+        })) : '']), m('.u-marginbottom-60.w-row', [m('.w-col.w-col-3', m("label.fontsize-smaller[for='field-2']", 'Tipo de entrega')), m('.w-col.w-col-9', [m('select.positive.text-field.w-select[id=\'project_rewards_attributes_' + index + '_shipping_options\']', {
+            name: 'project[rewards_attributes][' + index + '][shipping_options]',
+            value: ctrl.shipping_options() || 'free',
+            onchange: m.withAttr('value', ctrl.shipping_options)
+        }, [m('option[value=\'international\']', 'Frete Nacional e Internacional'), m('option[value=\'national\']', 'Frete Nacional'), m('option[value=\'free\']', 'Sem frete envolvido'), m('option[value=\'presential\']', 'Retirada presencial')]), ctrl.shipping_options() === 'national' || ctrl.shipping_options() === 'international' ? m('.card.card-terciary', [ctrl.shipping_options() === 'international' ? [
+        // international fee
+        m('.u-marginbottom-10.w-row', [m('input[type=\'hidden\']', {
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][0][destination]',
+            value: 'international'
+        }), m('.w-col.w-col-6', m('label.field-label.fontsize-smallest', 'Internacional')), m('.w-col.w-col-1'), m('.w-col.w-col-4', m('.w-row', [m('.no-hover.positive.prefix.text-field.w-col.w-col-3', m('.fontcolor-secondary.fontsize-mini.u-text-center', 'R$')), m('.w-col.w-col-9', m("input.positive.postfix.text-field.w-input[type='text']", {
+            value: ctrl.internationalFeeValue(),
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][0][value]',
+            onchange: m.withAttr('value', ctrl.internationalFeeValue)
+        }))])), m('.w-col.w-col-1')]),, m('.divider.u-marginbottom-10')] : '',
+        // other states fee
+        m('.u-marginbottom-10.w-row', [m('input[type=\'hidden\']', {
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][1][destination]',
+            value: 'others'
+        }), m('.w-col.w-col-6', m('label.field-label.fontsize-smallest', fees.length + ctrl.newFees().length > 0 ? 'Resto do Brasil' : 'Todos os estados do Brasil')), m('.w-col.w-col-1'), m('.w-col.w-col-4', m('.w-row', [m('.no-hover.positive.prefix.text-field.w-col.w-col-3', m('.fontcolor-secondary.fontsize-mini.u-text-center', 'R$')), m('.w-col.w-col-9', m("input.positive.postfix.text-field.w-input[type='text']", {
+            value: ctrl.otherFeeValue(),
+            name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][1][value]',
+            onchange: m.withAttr('value', ctrl.otherFeeValue)
+        }))])), m('.w-col.w-col-1')]), m('.divider.u-marginbottom-10'),
+
+        // state fees
+        _$1.map(fees, function (fee, feeIndex) {
+            return [m(shippingFeeInput, {
+                fee: fee,
+                index: index,
+                feeIndex: feeIndex + 2,
+                states: ctrl.states
+            }), m('input[type=\'hidden\'][id=\'project_rewards_shipping_fees_attributes_' + (feeIndex + 2) + '_id\']', {
+                name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][' + (feeIndex + 2) + '][id]',
+                value: fee.id
+            })];
+        }), _$1.map(ctrl.newFees(), function (fee) {
+            return fee;
+        }), m('.u-margintop-20', m("a.alt-link[href='#']", {
+            onclick: function onclick() {
+                ctrl.newFees().push(m(shippingFeeInput, {
+                    fee: ctrl.newFee,
+                    index: index,
+                    feeIndex: h.getRandomInt(999999999, 9999999999),
+                    states: ctrl.states
+                }));
+                return false;
+            }
+        }, 'Adicionar destino'))]) : ''])]), m('.w-row.u-margintop-30', [reward.newReward ? '' : m('.w-col.w-col-5.w-col-small-5.w-col-tiny-5.w-sub-col-middle', m("input.w-button.btn-terciary.btn.btn-small.reward-close-button[type='submit'][value='Fechar']", {
+            onclick: function onclick() {
+                reward.edit.toggle();
+            }
+        })), m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1', [m('input[id=\'project_rewards_attributes_' + index + '__destroy\'][type=\'hidden\'][value=\'false\']', {
+            name: 'project[rewards_attributes][' + index + '][_destroy]'
+        }), m("a.remove_fields.existing[data-confirm='Tem certeza?'][href='#']", m('.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border'))])])])))]);
+    }
+};
+
+var projectEditReward = {
+    controller: function controller(args) {
+        var rewards = m.prop([]),
+            newRewards = m.prop([]),
+            newReward = {
+            minimum_value: null,
+            deliver_at: null,
+            description: null,
+            limited: h.toggleProp(false, true),
+            maximum_contributions: null,
+            newReward: true
+        };
+        rewardVM.fetchRewards(args.project_id).then(function () {
+            _$1.map(rewardVM.rewards(), function (reward) {
+                var limited = reward.maximum_contributions !== null;
+                _$1.extend(reward, {
+                    edit: h.toggleProp(false, true),
+                    limited: h.toggleProp(limited, !limited)
+                });
+                rewards().push(reward);
+            });
+        });
+        return {
+            rewards: rewards,
+            newRewards: newRewards,
+            newReward: newReward
+        };
+    },
+    view: function view(ctrl, args) {
+        return m("[id='dashboard-rewards-tab']", m('.w-section.section', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', m('form.simple_form.project-form.w-form[action=\'/pt/projects/' + args.project_id + '\'][method=\'post\'][novalidate=\'novalidate\'][id=\'edit_project_' + args.project_id + '\']', [m("input[name='utf8'][type='hidden'][value='✓']"), m("input[name='_method'][type='hidden'][value='patch']"), m('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m('input[id=\'project_id\'][name=\'project_id\'][type=\'hidden\'][value=\'' + args.project_id + '\']'), m("input[id='anchor'][name='anchor'][type='hidden'][value='reward']"), m("[id='dashboard-rewards']", [m(".ui-sortable[id='rewards']", [_$1.map(ctrl.rewards(), function (reward, index) {
+            return m('div', [m('.nested-fields.ui-sortable-handle', m('.reward-card', [!reward.edit() ? m('.w-row.card-persisted.card.card-terciary.u-marginbottom-20.medium.sortable[data-update_url=\'/pt/projects/' + args.project_id + '/rewards/' + reward.id + '/sort\']', [m('.w-sub-col.w-col.w-col-5', [m('span.fontcolor-secondary.fontsize-smallest', 'Link para apoio direto'), m('.u-marginbottom-20.w-row', m('.w-col.w-col-12', m('.mithril-copy-link', m('.clipboard.w-row', [m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', m('textarea.copy-textarea.text-field.w-input', {
+                style: {
+                    'margin-bottom': '0'
+                }
+            }, 'https://www.catarse.me/pt/projects/' + args.project_id + '/contributions/new?reward_id=' + reward.id)), m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', m('button.btn.btn-medium.btn-no-border.btn-terciary.fa.fa-clipboard.w-button'))])))), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-20', 'O link acima leva para a página de contribuição com essa recompensa já selecionada.')]), m('.w-col.w-col-7', m('.card', [m('.w-row', [m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.fontsize-base.fontweight-semibold', 'Para R$ ' + reward.minimum_value + ' ou mais')), m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1', m("a.show_reward_form[href='javascript:void(0);']", {
+                onclick: function onclick() {
+                    reward.edit.toggle();
+                }
+            }, m('.btn.btn-small.btn-terciary.fa.fa-lg.fa-edit.btn-no-border')))]), m('.fontsize-smaller.u-marginbottom-20.fontweight-semibold', reward.paid_count + ' apoiadores'), reward.description, m('p'), reward.deliver_at ? m('.fontsize-smallest', [m('b', 'Estimativa de entrega: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : '']))]) : '', reward.edit() ? m(editRewardCard, {
+                reward: reward,
+                index: index
+            }) : ''])), m('input.ui-sortable-handle[id=\'project_rewards_attributes_' + index + '_id\'][type=\'hidden\']', {
+                name: 'project[rewards_attributes][' + index + '][id]',
+                value: reward.id
+            })]);
+        })]), _$1.map(ctrl.newRewards(), function (reward) {
+            return reward;
+        }), m("a.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields[href='#']", {
+            onclick: function onclick() {
+                return ctrl.newRewards().push(m(editRewardCard, {
+                    reward: ctrl.newReward,
+                    index: h.getRandomInt(999999999, 9999999999)
+                }));
+            }
+        }, '+ Adicionar recompensa'), m('.w-section.save-draft-btn-section', m('.w-container', m('.w-row', m('.w-col.w-col-4.w-col-push-4', m("input.btn.btn.btn-medium[name='commit'][type='submit'][value='Salvar']")))))])]))))));
     }
 };
 
@@ -10887,7 +11392,9 @@ var projectEditUserSettings = {
             user: ctrl.user(),
             userId: args.user_id,
             hideCreditCards: true,
-            useFloatBtn: true
+            useFloatBtn: true,
+            rails_errors: args.rails_errors,
+            publishingUserSettings: true
         }) : m('div', h.loader());
     }
 };
@@ -10921,11 +11428,12 @@ var c = {
         FollowFoundFriends: FollowFoundFriends,
         CheckEmail: CheckEmail,
         projectEditUserAbout: projectEditUserAbout,
-        projectEditUserSettings: projectEditUserSettings
+        projectEditUserSettings: projectEditUserSettings,
+        projectEditReward: projectEditReward
     }
 };
 
 return c;
 
 }(m,I18n,_,moment,$,postgrest,CatarseAnalytics,replaceDiacritics,Chart));
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3JjLyoqLyouanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7IiwicHJlRXhpc3RpbmdDb21tZW50IjoiLy8jIHNvdXJjZU1hcHBpbmdVUkw9ZGF0YTphcHBsaWNhdGlvbi9qc29uO2NoYXJzZXQ9dXRmLTg7YmFzZTY0LGV5SjJaWEp6YVc5dUlqb3pMQ0ptYVd4bElqcHVkV3hzTENKemIzVnlZMlZ6SWpwYlhTd2ljMjkxY21ObGMwTnZiblJsYm5RaU9sdGRMQ0p1WVcxbGN5STZXMTBzSW0xaGNIQnBibWR6SWpvaU96czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdJbjA9In0=
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3JjLyoqLyouanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OyIsInByZUV4aXN0aW5nQ29tbWVudCI6Ii8vIyBzb3VyY2VNYXBwaW5nVVJMPWRhdGE6YXBwbGljYXRpb24vanNvbjtjaGFyc2V0PXV0Zi04O2Jhc2U2NCxleUoyWlhKemFXOXVJam96TENKbWFXeGxJanB1ZFd4c0xDSnpiM1Z5WTJWeklqcGJYU3dpYzI5MWNtTmxjME52Ym5SbGJuUWlPbHRkTENKdVlXMWxjeUk2VzEwc0ltMWhjSEJwYm1keklqb2lPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN095SjkifQ==
