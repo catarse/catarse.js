@@ -28,10 +28,22 @@ const projectRewardList = {
 
         const setInput = (el, isInitialized) => (!isInitialized ? el.focus() : false);
 
+        const selectDestination = (destination) => {
+            selectedDestination(destination);
+
+            const shippingFee = vm.shippingFeeForCurrentReward(selectedDestination)
+                ? Number(vm.shippingFeeForCurrentReward(selectedDestination).value)
+                : 0;
+            const rewardMinValue = Number(vm.selectedReward().minimum_value);
+            vm.applyMask(shippingFee + rewardMinValue + ',00');
+        };
+
         const submitContribution = () => {
             const valueFloat = h.monetaryToFloat(vm.contributionValue);
             const shippingFee = hasShippingOptions(vm.selectedReward()) ? vm.shippingFeeForCurrentReward(selectedDestination) : { value: 0 };
-            if (valueFloat < vm.selectedReward().minimum_value + shippingFee.value) {
+            if (!selectedDestination()) {
+                vm.error('Por favor, selecione uma opção de frete válida.');
+            } else if (valueFloat < vm.selectedReward().minimum_value + shippingFee.value) {
                 vm.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${vm.selectedReward().minimum_value} + frete R$${h.formatNumber(shippingFee.value)}`);
             } else {
                 vm.error('');
@@ -64,6 +76,7 @@ const projectRewardList = {
             toggleDescriptionExtended,
             isRewardOpened,
             isRewardDescriptionExtended,
+            selectDestination,
             selectedDestination,
             error: vm.error,
             applyMask: vm.applyMask,
@@ -123,7 +136,7 @@ const projectRewardList = {
                 m('.w-col.w-col-6', ctrl.hasShippingOptions(reward) ? [
                     m('.fontcolor-secondary.fontsize-smallest',
                         m('span',
-                            'Forma de envio:'
+                            'Envio:'
                         )
                     ),
                     m('.fontsize-smallest',
@@ -156,10 +169,19 @@ const projectRewardList = {
                                 'Local de entrega'
                             ),
                             m('select.positive.text-field.w-select', {
-                                onchange: m.withAttr('value', ctrl.selectedDestination),
+                                onchange: m.withAttr('value', ctrl.selectDestination),
                                 value: ctrl.selectedDestination()
                             },
-                                _.map(ctrl.locationOptions(reward, ctrl.selectedDestination), option => m(`option[value="${option.value}"]`,{selected: option.value === ctrl.selectedDestination()},`${option.name} +R$${option.fee}`))
+                                _.map(
+                                    ctrl.locationOptions(reward, ctrl.selectedDestination),
+                                    option => m(`option[value="${option.value}"]`,
+                                        { selected: option.value === ctrl.selectedDestination() },
+                                        [
+                                            `${option.name} `,
+                                            option.fee ? `+R$${option.fee}` : null
+                                        ]
+                                    )
+                                )
                             )
                         ]) : '',
                         m('.fontcolor-secondary.u-marginbottom-10',

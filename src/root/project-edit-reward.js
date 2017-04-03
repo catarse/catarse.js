@@ -16,6 +16,7 @@ const projectEditReward = {
                 minimum_value: null,
                 deliver_at: null,
                 description: null,
+                paid_count: 0,
                 limited: h.toggleProp(false, true),
                 maximum_contributions: null,
                 newReward: true
@@ -128,13 +129,14 @@ const projectEditReward = {
 
 
                                                                     (reward.deliver_at ? m('.fontsize-smallest', [m('b', 'Estimativa de entrega: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : ''),
-                                                                    m('.fontsize-smallest', m('b', 'Forma de envio: '), I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope()))
+                                                                    m('.fontsize-smallest', m('b', 'Envio: '), I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope()))
 
                                                                 ])
                                                             )
                                                         ]) : ''),
                                                     (reward.edit() ?
                                                         m(editRewardCard, {
+                                                            canEdit: rewardVM.canEdit(reward, args.project_state),
                                                             reward,
                                                             index
                                                         }) : '')
@@ -147,17 +149,20 @@ const projectEditReward = {
                                         ]))
                                     ]),
                                     (_.map(ctrl.newRewards(), reward => reward)),
-                                    m("a.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields[href='#']", {
-                                        onclick: () => ctrl.newRewards().push(
+
+                                    (rewardVM.canAdd(args.project_state) ? [
+                                        m("a.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields[href='#']", {
+                                            onclick: () => ctrl.newRewards().push(
                                                 m(editRewardCard, {
+                                                    canEdit: true,
                                                     reward: ctrl.newReward,
                                                     index: h.getRandomInt(999999999, 9999999999)
                                                 })
                                             )
-                                    },
+                                        },
                                         '+ Adicionar recompensa'
                                     ),
-                                    m('.w-section.save-draft-btn-section',
+                                        m('.w-section.save-draft-btn-section',
                                         m('.w-container',
                                             m('.w-row',
                                                 m('.w-col.w-col-4.w-col-push-4',
@@ -165,7 +170,7 @@ const projectEditReward = {
                                                 )
                                             )
                                         )
-                                    )
+                                    )] : '')
                                 ])
                             ])
                         )

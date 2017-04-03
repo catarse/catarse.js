@@ -44,14 +44,14 @@ const projectPosts = {
             m('.w-container.u-margintop-20', [
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
-                    (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [
-                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of who has already supported his campaign and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')
-                    ]) : '') : ''
-                    // m('.w-row.u-marginbottom-20', [
-                    //     m('.w-col.w-col-4.w-col-push-4', [
-                    //         m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/edit#posts']`, 'Edit Post')
-                    //     ])
-                    // ])
+                    (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [=
+                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'Toda novidade publicada no Catarse é enviada diretamente para o email de quem já apoiou seu projeto e também fica disponível para visualização no site. Você pode optar por deixá-la pública, ou visível somente para seus apoiadores aqui nesta aba.')
+                    ]) : '') : '',
+                    m('.w-row.u-marginbottom-20', [
+                        m('.w-col.w-col-4.w-col-push-4', [
+                            m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/posts']`, 'Escrever novidade')
+                        ])
+                    ])
                 ] : ''), (_.map(list.collection(), post => m('.w-row', [
                     m('.w-col.w-col-1'),
                     m('.w-col.w-col-10', [
