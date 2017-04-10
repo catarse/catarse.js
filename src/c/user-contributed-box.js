@@ -4,6 +4,7 @@ import I18n from 'i18n-js';
 import h from '../h';
 import contributionVM from '../vms/contribution-vm';
 import userVM from '../vms/user-vm';
+import settingsVM from '../vms/settings-vm';
 import loadMoreBtn from './load-more-btn';
 import rewardReceiver from './reward-receiver';
 
@@ -100,7 +101,7 @@ const userContributedBox = {
                         ),
 
                         (contributionVM.canShowReceipt(contribution) ?
-                            m(`a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href='https://www.catarse.me/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/receipt'][target='__blank']`,
+                            m(`a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href='${settingsVM.base_url}/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/receipt'][target='__blank']`,
                                 'Ver recibo'
                             ) : ''),
 
@@ -110,7 +111,7 @@ const userContributedBox = {
                             ) : ''),
 
                         (contributionVM.canGenerateSlip(contribution) ?
-                            m(`a.btn.btn-inline.btn-small.u-margintop-10[href='https://www.catarse.me/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/second_slip'][target='__blank']`,
+                            m(`a.btn.btn-inline.btn-small.u-margintop-10[href='${settingsVM.base_url}/pt/projects/${contribution.project_id}/contributions/${contribution.contribution_id}/second_slip'][target='__blank']`,
                                 'Gerar 2a via'
                             ) : ''),
 

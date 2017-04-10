@@ -7,6 +7,7 @@ import m from 'mithril';
 import postgrest from 'mithril-postgrest';
 import CatarseAnalytics from 'CatarseAnalytics';
 import contributionVM from './vms/contribution-vm';
+import settingsVM from './vms/settings-vm';
 
 const
     _dataCache : Object = {},
@@ -350,7 +351,7 @@ const
             try {
                 window.FB.XFBML.parse();
             } catch (e) {
-                //console.log(e);
+                // console.log(e);
             }
         };
 
@@ -607,7 +608,7 @@ const
                 if (!eventObj.user) { eventObj.user = getUser(); }
                 CatarseAnalytics.event(eventObj);
             } catch (e) {
-                //console.error('[h.analyticsEvent] error:', e);
+                // console.error('[h.analyticsEvent] error:', e);
             }
             fn();
         };
@@ -680,7 +681,7 @@ const
     // Adapted from https://github.com/diogob/jquery.fixedmask
     mask = (maskDefinition: RegExp, value: string): string => {
         const maskCharDefinitions = {
-                '9': /\d/, // String key needed to avoid flowType error
+                9: /\d/, // String key needed to avoid flowType error
                 A: /[a-zA-Z]/
             },
             readMask = readMaskDefinition(maskCharDefinitions),
@@ -737,7 +738,7 @@ const
             permalink = project.permalink;
         }
 
-        return `https://www.catarse.me/${permalink}`;
+        return `${settingsVM.base_url}/${permalink}`;
     },
     isHome = (): boolean => {
         const path = window.location.pathname;

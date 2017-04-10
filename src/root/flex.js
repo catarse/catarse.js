@@ -5,6 +5,7 @@ import models from '../models';
 import landingSignup from '../c/landing-signup';
 import projectRow from '../c/project-row';
 import landingQA from '../c/landing-qa';
+import settingsVM from '../vms/settings-vm';
 
 const Flex = {
     controller() {
@@ -17,7 +18,7 @@ const Flex = {
             },
             addDisqus = (el, isInitialized) => {
                 if (!isInitialized) {
-                    h.discuss('https://catarse.me/flex', 'flex_page');
+                    h.discuss(`${settingsVM.base_url}/flex`, 'flex_page');
                 }
             },
             flexVM = postgrest.filtersVM({
