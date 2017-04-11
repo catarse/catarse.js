@@ -1,5 +1,6 @@
 import m from 'mithril';
 import h from '../h';
+import settingsVM from '../vms/settings-vm';
 
 const footer = {
     view() {
@@ -28,10 +29,10 @@ const footer = {
                                                 m('a.link-footer[href=\'http://crowdfunding.catarse.me/paratodos?ref=ctrse_footer\']',
                                                     ' Como funciona'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/flex?ref=ctrse_footer\']',
+                                                m(`a.link-footer[href=\'${settingsVM.base_url}/pt/flex?ref=ctrse_footer\']`,
                                                     ' Catarse flex'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/team?ref=ctrse_footer\']',
+                                                m(`a.link-footer[href=\'${settingsVM.base_url}/pt/team?ref=ctrse_footer\']`,
                                                     [
                                                         ' Nosso time ',
                                                         m.trust('&lt;'),
@@ -50,10 +51,10 @@ const footer = {
                                                 m('a.link-footer[href=\'http://github.com/catarse/catarse\']',
                                                     ' Github'
                                                 ),
-                                                m('a.link-footer[href=\'http://blog.catarse.me\']',
+                                                m(`a.link-footer[href=\'${settingsVM.blog_url}\']`,
                                                     ' Blog'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/jobs\']',
+                                                m(`a.link-footer[href=\'${settingsVM.base_url}/pt/jobs\']`,
                                                     ' Trabalhe conosco'
                                                 )
                                             ]
@@ -63,19 +64,19 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     'Ajuda'
                                                 ),
-                                                m('a.link-footer[href=\'http://suporte.catarse.me/hc/pt-br/requests/new\'][target="_BLANK"]',
+                                                m(`a.link-footer[href=\'${settingsVM.support_forum}hc/pt-br/requests/new\'][target="_BLANK"]`,
                                                     ' Contato'
                                                 ),
                                                 m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
                                                     ' Nossa Taxa'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/press?ref=ctrse_footer\']',
+                                                m(`a.link-footer[href=\'${settingsVM.base_url}/pt/press?ref=ctrse_footer\']`,
                                                     ' Imprensa'
                                                 ),
-                                                m('a.link-footer[href=\'http://suporte.catarse.me?ref=ctrse_footer/\']',
+                                                m(`a.link-footer[href=\'${settingsVM.support_forum}?ref=ctrse_footer/\']`,
                                                     ' Central de Suporte'
                                                 ),
-                                                m('a.link-footer[href=\'https://www.catarse.me/pt/guides?ref=ctrse_footer\']',
+                                                m(`a.link-footer[href=\'${settingsVM.base_url}/pt/guides?ref=ctrse_footer\']`,
                                                     ' Guia dos Realizadores'
                                                 ),
                                                 m('a.link-footer[href=\'http://pesquisa.catarse.me/\']',
@@ -117,14 +118,14 @@ const footer = {
                                                 ),
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     'Apoie projetos no Catarse'
-                                                ),                                           
+                                                ),
                                                 m('a.link-footer[href=\'/pt/explore?ref=ctrse_footer\']',
                                                     ' Explore projetos'
                                                 ),
                                                 m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']',
                                                     ' Blog'
                                                 ),
-                                                m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://suporte.catarse.me/hc/pt-br/requests/new\']',
+                                                m(`a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'${settingsVM.support_forum}hc/pt-br/requests/new\']`,
                                                     ' Contato'
                                                 ),
                                                 m('a.w-hidden-tiny.link-footer[href=\'/pt/explore?filter=score&ref=ctrse_footer\']',

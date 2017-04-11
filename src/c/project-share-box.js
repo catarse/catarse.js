@@ -1,6 +1,7 @@
 import m from 'mithril';
 import h from '../h';
 import facebookButton from './facebook-button';
+import settingsVM from '../vms/settings-vm';
 
 const projectShareBox = {
     controller() {
@@ -34,13 +35,13 @@ const projectShareBox = {
             ]) : ''),
             args.project().permalink ? m.component(facebookButton, {
                 mobile: true,
-                url: `https://www.catarse.me/${args.project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`
+                url: `${settingsVM.base_url}/${args.project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`
             }) : '',
-            m(`a.w-hidden-main.w-hidden-medium.btn.btn-medium.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20${args.project().name}%20https://www.catarse.me/${args.project().permalink}%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]`, [
+            m(`a.w-hidden-main.w-hidden-medium.btn.btn-medium.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20${args.project().name}%20${settingsVM.base_url}/${args.project().permalink}%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]`, [
                 m('span.fa.fa-twitter'), ' Tweet'
             ]),
             m('a.w-hidden-main.w-hidden-medium.btn.btn-medium[data-action="share/whatsapp/share"]', {
-                href: `whatsapp://send?text=${encodeURIComponent(`https://www.catarse.me/${args.project().permalink}/?ref=whatsapp&utm_source=whatsapp&utm_medium=social&utm_campaign=project_share`)}`
+                href: `whatsapp://send?text=${encodeURIComponent(`${settingsVM.base_url}/${args.project().permalink}/?ref=whatsapp&utm_source=whatsapp&utm_medium=social&utm_campaign=project_share`)}`
             }, [m('span.fa.fa-whatsapp'), ' Whatsapp'])
         ]);
     }

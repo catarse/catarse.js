@@ -2,6 +2,7 @@ import m from 'mithril';
 import _ from 'underscore';
 import h from '../h';
 import projectReminder from './project-reminder';
+import settingsVM from '../vms/settings-vm';
 
 const projectTabs = {
     controller(args) {
@@ -87,7 +88,7 @@ const projectTabs = {
                                     cat: 'project_view', act: 'project_comments_view', project: project() })
                             }, [
                                 'Comentários ',
-                                project() ? m(`fb:comments-count[href="http://www.catarse.me/${project().permalink}"][class="badge project-fb-comment w-hidden-small w-hidden-tiny"][style="display: inline"]`, m.trust('&nbsp;')) : '-'
+                                project() ? m(`fb:comments-count[href="${settingsVM.base_url}/${project().permalink}"][class="badge project-fb-comment w-hidden-small w-hidden-tiny"][style="display: inline"]`, m.trust('&nbsp;')) : '-'
                             ]),
                         ]),
                         project() ? m('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', project().open_for_contributions ? [

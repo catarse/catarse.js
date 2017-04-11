@@ -4,6 +4,7 @@ import postgrest from 'mithril-postgrest';
 import h from '../h';
 import models from '../models';
 import projectFilters from './project-filters-vm';
+import settingsVM from './settings-vm';
 
 const idVM = h.idVM,
     currentUser = m.prop({}),
@@ -121,12 +122,12 @@ const getCurrentUser = () => {
 };
 
 const displayName = (user) => {
-    let u = user || {name: 'no name'};
+    const u = user || { name: 'no name' };
     return _.isEmpty(u.public_name) ? u.name : u.public_name;
 };
 
 const displayImage = (user) => {
-    const defaultImg = 'https://catarse.me/assets/catarse_bootstrap/user.jpg';
+    const defaultImg = `${settingsVM.base_url}/assets/catarse_bootstrap/user.jpg`;
 
     if (user) {
         return user.profile_img_thumbnail || defaultImg;

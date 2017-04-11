@@ -3,6 +3,7 @@ import _ from 'underscore';
 import I18n from 'i18n-js';
 import h from '../h';
 import rewardVM from '../vms/reward-vm';
+import settingsVM from '../vms/settings-vm';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.reward_fields');
 
@@ -31,7 +32,7 @@ const dashboardRewardCard = {
                                             'margin-bottom': '0'
                                         }
                                     },
-                                        `https://www.catarse.me/pt/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
+                                        `${settingsVM.base_url}/pt/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
                                     )
                                 ),
                                 m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2',

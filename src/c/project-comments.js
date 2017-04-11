@@ -1,6 +1,7 @@
 import m from 'mithril';
 import h from '../h';
 import projectReport from './project-report';
+import settingsVM from '../vms/settings-vm';
 
 const projectComments = {
     controller() {
@@ -16,7 +17,7 @@ const projectComments = {
         return m('.w-row',
             [
                 m('.w-col.w-col-7',
-                m(`.fb-comments[data-href="http://www.catarse.me/${project.permalink}"][data-num-posts=50][data-width="610"]`, { config: ctrl.loadComments() })
+                m(`.fb-comments[data-href="${settingsVM.base_url}/${project.permalink}"][data-num-posts=50][data-width="610"]`, { config: ctrl.loadComments() })
               ),
                 m('.w-col.w-col-5', m.component(projectReport))
             ]
