@@ -1,9 +1,7 @@
 import m from 'mithril';
 import _ from 'underscore';
-import postgrest from 'mithril-postgrest';
 import I18n from 'i18n-js';
 import h from '../h';
-import models from '../models';
 import rewardVM from '../vms/reward-vm';
 import projectVM from '../vms/project-vm';
 
@@ -24,7 +22,6 @@ const projectRewardList = {
 
                 return false;
             };
-        const hasShippingOptions = reward => !(_.isNull(reward.shipping_options) || reward.shipping_options === 'free');
 
         const setInput = (el, isInitialized) => (!isInitialized ? el.focus() : false);
 
@@ -35,13 +32,14 @@ const projectRewardList = {
                 ? Number(vm.shippingFeeForCurrentReward(selectedDestination).value)
                 : 0;
             const rewardMinValue = Number(vm.selectedReward().minimum_value);
-            vm.applyMask(shippingFee + rewardMinValue + ',00');
+            vm.applyMask(`${shippingFee + rewardMinValue},00`);
         };
 
         const submitContribution = () => {
             const valueFloat = h.monetaryToFloat(vm.contributionValue);
-            const shippingFee = hasShippingOptions(vm.selectedReward()) ? vm.shippingFeeForCurrentReward(selectedDestination) : { value: 0 };
-            if (!selectedDestination()) {
+            const shippingFee = rewardVM.hasShippingOptions(vm.selectedReward()) ? vm.shippingFeeForCurrentReward(selectedDestination) : { value: 0 };
+
+            if (!selectedDestination() && rewardVM.hasShippingOptions(vm.selectedReward())) {
                 vm.error('Por favor, selecione uma opção de frete válida.');
             } else if (valueFloat < vm.selectedReward().minimum_value + shippingFee.value) {
                 vm.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${vm.selectedReward().minimum_value} + frete R$${h.formatNumber(shippingFee.value)}`);
@@ -72,7 +70,6 @@ const projectRewardList = {
         return {
             setInput,
             submitContribution,
-            hasShippingOptions,
             toggleDescriptionExtended,
             isRewardOpened,
             isRewardDescriptionExtended,
@@ -92,7 +89,7 @@ const projectRewardList = {
         const project = args.project() || {
             open_for_contributions: false
         };
-        return m('#rewards.reward.u-marginbottom-30', _.map(args.rewardDetails(), reward => m(`div[class="${h.rewardSouldOut(reward) ? 'card-gone' : `card-reward ${project.open_for_contributions ? 'clickable' : ''}`} card card-secondary u-marginbottom-10"]`, {
+        return m('#rewards.reward.u-marginbottom-30', _.map(_.sortBy(args.rewardDetails(), reward => Number(reward.row_order)), reward => m(`div[class="${h.rewardSouldOut(reward) ? 'card-gone' : `card-reward ${project.open_for_contributions ? 'clickable' : ''}`} card card-secondary u-marginbottom-10"]`, {
             onclick: h.analytics.event({
                 cat: 'contribution_create',
                 act: 'contribution_reward_click',
@@ -133,7 +130,7 @@ const projectRewardList = {
                         h.momentify(reward.deliver_at, 'MMM/YYYY')
                     )
                 ] : ''),
-                m('.w-col.w-col-6', ctrl.hasShippingOptions(reward) ? [
+                m('.w-col.w-col-6', rewardVM.hasShippingOptions(reward) || reward.shipping_options === 'presential' ? [
                     m('.fontcolor-secondary.fontsize-smallest',
                         m('span',
                             'Envio:'
@@ -164,7 +161,7 @@ const projectRewardList = {
                         onsubmit: ctrl.submitContribution
                     }, [
                         m('.divider.u-marginbottom-20'),
-                        ctrl.hasShippingOptions(reward) ? m('div', [
+                        rewardVM.hasShippingOptions(reward) ? m('div', [
                             m('.fontcolor-secondary.u-marginbottom-10',
                                 'Local de entrega'
                             ),
@@ -178,7 +175,7 @@ const projectRewardList = {
                                         { selected: option.value === ctrl.selectedDestination() },
                                         [
                                             `${option.name} `,
-                                            option.fee ? `+R$${option.fee}` : null
+                                            option.value != '' ? `+R$${option.fee}` : null
                                         ]
                                     )
                                 )

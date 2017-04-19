@@ -12,26 +12,24 @@ const editRewardCard = {
             minimumValue = m.prop(args.reward.minimum_value),
             maximumContributions = m.prop(args.reward.maximum_contributions),
             index = args.index,
+            showTips = h.toggleProp(false, true),
             states = m.prop([]),
             fees = m.prop([]),
             statesLoader = rewardVM.statesLoader,
             updateOptions = () => {
-                if ((shipping_options() === 'national' || shipping_options() === 'international')) {
-                    if (!_.contains(_.pluck(fees(), 'destination'), 'others')) {
-                        fees().push({
-                            value: 0,
-                            destination: 'others'
-                        });
-                    }
-                    fees(_.reject(fees(), fee => fee.destination === 'international'));
+                if (((shipping_options() === 'national' || shipping_options() === 'international') && !_.contains(_.pluck(fees(), 'destination'), 'others'))) {
+                    fees().push({
+                        value: 0,
+                        destination: 'others'
+                    });
                 }
-                if (shipping_options() === 'international') {
-                    if (!_.contains(_.pluck(fees(), 'destination'), 'international')) {
-                        fees().push({
-                            value: 0,
-                            destination: 'international'
-                        });
-                    }
+                if (shipping_options() === 'national') {
+                    fees(_.reject(fees(), fee => fee.destination === 'international'));
+                } else if (shipping_options() === 'international' && !_.contains(_.pluck(fees(), 'destination'), 'international')) {
+                    fees().push({
+                        value: 0,
+                        destination: 'international'
+                    });
                 }
             };
 
@@ -43,15 +41,18 @@ const editRewardCard = {
             });
 
             if (!args.reward.newReward) {
-                rewardVM.getFees(args.reward).then(fees);
+                rewardVM.getFees(args.reward).then((feeData) => {
+                    fees(feeData);
+                    updateOptions();
+                });
             }
-            updateOptions();
         });
 
         return {
             minimumValue,
             maximumContributions,
             updateOptions,
+            showTips,
             shipping_options,
             states,
             reward,
@@ -62,7 +63,10 @@ const editRewardCard = {
     view(ctrl) {
         const reward = ctrl.reward,
             index = ctrl.index,
-            newFee = { value: null, destination: null },
+            newFee = {
+                value: null,
+                destination: null
+            },
             fees = ctrl.fees();
 
         return m('.w-row.card.card-terciary.u-marginbottom-20.card-edition.medium', [
@@ -70,11 +74,14 @@ const editRewardCard = {
                 m('.fontweight-semibold.fontsize-smallest.u-marginbottom-10', [
                     'Editar recompensa',
                     m.trust('&nbsp;'),
-                    m("a.link-edit.fa.fa-question-circle[href='javascript:void(0);']")
+                    m('a.link-edit.fa.fa-question-circle', {
+                        onclick: () => ctrl.showTips.toggle()
+                    })
                 ]),
-                m('.fontsize-smallest.fontcolor-secondary.reward-explanation.w-hidden.u-marginbottom-20',
-                    'Descreva o valor da recompensa e coloque uma previsão de data de entrega real para os apoiadores. Você também pode limitar uma recompensa e quando o limite é atingido ela aparece como ESGOTADA. Se quiser mudar a ordem que as recompensas aparecem em seu projeto, basta fazer isso arrastando-as para cima ou para baixo.'
-                )
+                (ctrl.showTips() ?
+                    m('.fontsize-smallest.fontcolor-secondary.reward-explanation.u-marginbottom-20',
+                        'Descreva o valor da recompensa e coloque uma previsão de data de entrega real para os apoiadores. Você também pode limitar uma recompensa e quando o limite é atingido ela aparece como ESGOTADA. Se quiser mudar a ordem que as recompensas aparecem em seu projeto, basta fazer isso arrastando-as para cima ou para baixo.'
+                    ) : '')
             ]),
             m('.w-col.w-col-7',
                 m('.card',
@@ -124,10 +131,9 @@ const editRewardCard = {
                                                 _.map(moment.monthsShort(), (month, monthIndex) => {
                                                     const selectedMonth = reward.deliver_at ? moment(reward.deliver_at).format('MMM') : moment().format('MMM');
                                                     return m(`option[value='${monthIndex + 1}']${selectedMonth === month ? "[selected='selected']" : ''}`,
-                                                          h.capitalize(month)
-                                                      );
-                                                }
-                                                )
+                                                        h.capitalize(month)
+                                                    );
+                                                })
                                             ]),
                                             m(`select.date.required.w-input.text-field.w-col-6.positive[aria-required='true'][discard_day='true'][required='required'][use_short_month='true'][id='project_rewards_attributes_${index}_deliver_at_1i']`, {
                                                 name: `project[rewards_attributes][${index}][deliver_at(1i)]`
@@ -150,8 +156,8 @@ const editRewardCard = {
                         ),
                         m('.w-row', [
                             m(`textarea.text.required.w-input.text-field.positive.height-medium[aria-required='true'][placeholder='Descreva sua recompensa'][required='required'][id='project_rewards_attributes_${index}_description']`, {
-                                name: `project[rewards_attributes][${index}][description]`
-                            },
+                                    name: `project[rewards_attributes][${index}][description]`
+                                },
                                 reward.description),
                             m(".fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for='reward_description']",
                                 'Informe uma descrição para a recompensa'
@@ -192,21 +198,21 @@ const editRewardCard = {
 
                                         // state fees
                                         (_.map(fees, (fee, feeIndex) => [m(shippingFeeInput, {
-                                            fee,
-                                            fees: ctrl.fees,
-                                            index,
-                                            feeIndex,
-                                            states: ctrl.states
-                                        }),
+                                                fee,
+                                                fees: ctrl.fees,
+                                                index,
+                                                feeIndex,
+                                                states: ctrl.states
+                                            }),
 
                                         ])),
                                         m('.u-margintop-20',
                                             m("a.alt-link[href='#']", {
-                                                onclick: () => {
-                                                    ctrl.fees().push(newFee);
-                                                    return false;
-                                                }
-                                            },
+                                                    onclick: () => {
+                                                        ctrl.fees().push(newFee);
+                                                        return false;
+                                                    }
+                                                },
                                                 'Adicionar destino'
                                             )
                                         )
@@ -241,13 +247,13 @@ const editRewardCard = {
                         ]),
                         m('.w-row.u-margintop-30', [
                             (reward.newReward ? '' :
-                            m('.w-col.w-col-5.w-col-small-5.w-col-tiny-5.w-sub-col-middle',
-                                m("input.w-button.btn-terciary.btn.btn-small.reward-close-button[type='submit'][value='Fechar']", {
-                                    onclick: () => {
-                                        reward.edit.toggle();
-                                    }
-                                })
-                            )),
+                                m('.w-col.w-col-5.w-col-small-5.w-col-tiny-5.w-sub-col-middle',
+                                    m("input.w-button.btn-terciary.btn.btn-small.reward-close-button[type='submit'][value='Fechar']", {
+                                        onclick: () => {
+                                            reward.edit.toggle();
+                                        }
+                                    })
+                                )),
                             m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1', [
                                 m(`input[id='project_rewards_attributes_${index}__destroy'][type='hidden'][value='false']`, {
                                     name: `project[rewards_attributes][${index}][_destroy]`
