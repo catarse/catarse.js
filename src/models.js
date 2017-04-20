@@ -43,6 +43,7 @@ const models = {
     finishedProject: postgrest.model('finished_projects'),
     userFriend: postgrest.model('user_friends'),
     userFollow: postgrest.model('user_follows'),
+    followAllCreators: postgrest.model('rpc/follow_all_creators'),
     followAllFriends: postgrest.model('rpc/follow_all_friends'),
     contributor: postgrest.model('contributors'),
     userFollower: postgrest.model('user_followers'),
@@ -56,6 +57,7 @@ const models = {
 
 models.teamMember.pageSize(40);
 models.rewardDetail.pageSize(false);
+models.shippingFee.pageSize(false);
 models.project.pageSize(30);
 models.category.pageSize(50);
 models.contributionActivity.pageSize(40);
