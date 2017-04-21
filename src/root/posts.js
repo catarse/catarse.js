@@ -45,10 +45,10 @@ const posts = {
             },
             togglePreview = () => {
                 if (!validateTitle()) {
-                    errors('Título não pode ficar em branco.');
+                    errors('Title can not be empty');
                     showError(true);
                 } else if (!validateComment()) {
-                    errors('Mensagem não pode ficar em branco.');
+                    errors('Message can not be left blank.');
                     showError(true);
                 } else {
                     h.scrollTop();

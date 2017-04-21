@@ -28,7 +28,7 @@ const rewardReceiver = {
                     )
                 ),
                 m('.fontcolor-secondary.fontsize-smallest.lineheight-looser',
-                    'Recebi!'
+                    'I received!'
                 )
             ]) : m('');
     }

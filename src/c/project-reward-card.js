@@ -23,7 +23,7 @@ const projectRewardCard = {
                 m('.fontsize-mini.lineheight-tightest', 's/ juros')
             ]) : '',
             m('.u-marginbottom-20', [
-                m('.fontsize-base.fontweight-semibold', `Para R$ ${h.formatNumber(reward.minimum_value)} ou mais`),
+                m('.fontsize-base.fontweight-semibold', `For Rs ${h.formatNumber(reward.minimum_value)} or more`),
             ]),
 
             m('.fontsize-smaller.u-margintop-20.reward-description', {
@@ -32,14 +32,14 @@ const projectRewardCard = {
             ctrl.isRewardOpened(reward) ? m('a[href="javascript:void(0);"].alt-link.fontsize-smallest.gray.link-more.u-marginbottom-20', {
                 onclick: () => ctrl.descriptionExtended(reward.id)
             }, [
-                'mais',
+                'more',
                 m('span.fa.fa-angle-down')
             ]) : '',
             m('.u-marginbottom-20.w-row', [
                 m('.w-col.w-col-6', !_.isEmpty(reward.deliver_at) ? [
                     m('.fontcolor-secondary.fontsize-smallest',
                         m('span',
-                            'Entrega prevista:'
+                            'Estimated delivery time:'
                         )
                     ),
                     m('.fontsize-smallest',
@@ -49,7 +49,7 @@ const projectRewardCard = {
                 m('.w-col.w-col-6', rewardVM.hasShippingOptions(reward) ? [
                     m('.fontcolor-secondary.fontsize-smallest',
                         m('span',
-                            'Envio:'
+                            'Send:'
                         )
                     ),
                     m('.fontsize-smallest',
@@ -59,17 +59,17 @@ const projectRewardCard = {
             ]),
             reward.maximum_contributions > 0 ? [
                 (h.rewardSouldOut(reward) ? m('.u-margintop-10', [
-                    m('span.badge.badge-gone.fontsize-smaller', 'Esgotada')
+                    m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')
                 ]) : m('.u-margintop-10', [
                     m('span.badge.badge-attention.fontsize-smaller', [
-                        m('span.fontweight-bold', 'Limitada'),
-                        project.open_for_contributions ? ` (${h.rewardRemaning(reward)} de ${reward.maximum_contributions} disponíveis)` : ''
+                        m('span.fontweight-bold', 'Limited'),
+                        project.open_for_contributions ? ` (${h.rewardRemaning(reward)} in ${reward.maximum_contributions} Available)` : ''
                     ])
                 ]))
             ] : '',
-            m('.fontcolor-secondary.fontsize-smallest.fontweight-semibold', h.pluralize(reward.paid_count, ' apoio', ' apoios')),
+            m('.fontcolor-secondary.fontsize-smallest.fontweight-semibold', h.pluralize(reward.paid_count, ' support', ' supports')),
             reward.waiting_payment_count > 0 ? m('.maximum_contributions.in_time_to_confirm.clearfix', [
-                m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' apoio em prazo de confirmação', ' apoios em prazo de confirmação.'))
+                m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' Support in confirmation period', ' Support in confirmatory terms.'))
             ]) : '',
             project.open_for_contributions && !h.rewardSouldOut(reward) ? [
                 ctrl.isRewardOpened(reward) ? m('.w-form', [
@@ -79,7 +79,7 @@ const projectRewardCard = {
                         m('.divider.u-marginbottom-20'),
                         (rewardVM.hasShippingOptions(reward) ? m('div', [
                             m('.fontcolor-secondary.u-marginbottom-10',
-                              'Local de entrega'
+                              'Delivery place'
                              ),
                             m('select.positive.text-field.w-select', {
                                 onchange: m.withAttr('value', ctrl.selectedDestination)
@@ -88,12 +88,12 @@ const projectRewardCard = {
                              )
                         ]) : ''),
                         m('.fontcolor-secondary.u-marginbottom-10',
-                            'Valor do apoio'
+                            'Value of support'
                         ),
                         m('.w-row.u-marginbottom-20', [
                             m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
                                 m('.back-reward-input-reward.placeholder',
-                                    'R$'
+                                    'Rs'
                                 )
                             ),
                             m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
@@ -104,7 +104,7 @@ const projectRewardCard = {
                                 })
                             )
                         ]),
-                        m('input.w-button.btn.btn-medium[type="submit"][value="Continuar >"]'),
+                        m('input.w-button.btn.btn-medium[type="submit"][value="Continue >"]'),
                         ctrl.error().length > 0 ? m('.text-error', [
                             m('br'),
                             m('span.fa.fa-exclamation-triangle'),

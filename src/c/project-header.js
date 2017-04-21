@@ -30,10 +30,10 @@ const projectHeader = {
         const hasContribution = !_.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20', [
             m('.fontsize-small.u-text-center', [
                 m('span.fa.fa-thumbs-up'),
-                ' Você é apoiador deste projeto! ',
+                ' You are a supporter of this project! ',
                 m('a.alt-link[href=\'javascript:void(0);\']', {
                     onclick: ctrl.showContributions.toggle
-                }, 'Detalhes')
+                }, 'Details')
             ]),
             ctrl.showContributions() ? m('.card.u-margintop-20',
                 m('.w-row',

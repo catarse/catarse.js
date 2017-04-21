@@ -51,7 +51,7 @@ const shippingFeeInput = {
                                 value: 'others'
                             }),
                             m('label.field-label.fontsize-smallest',
-                                (othersCount > 0 ? 'Resto do Brasil' : 'Todos os estados do Brasil')
+                                (othersCount > 0 ? 'Rest of Brazil' : 'All states of Brazil')
                             )
                         ] :
 
@@ -63,7 +63,7 @@ const shippingFeeInput = {
                                 value: 'international'
                             }),
                             m('label.field-label.fontsize-smallest',
-                                'Internacional'
+                                'International'
                             )
                         ] :
 
@@ -88,7 +88,7 @@ const shippingFeeInput = {
                     m('.w-row', [
                         m('.no-hover.positive.prefix.text-field.w-col.w-col-3',
                             m('.fontcolor-secondary.fontsize-mini.u-text-center',
-                                'R$'
+                                'Rs'
                             )
                         ),
                         m('.w-col.w-col-9',

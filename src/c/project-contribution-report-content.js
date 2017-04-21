@@ -143,7 +143,7 @@ const projectContributionReportContent = {
                                 m('span.fa.fa-download',
                                     ''
                                 ),
-                                ' Baixar relatórios'
+                                ' Download reports'
                             ])
                         )
                     ])

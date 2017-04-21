@@ -32,9 +32,9 @@ const projectDataStats = {
                     m('.fontsize-large.fontweight-semibold',[
                         m('span.fa.fa-clock-o'),
                         (_.isNull(project.expires_at) ?
-                            ` Iniciado há ${elapsedTextObj.total} ${elapsedTextObj.unit}`
+                            ` Started there ${elapsedTextObj.total} ${elapsedTextObj.unit}`
                             :
-                            ` ${remainingTextObj.total} ${remainingTextObj.unit} ${(remainingTextObj.total > 1 ? 'restantes' : 'restante')}`
+                            ` ${remainingTextObj.total} ${remainingTextObj.unit} ${(remainingTextObj.total > 1 ? 'remaining' : 'remaining')}`
                         )
                     ])
                 ]),
@@ -53,26 +53,26 @@ const projectDataStats = {
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4',[
                                 m('.fontsize-larger.fontweight-semibold', `${project.total_contributors}`),
-                                'Apoiadores'
+                                'Supporters'
                             ])
                         ])
                     ]),
                     m('.w-col.w-col-6',[
                         m('.w-row.u-marginbottom-30.u-margintop-30',[
                             m('.w-col.w-col-9.w-col-small-6.w-col-tiny-6',[
-                                m('.fontsize-larger.fontweight-semibold', `R$ ${h.formatNumber(project.pledged, 2)}`),
-                                'Arrecadados'
+                                m('.fontsize-larger.fontweight-semibold', `Rs ${h.formatNumber(project.pledged, 2)}`),
+                                'Collected'
                             ]),
                             m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6',[
                                 m('.fontsize-larger.fontweight-semibold', `${h.formatNumber(project.progress,2)}%`),
-                                'da Meta'
+                                'From Meta'
                             ])
                         ])
                     ])
                 ]),
                 m('.fontcolor-secondary.fontsize-smallest.u-margintop-20', [
-                    'Os dados podem levar até 12 horas para serem atualizados.',
-                    m('a.alt-link', {href:"http://suporte.catarse.me/hc/pt-br/articles/214764343#visitante", target:"_blank"}, 'Saiba mais'),
+                    'Data may take up to 12 hours to update.',
+                    m('a.alt-link', {href:"http://suporte.catarse.me/hc/pt-br/articles/214764343#visitante", target:"_blank"}, 'know more'),
                     '.'
                 ])
             ])

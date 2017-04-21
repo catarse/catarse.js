@@ -96,7 +96,7 @@ const projectGoalEdit = {
                                     ]),
                                     m('.u-text-center.fontsize-smaller', [
                                         m('a.mode-diff-toggle.link-hidden-light.fontweight-semibold[href="javscript:void(0);"]', { onclick: ctrl.showModeDiff.toggle }, [
-                                            'Veja a diferença entre os modelos ',
+                                            'See the difference between the models ',
                                             m('span.fa.fa-chevron-down')
                                         ])
                                     ]),
@@ -175,13 +175,14 @@ const projectGoalEdit = {
                                                         m("label.field-label"),
                                                         m('input.numeric.integer.optional.disabled.w-input.text-field.postfix.positive.medium[id="project_online_days"][name="project[online_days]"][type="number"]', {
                                                             onchange: m.withAttr('value', vm.fields.online_days),
+                                                            value: vm.fields.online_days(),
                                                             class: vm.e.hasError('online_days') ? 'error' : false
                                                         })
                                                     ])
                                                 ]),
                                                 m('.w-col.w-col-4', [
                                                     m('.text-field.medium.prefix-permalink.u-text-center', [
-                                                        m('', 'dias')])
+                                                        m('', 'days')])
                                                 ])
                                             ]),
                                             vm.e.inlineError('online_days')
@@ -217,7 +218,7 @@ const projectGoalEdit = {
                                                     m('.text-field.medium.prefix-permalink', {
                                                         class: vm.e.hasError('online_days') ? 'error' : false
                                                     }, [
-                                                        m('', 'dias')
+                                                        m('', 'days')
                                                     ])
                                                 ])
                                             ]),

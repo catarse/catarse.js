@@ -123,7 +123,7 @@ const projectContributionReportContentCard = {
                                                 ' Received'
                                             ]) : '')
                                     ),
-                                    m('.fontsize-smallest.fontweight-semibold', `Recompensa: ${reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : ''}`),
+                                    m('.fontsize-smallest.fontweight-semibold', `Reward: ${reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : ''}`),
                                     m('.fontsize-smallest.fontweight-semibold',
                                         reward.title
                                     ),

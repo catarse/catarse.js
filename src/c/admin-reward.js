@@ -38,27 +38,27 @@ const adminReward = {
             m('.fontsize-smallest.lineheight-looser', reward.id ? [
                 `ID: ${reward.id}`,
                 m('br'),
-                `Local de entrega: ${(shippingFee.destination ? `${shippingFee.destination} R$ ${shippingFee.value}` : 'Nenhum')}`,
+                `Delivery place: ${(shippingFee.destination ? `${shippingFee.destination} Rs ${shippingFee.value}` : 'none')}`,
                 m('br'),
-                `Envio: ${I18n.t(`shared.shipping_options.${reward.shipping_options}`)}`,
+                `Send: ${I18n.t(`shared.shipping_options.${reward.shipping_options}`)}`,
                 m('br'),
-                `Valor mínimo: R$${h.formatNumber(reward.minimum_value, 2, 3)}`,
+                `Minimum value: Rs${h.formatNumber(reward.minimum_value, 2, 3)}`,
                 m('br'),
                 m.trust(`Available: ${available} / ${reward.maximum_contributions || '&infin;'}`),
                 m('br'),
                 `Waiting confirmation: ${reward.waiting_payment_count}`,
                 m('br'),
-                `Estimativa da Entrega: ${h.momentify(reward.deliver_at)}`,
+                `Estimated Delivery: ${h.momentify(reward.deliver_at)}`,
                 m('br'),
                 m('div', [
-                    'Status da Entrega: ',
+                    'Delivery Status: ',
                     h.contributionStatusBadge(contribution),
                 ]),
-                (reward.title ? [`Título: ${reward.title}`,
+                (reward.title ? [`Title: ${reward.title}`,
                     m('br')
                 ] : ''),
-                `Descrição: ${reward.description}`
-            ] : 'Apoio sem recompensa')
+                `Description: ${reward.description}`
+            ] : 'Support without reward')
         ]);
     }
 };
