@@ -110,7 +110,7 @@ const ownerMessageContent = {
                             ])) : ''),
                             m('.modal-dialog-nav-bottom',
                                 m('.w-row',
-                                    m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send message"]', {
+                                    m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send Message"]', {
                                         disabled: ctrl.submitDisabled()
                                     }) : h.loader())
                                 )
@@ -122,7 +122,7 @@ const ownerMessageContent = {
 
         return m('div', [
             m('.modal-dialog-header',
-                m('.fontsize-large.u-text-center', 'Send message')
+                m('.fontsize-large.u-text-center', 'Send Message')
             ),
             ctrl.sendSuccess() ? successMessage : contactForm
         ]);

@@ -22,7 +22,7 @@ const userContributionDetail = {
         const contribution = args.contribution;
 
         return m('.user-contribution-detail', [
-            m('.w-col.w-col-3', [
+            m('.w-col.w-col-4', [
                 m('.fontsize-smallest.lineheight-tight.fontweight-semibold.u-marginbottom-10',
                     'Value of support:'
                 ),
@@ -30,12 +30,12 @@ const userContributionDetail = {
                     `Rs${contribution.value}`
                 )
             ]),
-            m('.w-col.w-col-3',
-                m.component(paymentStatus, {
-                    item: contribution
-                })
-            ),
-            m('.w-col.w-col-5', [
+            // m('.w-col.w-col-3',
+            //     m.component(paymentStatus, {
+            //         item: contribution
+            //     })
+            // ),
+            m('.w-col.w-col-6', [
                 m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10',
                     'Reward:'
                 ),

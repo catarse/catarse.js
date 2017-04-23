@@ -22,7 +22,7 @@ const projectEditReward = {
                 // m.request won't serialize params properly here
                 return $.ajax({
                     type: 'PATCH',
-                    url: `/pt/projects/${args.project_id}'`,
+                    url: `/en/projects/${args.project_id}'`,
                     data,
                     dataType: 'JSON'
                 }).done(() => {
@@ -59,7 +59,7 @@ const projectEditReward = {
 
         const updateRewardSortPosition = (rewardId, position) => m.request({
             method: 'POST',
-            url: `/pt/projects/${args.project_id}/rewards/${rewardId}/sort?reward[row_order_position]=${position}`,
+            url: `/en/projects/${args.project_id}/rewards/${rewardId}/sort?reward[row_order_position]=${position}`,
             config: (xhr) => {
                 if (h.authenticityToken()) {
                     xhr.setRequestHeader('X-CSRF-Token', h.authenticityToken());

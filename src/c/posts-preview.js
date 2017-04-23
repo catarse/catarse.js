@@ -124,14 +124,14 @@ const postsPreview = {
                             ),
                             ' ',
                             m.trust('&nbsp;'),
-                            'To send'
+                            'Send'
                         ])
                     ),
                     m('.w-col.w-col-2',
                         m('button.btn.btn-large.btn-terciary', {
                                 onclick: ctrl.togglePreview
                             },
-                            'To edit'
+                            'Edit'
                         )
                     ),
                     m('.w-col.w-col-3')

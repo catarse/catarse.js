@@ -90,7 +90,7 @@ const rewardSelectCard = {
                     name: 'contribution[reward_id]'
                 }),
                 m(`label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for="contribution_reward_${reward.id}"]`,
-                    `R$ ${h.formatNumber(reward.minimum_value)} or more`
+                    `Rs ${h.formatNumber(reward.minimum_value)} or more`
                 ), !ctrl.isSelected(reward) ? '' : m('.w-row.back-reward-money', [
                     rewardVM.hasShippingOptions(reward) ?
                     m('.w-sub-col.w-col.w-col-4', [

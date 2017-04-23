@@ -190,8 +190,7 @@ const insights = {
                                 }
                             }, [
                                 m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', [
-                                    I18n.t('visitors_per_day_label', I18nScope()),
-                                    h.newFeatureBadge()
+                                    I18n.t('visitors_per_day_label', I18nScope())
                                 ]),
                                 !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
                                     collection: ctrl.visitorsPerDay,

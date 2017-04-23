@@ -32,7 +32,7 @@ const projectDataStats = {
                     m('.fontsize-large.fontweight-semibold',[
                         m('span.fa.fa-clock-o'),
                         (_.isNull(project.expires_at) ?
-                            ` Started there ${elapsedTextObj.total} ${elapsedTextObj.unit}`
+                            ` Started ${elapsedTextObj.total} ${elapsedTextObj.unit}`
                             :
                             ` ${remainingTextObj.total} ${remainingTextObj.unit} ${(remainingTextObj.total > 1 ? 'remaining' : 'remaining')}`
                         )
@@ -46,7 +46,7 @@ const projectDataStats = {
                         m('.w-row.u-marginbottom-30.u-margintop-30',[
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4',[
                                 m('.fontsize-larger.fontweight-semibold', `${visitorsTotal}`),
-                                'Visitantes'
+                                'Visitors'
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4',[
                                 m('.bg-triangle-funnel.fontcolor-secondary.fontsize-base', `${h.formatNumber(project.total_contributors/visitorsTotal*100,2)}%`)

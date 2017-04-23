@@ -30,7 +30,7 @@ const projectHighlight = {
             m('.project-share.w-hidden-small.w-hidden-tiny',
                 m('.u-marginbottom-30.u-text-center-small-only', [
                     m('.w-inline-block.fontcolor-secondary.fontsize-smaller.u-marginright-20',
-                        'To share:'
+                        'Share:'
                     ),
                     project().permalink ? m.component(facebookButton, {
                         url: `http://www.myjvn.com/${project().permalink}?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`

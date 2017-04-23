@@ -50,7 +50,6 @@ const projectBasicsEdit = {
         }
         vm.fillFields(args.project);
         vm.loadCategoriesOptionsTo(categories, vm.fields.category_id());
-
         return {
             vm,
             onSubmit,
@@ -156,7 +155,7 @@ const projectBasicsEdit = {
                                         m('.w-col.w-col-4.w-col-small-6.w-col-tiny6.text-field.prefix.no-hover.medium.prefix-permalink', {
                                             class: vm.e.hasError('permalink') ? 'error' : ''
                                         },
-                                          m('.fontcolor-secondary.u-text-center.fontcolor-secondary.u-text-center.fontsize-smallest', 'www.catarse.me/')),
+                                          m('.fontcolor-secondary.u-text-center.fontcolor-secondary.u-text-center.fontsize-smallest', 'www.myjvn.com/')),
                                         m('.w-col.w-col-8.w-col-small-6.w-col-tiny-6', [
                                             m('input.string.required.w-input.text-field.postfix.positive.medium[type="text"]', {
                                                 value: vm.fields.permalink(),

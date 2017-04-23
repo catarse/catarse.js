@@ -122,7 +122,7 @@ const projectGoalEdit = {
                                         m('.w-col.w-col-8', [
                                             m('.w-row', [
                                                 m('.w-col.w-col-4.w-col-small-6.w-col-tiny-6.text-field.prefix.no-hover.medium.prefix-permalink', [
-                                                    m('.fontcolor-secondary.u-text-center.fontsize-base.lineheight-tightest', 'R$')
+                                                    m('.fontcolor-secondary.u-text-center.fontsize-base.lineheight-tightest', 'Rs')
                                                 ]),
                                                 m('.w-col.w-col-8.w-col-small-6.w-col-tiny-6.label-hide',
                                                   [

@@ -183,7 +183,7 @@ const Flex = {
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [
                                         m('div', [
                                             m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'),
-                                            m(`a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.myjvn.com/flex?ref=facebook&title=${encodeURIComponent('Meet the new JVN Flex!')}"][target="_blank"]`, 'To share')
+                                            m(`a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.myjvn.com/flex?ref=facebook&title=${encodeURIComponent('Meet the new JVN Flex!')}"][target="_blank"]`, 'Share')
                                         ])
                                     ]),
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [

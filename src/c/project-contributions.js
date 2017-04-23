@@ -110,7 +110,7 @@ const projectContributions = {
                                   `${Math.floor(stats.new_percent)}%`
                                  ),
                                 m('.fontsize-smallest',
-                                  'Supporters who had never supported a project in JVN'
+                                  'Supporters who had never supported a campaign in JVN'
                                  )
                             ]),
                             m('.w-col.w-col-6.w-col-small-6', [
@@ -122,7 +122,7 @@ const projectContributions = {
                                   `${Math.ceil(stats.returning_percent)}%`
                                  ),
                                 m('.fontsize-smallest',
-                                  'Supporters who had already supported a project in JVN'
+                                  'Supporters who had already supported a campaign in JVN'
                                  )
                             ])
                         ])
@@ -187,7 +187,7 @@ const projectContributions = {
                              }
                          }, [!ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
                              collection: ctrl.contributionsPerDay,
-                             label: 'Rs Collected per day',
+                             label: 'Rs collected per day',
                              dataKey: 'total_amount',
                              xAxis: (item) => h.momentify(item.paid_at),
                              emptyState: 'Unaccounted support'

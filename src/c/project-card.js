@@ -73,7 +73,7 @@ const projectCard = {
                 ];
             }
             return [
-                m('.fontsize-smallest.lineheight-tight', ['Started there', m('br'), `${elapsedTextObj.total} ${elapsedTextObj.unit}`])
+                m('.fontsize-smallest.lineheight-tight', ['Started', m('br'), `${elapsedTextObj.total} ${elapsedTextObj.unit}`])
             ];
         };
 

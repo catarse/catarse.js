@@ -30,7 +30,7 @@ const projectHeader = {
         const hasContribution = !_.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20', [
             m('.fontsize-small.u-text-center', [
                 m('span.fa.fa-thumbs-up'),
-                ' You are a supporter of this project! ',
+                ' You are a supporter of this campaign! ',
                 m('a.alt-link[href=\'javascript:void(0);\']', {
                     onclick: ctrl.showContributions.toggle
                 }, 'Details')

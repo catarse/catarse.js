@@ -123,7 +123,6 @@ const projectsPayment = {
     view(ctrl) {
         const user = ctrl.user(),
             project = ctrl.project;
-        console.log(ctrl.reward());
 
         return m('#project-payment.w-section.w-clearfix.section', [
             m('.w-col',
