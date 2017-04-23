@@ -1,11 +1,11 @@
-var c = (function (m,I18n$1,_$1,moment,$,postgrest$1,CatarseAnalytics$1,replaceDiacritics,Chart) {
+var c = (function (m,I18n$1,_$1,moment,$$1,postgrest$1,CatarseAnalytics$1,replaceDiacritics,Chart) {
 'use strict';
 
 m = 'default' in m ? m['default'] : m;
 I18n$1 = 'default' in I18n$1 ? I18n$1['default'] : I18n$1;
 _$1 = 'default' in _$1 ? _$1['default'] : _$1;
 moment = 'default' in moment ? moment['default'] : moment;
-$ = 'default' in $ ? $['default'] : $;
+$$1 = 'default' in $$1 ? $$1['default'] : $$1;
 postgrest$1 = 'default' in postgrest$1 ? postgrest$1['default'] : postgrest$1;
 CatarseAnalytics$1 = 'default' in CatarseAnalytics$1 ? CatarseAnalytics$1['default'] : CatarseAnalytics$1;
 replaceDiacritics = 'default' in replaceDiacritics ? replaceDiacritics['default'] : replaceDiacritics;
@@ -40,6 +40,7 @@ var models = {
     projectContributionsPerDay: postgrest$1.model('project_contributions_per_day'),
     projectContributionsPerLocation: postgrest$1.model('project_contributions_per_location'),
     projectContributionsPerRef: postgrest$1.model('project_contributions_per_ref'),
+    projectVisitorsPerDay: postgrest$1.model('project_visitors_per_day'),
     projectTransfer: postgrest$1.model('project_transfers'),
     project: postgrest$1.model('projects'),
     projectSearch: postgrest$1.model('rpc/project_search'),
@@ -53,17 +54,21 @@ var models = {
     finishedProject: postgrest$1.model('finished_projects'),
     userFriend: postgrest$1.model('user_friends'),
     userFollow: postgrest$1.model('user_follows'),
+    followAllCreators: postgrest$1.model('rpc/follow_all_creators'),
     followAllFriends: postgrest$1.model('rpc/follow_all_friends'),
     contributor: postgrest$1.model('contributors'),
     userFollower: postgrest$1.model('user_followers'),
     creatorSuggestion: postgrest$1.model('creator_suggestions'),
     userContribution: postgrest$1.model('user_contributions'),
+    shippingFee: postgrest$1.model('shipping_fees'),
     deleteProject: postgrest$1.model('rpc/delete_project'),
-    cancelProject: postgrest$1.model('rpc/cancel_project')
+    cancelProject: postgrest$1.model('rpc/cancel_project'),
+    city: postgrest$1.model('cities')
 };
 
 models.teamMember.pageSize(40);
 models.rewardDetail.pageSize(false);
+models.shippingFee.pageSize(false);
 models.project.pageSize(30);
 models.category.pageSize(50);
 models.contributionActivity.pageSize(40);
@@ -75,6 +80,7 @@ models.projectContribution.pageSize(9);
 models.contributor.pageSize(9);
 models.recommendedProjects.pageSize(3);
 models.bank.pageSize(400);
+models.city.pageSize(200);
 
 var currentContribution = m.prop({});
 
@@ -137,6 +143,125 @@ var contributionVM = {
     canBeDelivered: canBeDelivered
 };
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
 //      
 var _dataCache = {};
 var hashMatch = function hashMatch(str) {
@@ -165,6 +290,9 @@ var momentify = function momentify(date, format) {
     format = format || 'DD/MM/YYYY';
     return date ? moment(date).locale('en').format(format) : 'no date';
 };
+var getRandomInt = function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 var storeAction = function storeAction(action, value) {
     if (!sessionStorage.getItem(action)) {
         return sessionStorage.setItem(action, String(value));
@@ -187,6 +315,9 @@ var callStoredAction = function callStoredAction(action) {
         return item;
     }
     return null;
+};
+var capitalize = function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };
 var discuss = function discuss(page, identifier) {
     var d = document,
@@ -471,7 +602,7 @@ var fbParse = function fbParse() {
         try {
             window.FB.XFBML.parse();
         } catch (e) {
-            console.log(e);
+            //console.log(e);
         }
     };
 
@@ -510,7 +641,7 @@ var parseUrl = function parseUrl(href) {
 var UIHelper = function UIHelper() {
     return function (el, isInitialized) {
         if (!isInitialized && window.$ && window.UIHelper) {
-            window.UIHelper.setupResponsiveIframes($(el));
+            window.UIHelper.setupResponsiveIframes($$1(el));
         }
     };
 };
@@ -732,7 +863,7 @@ var analyticsEvent = function analyticsEvent(eventObj) {
             }
             CatarseAnalytics$1.event(eventObj);
         } catch (e) {
-            console.error('[h.analyticsEvent] error:', e);
+            //console.error('[h.analyticsEvent] error:', e);
         }
         fn();
     };
@@ -863,7 +994,7 @@ var analyticsWindowScroll = function analyticsWindowScroll(eventObj) {
             var fired = false;
             window.addEventListener('scroll', function (e) {
                 // console.log('windowScroll');
-                if (!fired && window.$ && $(document).scrollTop() > $(window).height() * (3 / 4)) {
+                if (!fired && window.$ && $$1(document).scrollTop() > $$1(window).height() * (3 / 4)) {
                     fired = true;
                     var fireEvent = analyticsEvent(eventObj);
                     fireEvent();
@@ -1007,6 +1138,20 @@ var contributionStatusBadge = function contributionStatusBadge(contribution) {
 
     return contributionVM.canBeDelivered(contribution) ? status[contribution.delivery_status] : '';
 };
+var getParams = function getParams(searchKey) {
+    var query = window.location.href;
+    var queryParams = (/^[?#]/.test(query) ? query.slice(1) : query).split('?');
+
+    return queryParams.length > 1 ? queryParams[1].split('&').reduce(function (params, param) {
+        var _param$split = param.split('='),
+            _param$split2 = slicedToArray(_param$split, 2),
+            key = _param$split2[0],
+            value = _param$split2[1];
+
+        params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+        return params;
+    }, {})[searchKey] : null;
+};
 
 setMomentifyLocale();
 closeFlash();
@@ -1034,6 +1179,7 @@ var h = {
     getApiHost: getApiHost,
     getMailchimpUrl: getMailchimpUrl,
     getCurrentProject: getCurrentProject,
+    getParams: getParams,
     toggleProp: toggleProp,
     loader: loader,
     newFeatureBadge: newFeatureBadge,
@@ -1054,6 +1200,7 @@ var h = {
     callStoredAction: callStoredAction,
     UIHelper: UIHelper,
     toAnchor: toAnchor,
+    capitalize: capitalize,
     paramByName: paramByName,
     i18nScope: i18nScope,
     RDTracker: RDTracker,
@@ -1061,6 +1208,7 @@ var h = {
     animateScrollTo: animateScrollTo,
     scrollTo: scrollTo,
     scrollTop: scrollTop,
+    getRandomInt: getRandomInt,
     projectStateTextClass: projectStateTextClass,
     validationErrors: validationErrors,
     validate: validate,
@@ -2008,12 +2156,32 @@ var adminTransactionHistory = {
 };
 
 var adminReward = {
+    controller: function controller(args) {
+        var l = void 0;
+        var loadShippingFee = function loadShippingFee() {
+            var shippingFee = m.prop({});
+
+            if (args.contribution.shipping_fee_id) {
+                var options = models.shippingFee.getRowOptions(h.idVM.id(args.contribution.shipping_fee_id).parameters());
+
+                l = postgrest$1.loaderWithToken(options);
+                l.load().then(_.compose(shippingFee, _.first));
+            }
+
+            return shippingFee;
+        };
+
+        return {
+            shippingFee: loadShippingFee()
+        };
+    },
     view: function view(ctrl, args) {
         var reward = args.reward(),
             contribution = args.contribution,
-            available = parseInt(reward.paid_count) + parseInt(reward.waiting_payment_count);
+            available = parseInt(reward.paid_count) + parseInt(reward.waiting_payment_count),
+            shippingFee = ctrl.shippingFee();
 
-        return m('.w-col.w-col-4', [m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Reward'), m('.fontsize-smallest.lineheight-looser', reward.id ? ['ID: ' + reward.id, m('br'), 'Minimum value: Rs' + h.formatNumber(reward.minimum_value, 2, 3), m('br'), m.trust('Available: ' + available + ' / ' + (reward.maximum_contributions || '&infin;')), m('br'), 'Waiting confirmation: ' + reward.waiting_payment_count, m('br'), 'Estimated Delivery: ' + h.momentify(reward.deliver_at), m('br'), m('div', ['Delivery Status: ', h.contributionStatusBadge(contribution)]), 'Description: ' + reward.description] : 'Support without reward')]);
+        return m('.w-col.w-col-4', [m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Reward'), m('.fontsize-smallest.lineheight-looser', reward.id ? ['ID: ' + reward.id, m('br'), 'Delivery place: ' + (shippingFee.destination ? shippingFee.destination + ' Rs ' + shippingFee.value : 'none'), m('br'), 'Send: ' + I18n.t('shared.shipping_options.' + reward.shipping_options), m('br'), 'Minimum value: Rs' + h.formatNumber(reward.minimum_value, 2, 3), m('br'), m.trust('Available: ' + available + ' / ' + (reward.maximum_contributions || '&infin;')), m('br'), 'Waiting confirmation: ' + reward.waiting_payment_count, m('br'), 'Estimated Delivery: ' + h.momentify(reward.deliver_at), m('br'), m('div', ['Delivery Status: ', h.contributionStatusBadge(contribution)]), reward.title ? ['Title: ' + reward.title, m('br')] : '', 'Description: ' + reward.description] : 'Support without reward')]);
     }
 };
 
@@ -2164,7 +2332,7 @@ var adminContributions = {
         }, { // delivery_status
             component: filterDropdown,
             data: {
-                label: 'Status da entrega',
+                label: 'Delivery Status',
                 name: 'delivery_status',
                 vm: filterVM.delivery_status,
                 options: [{
@@ -2336,6 +2504,8 @@ var landingSignup = {
 
 var error$1 = m.prop('');
 var rewards = m.prop([]);
+var states = m.prop([]);
+var fees = m.prop([]);
 var noReward = {
     id: -1,
     description: 'Thank you. I just want to help the project.',
@@ -2347,14 +2517,24 @@ var vm$3 = postgrest$1.filtersVM({
     project_id: 'eq'
 });
 
-var rewardsLoader = function rewardsLoader(project_id) {
-    vm$3.project_id(project_id);
+var rewardsLoader = function rewardsLoader(projectId) {
+    vm$3.project_id(projectId);
 
     return postgrest$1.loaderWithToken(models.rewardDetail.getPageOptions(vm$3.parameters()));
 };
 
-var fetchRewards = function fetchRewards(project_id) {
-    return rewardsLoader(project_id).load().then(rewards);
+var fetchRewards = function fetchRewards(projectId) {
+    return rewardsLoader(projectId).load().then(rewards);
+};
+
+var getFees = function getFees(reward) {
+    var feesFilter = postgrest$1.filtersVM({
+        reward_id: 'eq'
+    });
+
+    feesFilter.reward_id(reward.id);
+    var feesLoader = postgrest$1.loader(models.shippingFee.getPageOptions(feesFilter.parameters()));
+    return feesLoader.load();
 };
 
 var getSelectedReward = function getSelectedReward() {
@@ -2363,30 +2543,114 @@ var getSelectedReward = function getSelectedReward() {
 
     if (data) {
         var contribution = JSON.parse(data);
-        var reward = selectedReward(contribution.reward);
 
+        selectedReward(contribution.reward);
         m.redraw(true);
 
         return selectedReward;
     }
+
     return false;
 };
 
 var selectReward = function selectReward(reward) {
     return function () {
-        if (rewardVM.selectedReward() !== reward) {
-            rewardVM.selectedReward(reward);
-
-            // contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
-            contributionValue('' + reward.minimum_value);
+        if (selectedReward() !== reward) {
+            error$1('');
+            selectedReward(reward);
+            contributionValue(h.applyMonetaryMask(reward.minimum_value + ',00'));
+            if (reward.id) {
+                getFees(reward).then(fees);
+            }
         }
     };
 };
 
 var applyMask$1 = _$1.compose(contributionValue, h.applyMonetaryMask);
 
+var statesLoader = postgrest$1.loader(models.state.getPageOptions());
+var getStates = function getStates() {
+    statesLoader.load().then(states);
+    return states;
+};
+
+var locationOptions = function locationOptions(reward, destination) {
+    var options = m.prop([]),
+        mapStates = _$1.map(states(), function (state) {
+        var fee = void 0;
+        var feeState = _$1.findWhere(fees(), {
+            destination: state.acronym
+        });
+        var feeOthers = _$1.findWhere(fees(), {
+            destination: 'others'
+        });
+        if (feeState) {
+            fee = feeState.value;
+        } else if (feeOthers) {
+            fee = feeOthers.value;
+        }
+
+        return {
+            name: state.name,
+            value: state.acronym,
+            fee: fee
+        };
+    });
+    if (reward.shipping_options === 'national') {
+        options(mapStates);
+    } else if (reward.shipping_options === 'international') {
+        var fee = void 0;
+        var feeInternational = _$1.findWhere(fees(), {
+            destination: 'international'
+        });
+        if (feeInternational) {
+            fee = feeInternational.value;
+        }
+        options(_$1.union([{
+            value: 'international',
+            name: 'Outside Brazil',
+            fee: fee
+        }], mapStates));
+    }
+
+    options(_$1.union([{ value: '', name: 'Selecione Opção', fee: 0 }], options()));
+
+    return options();
+};
+
+var shippingFeeForCurrentReward = function shippingFeeForCurrentReward(selectedDestination) {
+    var currentFee = _$1.findWhere(fees(), {
+        destination: selectedDestination()
+    });
+
+    if (!currentFee && _$1.findWhere(states(), { acronym: selectedDestination() })) {
+        currentFee = _$1.findWhere(fees(), {
+            destination: 'others'
+        });
+    }
+
+    return currentFee;
+};
+
+var canEdit = function canEdit(reward, projectState, user) {
+    return user.is_admin || projectState === 'draft' || projectState === 'online' && reward.paid_count <= 0 && reward.waiting_payment_count <= 0;
+};
+
+var canAdd = function canAdd(projectState) {
+    return projectState === 'draft' || projectState === 'online';
+};
+
+var hasShippingOptions = function hasShippingOptions(reward) {
+    return !(_$1.isNull(reward.shipping_options) || reward.shipping_options === 'free' || reward.shipping_options === 'presential');
+};
+
 var rewardVM = {
+    canEdit: canEdit,
+    canAdd: canAdd,
     error: error$1,
+    getStates: getStates,
+    getFees: getFees,
+    fees: fees,
     rewards: rewards,
     applyMask: applyMask$1,
     noReward: noReward,
@@ -2396,8 +2660,12 @@ var rewardVM = {
     selectedReward: selectedReward,
     contributionValue: contributionValue,
     rewardsLoader: rewardsLoader,
+    locationOptions: locationOptions,
+    shippingFeeForCurrentReward: shippingFeeForCurrentReward,
+    statesLoader: statesLoader,
     getValue: contributionValue,
-    setValue: contributionValue
+    setValue: contributionValue,
+    hasShippingOptions: hasShippingOptions
 };
 
 var I18nScope$3 = _.partial(h.i18nScope, 'projects');
@@ -2522,7 +2790,7 @@ var projectFiltersVM = function projectFiltersVM() {
     };
 };
 
-var idVM$1 = h.idVM;
+var idVM$2 = h.idVM;
 var currentUser = m.prop({});
 var createdVM = postgrest$1.filtersVM({ project_user_id: 'eq' });
 
@@ -2633,9 +2901,9 @@ var fetchUser = function fetchUser(user_id) {
     var handlePromise = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
     var customProp = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : currentUser;
 
-    idVM$1.id(user_id);
+    idVM$2.id(user_id);
 
-    var lUser = postgrest$1.loaderWithToken(models.userDetail.getRowOptions(idVM$1.parameters()));
+    var lUser = postgrest$1.loaderWithToken(models.userDetail.getRowOptions(idVM$2.parameters()));
 
     return !handlePromise ? lUser.load() : lUser.load().then(_$1.compose(customProp, _$1.first));
 };
@@ -2643,6 +2911,11 @@ var fetchUser = function fetchUser(user_id) {
 var getCurrentUser = function getCurrentUser() {
     fetchUser(h.getUserID());
     return currentUser;
+};
+
+var displayName = function displayName(user) {
+    var u = user || { name: 'no name' };
+    return _$1.isEmpty(u.public_name) ? u.name : u.public_name;
 };
 
 var displayImage = function displayImage(user) {
@@ -2728,6 +3001,7 @@ var userVM = {
     getPublicUserContributedProjects: getPublicUserContributedProjects,
     displayImage: displayImage,
     displayCover: displayCover,
+    displayName: displayName,
     fetchUser: fetchUser,
     getCurrentUser: getCurrentUser
 };
@@ -2736,6 +3010,7 @@ var currentProject$1 = m.prop();
 var userDetails = m.prop();
 var projectContributions = m.prop([]);
 var vm$2 = postgrest$1.filtersVM({ project_id: 'eq' });
+var idVM$1 = h.idVM;
 
 var setProject$1 = function setProject(project_user_id) {
     return function (data) {
@@ -2753,27 +3028,6 @@ var init = function init(project_id, project_user_id) {
     vm$2.project_id(project_id);
     var lProject = postgrest$1.loaderWithToken(models.projectDetail.getRowOptions(vm$2.parameters()));
     fetchParallelData(project_id, project_user_id);
-
-    /* try {
-        if(project_id && _.contains([29706], project_id)) {
-            (window.$zopim && window.$zopim.livechat)||(function(d,s){var z=window.$zopim=function(c){z._.push(c)},$=z.s=d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set._.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute('charset','utf-8');$.src='//v2.zopim.com/?2qPtIfZX0Exh5Szx5JUoUxWKqrTQI5Tm';z.t=+new Date;$.type='text/javascript';e.parentNode.insertBefore($,e)})(document,'script');
-            setTimeout(function t(){
-                const c = window.$zopim && window.$zopim.livechat;
-                if(c) {
-                    const u = h.getUser();
-                    if(u) {
-                        c.setEmail(u.email);
-                        c.setName(u.name);
-                    }
-                    window.zE && window.zE.hide();
-                } else {
-                    setTimeout(t, 1000);
-                }
-            }, 1000);
-        }
-    } catch(e) {
-        console.error(e);
-    }*/
     return lProject.load().then(setProject$1(project_user_id));
 };
 
@@ -2828,6 +3082,26 @@ var setProjectPageTitle = function setProjectPageTitle() {
     }
 };
 
+var fetchProject = function fetchProject(project_id) {
+    var handlePromise = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    var customProp = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : currentProject$1;
+
+    idVM$1.id(project_id);
+
+    var lproject = postgrest$1.loaderWithToken(models.projectDetail.getRowOptions(idVM$1.parameters()));
+
+    return !handlePromise ? lproject.load() : lproject.load().then(_$1.compose(customProp, _$1.first));
+};
+
+var updateProject = function updateProject(project_id, projectData) {
+    return m.request({
+        method: 'PUT',
+        url: '/projects/' + project_id + '.json',
+        data: { project: projectData },
+        config: h.setCsrfToken
+    });
+};
+
 var projectVM = {
     userDetails: userDetails,
     getCurrentProject: getCurrentProject$1,
@@ -2836,7 +3110,9 @@ var projectVM = {
     rewardDetails: rewardVM.rewards,
     routeToProject: routeToProject,
     setProjectPageTitle: setProjectPageTitle,
-    init: init
+    init: init,
+    fetchProject: fetchProject,
+    updateProject: updateProject
 };
 
 var projectFriends = {
@@ -2941,7 +3217,7 @@ var projectCard = {
             if (project.expires_at) {
                 return isFinished(project) ? [m('.fontsize-smaller.fontweight-loose', 'Closed'), m('.fontsize-smallest.lineheight-tightest', h.momentify(project.expires_at))] : [m('.fontsize-smaller.fontweight-semibold', remainingTextObj.total + ' ' + remainingTextObj.unit), m('.fontsize-smallest.lineheight-tightest', remainingTextObj.total > 1 ? 'Remaining' : 'Remaining')];
             }
-            return [m('.fontsize-smallest.lineheight-tight', ['Started there', m('br'), elapsedTextObj.total + ' ' + elapsedTextObj.unit])];
+            return [m('.fontsize-smallest.lineheight-tight', ['Started', m('br'), elapsedTextObj.total + ' ' + elapsedTextObj.unit])];
         };
 
         return {
@@ -2956,19 +3232,21 @@ var projectCard = {
         };
     },
     view: function view(ctrl, args) {
-        var project = args.project;
+        var project = args.project,
+            projectOwnerName = project.user ? project.user.public_name || project.user.name : project.owner_public_name || project.owner_name,
+            projectAddress = project.address ? project.address.city + ' - ' + project.address.state_acronym : project.city_name + ' - ' + project.state_acronym;
 
         return m(ctrl.css().wrapper, [m(ctrl.css().innerWrapper, [m('a' + ctrl.css().thumb + '[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref),
             style: {
-                'background-image': 'url(' + project.project_img + ')',
+                'background-image': 'url(' + (project.project_img || project.large_image) + ')',
                 display: 'block'
             }
         }), m(ctrl.css().descriptionWrapper, [m(ctrl.css().description, [m(ctrl.css().title, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref)
-        }, project.project_name)]), m(ctrl.css().author, I18n$1.t('by', I18nScope$2()) + ' ' + project.owner_public_name), m(ctrl.css().headline, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
+        }, project.project_name || project.name)]), m(ctrl.css().author, I18n$1.t('by', I18nScope$2()) + ' ' + projectOwnerName), m(ctrl.css().headline, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref)
-        }, project.headline)])]), m(ctrl.css().city, [m('.fontsize-smallest.fontcolor-secondary', [m('span.fa.fa-map-marker.fa-1', ' '), ' ' + (project.city_name ? project.city_name : '') + ', ' + (project.state_acronym ? project.state_acronym : '')])]), m(ctrl.cardMeter(), [ctrl.isFinished(project) ? m('div', project.state === 'successful' && ctrl.progress < 100 ? I18n$1.t('display_status.flex_successful', I18nScope$2()) : I18n$1.t('display_status.' + project.state, I18nScope$2())) : m('.meter', [m('.meter-fill', {
+        }, project.headline)])]), m(ctrl.css().city, [m('.fontsize-smallest.fontcolor-secondary', [m('span.fa.fa-map-marker.fa-1', ' '), projectAddress])]), m(ctrl.cardMeter(), [ctrl.isFinished(project) ? m('div', project.state === 'successful' && ctrl.progress < 100 ? I18n$1.t('display_status.flex_successful', I18nScope$2()) : I18n$1.t('display_status.' + project.state, I18nScope$2())) : m('.meter', [m('.meter-fill', {
             style: {
                 width: (ctrl.progress > 100 ? 100 : ctrl.progress) + '%'
             }
@@ -3097,7 +3375,7 @@ var Flex = {
             answer: 'We still do not know when we will open flex for the general public, but you can register your email on this page and receive special material on how to submit your project.'
         })])])])]), m('.w-section.section-large.u-text-center.bg-purple', [m('.w-container.fontcolor-negative', [m('.fontsize-largest', 'Inscreva seu projeto!'), m('.fontsize-base.u-marginbottom-60', 'Register your email and learn how to register your project on flex!'), m('.w-row', [m('.w-col.w-col-2'), m.component(landingSignup, {
             builder: ctrl.builder
-        }), m('.w-col.w-col-2')])])]), m('.w-section.section-one-column.bg-catarse-zelo.section-large[style="min-height: 50vh;"]', [m('.w-container.u-text-center', [m('.w-editable.u-marginbottom-40.fontsize-larger.lineheight-tight.fontcolor-negative', 'Flex is an experiment and initiative of JVN, Nepal`s largest crowdfunding platform.'), m('.w-row.u-text-center', ctrl.statsLoader() ? h.loader() : [m('.w-col.w-col-4', [m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'People have already supported at least 01 project in JVN')]), m('.w-col.w-col-4', [m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'Projects have already been funded in JVN')]), m('.w-col.w-col-4', [m('.fontsize-jumbo.text-success.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in JVN')])])])]), m('.w-section.section.bg-blue-one.fontcolor-negative', [m('.w-container', [m('.fontsize-large.u-text-center.u-marginbottom-20', 'Recommend the Catarse flex for friends! '), m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('div', [m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'), m('a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.myjvn.com/flex?ref=facebook&title=' + encodeURIComponent('Meet the new JVN Flex!') + '"][target="_blank"]', 'To share')])]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('div', [m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'), m('a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!') + 'http://www.myjvn.com/flex?ref=twitter"][target="_blank"]', 'To tweet')])])])]), m('.w-col.w-col-2')])])]), m('.w-section.section-large.bg-greenlime', [m('.w-container', [m('#participe-do-debate.u-text-center', { config: h.toAnchor() }, [m('h1.fontsize-largest.fontcolor-negative', 'Build Flex with us'), m('.fontsize-base.u-marginbottom-60.fontcolor-negative', 'Start a conversation, ask, comment, critique and make suggestions!')]), m('#disqus_thread.card.u-radius[style="min-height: 50vh;"]', {
+        }), m('.w-col.w-col-2')])])]), m('.w-section.section-one-column.bg-catarse-zelo.section-large[style="min-height: 50vh;"]', [m('.w-container.u-text-center', [m('.w-editable.u-marginbottom-40.fontsize-larger.lineheight-tight.fontcolor-negative', 'Flex is an experiment and initiative of JVN, Nepal`s largest crowdfunding platform.'), m('.w-row.u-text-center', ctrl.statsLoader() ? h.loader() : [m('.w-col.w-col-4', [m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'People have already supported at least 01 project in JVN')]), m('.w-col.w-col-4', [m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'Projects have already been funded in JVN')]), m('.w-col.w-col-4', [m('.fontsize-jumbo.text-success.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in JVN')])])])]), m('.w-section.section.bg-blue-one.fontcolor-negative', [m('.w-container', [m('.fontsize-large.u-text-center.u-marginbottom-20', 'Recommend the Catarse flex for friends! '), m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('div', [m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'), m('a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.myjvn.com/flex?ref=facebook&title=' + encodeURIComponent('Meet the new JVN Flex!') + '"][target="_blank"]', 'Share')])]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('div', [m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'), m('a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=' + encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!') + 'http://www.myjvn.com/flex?ref=twitter"][target="_blank"]', 'To tweet')])])])]), m('.w-col.w-col-2')])])]), m('.w-section.section-large.bg-greenlime', [m('.w-container', [m('#participe-do-debate.u-text-center', { config: h.toAnchor() }, [m('h1.fontsize-largest.fontcolor-negative', 'Build Flex with us'), m('.fontsize-base.u-marginbottom-60.fontcolor-negative', 'Start a conversation, ask, comment, critique and make suggestions!')]), m('#disqus_thread.card.u-radius[style="min-height: 50vh;"]', {
             config: ctrl.addDisqus
         })])])]];
     }
@@ -3338,12 +3616,12 @@ var onlineSuccessModalContent = {
 var projectDataStats = {
     view: function view(ctrl, args) {
         var project = args.project(),
-            progress = project.progress.toFixed(2),
+            visitorsTotal = args.visitorsTotal(),
             statusTextObj = h.projectStateTextClass(project.state),
             remainingTextObj = h.translatedTime(project.remaining_time),
             elapsedTextObj = h.translatedTime(project.elapsed_time);
 
-        return m('.w-row.u-marginbottom-40', [m('.w-col.w-col-3.u-text-center-small-only', [m('.fontsize-small.fontweight-semibold.u-marginbottom-20', [m('span.fontcolor-secondary', 'Status: '), m('span', { class: statusTextObj.cssClass }, statusTextObj.text)])]), m('.w-col.w-col-9', [m('.w-row.u-text-center', [m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m('.fontweight-semibold.fontsize-large.lineheight-tight', progress + '%'), m('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'Financed')]), m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m('.fontweight-semibold.fontsize-large.lineheight-tight', 'Rs ' + h.formatNumber(project.pledged, 2)), m('.fontcolor-secondary.lineheight-tighter.fontsize-small.u-marginbottom-10', 'Raised')]), m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions), m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Supports')]), m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [_$1.isNull(project.expires_at) ? [m('.fontweight-semibold.fontsize-large.lineheight-tight', elapsedTextObj.total + ' ' + elapsedTextObj.unit), m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Initiated')] : [m('.fontweight-semibold.fontsize-large.lineheight-tight', '' + remainingTextObj.total), m('.fontcolor-secondary.lineheight-tighter.fontsize-small', remainingTextObj.unit + ' ' + (remainingTextObj.total > 0 ? 'remaining' : 'remaining'))]])])])]);
+        return m('', [m('.w-row.u-marginbottom-60.u-margintop-30.u-text-center', [m('.w-col.w-col-2'), m('.w-col.w-col-4', [m('.fontsize-large', [m('span.fontcolor-secondary', 'Status: '), m('span', { class: statusTextObj.cssClass }, statusTextObj.text)])]), m('.w-col.w-col-4', [m('.fontsize-large.fontweight-semibold', [m('span.fa.fa-clock-o'), _$1.isNull(project.expires_at) ? ' Started ' + elapsedTextObj.total + ' ' + elapsedTextObj.unit : ' ' + remainingTextObj.total + ' ' + remainingTextObj.unit + ' ' + (remainingTextObj.total > 1 ? 'remaining' : 'remaining')])]), m('.w-col.w-col-2')]), m('.card.medium.u-marginbottom-60.u-radius.u-text-center', { style: { 'white-space': 'nowrap' } }, [m('.w-row', [m('.w-col.w-col-6', [m('.w-row.u-marginbottom-30.u-margintop-30', [m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [m('.fontsize-larger.fontweight-semibold', '' + visitorsTotal), 'Visitors']), m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [m('.bg-triangle-funnel.fontcolor-secondary.fontsize-base', h.formatNumber(project.total_contributors / visitorsTotal * 100, 2) + '%')]), m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [m('.fontsize-larger.fontweight-semibold', '' + project.total_contributors), 'Supporters'])])]), m('.w-col.w-col-6', [m('.w-row.u-marginbottom-30.u-margintop-30', [m('.w-col.w-col-9.w-col-small-6.w-col-tiny-6', [m('.fontsize-larger.fontweight-semibold', 'Rs ' + h.formatNumber(project.pledged, 2)), 'Collected']), m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [m('.fontsize-larger.fontweight-semibold', h.formatNumber(project.progress, 2) + '%'), 'From Meta'])])])]), m('.fontcolor-secondary.fontsize-smallest.u-margintop-20', ['Data may take up to 12 hours to update.', m('a.alt-link', { href: "http://suporte.catarse.me/hc/pt-br/articles/214764343#visitante", target: "_blank" }, 'know more'), '.'])])]);
     }
 };
 
@@ -3494,9 +3772,9 @@ var projectDataChart = {
                 var ctx = element.getContext('2d');
 
                 new Chart(ctx).Line({
-                    labels: _$1.map(source, function (item) {
+                    labels: args.xAxis ? _$1.map(source, function (item) {
                         return args.xAxis(item);
-                    }),
+                    }) : [],
                     datasets: mountDataset()
                 });
             }
@@ -3729,89 +4007,6 @@ var successfulProjectTaxModal = {
     }
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
-};
-
 var I18nScope$9 = _$1.partial(h.i18nScope, 'projects.successful_onboard');
 
 var parseAccountData = function parseAccountData(account, transfer) {
@@ -3828,7 +4023,9 @@ var parseAccountData = function parseAccountData(account, transfer) {
 var insightVM = {
     content: function content(state, data) {
         var translations = I18n$1.translations[I18n$1.currentLocale()].projects.successful_onboard[state],
-            translationContext = state === 'finished' ? {} : parseAccountData(_$1.first(data.account()), _$1.first(data.transfer()));
+            translationContext = state === 'finished' ? {
+            link_news: '/projects/' + _$1.first(data.account()).project_id + '/posts'
+        } : parseAccountData(_$1.first(data.account()), _$1.first(data.transfer()));
         var contentObj = {};
 
         _$1.map(translations, function (translation, translationKey) {
@@ -4024,17 +4221,17 @@ var facebookButton = {
 };
 
 var popNotification = {
-    controller: function controller() {
+    controller: function controller(args) {
         return {
-            displayNotification: h.toggleProp(true, false)
+            displayNotification: args.toggleOpt || h.toggleProp(true, false)
         };
     },
     view: function view(ctrl, args) {
         return ctrl.displayNotification() ? m('.flash.w-clearfix.card.card-notification.u-radius.zindex-20', {
             class: args.error ? 'card-error' : ''
-        }, [m('img.icon-close[src="/assets/catarse_bootstrap/x.png"][width="12"][alt="fechar"]', {
+        }, [m('img.icon-close[src="/assets/catarse_bootstrap/x.png"][width="12"][alt="close"]', {
             onclick: ctrl.displayNotification.toggle
-        }), m('.fontsize-small', args.message)]) : m('span');
+        }), m('.fontsize-small', m.trust(args.message))]) : m('span');
     }
 };
 
@@ -4125,6 +4322,8 @@ var insights = {
             displayModal = h.toggleProp(false, true),
             projectDetails = m.prop([]),
             contributionsPerDay = m.prop([]),
+            visitorsTotal = m.prop(0),
+            visitorsPerDay = m.prop([]),
             loader = postgrest$1.loaderWithToken,
             setProjectId = function setProjectId() {
             try {
@@ -4144,6 +4343,16 @@ var insights = {
 
         var l = loader(models.projectDetail.getRowOptions(filtersVM.parameters()));
         l.load().then(projectDetails);
+
+        var processVisitors = function processVisitors(data) {
+            if (!_$1.isEmpty(data)) {
+                visitorsPerDay(data);
+                visitorsTotal(_$1.first(data).total);
+            }
+        };
+
+        var lVisitorsPerDay = loader(models.projectVisitorsPerDay.getRowOptions(filtersVM.parameters()));
+        lVisitorsPerDay.load().then(processVisitors);
 
         var lContributionsPerDay = loader(models.projectContributionsPerDay.getRowOptions(filtersVM.parameters()));
         lContributionsPerDay.load().then(contributionsPerDay);
@@ -4194,12 +4403,15 @@ var insights = {
             lContributionsPerRef: lContributionsPerRef,
             lContributionsPerLocation: lContributionsPerLocation,
             lContributionsPerDay: lContributionsPerDay,
+            lVisitorsPerDay: lVisitorsPerDay,
             displayModal: displayModal,
             filtersVM: filtersVM,
             projectDetails: projectDetails,
             contributionsPerDay: contributionsPerDay,
             contributionsPerLocationTable: contributionsPerLocationTable,
-            contributionsPerRefTable: contributionsPerRefTable
+            contributionsPerRefTable: contributionsPerRefTable,
+            visitorsPerDay: visitorsPerDay,
+            visitorsTotal: visitorsTotal
         };
     },
     view: function view(ctrl) {
@@ -4227,7 +4439,18 @@ var insights = {
             content: [onlineSuccessModalContent]
         }) : '', m('.w-container', project.state === 'successful' ? m.component(projectSuccessfulOnboard, { project: m.prop(project) }) : [m('.w-row.u-marginbottom-40', [m('.w-col.w-col-8.w-col-push-2', [m('.fontweight-semibold.fontsize-larger.lineheight-looser.u-marginbottom-10.u-text-center.dashboard-header', I18n$1.t('campaign_title', I18nScope$4())), project.state === 'online' ? m.component(projectInviteCard, { project: project }) : '', project.state === 'draft' ? m.component(adminProjectDetailsCard, {
             resource: project
-        }) : '', m('p.' + project.state + '-project-text.u-text-center.fontsize-small.lineheight-loose', [project.mode === 'flex' && _$1.isNull(project.expires_at) && project.state !== 'draft' ? m('span', [I18n$1.t('finish_explanation', I18nScope$4()), m('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/articles/213783503-tudo-sobre-Prazo-da-campanha"][target="_blank"]', I18n$1.t('know_more', I18nScope$4()))]) : m.trust(I18n$1.t('campaign.' + project.mode + '.' + project.state, I18nScope$4({ username: project.user.name, expires_at: h.momentify(project.zone_expires_at), sent_to_analysis_at: h.momentify(project.sent_to_analysis_at) })))])])])]), project.state === 'draft' ? m.component(projectDeleteButton, { project: project }) : '', project.is_published ? [m('.divider'), m('.w-section.section-one-column.section.bg-gray.before-footer', [m('.w-container', [m.component(projectDataStats, { project: m.prop(project) }), m('.w-row', [m('.w-col.w-col-12.u-text-center', {
+        }) : '', m('p.' + project.state + '-project-text.u-text-center.fontsize-small.lineheight-loose', [project.mode === 'flex' && _$1.isNull(project.expires_at) && project.state !== 'draft' ? m('span', [m.trust(I18n$1.t('finish_explanation', I18nScope$4())), m('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/articles/213783503-tudo-sobre-Prazo-da-campanha"][target="_blank"]', I18n$1.t('know_more', I18nScope$4()))]) : m.trust(I18n$1.t('campaign.' + project.mode + '.' + project.state, I18nScope$4({ username: project.user.name, expires_at: h.momentify(project.zone_expires_at), sent_to_analysis_at: h.momentify(project.sent_to_analysis_at) })))])])])]), project.state === 'draft' ? m.component(projectDeleteButton, { project: project }) : '', project.is_published ? [m('.divider'), m('.w-section.section-one-column.section.bg-gray.before-footer', [m('.w-container', [m.component(projectDataStats, { project: m.prop(project), visitorsTotal: ctrl.visitorsTotal }), m('.w-row', [m('.w-col.w-col-12.u-text-center', {
+            style: {
+                'min-height': '300px'
+            }
+        }, [m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', [I18n$1.t('visitors_per_day_label', I18nScope$4())]), !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
+            collection: ctrl.visitorsPerDay,
+            dataKey: 'visitors',
+            xAxis: function xAxis(item) {
+                return h.momentify(item.day);
+            },
+            emptyState: I18n$1.t('visitors_per_day_empty', I18nScope$4())
+        }) : h.loader()])]), m('.w-row', [m('.w-col.w-col-12.u-text-center', {
             style: {
                 'min-height': '300px'
             }
@@ -4251,10 +4474,7 @@ var insights = {
                 return h.momentify(item.paid_at);
             },
             emptyState: I18n$1.t('contributions_per_day_empty', I18nScope$4())
-        }) : h.loader()])]), m('.w-row', [m('.w-col.w-col-12.u-text-center', [m('.project-contributions-per-ref', [m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', [I18n$1.t('ref_origin_title', I18nScope$4())
-        // h.newFeatureBadge(),
-        // buildTooltip('span.fontsize-smallest.tooltip-wrapper.fa.fa-question-circle.fontcolor-secondary')
-        ]), !ctrl.lContributionsPerRef() ? !_$1.isEmpty(_$1.rest(ctrl.contributionsPerRefTable)) ? m.component(projectDataTable, {
+        }) : h.loader()])]), m('.w-row', [m('.w-col.w-col-12.u-text-center', [m('.project-contributions-per-ref', [m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', [I18n$1.t('ref_origin_title', I18nScope$4()), ' ', buildTooltip('span.fontsize-smallest.tooltip-wrapper.fa.fa-question-circle.fontcolor-secondary')]), !ctrl.lContributionsPerRef() ? !_$1.isEmpty(_$1.rest(ctrl.contributionsPerRefTable)) ? m.component(projectDataTable, {
             table: ctrl.contributionsPerRefTable,
             defaultSortIndex: -2
         }) : m('.card.u-radius.medium.u-marginbottom-60', m('.w-row.u-text-center.u-margintop-40.u-marginbottom-40', m('.w-col.w-col-8.w-col-push-2', m('p.fontsize-base', I18n$1.t('contributions_per_ref_empty', I18nScope$4()))))) : h.loader()])])]), m('.w-row', [m('.w-col.w-col-12.u-text-center', [m('.project-contributions-per-ref', [m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', I18n$1.t('location_origin_title', I18nScope$4())), !ctrl.lContributionsPerLocation() ? !_$1.isEmpty(_$1.rest(ctrl.contributionsPerLocationTable)) ? m.component(projectDataTable, {
@@ -4313,9 +4533,9 @@ var postsPreview = {
 
         return m('div', [m('.dashboard-header.u-text-center', m('.w-container', m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', m('.fontsize-larger.fontweight-semibold.lineheight-tight', 'Review your news before submitting!')), m('.w-col.w-col-3')]))), m('.section', [m('.w-container', m('.card.u-marginbottom-60.u-radius.w-row', [m('.w-col.w-col-1'), m('.u-marginbottom-30.u-margintop-30.w-col.w-col-10.w-hidden-small.w-hidden-tiny', [m('.fontcolor-secondary.fontsize-small.u-text-center', '16/01/2017'), m('.fontsize-larger.fontweight-semibold.u-marginbottom-30.u-text-center', title), m('.fontsize-base', m.trust(comment_html))]), m('.w-col.w-col-1')])), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', recipientsText), m('.w-col.w-col-3')]), m('.u-marginbottom-20.w-row', [m('.w-col.w-col-3'), m('._w-sub-col.w-col.w-col-4', m('button.btn.btn-large', {
             onclick: ctrl.sendNotification
-        }, [m('span.fa.fa-paper-plane', ''), ' ', m.trust('&nbsp;'), 'To send'])), m('.w-col.w-col-2', m('button.btn.btn-large.btn-terciary', {
+        }, [m('span.fa.fa-paper-plane', ''), ' ', m.trust('&nbsp;'), 'Send'])), m('.w-col.w-col-2', m('button.btn.btn-large.btn-terciary', {
             onclick: ctrl.togglePreview
-        }, 'To edit')), m('.w-col.w-col-3')])])]);
+        }, 'Edit')), m('.w-col.w-col-3')])])]);
     }
 };
 
@@ -4356,10 +4576,10 @@ var posts = {
         },
             togglePreview = function togglePreview() {
             if (!validateTitle()) {
-                errors('Título não pode ficar em branco.');
+                errors('Title can not be empty');
                 showError(true);
             } else if (!validateComment()) {
-                errors('Mensagem não pode ficar em branco.');
+                errors('Message can not be left blank.');
                 showError(true);
             } else {
                 h.scrollTop();
@@ -4373,7 +4593,7 @@ var posts = {
             var reward = _$1.find(rewardVM.rewards(), function (r) {
                 return String(r.id) === String(rewardId);
             });
-            return 'Reward supporters Rs' + reward.minimum_value + ' - ' + (reward.description.substring(0, 70) + '...');
+            return 'Reward supporters Rs' + reward.minimum_value + ' - ' + (reward.title ? reward.title : reward.description.substring(0, 70) + '...');
         },
             showRecipientes = function showRecipientes(post) {
             if (post.recipients === 'public') {
@@ -4550,6 +4770,8 @@ var liveStatistics = {
     }
 };
 
+var I18nScope$11 = _$1.partial(h.i18nScope, 'projects.dashboard_contribution_reports');
+
 var projectContributionReportHeader = {
     view: function view(ctrl, args) {
         var filterBuilder = args.filterBuilder,
@@ -4569,7 +4791,7 @@ var projectContributionReportHeader = {
 
         rewardFilter.data.options = args.mapRewardsToOptions();
 
-        return m('.w-section.dashboard-header', m('.w-container', [m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', m('.fontsize-larger.fontweight-semibold.lineheight-looser.u-marginbottom-30.u-text-center', 'Support report')), m('.w-col.w-col-3')]), m('.w-form', [m('form', {
+        return m('.w-section.dashboard-header', m('.w-container', [m('.w-container', m('.w-row', m('.w-col.w-col-8.w-col-push-2.u-marginbottom-30.u-text-center', [m('.fontweight-semibold.fontsize-larger.lineheight-looser', I18n$1.t('title', I18nScope$11())), m('.fontsize-base', I18n$1.t('subtitle_html', I18nScope$11()))]))), m('.w-form', [m('form', {
             onsubmit: args.submit
         }, m('.w-row', [m('.w-col.w-col-8', m('.w-row', [m.component(paymentStateFilter.component, paymentStateFilter.data), m.component(rewardFilter.component, rewardFilter.data), m.component(deliveryFilter.component, deliveryFilter.data)])), m('.w-col.w-col-4', m('.u-margintop-20.w-row', [m.component(mainFilter.component, mainFilter.data)]))]))])]));
     }
@@ -4582,7 +4804,7 @@ var projectContributionReportContentCard = {
             return _$1.contains(args.selectedContributions(), contribution.id);
         },
             selectContribution = function selectContribution(contribution) {
-            var anyChecked = $('input:checkbox').is(':checked');
+            var anyChecked = $$1('input:checkbox').is(':checked');
 
             args.selectedAny(anyChecked);
             if (!checked(contribution)) {
@@ -4648,7 +4870,7 @@ var projectContributionReportContentCard = {
             onclick: function onclick() {
                 return ctrl.selectContribution(contribution);
             }
-        }) : ''))), m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.w-row', [m('.w-col.w-col-1.w-col-tiny-1', [m('img.user-avatar.u-marginbottom-10[src=\'' + profileImg + '\']')]), m('.w-col.w-col-11.w-col-tiny-11', [m('.w-row', [m('.w-col.w-col-3', [m('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m('a.link-hidden-light.badge.badge-light', '+1 support ')] : '', contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' Non-public support')) : '']), m('.fontsize-smallest.lineheight-looser', contribution.email)]), m('.w-col.w-col-3', [m('.lineheight-tighter', [m('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m('span.fontsize-large', 'Rs ' + h.formatNumber(contribution.value, 2, 3))])]), m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m('div', contribution.delivery_status === 'error' ? m('span.badge.badge-attention.fontsize-smaller', 'Error sending') : contribution.delivery_status === 'delivered' ? m('span.badge.badge-success.fontsize-smaller', 'Sent') : contribution.delivery_status === 'received' ? m('span.fontsize-smaller.badge.badge-success', [m('span.fa.fa-check-circle', ''), ' Received']) : ''), m('.fontsize-smallest.fontweight-semibold', 'Reward:\xA0Rs ' + h.formatNumber(reward.minimum_value, 2, 3)), m('.fontsize-smallest', reward.description.substring(0, 80) + '...')])])])]))])]);
+        }) : ''))), m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.w-row', [m('.w-col.w-col-1.w-col-tiny-1', [m('img.user-avatar.u-marginbottom-10[src=\'' + profileImg + '\']')]), m('.w-col.w-col-11.w-col-tiny-11', [m('.w-row', [m('.w-col.w-col-3', [m('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m('a.link-hidden-light.badge.badge-light', '+1 support ')] : '', contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' Non-public support')) : '']), m('.fontsize-smallest.lineheight-looser', contribution.email)]), m('.w-col.w-col-3', [m('.lineheight-tighter', [m('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m('span.fontsize-large', 'Rs ' + h.formatNumber(contribution.value, 2, 3))])]), m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m('div', contribution.delivery_status === 'error' ? m('span.badge.badge-attention.fontsize-smaller', 'Error sending') : contribution.delivery_status === 'delivered' ? m('span.badge.badge-success.fontsize-smaller', 'Sent') : contribution.delivery_status === 'received' ? m('span.fontsize-smaller.badge.badge-success', [m('span.fa.fa-check-circle', ''), ' Received']) : ''), m('.fontsize-smallest.fontweight-semibold', 'Reward: ' + (reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : '')), m('.fontsize-smallest.fontweight-semibold', reward.title), m('.fontsize-smallest.fontcolor-secondary', reward.description.substring(0, 80) + '...')])])])]))])]);
     }
 };
 
@@ -4708,12 +4930,56 @@ vm$4.withNullParameters = function () {
     return withNullVm.parameters();
 };
 
+/**
+ * window.c.deliverContributionModalContent component
+ * Render deliver contribution modal
+ *
+ */
+var deliverContributionModalContent = {
+    view: function view(ctrl, args) {
+        return m('div', m('.modal-dialog-header', m('.fontsize-large.u-text-center', [m('span.fa.fa-check-circle', ''), ' Rewards on the way! Hurray !!!!'])), m('.modal-dialog-content', [m('p.fontsize-small.u-marginbottom-30', [m('span.fontweight-semibold', 'You selected ' + args.amount + ' Supports.'), ' Upon your confirmation, supporters who have made these supports for your project will be notified that their rewards will be delivered soon.']), m('.w-form', [m('form', [m('.fontsize-smaller', 'If you want to add some information in this message, use the space below! It`s a great time to thank those people who believed in you!'), m("textarea.height-mini.text-field.w-input[placeholder='Enter your message (optional)']", {
+            value: args.message(),
+            onchange: m.withAttr('value', args.message)
+        })])]), m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.fontsize-small.fontweight-semibold.u-marginbottom-20.u-text-center', 'Do you confirm that the rewards for the selected supports have been sent?')), m('.w-col.w-col-1')]), m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-5', m('a.btn.btn-medium.w-button', {
+            onclick: function onclick() {
+                return args.updateStatus('delivered');
+            }
+        }, 'Yes!')), m('.w-col.w-col-5', m('a.btn.btn-medium.btn-terciary.w-button', {
+            onclick: args.displayModal.toggle
+        }, 'Come back')), m('.w-col.w-col-1')])]));
+    }
+};
+
+/**
+ * window.c.errorContributionModalContent component
+ * Render deliver error contribution modal
+ *
+ */
+var errorContributionModalContent = {
+    view: function view(ctrl, args) {
+        return m('div', m('.modal-dialog-header', m('.fontsize-large.u-text-center', [m('span.fa.fa-exclamation-triangle', ''), ' Ops. Error sending!'])), m('.modal-dialog-content', [m('p.fontsize-small.u-marginbottom-30', [m('span.fontweight-semibold', 'You selected ' + args.amount + ' Supports.'), ' Upon your confirmation, the supporters who made these supports for your project will be notified that there was a problem with sending your rewards.']), m('.w-form', [m('form', [m('.fontsize-smaller', 'If you want to add some information in this message, use the space below (ex: you can request confirmation of delivery address or explain reasons for the error) '), m("textarea.height-mini.text-field.w-input[placeholder='Enter your message (optional)']", {
+            value: args.message(),
+            onchange: m.withAttr('value', args.message)
+        })])]), m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.fontsize-small.fontweight-semibold.u-marginbottom-20.u-text-center', 'Do you confirm that there was an error in sending the rewards of the selected supports?')), m('.w-col.w-col-1')]), m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-5', m('a.btn.btn-medium.w-button', {
+            onclick: function onclick() {
+                return args.updateStatus('error');
+            }
+        }, 'Yes!')), m('.w-col.w-col-5', m('a.btn.btn-medium.btn-terciary.w-button', {
+            onclick: args.displayModal.toggle
+        }, 'Come back')), m('.w-col.w-col-1')])]));
+    }
+};
+
 var projectContributionReportContent = {
     controller: function controller(args) {
         var showSelectedMenu = h.toggleProp(false, true),
             selectedAny = m.prop(false),
             showSuccess = m.prop(false),
+            loading = m.prop(false),
+            displayDeliverModal = h.toggleProp(false, true),
+            displayErrorModal = h.toggleProp(false, true),
             selectedContributions = m.prop([]),
+            deliveryMessage = m.prop(''),
             selectAll = function selectAll() {
             vm$4.getAllContributions(args.filterVM).then(function (data) {
                 var _selectedContribution;
@@ -4732,18 +4998,27 @@ var projectContributionReportContent = {
             updateStatus = function updateStatus(status) {
             var data = {
                 contributions: selectedContributions(),
+                message: deliveryMessage(),
                 delivery_status: status
             };
+            if (status === 'delivered') {
+                displayDeliverModal.toggle();
+            } else if (status === 'error') {
+                displayErrorModal.toggle();
+            }
+            loading(true);
+            showSelectedMenu.toggle();
+            m.redraw();
             vm$4.updateStatus(data).then(function () {
+                loading(false);
                 showSuccess(true);
-                showSelectedMenu.toggle();
                 // update status so we don't have to reload the page
                 _$1.map(_$1.filter(args.list.collection(), function (contrib) {
                     return _$1.contains(selectedContributions(), contrib.id);
                 }), function (item) {
                     return item.delivery_status = status;
                 });
-            }).catch(function (err) {
+            }).catch(function () {
                 m.redraw();
             });
             return false;
@@ -4753,7 +5028,11 @@ var projectContributionReportContent = {
             showSuccess: showSuccess,
             selectAll: selectAll,
             unselectAll: unselectAll,
+            deliveryMessage: deliveryMessage,
+            displayDeliverModal: displayDeliverModal,
+            displayErrorModal: displayErrorModal,
             updateStatus: updateStatus,
+            loading: loading,
             showSelectedMenu: showSelectedMenu,
             selectedAny: selectedAny,
             selectedContributions: selectedContributions
@@ -4763,7 +5042,15 @@ var projectContributionReportContent = {
         var list = args.list;
         var isFailed = args.project().state === 'failed';
 
-        return m('.w-section.bg-gray.before-footer.section', [ctrl.showSuccess() ? m.component(popNotification, {
+        return m('.w-section.bg-gray.before-footer.section', ctrl.loading() ? h.loader() : [ctrl.displayErrorModal() ? m.component(modalBox, {
+            displayModal: ctrl.displayErrorModal,
+            hideCloseButton: false,
+            content: [errorContributionModalContent, { project: args.project, displayModal: ctrl.displayErrorModal, amount: ctrl.selectedContributions().length, updateStatus: ctrl.updateStatus, message: ctrl.deliveryMessage }]
+        }) : '', ctrl.displayDeliverModal() ? m.component(modalBox, {
+            displayModal: ctrl.displayDeliverModal,
+            hideCloseButton: false,
+            content: [deliverContributionModalContent, { project: args.project, displayModal: ctrl.displayDeliverModal, amount: ctrl.selectedContributions().length, updateStatus: ctrl.updateStatus, message: ctrl.deliveryMessage }]
+        }) : '', ctrl.showSuccess() ? m.component(popNotification, {
             message: 'As informações foram atualizadas'
         }) : '', m('.w-container', [m('.u-marginbottom-40', m('.w-row', [m('.u-text-center-small-only.w-col.w-col-2', m('.fontsize-base.u-marginbottom-10', [m('span.fontweight-semibold', list.isLoading() ? '' : list.total()), ' Supports'])), m('.w-col.w-col-6', isFailed ? '' : [!ctrl.selectedAny() ? m('button.btn.btn-inline.btn-small.btn-terciary.u-marginright-20.w-button', {
             onclick: ctrl.selectAll
@@ -4773,30 +5060,13 @@ var projectContributionReportContent = {
             onclick: ctrl.showSelectedMenu.toggle
         }, ['Mark ', m('span.w-hidden-tiny', 'delivery'), ' as']), ctrl.showSelectedMenu() ? m('.card.dropdown-list.dropdown-list-medium.u-radius.zindex-10[id=\'transfer\']', [m('a.dropdown-link.fontsize-smaller[href=\'#\']', {
             onclick: function onclick() {
-                return ctrl.updateStatus('delivered');
+                return ctrl.displayDeliverModal.toggle();
             }
         }, 'Sent'), m('a.dropdown-link.fontsize-smaller[href=\'#\']', {
             onclick: function onclick() {
-                return ctrl.updateStatus('error');
+                return ctrl.displayErrorModal.toggle();
             }
-        }, 'Error sending')]) : '']) : '']), m('.w-clearfix.w-col.w-col-4', m('a.alt-link.fontsize-small.lineheight-looser.u-right[href="/projects/' + args.project().project_id + '/download_reports"]', [m('span.fa.fa-download', ''), ' Baixar relatórios']))])),
-
-        // TODO: ordering filter template
-        // m(".w-col.w-col-3.w-col-small-6.w-col-tiny-6", [
-        // m(".w-form", [
-        // m("form[data-name='Email Form 5'][id='email-form-5'][name='email-form-5']", [
-        // m(".fontsize-smallest.fontcolor-secondary", "Ordenar por:"),
-        // m("select.w-select.text-field.positive.fontsize-smallest[id='field-9'][name='field-9']", [
-        // m("option[value='']", "Data (recentes para antigos)"),
-        // m("option[value='']", "Data (antigos para recentes)"),
-        // m("option[value='']", "Valor (maior para menor)"),
-        // m("option[value='First']", "Valor (menor para maior)")
-        // ])
-        // ])
-        // ])
-        // ])*/
-        // ]),
-        _$1.map(list.collection(), function (item) {
+        }, 'Error sending')]) : '']) : '']), m('.w-clearfix.w-col.w-col-4', m('a.alt-link.fontsize-small.lineheight-looser.u-right[href="/projects/' + args.project().project_id + '/download_reports"]', [m('span.fa.fa-download', ''), ' Download reports']))])), _$1.map(list.collection(), function (item) {
             var contribution = m.prop(item);
             return m.component(projectContributionReportContentCard, {
                 project: args.project,
@@ -4826,12 +5096,12 @@ var InfoProjectContributionLegend = {
     }
 };
 
-var I18nScope$11 = _$1.partial(h.i18nScope, 'projects.contributions_report.legend_labels');
+var I18nScope$12 = _$1.partial(h.i18nScope, 'projects.contributions_report.legend_labels');
 
 var ProjectContributionStateLegendModal = {
     controller: function controller(args) {
         var translate = function translate(path) {
-            return I18n$1.t(path, I18nScope$11());
+            return I18n$1.t(path, I18nScope$12());
         };
 
         return {
@@ -4887,7 +5157,7 @@ var ProjectContributionStateLegendModal = {
 
 var ProjectContributionDeliveryLegendModal = {
     view: function view(ctrl, args) {
-        return m('div', [m('.modal-dialog-header', [m('.fontsize-large.u-text-center', 'Status da entrega')]), m('.modal-dialog-content', [m('.fontsize-small.u-marginbottom-30', 'Todo apoio tem, por padrão, o status de entrega \'Não enviada\'. Para ajudar no seu controle da entrega de recompensas, você pode alterar esses status e filtrar a pesquisa de apoios com os seguintes rótulos:'), m('.u-marginbottom-20', [m('.fontsize-small.fontweight-semibold', ['Não enviada', m.trust('&nbsp;')]), m('.fontsize-smaller', 'Você ainda não enviou a recompensa para o apoiador.')]), m('div', m('span.fontsize-small.badge.badge-success', 'Enviada')), m('.u-marginbottom-20', m('.fontsize-smaller', 'Você já enviou a recompensa para o apoiador.')), m('.u-marginbottom-20', [m('div', m('span.fontsize-small.badge.badge-attention', 'Erro no envio')), m('.fontsize-smaller', 'Você enviou a recompensa, mas houve algum problema com o envio (ex: endereço incorreto).')]), m('.u-marginbottom-20', [m('div', m('span.fontsize-small.badge.badge-success', [m('span.fa.fa-check-circle', ''), ' Recebida'])), m('.fontsize-smaller', 'O apoiador marcou a recompensa como \'Recebida\' no seu painel de controle \o/')])])]);
+        return m('div', [m('.modal-dialog-header', [m('.fontsize-large.u-text-center', 'Delivery status')]), m('.modal-dialog-content', [m('.fontsize-smaller.u-marginbottom-30', 'All support has, by default, delivery status \'Not Sent \'. To assist in your control of rewards delivery, you can change these statuses and filter the search for supports with the following labels:'), m('.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold', ['Not sent', m.trust('&nbsp;')]), m('.fontsize-smaller', 'You have not yet sent the reward to the supporter.')]), m('div', m('span.fontsize-smaller.badge.badge-success', 'Sent')), m('.u-marginbottom-20', m('.fontsize-smaller', 'You have already sent the reward to the supporter.')), m('.u-marginbottom-20', [m('div', m('span.fontsize-smaller.badge.badge-attention', 'Sending error')), m('.fontsize-smaller', 'You sent the reward, but there was a problem with the submission (ex: incorrect address).')]), m('.u-marginbottom-20', [m('div', m('span.fontsize-smaller.badge.badge-success', [m('span.fa.fa-check-circle', ''), ' Received'])), m('.fontsize-smaller', 'The supporter has marked the reward as \'Received \' in your control panel \o/')])]), m('.divider.u-marginbottom-10'), m('.fontcolor-secondary.fontsize-smaller.u-marginbottom-30', ['Note: even if the reward is not physical (like a digital copy, for example), you can still use the system above!'])]);
     }
 };
 
@@ -5032,13 +5302,13 @@ var projectContributionReport = {
                 inputWrapperClass: '.w-input.text-field',
                 btnClass: '.btn.btn-medium',
                 vm: filterVM.full_text_index,
-                placeholder: 'Busque por nome ou email do apoiador'
+                placeholder: 'Search by name or email'
             }
         }, {
             label: 'reward_filter',
             component: filterDropdown,
             data: {
-                label: 'Recompensa selecionada',
+                label: 'Reward selected',
                 onchange: submit,
                 name: 'reward_id',
                 vm: filterVM.reward_id,
@@ -5051,7 +5321,7 @@ var projectContributionReport = {
             data: {
                 custom_label: [InfoProjectContributionLegend, {
                     content: [ProjectContributionDeliveryLegendModal],
-                    text: 'Status da entrega'
+                    text: 'Delivery Status'
                 }],
                 onchange: submit,
                 name: 'delivery_status',
@@ -5059,19 +5329,19 @@ var projectContributionReport = {
                 wrapper_class: '.w-col.w-col-4',
                 options: [{
                     value: '',
-                    option: 'Todos'
+                    option: 'All'
                 }, {
                     value: 'undelivered',
-                    option: 'Não enviada'
+                    option: 'Not sent'
                 }, {
                     value: 'delivered',
-                    option: 'Enviada'
+                    option: 'Sent'
                 }, {
                     value: 'error',
-                    option: 'Erro no envio'
+                    option: 'Sending error'
                 }, {
                     value: 'received',
-                    option: 'Recebida'
+                    option: 'Received'
                 }]
             }
         }, {
@@ -5079,7 +5349,7 @@ var projectContributionReport = {
             component: filterDropdown,
             data: {
                 custom_label: [InfoProjectContributionLegend, {
-                    text: 'Status do apoio',
+                    text: 'Support Status',
                     content: [ProjectContributionStateLegendModal, {
                         project: project
                     }]
@@ -5199,7 +5469,7 @@ var projectsDashboard = {
  * m.component(c.Search, {action: '/search', method: 'GET'})
  */
 
-var I18nScope$13 = _.partial(h.i18nScope, 'layouts');
+var I18nScope$14 = _.partial(h.i18nScope, 'layouts');
 
 var search = {
     view: function view(ctrl) {
@@ -5208,7 +5478,7 @@ var search = {
         var action = args.action || '/en/explore?ref=ctrse_explore_pgsearch',
             method = args.method || 'GET';
 
-        return m('#search.w-container.w-hidden-main.w-hidden-medium', [m('.w-row', [m('.w-col.w-col-10.u-marginbottom-20', [m('.w-form', [m('form#email-form', { action: action, method: method }, [m('.w-row', [m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('input[type="text"][name="pg_search"][placeholder=' + I18n$1.t('header.search', I18nScope$13()) + ']#pg_search_inside.w-input.text-field.negative.prefix')]), m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m('button.w-inline-block.btn.btn-dark.btn-attached.postfix', [m('img.header-lupa[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/54e44178b2135fce2b6cd235_lupa.png"]')])])])])])])])]);
+        return m('#search.w-container.w-hidden-main.w-hidden-medium', [m('.w-row', [m('.w-col.w-col-10.u-marginbottom-20', [m('.w-form', [m('form#email-form', { action: action, method: method }, [m('.w-row', [m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('input[type="text"][name="pg_search"][placeholder=' + I18n$1.t('header.search', I18nScope$14()) + ']#pg_search_inside.w-input.text-field.negative.prefix')]), m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m('button.w-inline-block.btn.btn-dark.btn-attached.postfix', [m('img.header-lupa[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/54e44178b2135fce2b6cd235_lupa.png"]')])])])])])])])]);
     }
 };
 
@@ -5234,7 +5504,7 @@ var categoryButton = {
     }
 };
 
-var I18nScope$14 = _$1.partial(h.i18nScope, 'fb_connect');
+var I18nScope$15 = _$1.partial(h.i18nScope, 'fb_connect');
 
 var UnsignedFriendFacebookConnect = {
     controller: function controller(args) {
@@ -5248,7 +5518,7 @@ var UnsignedFriendFacebookConnect = {
         };
     },
     view: function view(ctrl, args) {
-        return m('.w-section.section' + (ctrl.largeBg ? '.bg-backs-carrosel.section-large' : ''), [m('.w-container', [m('.card.card-big', [m('.w-row', [m('.w-col.w-col-8', [m('.fontsize-largest.u-marginbottom-20', I18n$1.t('find_project', I18nScope$14())), m('.fontsize-small', I18n$1.t('with', I18nScope$14()))]), m('.w-col.w-col-4', [m('a.w-button.btn.btn-fb.btn-large.u-margintop-30.u-marginbottom-10[href="/connect-facebook"]', I18n$1.t('connect', I18nScope$14())), m('.fontsize-smallest.fontcolor-secondary.u-text-center', I18n$1.t('oath', I18nScope$14()))])])])])]);
+        return m('.w-section.section' + (ctrl.largeBg ? '.bg-backs-carrosel.section-large' : ''), [m('.w-container', [m('.card.card-big', [m('.w-row', [m('.w-col.w-col-8', [m('.fontsize-largest.u-marginbottom-20', I18n$1.t('find_project', I18nScope$15())), m('.fontsize-small', I18n$1.t('with', I18nScope$15()))]), m('.w-col.w-col-4', [m('a.w-button.btn.btn-fb.btn-large.u-margintop-30.u-marginbottom-10[href="/connect-facebook"]', I18n$1.t('connect', I18nScope$15())), m('.fontsize-smallest.fontcolor-secondary.u-text-center', I18n$1.t('oath', I18nScope$15()))])])])])]);
     }
 };
 
@@ -5260,7 +5530,7 @@ var UnsignedFriendFacebookConnect = {
  * To mount this component just create a DOM element like:
  * <div data-mithril="ProjectsExplore">
  */
-var I18nScope$12 = _$1.partial(h.i18nScope, 'pages.explore');
+var I18nScope$13 = _$1.partial(h.i18nScope, 'pages.explore');
 // TODO Slim down controller by abstracting logic to view-models where it fits
 var projectsExplore = {
     controller: function controller(args) {
@@ -5466,7 +5736,7 @@ var projectsExplore = {
             }
         }
 
-        return m('#explore', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$12())) }, [m('.w-section.hero-search', [m.component(search), m('.w-container.u-marginbottom-10', [m('.u-text-center.u-marginbottom-40', [m('a#explore-open.link-hidden-white.fontweight-light.fontsize-larger[href="javascript:void(0);"]', { onclick: function onclick() {
+        return m('#explore', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$13())) }, [m('.w-section.hero-search', [m.component(search), m('.w-container.u-marginbottom-10', [m('.u-text-center.u-marginbottom-40', [m('a#explore-open.link-hidden-white.fontweight-light.fontsize-larger[href="javascript:void(0);"]', { onclick: function onclick() {
                 return ctrl.toggleCategories.toggle();
             } }, ['Explore Incredible Campaigns ', m('span#explore-btn.fa.fa-angle-down' + (ctrl.toggleCategories() ? '.opened' : ''), '')])]), m('#categories.category-slider' + (ctrl.toggleCategories() ? '.opened' : ''), [m('.w-row.u-marginbottom-30', [_$1.map(ctrl.categories(), function (category) {
             return m.component(categoryButton, { category: category });
@@ -5509,7 +5779,7 @@ var projectsExplore = {
                 ctrl.projects().nextPage();return false;
             } }, 'Load more')])])])]), m('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [m('.w-container.u-text-center', [m('img.u-marginbottom-20.icon-hero', {
             src: hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].icon : 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png'
-        }), m('h2.fontsize-larger.u-marginbottom-60', hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [hasSpecialFooter ? m('a.w-button.btn.btn-large', { href: ctrl.externalLinkCategories[categoryId()].link }, ctrl.externalLinkCategories[categoryId()].cta) : m('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'LEARN HOW')])])])])]);
+        }), m('h2.fontsize-larger.u-marginbottom-60', hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [hasSpecialFooter ? m('a.w-button.btn.btn-large', { href: ctrl.externalLinkCategories[categoryId()].link + '?ref=ctrse_explore' }, ctrl.externalLinkCategories[categoryId()].cta) : m('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'Learn how')])])])])]);
     }
 };
 
@@ -5665,7 +5935,7 @@ var blogBanner = {
     }
 };
 
-var I18nScope$15 = _$1.partial(h.i18nScope, 'projects.home');
+var I18nScope$16 = _$1.partial(h.i18nScope, 'projects.home');
 
 var projectsHome = {
     controller: function controller(args) {
@@ -5715,7 +5985,7 @@ var projectsHome = {
         var slides = function slides() {
             return _$1.map(ctrl.slidesContent, function (slide) {
                 var customStyle = 'background-image: url(' + slide.image + ');';
-                var content = m('.w-container.u-text-center', [m('.w-row.u-marginbottom-40', [m('h1.fontcolor-negative.fontsize-megajumbo.u-marginbottom-20', slide.title), m('h2.fontcolor-negative.fontsize-large', m.trust(slide.subtitle))]), m('a.btn.btn-large.u-marginbottom-10.btn-inline', { href: slide.link }, slide.cta)]);
+                var content = m('.w-container.u-text-center', [m('.w-row.u-marginbottom-40', [m('h1.fontcolor-negative.fontsize-megajumbo.u-marginbottom-20', m.trust(slide.title)), m('h2.fontcolor-negative.fontsize-large', m.trust(slide.subtitle))]), m('a.btn.btn-large.u-marginbottom-10.btn-inline', { href: slide.link }, slide.cta)]);
 
                 return {
                     content: content,
@@ -5724,7 +5994,7 @@ var projectsHome = {
             });
         };
 
-        return m('#projects-home-component', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$15())) }, [
+        return m('#projects-home-component', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$16())) }, [
         // m.component(menu, {transparent: true}),
         m.component(slider, {
             slides: slides(),
@@ -5794,7 +6064,7 @@ var categoryTag = {
     view: function view(ctrl, args) {
         var project = args.project;
 
-        return project ? m('a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light[href="/en/explore#by_category_id/' + project().category_id + '"]', {
+        return project ? m('a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light[href="/explore#by_category_id/' + project().category_id + '"]', {
             onclick: h.analytics.event({
                 cat: 'project_view',
                 act: 'project_category_link',
@@ -5817,7 +6087,7 @@ var projectHighlight = {
             style: 'min-height: 240px;'
         }, [m('iframe.embedly-embed[itemprop="video"][src="' + project().video_embed_url + '"][frameborder="0"][allowFullScreen]')]) : m('.project-image', {
             style: 'background-image:url(\'' + (project().original_image || project().project_img) + '\');'
-        }), m('.w-hidden-small.w-hidden-tiny', [m.component(addressTag, { project: project }), m.component(categoryTag, { project: project })]), m('.project-blurb', project().headline), m('.project-share.w-hidden-small.w-hidden-tiny', m('.u-marginbottom-30.u-text-center-small-only', [m('.w-inline-block.fontcolor-secondary.fontsize-smaller.u-marginright-20', 'To share:'), project().permalink ? m.component(facebookButton, {
+        }), m('.w-hidden-small.w-hidden-tiny', [m.component(addressTag, { project: project }), m.component(categoryTag, { project: project })]), m('.project-blurb', project().headline), m('.project-share.w-hidden-small.w-hidden-tiny', m('.u-marginbottom-30.u-text-center-small-only', [m('.w-inline-block.fontcolor-secondary.fontsize-smaller.u-marginright-20', 'Share:'), project().permalink ? m.component(facebookButton, {
             url: 'http://www.myjvn.com/' + project().permalink + '?ref=facebook&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share'
         }) : '', project().permalink ? m.component(facebookButton, {
             messenger: true,
@@ -5856,7 +6126,7 @@ var projectMode = {
             buildTooltip = function buildTooltip(el) {
             return m.component(tooltip, {
                 el: el,
-                text: mode === 'aon' ? 'You will only receive the resources if you reach or exceed the goal until ' + h.momentify(project.zone_expires_at, 'DD/MM/YYYY') + '.' : 'The director will receive all the resources when he closes the campaign, even if he has not reached this goal.',
+                text: mode === 'aon' ? 'You will only receive the resources if you reach or exceed the goal until ' + h.momentify(project.zone_expires_at, 'DD/MM/YYYY') + '.' : 'The campaign manager will receive all the resources when he closes the campaign, even if s/he has not reached this goal.',
                 width: 280
             });
         };
@@ -5955,7 +6225,7 @@ var ownerMessageContent = {
             name: '',
             email: ''
         },
-            from_name = m.prop(user.public_name),
+            from_name = m.prop(userVM.displayName(user)),
             from_email = m.prop(user.email),
             content = m.prop('');
 
@@ -6019,11 +6289,11 @@ var ownerMessageContent = {
             class: h.validate().hasError(ctrl.content) ? 'error' : ''
         }), m('.u-marginbottom-10.fontsize-smallest.fontcolor-terciary', 'You will receive a copy of this message in your email.'), m('.w-row', h.validationErrors().length ? _$1.map(h.validationErrors(), function (errors) {
             return m('span.fontsize-smallest.text-error', [m('span.fa.fa-exclamation-triangle'), ' ' + errors.message, m('br')]);
-        }) : ''), m('.modal-dialog-nav-bottom', m('.w-row', m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send message"]', {
+        }) : ''), m('.modal-dialog-nav-bottom', m('.w-row', m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send Message"]', {
             disabled: ctrl.submitDisabled()
         }) : h.loader())))])])])];
 
-        return m('div', [m('.modal-dialog-header', m('.fontsize-large.u-text-center', 'Send message')), ctrl.sendSuccess() ? successMessage : contactForm]);
+        return m('div', [m('.modal-dialog-header', m('.fontsize-large.u-text-center', 'Send Message')), ctrl.sendSuccess() ? successMessage : contactForm]);
     }
 };
 
@@ -6130,11 +6400,11 @@ var projectUserCard = {
         return m('#user-card', _$1.isEmpty(userDetail) ? 'Loading...' : m('.u-marginbottom-30.u-text-center-small-only', [ctrl.displayModal() ? m.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: contactModalC
-        }) : '', m('.w-row', [m('.w-col.w-col-4', [m('img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="' + userDetail.profile_img_thumbnail + '"]')]), m('.w-col.w-col-8', [m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [m('a.link-hidden[href="/users/' + userDetail.id + '"]', { config: m.route,
+        }) : '', m('.w-row', [m('.w-col.w-col-4', [m('img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="' + userVM.displayImage(userDetail) + '"]')]), m('.w-col.w-col-8', [m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [m('a.link-hidden[href="/users/' + userDetail.id + '"]', { config: m.route,
             onclick: function onclick() {
                 m.route('/users/' + userDetail.id, { user_id: userDetail.id });
                 h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
-            } }, userDetail.public_name || userDetail.name)]), m('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' Created', ' Created'), m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' Backed', ' Backed')]), m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Facebook Profile')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Twitter Profile')]) : '', _$1.map(userDetail.links, function (link) {
+            } }, userVM.displayName(userDetail))]), m('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' Created', ' Created'), m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' Backed', ' Backed')]), m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Facebook Profile')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Twitter Profile')]) : '', _$1.map(userDetail.links, function (link) {
             var parsedLink = h.parseUrl(link.link);
 
             return !_$1.isEmpty(parsedLink.hostname) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_otherlinks', lbl: link.link, project: project() }) }, parsedLink.hostname)]) : '';
@@ -6142,11 +6412,11 @@ var projectUserCard = {
             enabledClass: 'a.w-button.btn.btn-terciary.btn-small..u-marginbottom-10',
             disabledClass: 'a.w-button.btn.btn-terciary.btn-small.u-marginbottom-10',
             follow_id: userDetail.id,
-            following: userDetail.following_this_user }), m('a.w-button.btn.btn-terciary.btn-small[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.sendMessage) }, 'Send message')] : '', args.project().is_admin_role ? m('p', userDetail.email) : ''])])]));
+            following: userDetail.following_this_user }), m('a.w-button.btn.btn-terciary.btn-small[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.sendMessage) }, 'Send Message')] : '', args.project().is_admin_role ? m('p', userDetail.email) : ''])])]));
     }
 };
 
-var I18nScope$16 = _$1.partial(h.i18nScope, 'projects.project_sidebar');
+var I18nScope$17 = _$1.partial(h.i18nScope, 'projects.project_sidebar');
 
 var projectSidebar = {
     controller: function controller(args) {
@@ -6211,24 +6481,24 @@ var projectSidebar = {
         },
             displayStatusText = function displayStatusText() {
             var states = {
-                approved: I18n$1.t('display_status.approved', I18nScope$16()),
-                online: h.existy(project().zone_expires_at) && project().open_for_contributions ? I18n$1.t('display_status.online', I18nScope$16({ date: h.momentify(project().zone_expires_at) })) : '',
-                failed: I18n$1.t('display_status.failed', I18nScope$16({ date: h.momentify(project().zone_expires_at), goal: project().goal })),
-                rejected: I18n$1.t('display_status.rejected', I18nScope$16()),
-                in_analysis: I18n$1.t('display_status.in_analysis', I18nScope$16()),
-                successful: I18n$1.t('display_status.successful', I18nScope$16({ date: h.momentify(project().zone_expires_at) })),
-                waiting_funds: I18n$1.t('display_status.waiting_funds', I18nScope$16()),
-                draft: I18n$1.t('display_status.draft', I18nScope$16())
+                approved: I18n$1.t('display_status.approved', I18nScope$17()),
+                online: h.existy(project().zone_expires_at) && project().open_for_contributions ? I18n$1.t('display_status.online', I18nScope$17({ date: h.momentify(project().zone_expires_at) })) : '',
+                failed: I18n$1.t('display_status.failed', I18nScope$17({ date: h.momentify(project().zone_expires_at), goal: project().goal })),
+                rejected: I18n$1.t('display_status.rejected', I18nScope$17()),
+                in_analysis: I18n$1.t('display_status.in_analysis', I18nScope$17()),
+                successful: I18n$1.t('display_status.successful', I18nScope$17({ date: h.momentify(project().zone_expires_at) })),
+                waiting_funds: I18n$1.t('display_status.waiting_funds', I18nScope$17()),
+                draft: I18n$1.t('display_status.draft', I18nScope$17())
             };
 
             return states[project().state];
         };
 
-        return m('#project-sidebar.aside', [m('.project-stats', [m('.project-stats-inner', [m('.project-stats-info', [m('.u-marginbottom-20', [m('#pledged.fontsize-largest.fontweight-semibold.u-text-center-small-only', 'Rs ' + (project().pledged ? h.formatNumber(project().pledged) : '0')), m('.fontsize-small.u-text-center-small-only', [I18n$1.t('contributors_call', I18nScope$16()), m('span#contributors.fontweight-semibold', I18n$1.t('contributors_count', I18nScope$16({ count: project().total_contributors }))), !project().expires_at && elapsed ? ' in ' + I18n$1.t('datetime.distance_in_words.x_' + elapsed.unit, { count: elapsed.total }, I18nScope$16()) : ''])]), m('.meter', [m('#progressBar.meter-fill', {
+        return m('#project-sidebar.aside', [m('.project-stats', [m('.project-stats-inner', [m('.project-stats-info', [m('.u-marginbottom-20', [m('#pledged.fontsize-largest.fontweight-semibold.u-text-center-small-only', 'Rs ' + (project().pledged ? h.formatNumber(project().pledged) : '0')), m('.fontsize-small.u-text-center-small-only', [I18n$1.t('contributors_call', I18nScope$17()), m('span#contributors.fontweight-semibold', I18n$1.t('contributors_count', I18nScope$17({ count: project().total_contributors }))), !project().expires_at && elapsed ? ' in ' + I18n$1.t('datetime.distance_in_words.x_' + elapsed.unit, { count: elapsed.total }, I18nScope$17()) : ''])]), m('.meter', [m('#progressBar.meter-fill', {
             style: {
                 width: project().progress + '%'
             }
-        })]), m('.w-row.u-margintop-10', [m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [m('.fontsize-small.fontweight-semibold.lineheight-tighter', (project().progress ? parseInt(project().progress) : '0') + '%')]), m('.w-col.w-col-7.w-col-small-6.w-col-tiny-6.w-clearfix', [m('.u-right.fontsize-small.lineheight-tighter', remaining && remaining.total ? [m('span.fontweight-semibold', remaining.total), I18n$1.t('remaining_time.' + remaining.unit, I18nScope$16({ count: remaining.total }))] : '')])])]), m('.w-row', [m.component(projectMode, {
+        })]), m('.w-row.u-margintop-10', [m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [m('.fontsize-small.fontweight-semibold.lineheight-tighter', (project().progress ? parseInt(project().progress) : '0') + '%')]), m('.w-col.w-col-7.w-col-small-6.w-col-tiny-6.w-clearfix', [m('.u-right.fontsize-small.lineheight-tighter', remaining && remaining.total ? [m('span.fontweight-semibold', remaining.total), I18n$1.t('remaining_time.' + remaining.unit, I18nScope$17({ count: remaining.total }))] : '')])])]), m('.w-row', [m.component(projectMode, {
             project: project
         })])]), project().open_for_contributions ? m('.back-project-btn-div', [m('.back-project--btn-row', [m('a#contribute_project_form.btn.btn-large.u-marginbottom-20[href="javascript:void(0);"]', {
             onclick: h.analytics.event({
@@ -6239,7 +6509,7 @@ var projectSidebar = {
                 return h.navigateTo('/projects/' + project().project_id + '/contributions/new');
             })
 
-        }, I18n$1.t('submit', I18nScope$16()))]), m('.back-project-btn-row-right', m.component(projectReminder, {
+        }, I18n$1.t('submit', I18nScope$17()))]), m('.back-project-btn-row-right', m.component(projectReminder, {
             project: project,
             type: 'link'
         }))]) : '', m('.friend-backed-card.project-page', [!_$1.isUndefined(project()) && project().contributed_by_friends ? m.component(projectFriends, { project: project(), wrapper: 'div' }) : '']), m('div[class="fontsize-smaller u-marginbottom-30 ' + displayCardClass() + '"]', displayStatusText())]), m('.project-share.w-hidden-main.w-hidden-medium', [m.component(addressTag, { project: project }), m.component(categoryTag, { project: project }), m('.u-marginbottom-30.u-text-center-small-only', m('button.btn.btn-inline.btn-medium.btn-terciary', {
@@ -6251,6 +6521,14 @@ var projectSidebar = {
             userDetails: args.userDetails,
             project: project
         }))]);
+    }
+};
+
+var projectHeaderTitle = {
+    view: function view(ctrl, args) {
+        var project = args.project;
+
+        return !_$1.isUndefined(project()) ? m('.w-section.page-header.u-text-center', [m('.w-container', [m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['by ', project().user ? userVM.displayName(project().user) : project().owner_public_name ? project().owner_name : '']), args.children])]) : m('div', '');
     }
 };
 
@@ -6270,11 +6548,11 @@ var rewardReceiver = {
     view: function view(ctrl, args) {
         var contribution = args.contribution;
 
-        return contributionVM.canBeDelivered(contribution) ? m('.u-text-center.w-col.w-col-1', {
+        return contributionVM.canBeDelivered(contribution) ? m('.u-text-center.w-col.w-col-2', {
             onclick: function onclick() {
                 return ctrl.toggleDelivery(contribution.project_id, contribution);
             }
-        }, [m('.fontsize-smallest', m('a.checkbox-big' + (contribution.delivery_status === 'received' ? '.checkbox--selected.fa.fa-check.fa-lg' : ''), '')), m('.fontcolor-secondary.fontsize-smallest.lineheight-looser', 'Recebi!')]) : m('');
+        }, [m('.fontsize-smallest', m('a.checkbox-big' + (contribution.delivery_status === 'received' ? '.checkbox--selected.fa.fa-check.fa-lg' : ''), '')), m('.fontcolor-secondary.fontsize-smallest.lineheight-looser', 'Received?')]) : m('');
     }
 };
 
@@ -6282,7 +6560,9 @@ var userContributionDetail = {
     controller: function controller(args) {
         var contribution = args.contribution,
             rewardDetails = args.rewardDetails,
-            chosenReward = _$1.findWhere(rewardDetails(), { id: contribution.reward_id });
+            chosenReward = _$1.findWhere(rewardDetails(), {
+            id: contribution.reward_id
+        });
 
         return {
             contribution: contribution,
@@ -6292,7 +6572,16 @@ var userContributionDetail = {
     view: function view(ctrl, args) {
         var contribution = args.contribution;
 
-        return m('.user-contribution-detail', [m('.w-col.w-col-3', [m('.fontsize-smallest.lineheight-tight.fontweight-semibold.u-marginbottom-10', 'Value of support:'), m('.fontsize-large', 'Rs' + contribution.value)]), m('.w-col.w-col-3', m.component(paymentStatus, { item: contribution })), m('.w-col.w-col-5', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', 'Recompensa:'), m('.fontsize-smallest.lineheight-tight.u-marginbottom-20', !_$1.isUndefined(ctrl.chosenReward) ? ctrl.chosenReward.description : 'No reward selected.'), m('.fontsize-smallest.lineheight-looser', !_$1.isUndefined(ctrl.chosenReward) ? [m('span.fontweight-semibold', 'Estimated delivery: '), h.momentify(ctrl.chosenReward.deliver_at, 'MMM/YYYY')] : ''), contributionVM.canBeDelivered(contribution) ? m('.fontsize-smallest.lineheight-looser', [m('span.fontweight-semibold', 'Delivery status: '), h.contributionStatusBadge(contribution)]) : '']), m(rewardReceiver, { contribution: contribution, wrapperClass: '' })]);
+        return m('.user-contribution-detail', [m('.w-col.w-col-4', [m('.fontsize-smallest.lineheight-tight.fontweight-semibold.u-marginbottom-10', 'Value of support:'), m('.fontsize-large', 'Rs' + contribution.value)]),
+        // m('.w-col.w-col-3',
+        //     m.component(paymentStatus, {
+        //         item: contribution
+        //     })
+        // ),
+        m('.w-col.w-col-6', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', 'Reward:'), m('.fontsize-smallest.lineheight-tight.u-marginbottom-20', !_$1.isUndefined(ctrl.chosenReward) ? [m('.fontsize-smallest.fontweight-semibold', ctrl.chosenReward.title), m('.fontsize-smallest.fontcolor-secondary', ctrl.chosenReward.description)] : 'No reward selected.'), m('.fontsize-smallest.lineheight-looser', !_$1.isUndefined(ctrl.chosenReward) ? [m('span.fontweight-semibold', 'Estimated delivery: '), h.momentify(ctrl.chosenReward.deliver_at, 'MMM/YYYY')] : ''), contributionVM.canBeDelivered(contribution) ? m('.fontsize-smallest.lineheight-looser', [m('span.fontweight-semibold', 'Delivery status: '), h.contributionStatusBadge(contribution)]) : '']), m(rewardReceiver, {
+            contribution: contribution,
+            wrapperClass: ''
+        })]);
     }
 };
 
@@ -6313,10 +6602,19 @@ var projectHeader = {
     view: function view(ctrl, args) {
         var project = args.project,
             rewardDetails = args.rewardDetails;
+        var hasContribution = !_$1.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20', [m('.fontsize-small.u-text-center', [m('span.fa.fa-thumbs-up'), ' You are a supporter of this campaign! ', m('a.alt-link[href=\'javascript:void(0);\']', {
+            onclick: ctrl.showContributions.toggle
+        }, 'Details')]), ctrl.showContributions() ? m('.card.u-margintop-20', m('.w-row', _$1.map(ctrl.projectContributions(), function (contribution) {
+            return m.component(userContributionDetail, {
+                contribution: contribution,
+                rewardDetails: rewardDetails
+            });
+        }))) : '']) : '';
 
-        return !_$1.isUndefined(project()) ? m('#project-header', [m('.w-section.section-product.' + project().mode), m('.w-section.page-header.u-text-center', [m('.w-container', [m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['by ', project().user ? project().user.public_name : project().owner_public_name ? project().owner_name : '']), !_$1.isEmpty(ctrl.projectContributions()) ? m('.card.card-terciary.u-radius.u-margintop-20', [m('.fontsize-small.u-text-center', [m('span.fa.fa-thumbs-up'), ' You are a supporter of this project! ', m('a.alt-link[href=\'javascript:void(0);\']', { onclick: ctrl.showContributions.toggle }, 'Details')]), ctrl.showContributions() ? m('.card.u-margintop-20', m('.w-row', _$1.map(ctrl.projectContributions(), function (contribution) {
-            return m.component(userContributionDetail, { contribution: contribution, rewardDetails: rewardDetails });
-        }))) : '']) : ''])]), m('.w-section.project-main', [m('.w-container', [m('.w-row.project-main', [m('.w-col.w-col-8.project-highlight', m.component(projectHighlight, {
+        return !_$1.isUndefined(project()) ? m('#project-header', [m('.w-section.section-product.' + project().mode), m(projectHeaderTitle, {
+            project: project,
+            children: hasContribution
+        }), m('.w-section.project-main', [m('.w-container', [m('.w-row.project-main', [m('.w-col.w-col-8.project-highlight', m.component(projectHighlight, {
             project: project
         })), m('.w-col.w-col-4', m.component(projectSidebar, {
             project: project,
@@ -6402,41 +6700,60 @@ var projectTabs = {
     }
 };
 
+var I18nScope$18 = _$1.partial(h.i18nScope, 'projects.contributions');
+
 var projectRewardList = {
-    controller: function controller(args) {
+    controller: function controller() {
         var storeKey = 'selectedReward',
-            vm = rewardVM;
-
-        var setInput = function setInput(el, isInitialized) {
-            return !isInitialized ? el.focus() : false;
-        };
-
-        var submitContribution = function submitContribution() {
-            var valueFloat = h.monetaryToFloat(vm.contributionValue);
-
-            if (valueFloat < vm.selectedReward().minimum_value) {
-                vm.error('The support amount for this reward must be at least Rs' + vm.selectedReward().minimum_value);
+            vm = rewardVM,
+            descriptionExtended = m.prop(0),
+            selectedDestination = m.prop(''),
+            toggleDescriptionExtended = function toggleDescriptionExtended(rewardId) {
+            if (descriptionExtended() === rewardId) {
+                descriptionExtended(0);
             } else {
-                vm.error('');
-
-                // THIS CHECK IS ONLY NECESSARY IF WHEN WE START ROUTING DIRECTLY TO THE /contributions/edit page
-                // if (!h.getUser()) {
-                //     h.storeObject(storeKey, {value: valueFloat, reward: vm.selectedReward()});
-
-                //     return h.navigateToDevise('/' + projectVM.currentProject().permalink);
-                // } else {
-                // vm.contributionValue(valueFloat);
-                // h.navigateTo(`/projects/${projectVM.currentproject().project_id}/contributions/new?reward_id=${vm.selectedReward().id}`);
-                h.navigateTo('/projects/' + projectVM.currentProject().project_id + '/contributions/fallback_create?contribution%5Breward_id%5D=' + vm.selectedReward().id + '&contribution%5Bvalue%5D=' + valueFloat);
-                // m.route(`/projects/${projectVM.currentproject().project_id}/payment`, {
-                //    project_user_id: projectVM.currentProject().user_id
-                // });
-                // }
+                descriptionExtended(rewardId);
             }
 
             return false;
         };
 
+        var setInput = function setInput(el, isInitialized) {
+            return !isInitialized ? el.focus() : false;
+        };
+
+        var selectDestination = function selectDestination(destination) {
+            selectedDestination(destination);
+
+            var shippingFee = vm.shippingFeeForCurrentReward(selectedDestination) ? Number(vm.shippingFeeForCurrentReward(selectedDestination).value) : 0;
+            var rewardMinValue = Number(vm.selectedReward().minimum_value);
+            vm.applyMask(shippingFee + rewardMinValue + ',00');
+        };
+
+        var submitContribution = function submitContribution() {
+            var valueFloat = h.monetaryToFloat(vm.contributionValue);
+            var shippingFee = rewardVM.hasShippingOptions(vm.selectedReward()) ? vm.shippingFeeForCurrentReward(selectedDestination) : { value: 0 };
+
+            if (!selectedDestination() && rewardVM.hasShippingOptions(vm.selectedReward())) {
+                vm.error('Please select a valid freight option.');
+            } else if (valueFloat < vm.selectedReward().minimum_value + shippingFee.value) {
+                vm.error('The support amount for this reward must be at least Rs' + vm.selectedReward().minimum_value + ' + freight Rs' + h.formatNumber(shippingFee.value));
+            } else {
+                vm.error('');
+                h.navigateTo('/projects/' + projectVM.currentProject().project_id + '/contributions/fallback_create?contribution%5Breward_id%5D=' + vm.selectedReward().id + '&contribution%5Bvalue%5D=' + valueFloat + '&contribution%5Bshipping_fee_id%5D=' + shippingFee.id);
+            }
+
+            return false;
+        };
+        var isRewardOpened = function isRewardOpened(reward) {
+            return vm.selectedReward().id === reward.id;
+        };
+        var isRewardDescriptionExtended = function isRewardDescriptionExtended(reward) {
+            return descriptionExtended() === reward.id;
+        };
+        var isLongDescription = function isLongDescription(reward) {
+            return reward.description.length > 110;
+        };
         if (h.getStoredObject(storeKey)) {
             var _h$getStoredObject = h.getStoredObject(storeKey),
                 value = _h$getStoredObject.value,
@@ -6449,23 +6766,34 @@ var projectRewardList = {
             submitContribution();
         }
 
+        vm.getStates();
+
         return {
-            applyMask: vm.applyMask,
-            error: vm.error,
+            setInput: setInput,
             submitContribution: submitContribution,
-            openedReward: vm.selectedReward,
+            toggleDescriptionExtended: toggleDescriptionExtended,
+            isRewardOpened: isRewardOpened,
+            isLongDescription: isLongDescription,
+            isRewardDescriptionExtended: isRewardDescriptionExtended,
+            selectDestination: selectDestination,
+            selectedDestination: selectedDestination,
+            error: vm.error,
+            applyMask: vm.applyMask,
             selectReward: vm.selectReward,
-            contributionValue: vm.contributionValue,
-            setInput: setInput
+            locationOptions: vm.locationOptions,
+            contributionValue: vm.contributionValue
         };
     },
     view: function view(ctrl, args) {
         // FIXME: MISSING ADJUSTS
         // - add draft admin modifications
+        // - move the cards to it's own component
         var project = args.project() || {
             open_for_contributions: false
         };
-        return m('#rewards.u-marginbottom-30', _$1.map(args.rewardDetails(), function (reward) {
+        return m('#rewards.reward.u-marginbottom-30', _$1.map(_$1.sortBy(args.rewardDetails(), function (reward) {
+            return Number(reward.row_order);
+        }), function (reward) {
             return m('div[class="' + (h.rewardSouldOut(reward) ? 'card-gone' : 'card-reward ' + (project.open_for_contributions ? 'clickable' : '')) + ' card card-secondary u-marginbottom-10"]', {
                 onclick: h.analytics.event({
                     cat: 'contribution_create',
@@ -6476,14 +6804,28 @@ var projectRewardList = {
                         reward_id: reward.id,
                         reward_value: reward.minimum_value
                     }
-                }, ctrl.selectReward(reward))
+                }, ctrl.selectReward(reward)),
+                config: ctrl.isRewardOpened(reward) ? h.scrollTo() : Function.prototype
             }, [reward.minimum_value >= 1000 ? m('.tag-circle-installment', [m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x')
             // m('.fontsize-mini.lineheight-tightest', 's/ interest')
-            ]) : '', m('.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'For Rs ' + h.formatNumber(reward.minimum_value) + ' or more'), m('.fontsize-smaller.fontweight-semibold', h.pluralize(reward.paid_count, ' support', ' supports')), reward.maximum_contributions > 0 ? [reward.waiting_payment_count > 0 ? m('.maximum_contributions.in_time_to_confirm.clearfix', [m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' Support in confirmation period', ' Support in confirmation period....'))]) : '', h.rewardSouldOut(reward) ? m('.u-margintop-10', [m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')]) : m('.u-margintop-10', [m('span.badge.badge-attention.fontsize-smaller', [m('span.fontweight-bold', 'Limited'), project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' in ' + reward.maximum_contributions + ' availabe)' : ''])])] : '']), m('.fontsize-smaller.u-margintop-20', m.trust(h.simpleFormat(h.strip(reward.description)))), !_$1.isEmpty(reward.deliver_at) ? m('.fontsize-smaller', [m('b', 'Estimated Delivery: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : '', project.open_for_contributions && !h.rewardSouldOut(reward) ? [ctrl.openedReward().id === reward.id ? m('.w-form', [m('form.u-margintop-30', {
+            ]) : '', m('.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'For Rs ' + h.formatNumber(reward.minimum_value) + ' or more')]), m('.fontsize-smaller.fontweight-semibold', reward.title), m('.fontsize-smaller.reward-description' + (h.rewardSouldOut(reward) ? '' : '.fontcolor-secondary'), {
+                class: ctrl.isLongDescription(reward) ? ctrl.isRewardOpened(reward) ? 'opened ' + (ctrl.isRewardDescriptionExtended(reward) ? 'extended' : '') : '' : 'opened extended'
+            }, m.trust(h.simpleFormat(h.strip(reward.description)))), ctrl.isLongDescription(reward) && ctrl.isRewardOpened(reward) ? m('a[href="javascript:void(0);"].alt-link.fontsize-smallest.gray.link-more.u-marginbottom-20', {
+                onclick: function onclick() {
+                    return ctrl.toggleDescriptionExtended(reward.id);
+                }
+            }, [ctrl.isRewardDescriptionExtended(reward) ? 'any less ' : 'more ', m('span.fa.fa-angle-down', {
+                class: ctrl.isRewardDescriptionExtended(reward) ? 'reversed' : ''
+            })]) : '', m('.u-marginbottom-20.w-row', [m('.w-col.w-col-6', !_$1.isEmpty(reward.deliver_at) ? [m('.fontcolor-secondary.fontsize-smallest', m('span', 'Estimated delivery time:')), m('.fontsize-smallest', h.momentify(reward.deliver_at, 'MMM/YYYY'))] : ''), m('.w-col.w-col-6', rewardVM.hasShippingOptions(reward) || reward.shipping_options === 'presential' ? [m('.fontcolor-secondary.fontsize-smallest', m('span', 'Send:')), m('.fontsize-smallest', I18n$1.t('shipping_options.' + reward.shipping_options, I18nScope$18()))] : '')]), reward.maximum_contributions > 0 ? [h.rewardSouldOut(reward) ? m('.u-margintop-10', [m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')]) : m('.u-margintop-10', [m('span.badge.badge-attention.fontsize-smaller', [m('span.fontweight-bold', 'Limited'), project.open_for_contributions ? ' (' + h.rewardRemaning(reward) + ' in ' + reward.maximum_contributions + ' Available)' : ''])])] : '', m('.fontcolor-secondary.fontsize-smallest.fontweight-semibold', h.pluralize(reward.paid_count, ' support', ' supports')), reward.waiting_payment_count > 0 ? m('.maximum_contributions.in_time_to_confirm.clearfix', [m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' Support in confirmation period', ' Support in confirmatory terms.'))]) : '', project.open_for_contributions && !h.rewardSouldOut(reward) ? [ctrl.isRewardOpened(reward) ? m('.w-form', [m('form.u-margintop-30', {
                 onsubmit: ctrl.submitContribution
-            }, [m('.divider.u-marginbottom-20'), m('.fontcolor-secondary.u-marginbottom-10', 'Value of support'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('.back-reward-input-reward.placeholder', 'Rs')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.w-input.back-reward-input-reward[type="tel"]', {
+            }, [m('.divider.u-marginbottom-20'), rewardVM.hasShippingOptions(reward) ? m('div', [m('.fontcolor-secondary.u-marginbottom-10', 'Delivery place'), m('select.positive.text-field.w-select', {
+                onchange: m.withAttr('value', ctrl.selectDestination),
+                value: ctrl.selectedDestination()
+            }, _$1.map(ctrl.locationOptions(reward, ctrl.selectedDestination), function (option) {
+                return m('option[value="' + option.value + '"]', { selected: option.value === ctrl.selectedDestination() }, [option.name + ' ', option.value != '' ? '+Rs' + option.fee : null]);
+            }))]) : '', m('.fontcolor-secondary.u-marginbottom-10', 'Value of support'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('.back-reward-input-reward.placeholder', 'Rs')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.w-input.back-reward-input-reward[type="tel"]', {
                 config: ctrl.setInput,
-                onkeyup: m.withAttr('value'),
+                onkeyup: m.withAttr('value', ctrl.applyMask),
                 value: ctrl.contributionValue()
             }))]), m('input.w-button.btn.btn-medium[type="submit"][value="Continue >"]'), ctrl.error().length > 0 ? m('.text-error', [m('br'), m('span.fa.fa-exclamation-triangle'), ' ' + ctrl.error()]) : ''])]) : ''] : '']);
         }));
@@ -6593,7 +6935,7 @@ var projectContributions$1 = {
             stats = ctrl.contributionsStats(),
             groupedCollection = ctrl.groupedCollection(list.collection());
 
-        return m('#project_contributions', m('#contributions_top', [m('.section.w-section', m('.w-container', m('.w-row', ctrl.lContributionsStats() ? h.loader() : !_$1.isEmpty(stats) ? [m('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [m('.fontsize-megajumbo', stats.total), m('.fontsize-large', 'People support this campaign')]), m('.w-col.w-col-6', m('.card.card-terciary.u-radius', m('.w-row', [m('.u-marginbottom-20.w-col.w-col-6.w-col-small-6', [m('.fontweight-semibold.u-marginbottom-10', 'New supporters'), m('.fontsize-largest.u-marginbottom-10', Math.floor(stats.new_percent) + '%'), m('.fontsize-smallest', 'Supporters who had never supported a project in JVN')]), m('.w-col.w-col-6.w-col-small-6', [m('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'), m('.fontweight-semibold.u-marginbottom-10', 'Recurring supporters'), m('.fontsize-largest.u-marginbottom-10', Math.ceil(stats.returning_percent) + '%'), m('.fontsize-smallest', 'Supporters who had already supported a project in JVN')])])))] : ''))), m('.divider.w-section'), m('.section.w-section', m('.w-container', [m('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Supporters'), m('.project-contributions.w-clearfix', _$1.map(groupedCollection, function (group, idx) {
+        return m('#project_contributions', m('#contributions_top', [m('.section.w-section', m('.w-container', m('.w-row', ctrl.lContributionsStats() ? h.loader() : !_$1.isEmpty(stats) ? [m('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [m('.fontsize-megajumbo', stats.total), m('.fontsize-large', 'People support this campaign')]), m('.w-col.w-col-6', m('.card.card-terciary.u-radius', m('.w-row', [m('.u-marginbottom-20.w-col.w-col-6.w-col-small-6', [m('.fontweight-semibold.u-marginbottom-10', 'New supporters'), m('.fontsize-largest.u-marginbottom-10', Math.floor(stats.new_percent) + '%'), m('.fontsize-smallest', 'Supporters who had never supported a campaign in JVN')]), m('.w-col.w-col-6.w-col-small-6', [m('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'), m('.fontweight-semibold.u-marginbottom-10', 'Recurring supporters'), m('.fontsize-largest.u-marginbottom-10', Math.ceil(stats.returning_percent) + '%'), m('.fontsize-smallest', 'Supporters who had already supported a campaign in JVN')])])))] : ''))), m('.divider.w-section'), m('.section.w-section', m('.w-container', [m('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Supporters'), m('.project-contributions.w-clearfix', _$1.map(groupedCollection, function (group, idx) {
             return m('.w-row', _$1.map(group, function (contribution) {
                 return m('.project-contribution-item.w-col.w-col-4', [
                 // here new card
@@ -6611,7 +6953,7 @@ var projectContributions$1 = {
                         lbl: contribution.user_id,
                         project: args.project()
                     })
-                }, contribution.data.public_name || contribution.data.name), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', h.selfOrEmpty(contribution.data.city) + ', ' + h.selfOrEmpty(contribution.data.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', contribution.data.total_contributed_projects), ' Supported  |  ', m('span.fontweight-semibold', contribution.data.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', [m(UserFollowBtn, { follow_id: contribution.user_id, following: contribution.is_follow })]), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])])
+                }, userVM.displayName(contribution.data)), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', h.selfOrEmpty(contribution.data.city) + ', ' + h.selfOrEmpty(contribution.data.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', contribution.data.total_contributed_projects), ' Supported  |  ', m('span.fontweight-semibold', contribution.data.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', [m(UserFollowBtn, { follow_id: contribution.user_id, following: contribution.is_follow })]), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])])
                 // new card
                 ]);
             }));
@@ -6623,7 +6965,7 @@ var projectContributions$1 = {
             }
         }, [!ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
             collection: ctrl.contributionsPerDay,
-            label: 'Rs Collected per day',
+            label: 'Rs collected per day',
             dataKey: 'total_amount',
             xAxis: function xAxis(item) {
                 return h.momentify(item.paid_at);
@@ -6747,7 +7089,7 @@ var projectComments = {
     }
 };
 
-var I18nScope$17 = _$1.partial(h.i18nScope, 'projects.posts');
+var I18nScope$19 = _$1.partial(h.i18nScope, 'projects.posts');
 
 var projectPosts = {
     controller: function controller(args) {
@@ -6782,15 +7124,9 @@ var projectPosts = {
         var list = ctrl.listVM,
             project = args.project() || {};
 
-        return m('#posts.project-posts.w-section', { config: ctrl.scrollTo }, [m('.w-container.u-margintop-20', [project.is_owner_or_admin ? [!list.isLoading() ? _$1.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of who has already supported his campaign and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')]) : '' : ''
-        // m('.w-row.u-marginbottom-20', [
-        //     m('.w-col.w-col-4.w-col-push-4', [
-        //         m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/edit#posts']`, 'Edit Post')
-        //     ])
-        // ])
-        ] : '', _$1.map(list.collection(), function (post) {
-            return m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', [m('.post', [m('.u-marginbottom-60 .w-clearfix', [m('.fontsize-small.fontcolor-secondary.u-text-center', h.momentify(post.created_at)), m('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [m('a.link-hidden[href="/projects/' + post.project_id + '/posts/' + post.id + '#posts"]', post.title)]), !_$1.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Post exclusivo para apoiadores.')]), m('.divider.u-marginbottom-60')])]), m('.w-col.w-col-1')]);
-        }), m('.w-row', [!_$1.isUndefined(args.post_id) ? '' : !list.isLoading() ? list.collection().length === 0 && args.projectContributions().length === 0 ? !project.is_owner_or_admin ? m('.w-col.w-col-10.w-col-push-1', m('p.fontsize-base', m.trust(I18n$1.t('empty', I18nScope$17({
+        return m('#posts.project-posts.w-section', { config: ctrl.scrollTo }, [m('.w-container.u-margintop-20', [project.is_owner_or_admin ? [!list.isLoading() ? _$1.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of those who have already supported your campaign and is also available for viewing on the website. You can choose to leave it public, or visible only to your supporters here on this tab.')]) : '' : '', m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4.w-col-push-4', [m('a.btn.btn-edit.btn-small[href=\'/en/projects/' + project.project_id + '/posts\']', 'Write News')])])] : '', _$1.map(list.collection(), function (post) {
+            return m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', [m('.post', [m('.u-marginbottom-60 .w-clearfix', [m('.fontsize-small.fontcolor-secondary.u-text-center', h.momentify(post.created_at)), m('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [m('a.link-hidden[href="/projects/' + post.project_id + '/posts/' + post.id + '#posts"]', post.title)]), !_$1.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Exclusive post for supporters.')]), m('.divider.u-marginbottom-60')])]), m('.w-col.w-col-1')]);
+        }), m('.w-row', [!_$1.isUndefined(args.post_id) ? '' : !list.isLoading() ? list.collection().length === 0 && args.projectContributions().length === 0 ? !project.is_owner_or_admin ? m('.w-col.w-col-10.w-col-push-1', m('p.fontsize-base', m.trust(I18n$1.t('empty', I18nScope$19({
             project_user_name: args.userDetails().name,
             project_id: project.project_id
         }))))) : '' : m('.w-col.w-col-2.w-col-push-5', list.isLastPage() ? list.collection().length === 0 ? 'No news.' : '' : m('button#load-more.btn.btn-medium.btn-terciary', {
@@ -6854,14 +7190,18 @@ var projectsShow = {
             project_user_id = args.project_user_id;
 
 
-        h.analytics.event({ cat: 'project_view', act: 'project_page_view', project: { id: project_id, user_id: project_user_id } });
-        h.analytics.windowScroll({ cat: 'project_view', act: 'project_page_scroll', project: { id: project_id, user_id: project_user_id } });
-
         if (project_id && !_$1.isNaN(Number(project_id))) {
             projectVM.init(project_id, project_user_id);
         } else {
             projectVM.getCurrentProject();
         }
+        try {
+            h.analytics.windowScroll({ cat: 'project_view', act: 'project_page_scroll', project: project_id ? { id: project_id, user_id: project_user_id } : null });
+            h.analytics.event({ cat: 'project_view', act: 'project_page_view', project: project_id ? { id: project_id, user_id: project_user_id } : null }).call();
+        } catch (e) {
+            console.error(e);
+        }
+
         return projectVM;
     },
     view: function view(ctrl, args) {
@@ -6889,1171 +7229,8 @@ var projectsShow = {
     }
 };
 
-//       weak
-var userHeader = {
-    view: function view(ctrl, args) {
-        var user = args.user,
-            hideDetails = args.hideDetails,
-            profileImage = userVM.displayImage(user),
-            coverImage = userVM.displayCover(user);
-
-        return m('.hero-' + (hideDetails ? 'small' : 'half'), [m('.w-container.content-hero-profile', m('.w-row.u-text-center', m('.w-col.w-col-8.w-col-push-2', [hideDetails ? '' : m('.u-marginbottom-20', m('.avatar_wrapper', m('img.thumb.big.u-round[alt=\'User\'][src=\'' + profileImage + '\']'))), m('.fontsize-larger.fontweight-semibold.u-marginbottom-20', user.public_name || user.name), hideDetails ? '' : m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base', ['Joined on ' + h.momentify(user.created_at, 'MMMM YYYY'), m('br'), user.total_contributed_projects == 0 ? 'Has not yet backed any campaigns' : 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'), user.total_published_projects > 0 ? ' And already created ' + h.pluralize(user.total_published_projects, ' campaign', ' campaigns') : ''])]))), m('.hero-profile', { style: 'background-image:url(\'' + coverImage + '\');' })]);
-    }
-};
-
-var inlineError = {
-    view: function view(ctrl, args) {
-        return m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle', m('span', ' ' + args.message));
-    }
-};
-
-/**
- * window.c.loadMoreBtn component
- * Button to paginate collection
- *
- * Example of use:
- * view: () => {
- *   ...
- *   m.component(c.loadMoreBtn, {collection: collection, cssClass: 'class'})
- *   ...
- * }
- */
-var loadMoreBtn = {
-    view: function view(ctrl, args) {
-        var collection = args.collection,
-            cssClass = args.cssClass;
-        return m('.w-col.w-col-2' + cssClass, [!collection.isLoading() ? collection.isLastPage() ? '' : m('button#load-more.btn.btn-medium.btn-terciary', {
-            onclick: collection.nextPage
-        }, 'Load more') : h.loader()]);
-    }
-};
-
-var userCreated = {
-    controller: function controller(args) {
-        var user_id = args.userId,
-            showDraft = args.showDraft || false,
-            error = m.prop(false),
-            pages = postgrest$1.paginationVM(models.project),
-            loader = m.prop(true),
-            contextVM = postgrest$1.filtersVM({
-            project_user_id: 'eq',
-            state: 'in'
-        });
-
-        var states = ['online', 'waiting_funds', 'successful', 'failed'];
-        if (showDraft) {
-            states.push('draft');
-        }
-        contextVM.state(states).project_user_id(user_id).order({
-            updated_at: 'desc'
-        });
-
-        models.project.pageSize(9);
-        pages.firstPage(contextVM.parameters()).then(function () {
-            loader(false);
-        }).catch(function (err) {
-            error(true);
-            loader(false);
-            m.redraw();
-        });
-
-        return {
-            projects: pages,
-            loader: loader,
-            error: error
-        };
-    },
-    view: function view(ctrl, args) {
-        var projects_collection = ctrl.projects.collection();
-
-        return m('.content[id=\'created-tab\']', ctrl.error() ? m.component(inlineError, {
-            message: 'Error loading projects.'
-        }) : !ctrl.loader() ? [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
-            return m.component(projectCard, {
-                project: project,
-                ref: 'user_contributed',
-                showFriends: false
-            });
-        }) : m('.w-container', m('.u-margintop-30.u-text-center.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.fontsize-large.u-marginbottom-30', 'It`s Time To Fund Your Idea'), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', m('a.btn.btn-large[href=\'/start\']', 'GET STARTED FOR FREE')), m('.w-col.w-col-3')])]), m('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, {
-            collection: ctrl.projects,
-            cssClass: '.w-col-push-5'
-        })]) : ''] : h.loader());
-    }
-};
-
-var userContributed = {
-    controller: function controller(args) {
-        var contributedProjects = m.prop(),
-            user_id = args.userId,
-            pages = postgrest$1.paginationVM(models.project),
-            error = m.prop(false),
-            loader = m.prop(true),
-            contextVM = postgrest$1.filtersVM({
-            project_id: 'in'
-        });
-
-        userVM.getPublicUserContributedProjects(user_id, null).then(function (data) {
-            contributedProjects(data);
-            if (!_$1.isEmpty(contributedProjects())) {
-                contextVM.project_id(_$1.pluck(contributedProjects(), 'project_id')).order({
-                    online_date: 'desc'
-                });
-
-                models.project.pageSize(9);
-                pages.firstPage(contextVM.parameters()).then(function () {
-                    loader(false);
-                });
-            } else {
-                loader(false);
-            }
-        }).catch(function (err) {
-            error(true);
-            loader(false);
-            m.redraw();
-        });
-
-        return {
-            projects: pages,
-            error: error,
-            loader: loader
-        };
-    },
-    view: function view(ctrl, args) {
-        var projects_collection = ctrl.projects.collection();
-        return ctrl.error() ? m.component(inlineError, { message: 'Error loading projects.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
-            return m.component(projectCard, {
-                project: project,
-                ref: 'user_contributed',
-                showFriends: false
-            });
-        }) : m('.w-container', m('.u-margintop-30.u-text-center.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.fontsize-large.u-marginbottom-30', 'No campaigns backed yet')]), m('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, { collection: ctrl.projects, cssClass: '.w-col-push-5' })]) : '']);
-    }
-};
-
-var userCard = {
-    controller: function controller(args) {
-        var userDetails = m.prop({}),
-            user_id = args.userId;
-
-        userVM.fetchUser(user_id, true, userDetails);
-
-        return {
-            userDetails: userDetails,
-            displayModal: h.toggleProp(false, true)
-        };
-    },
-    view: function view(ctrl) {
-        var user = ctrl.userDetails(),
-            contactModalC = [ownerMessageContent, ctrl.userDetails],
-            profileImage = userVM.displayImage(user);
-
-        return m('#user-card', m('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [m('.w-row', [m('.w-col.w-col-4.w.col-small-4.w-col-tiny-4.w-clearfix', m('img.thumb.u-round[itemprop=\'image\'][src=\'' + profileImage + '\'][width=\'100\']')), m('.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m('.fontsize-small.fontweight-semibold.lineheight-tighter[itemprop=\'name\']', m('a.link-hidden[href="/users/' + user.id + '"]', user.public_name || user.name)), m('.fontsize-smallest.lineheight-looser[itemprop=\'address\']', user.address_city), m('.fontsize-smallest', h.pluralize(user.total_published_projects, ' campaign', ' campaigns') + ' Created'), m('.fontsize-smallest', 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'))])]), m('.project-author-contacts', [m('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [!_$1.isEmpty(user.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook Profile')]) : '', !_$1.isEmpty(user.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')]) : '', _$1.map(user.links, function (link) {
-            return m('li', [m('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', link.link)]);
-        })])]), ctrl.displayModal() ? m.component(modalBox, {
-            displayModal: ctrl.displayModal,
-            content: contactModalC
-        }) : '', m(UserFollowBtn, { follow_id: user.id, following: user.follwing_this_user, enabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10', disabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10' }), !_$1.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', { onclick: ctrl.displayModal.toggle }, 'Send Message') : '']));
-    }
-};
-
-var userAbout = {
-    controller: function controller(args) {
-        var userDetails = m.prop({}),
-            loader = m.prop(true),
-            error = m.prop(false),
-            user_id = args.userId;
-
-        userVM.fetchUser(user_id, true, userDetails).then(function () {
-            loader(false);
-        }).catch(function (err) {
-            error(true);
-            loader(false);
-            m.redraw();
-        });
-
-        return {
-            userDetails: userDetails,
-            error: error,
-            loader: loader
-        };
-    },
-    view: function view(ctrl, args) {
-        var user = ctrl.userDetails();
-        return ctrl.error() ? m.component(inlineError, { message: 'Error loading data.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'about-tab\']', m('.w-container[id=\'about-content\']', m('.w-row', [m('.w-col.w-col-8', m('.fontsize-base', user.about_html ? m.trust(user.about_html) : '')), m('.w-col.w-col-4', user.id ? m.component(userCard, { userId: user.id }) : h.loader)])));
-    }
-};
-
-var usersShow = {
-    controller: function controller(args) {
-        var userDetails = m.prop({}),
-            user_id = args.user_id.split('-')[0],
-            hash = m.prop(window.location.hash),
-            displayTabContent = function displayTabContent(user) {
-            var tabs = {
-                '#created': m.component(userCreated, { userId: user.id }),
-                '#contributed': m.component(userContributed, { userId: user.id }),
-                '#about': m.component(userAbout, { userId: user.id })
-            };
-
-            hash(window.location.hash);
-
-            if (_$1.isEmpty(hash()) || hash() === '#_=_') {
-                if (user.total_published_projects > 0) {
-                    hash('#created');
-                    return tabs['#created'];
-                } else if (user.total_contributed_projects > 0) {
-                    hash('#contributed');
-                    return tabs['#contributed'];
-                }
-
-                hash('#about');
-                return tabs['#about'];
-            }
-
-            return tabs[hash()];
-        };
-
-        h.redrawHashChange();
-
-        userVM.fetchUser(user_id, true, userDetails);
-
-        return {
-            displayTabContent: displayTabContent,
-            hash: hash,
-            userDetails: userDetails
-        };
-    },
-    view: function view(ctrl, args) {
-        var user = ctrl.userDetails();
-
-        return m('div', [m.component(userHeader, { user: user }), m('nav.project-nav.u-text-center.u-marginbottom-30.profile', { style: { 'z-index': '10', position: 'relative' } }, m('.w-container[data-anchor=\'created\']', [!_$1.isEmpty(user) ? user.is_owner_or_admin ? m('a.dashboard-nav-link.dashboard[href=\'/en/users/' + user.id + '/edit\']', { config: m.route,
-            onclick: function onclick() {
-                m.route('/users/edit/' + user.id, { user_id: user.id });
-            } }, [m('span.fa.fa-cog'), m.trust('&nbsp;'), ' Edit Profile']) : '' : h.loader(), m('a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#contributed' ? 'selected' : '') + '\']', ['Backed ', m.trust('&nbsp;'), m('span.badge', user.total_contributed_projects)]), m('a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#created' ? 'selected' : '') + '\']', ['Created ', m.trust('&nbsp;'), m('span.badge', user.total_published_projects)]), m('a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#about' ? 'selected' : '') + '\']', 'About')])), m('section.section', m('.w-container', m('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))]);
-    }
-};
-
-var userAboutEdit = {
-    controller: function controller(args) {
-        var deleteUser = void 0;
-        var user = args.user || {},
-            fields = {
-            password: m.prop(''),
-            current_password: m.prop(''),
-            uploaded_image: m.prop(userVM.displayImage(user)),
-            cover_image: m.prop(user.profile_cover_image || ''),
-            email: m.prop(''),
-            permalink: m.prop(user.permalink || ''),
-            public_name: m.prop(user.public_name || ''),
-            facebook_link: m.prop(user.facebook_link || ''),
-            twitter: m.prop(user.twitter_username || ''),
-            links: m.prop(user.links || []),
-            about_html: m.prop(user.about_html || ''),
-            email_confirmation: m.prop('')
-        },
-            passwordHasError = m.prop(false),
-            emailHasError = m.prop(false),
-            showEmailForm = h.toggleProp(false, true),
-            showSuccess = m.prop(false),
-            showError = m.prop(false),
-            errors = m.prop(),
-            loading = m.prop(false),
-            uploading = m.prop(false),
-            errorsArray = m.prop([]),
-            pushErrosMessage = function pushErrosMessage() {
-            errors(errorsArray().join('<br/>'));
-        },
-            updateFieldsFromUser = function updateFieldsFromUser() {
-            userVM.fetchUser(args.userId, false).then(function (dataResponse) {
-                var data = _$1.first(dataResponse);
-                fields.uploaded_image(userVM.displayImage(data));
-                fields.cover_image(data.profile_cover_image);
-                fields.permalink(data.permalink);
-                fields.public_name(data.public_name);
-                fields.facebook_link(data.facebook_link);
-                fields.twitter(data.twitter_username);
-                fields.links(data.links);
-                fields.about_html(data.about_html);
-            });
-        },
-            uploadImage = function uploadImage() {
-            var userUploadedImageEl = window.document.getElementById('user_uploaded_image'),
-                userCoverImageEl = window.document.getElementById('user_cover_image'),
-                formData = new FormData();
-
-            formData.append('uploaded_image', userUploadedImageEl.files[0]);
-            if (!args.hideCoverImg) {
-                formData.append('cover_image', userCoverImageEl.files[0]);
-            }
-
-            uploading(true);
-            m.redraw();
-            return m.request({
-                method: 'POST',
-                url: '/users/' + user.id + '/upload_image.json',
-                data: formData,
-                config: h.setCsrfToken,
-                serialize: function serialize(data) {
-                    return data;
-                }
-            }).then(function (data) {
-                fields.uploaded_image(data.uploaded_image);
-                fields.cover_image(data.cover_image);
-                uploading(false);
-            }).catch(function (err) {
-                if (_$1.isArray(err.errors)) {
-                    errorsArray(errorsArray().concat(err.errors));
-                } else {
-                    errors('Error updating info.');
-                }
-                pushErrosMessage();
-                showError(true);
-                uploading(false);
-            });
-        },
-            updateUser = function updateUser() {
-            var userData = {
-                current_password: fields.current_password(),
-                password: fields.password(),
-                email: fields.email(),
-                permalink: fields.permalink(),
-                public_name: fields.public_name(),
-                facebook_link: fields.facebook_link(),
-                twitter: fields.twitter(),
-                about_html: fields.about_html(),
-                links_attributes: linkAttributes()
-            };
-
-            loading(true);
-            uploadImage();
-
-            return m.request({
-                method: 'PUT',
-                url: '/users/' + user.id + '.json',
-                data: {
-                    user: userData
-                },
-                config: h.setCsrfToken
-            }).then(function () {
-                showSuccess(true);
-                updateFieldsFromUser();
-                loading(false);
-                m.redraw();
-            }).catch(function (err) {
-                if (_$1.isArray(err.errors)) {
-                    errorsArray(errorsArray().concat(err.errors));
-                } else {
-                    errors('Error updating info.');
-                }
-
-                pushErrosMessage();
-                showError(true);
-                loading(false);
-                m.redraw();
-            });
-        },
-            removeLinks = [],
-            addLink = function addLink() {
-            return fields.links().push({ link: '' });
-        },
-            removeLink = function removeLink(linkId, idx) {
-            return function () {
-                fields.links()[idx]._destroy = true;
-                return false;
-            };
-        },
-            linkAttributes = function linkAttributes() {
-            return _$1.reduce(fields.links(), function (memo, item, index) {
-                memo[index.toString()] = item;
-                return memo;
-            }, {});
-        },
-            validateEmailConfirmation = function validateEmailConfirmation() {
-            if (fields.email() !== fields.email_confirmation()) {
-                emailHasError(true);
-            } else {
-                emailHasError(false);
-            }
-            return !emailHasError();
-        },
-            validatePassword = function validatePassword() {
-            var pass = String(fields.password());
-            if (pass.length > 0 && pass.length <= 5) {
-                passwordHasError(true);
-            }
-
-            return !passwordHasError();
-        },
-            setDeleteForm = function setDeleteForm(el, isInit) {
-            if (!isInit) {
-                deleteUser = function deleteUser() {
-                    return el.submit();
-                };
-            }
-        },
-            deleteAccount = function deleteAccount() {
-            if (window.confirm('Are you sure you want to deactivate your account??')) {
-                deleteUser();
-            }
-
-            return false;
-        },
-            onSubmit = function onSubmit(e) {
-            e.preventDefault();
-            if (!validateEmailConfirmation()) {
-                errors('Email confirmation is incorrect.');
-                showError(true);
-            } else if (!validatePassword()) {
-                errors('New password is incorrect.');
-                showError(true);
-            } else {
-                updateUser();
-            }
-            return false;
-        };
-        // Temporary fix for the menu selection bug. Should be fixed/removed as soon as we route all tabs from mithril.
-        setTimeout(m.redraw, 0);
-
-        return {
-            removeLinks: removeLinks,
-            removeLink: removeLink,
-            addLink: addLink,
-            fields: fields,
-            loading: loading,
-            showSuccess: showSuccess,
-            showError: showError,
-            errors: errors,
-            uploading: uploading,
-            onSubmit: onSubmit,
-            emailHasError: emailHasError,
-            showEmailForm: showEmailForm,
-            validateEmailConfirmation: validateEmailConfirmation,
-            passwordHasError: passwordHasError,
-            validatePassword: validatePassword,
-            deleteAccount: deleteAccount,
-            setDeleteForm: setDeleteForm
-        };
-    },
-    view: function view(ctrl, args) {
-        var user = args.user || {},
-            fields = ctrl.fields;
-        return m('#about-tab.content', [ctrl.showSuccess() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
-            message: 'Your information has been updated'
-        }) : '', ctrl.showError() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
-            message: m.trust(ctrl.errors()),
-            error: true
-        }) : '', m('form.simple_form.w-form', { onsubmit: ctrl.onSubmit }, [m('input[name="utf8"][type="hidden"][value="✓"]'), m('input[name="_method"][type="hidden"][value="patch"]'), m('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m('div', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', [!user.is_admin ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', 'Address'), m('label.field-label.fontsize-smallest.fontcolor-secondary', 'Your public profile may have a custom URL. Choose an easy to save!    ')]), m('.w-col.w-col-7', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', m('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
-            name: 'user[permalink]',
-            value: fields.permalink(),
-            onchange: m.withAttr('value', fields.permalink)
-        })), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover', m('.fontcolor-secondary.fontsize-smaller', '  .myjvn.com/'))]))]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Email'), m('.fontsize-small.u-marginbottom-30', 'Keep this email up to date as it is the communication channel between you, the JVN team and the team of campaigns you have supported. '), m('.fontsize-base.u-marginbottom-40', [m('span.fontweight-semibold.card.u-radius', user.email), m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
-            onclick: function onclick() {
-                ctrl.showEmailForm.toggle();
-            }
-        }, 'Change email')]), m((ctrl.showEmailForm() ? '' : '.w-hidden') + '.u-marginbottom-20.w-row[id=\'email_update_form\']', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'New Email'), m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
-            class: ctrl.emailHasError() ? 'error' : '',
-            value: fields.email(),
-            onfocus: function onfocus() {
-                return ctrl.emailHasError(false);
-            },
-            onchange: m.withAttr('value', fields.email)
-        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', 'Confirm Email'), m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
-            class: ctrl.emailHasError() ? 'error' : '',
-            value: fields.email_confirmation(),
-            onfocus: function onfocus() {
-                return ctrl.emailHasError(false);
-            },
-            onblur: ctrl.validateEmailConfirmation,
-            onchange: m.withAttr('value', fields.email_confirmation)
-        })]), ctrl.emailHasError() ? m(inlineError, { message: 'Email confirmation is incorrect.' }) : ''])]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Name'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  This is the name that users will see in your profile. It can not be changed after a campaign has been supported or published.')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[id="user_public_name"][type="text"]', {
-            name: 'user[public_name]',
-            value: fields.public_name(),
-            onchange: m.withAttr('value', fields.public_name)
-        }))]), m('.w-form', [m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Profile Picture'), m('label.field-label.fontsize-smallest.fontcolor-secondary', ' This image will be used as your profile picture (PNG, JPG size 280x280).')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_uploaded_image.field_with_hint', [m('label.field-label'), m('span.hint', m('img[alt="User avatar"][src="' + fields.uploaded_image() + '"]')), m('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', {
-            name: 'user[uploaded_image]'
-        })]))]), args.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Profile Cover Image'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  This image will be used as the background of your public profile header (PNG or JPG). If you do not submit any images here, we will use your profile image as an alternative.')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_cover_image', [m('label.field-label'), m('span.hint', user.profile_cover_image ? m('img', { src: fields.cover_image() }) : ''), m('input.file.optional.w-input.text-field[id="user_cover_image"][type="file"]', { name: 'user[cover_image]' })]))])]), m('.w-row', m('.w-col', m('.card.card-terciary.u-marginbottom-30', [m('label.field-label.fontweight-semibold', 'About'), m('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20', 'Talk about yourself and try to provide the most relevant information so visitors can get to know you better.'), m('.w-form', m('.preview-container.u-marginbottom-40', h.redactor('user[about_html]', fields.about_html)))]))), m('.w-form.card.card-terciary.u-marginbottom-30', [m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Facebook Profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Paste your profile link')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
-            name: 'user[facebook_link]',
-            value: fields.facebook_link(),
-            onchange: m.withAttr('value', fields.facebook_link)
-        }))]), m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Twitter Profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  Paste your profile link')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
-            name: 'user[twitter]',
-            value: fields.twitter(),
-            onchange: m.withAttr('value', fields.twitter)
-        }))])]), m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold[for="name-8"]', ' Internet Presence'), m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')]), m('.w-col.w-col-7', [m('.w-row', [fields.links() && fields.links().length <= 0 ? '' : m('.link', _$1.map(fields.links(), function (link, idx) {
-            var toRemove = link._destroy;
-
-            return m('div', {
-                key: idx,
-                class: toRemove ? 'w-hidden' : 'none'
-            }, [m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', m('input.string.w-input.text-field.w-input.text-field][type="text"][value="' + link.link + '"]', {
-                class: link.link === '' ? 'positive' : 'optional',
-                name: 'user[links_attributes][' + idx + '][link]',
-                onchange: m.withAttr('value', function (val) {
-                    return fields.links()[idx].link = val;
-                })
-            })), m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m('a.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border', {
-                onclick: ctrl.removeLink(link.id, idx)
-            })])]);
-        }))]), m('.w-row', [m('.w-col.w-col-6.w-col-push-6', m('a.btn.btn-small.btn-terciary', { onclick: ctrl.addLink }, m('span.translation_missing', 'Add Link')))])])])), args.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontsize-base.fontweight-semibold', 'Change my password'), m('.fontsize-small.u-marginbottom-20', 'In order for the password to be changed you must confirm your current password.'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', ' Current Password'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
-            value: fields.current_password(),
-            onchange: m.withAttr('value', fields.current_password)
-        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', ' New Password'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
-            class: ctrl.passwordHasError() ? 'error' : '',
-            value: fields.password(),
-            onfocus: function onfocus() {
-                return ctrl.passwordHasError(false);
-            },
-            onblur: ctrl.validatePassword,
-            onchange: m.withAttr('value', fields.password)
-        }), !ctrl.passwordHasError() ? '' : m(inlineError, { message: 'Your new password must be at least 6 characters long.' })])])])), args.hideDisableAcc ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontweight-semibold.fontsize-smaller', 'Disable my account'), m('.fontsize-smallest', 'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'), m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '\'][rel=\'nofollow\']', {
-            onclick: ctrl.deleteAccount
-        }, 'Disable my JVN account'), m('form.w-hidden', { action: '/en/users/' + user.id, method: 'post', config: ctrl.setDeleteForm }, [m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')])]))])))), m('div', m('.w-container' + (args.useFloatBtn ? '.w-section.save-draft-btn-section' : ''), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', [m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'), !ctrl.loading() && !ctrl.uploading() ? m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Save"]', {
-            onclick: ctrl.onSubmit
-        }) : h.loader()]), m('.w-col.w-col-4')])))])]);
-    }
-};
-
-var I18nScope$18 = _$1.partial(h.i18nScope, 'payment.state');
-
-var userContributedBox = {
-    controller: function controller() {
-        var toggleDelivery = function toggleDelivery(projectId, contribution) {
-            userVM.toggleDelivery(projectId, contribution).then(function () {
-                var lastStatus = contribution.reward_sent_at ? 'delivered' : 'undelivered';
-                contribution.delivery_status = contribution.delivery_status == 'received' ? lastStatus : 'received'; // so we don't have to reload the page
-            });
-        };
-
-        return {
-            toggleAnonymous: userVM.toggleAnonymous,
-            toggleDelivery: toggleDelivery
-        };
-    },
-    view: function view(ctrl, args) {
-        var collection = args.collection,
-            pagination = args.pagination,
-            title = args.title;
-
-        return !_$1.isEmpty(collection) ? m('.section-one-column.u-marginbottom-30', [m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center', title), m('.w-row.w-hidden-small.w-hidden-tiny.card.card-secondary', [m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', 'Projects I supported')), m('.w-col.w-col-2', m('.fontsize-small.fontweight-semibold', 'Value of support')), m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', 'Support Status')), m('.w-col.w-col-4', m('.fontsize-small.fontweight-semibold', 'Reward'))]), _$1.map(collection, function (contribution) {
-            return m('.w-row.card', [m('.w-col.w-col-3', m('.w-row', [m('.w-col.w-col-4.u-marginbottom-10', m('a[href=\'/' + contribution.permalink + '\']', m('img.thumb-project.u-radius[alt=\'' + contribution.project_name + '\'][src=\'' + contribution.project_image + '\'][width=\'50\']'))), m('.w-col.w-col-8', m('.fontsize-small.fontweight-semibold', m('a.alt-link[href=\'/' + contribution.permalink + '\']', contribution.project_name)))])), m('.w-col.w-col-2.u-marginbottom-10', m('.fontsize-base.inline-block', [m('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Value of support'), ' Rs ' + contribution.value])), m('.w-col.w-col-3.u-marginbottom-10', [m('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold', 'Status'), m('.fontsize-smaller.fontweight-semibold', [m('.lineheight-tighter'), m('span.fa.fa-circle.fontsize-smallest.' + (contribution.state === 'paid' ? 'text-success' : contribution.state === 'pending' ? 'text-waiting' : 'text-error'), m.trust('&nbsp;')), I18n$1.t(contribution.state, I18nScope$18({
-                date: h.momentify(contribution[contribution.state + '_at'])
-            }))]), m('.fontsize-smallest', contribution.installments > 1 ? contribution.installments + ' x Rs ' + contribution.installment_value + ' ' : '', contribution.payment_method === 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito'), contributionVM.canShowReceipt(contribution) ? m('a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href=\'https://www.myjvn.com/en/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/receipt\'][target=\'__blank\']', 'View Receipt') : '', contributionVM.canShowSlip(contribution) ? m('a.btn.btn-inline.btn-small.u-margintop-10[href=\'' + contribution.gateway_data.boleto_url + '\'][target=\'__blank\']', 'Print Ticket') : '', contributionVM.canGenerateSlip(contribution) ? m('a.btn.btn-inline.btn-small.u-margintop-10[href=\'https://www.myjvn.com/en/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/second_slip\'][target=\'__blank\']', 'Generate 2nd via') : '', m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [m('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']' + (contribution.anonymous ? '[checked=\'checked\']' : '') + '[value=\'1\']', {
-                onclick: function onclick() {
-                    return ctrl.toggleAnonymous(contribution.project_id, contribution);
-                }
-            }), m('label.w-form-label', 'I want my support not to be public')])]), m('.w-col.w-col-3', m('.fontsize-smallest', [m('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Reward'), contribution.reward_id ? m.trust(h.simpleFormat(contribution.reward_description)) : ' You have not selected a reward']), contribution.deliver_at ? m('.fontsize-smallest.lineheight-looser', [m('span.fontweight-semibold', 'Estimated delivery: '), h.momentify(contribution.deliver_at, 'MMMM/YYYY')]) : '', contributionVM.canBeDelivered(contribution) ? m('.fontsize-smallest', [m('span.fontweight-semibold', 'Status da entrega:'), m.trust('&nbsp;'), h.contributionStatusBadge(contribution)]) : ''), m(rewardReceiver, { contribution: contribution })]);
-        }), m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, {
-            collection: pagination,
-            cssClass: '.w-col-push-5'
-        })])]) : m('div', '');
-    }
-};
-
-var userPrivateContributed = {
-    controller: function controller(args) {
-        var user_id = args.userId,
-            onlinePages = postgrest$1.paginationVM(models.userContribution),
-            successfulPages = postgrest$1.paginationVM(models.userContribution),
-            failedPages = postgrest$1.paginationVM(models.userContribution),
-            error = m.prop(false),
-            loader = m.prop(true),
-            handleError = function handleError() {
-            error(true);
-            loader(false);
-            m.redraw();
-        },
-            contextVM = postgrest$1.filtersVM({
-            user_id: 'eq',
-            state: 'in',
-            project_state: 'in'
-        });
-
-        models.userContribution.pageSize(9);
-        contextVM.user_id(user_id).order({
-            created_at: 'desc'
-        }).state(['refunded', 'pending_refund', 'paid', 'refused', 'pending']);
-
-        contextVM.project_state(['online', 'waiting_funds']);
-        onlinePages.firstPage(contextVM.parameters()).then(function () {
-            loader(false);
-        }).catch(handleError);
-
-        contextVM.project_state(['failed']);
-        failedPages.firstPage(contextVM.parameters()).then(function () {
-            loader(false);
-        }).catch(handleError);
-
-        contextVM.project_state(['successful']).state(['paid', 'refunded', 'pending_refund']);
-        successfulPages.firstPage(contextVM.parameters()).then(function () {
-            loader(false);
-        }).catch(handleError);
-
-        return {
-            onlinePages: onlinePages,
-            successfulPages: successfulPages,
-            failedPages: failedPages,
-            error: error,
-            loader: loader
-        };
-    },
-    view: function view(ctrl, args) {
-        var onlineCollection = ctrl.onlinePages.collection(),
-            successfulCollection = ctrl.successfulPages.collection(),
-            failedCollection = ctrl.failedPages.collection();
-
-        return m('.content[id=\'private-contributed-tab\']', ctrl.error() ? m.component(inlineError, {
-            message: 'Error loading projects.'
-        }) : ctrl.loader() ? h.loader() : _$1.isEmpty(onlineCollection) && _$1.isEmpty(successfulCollection) && _$1.isEmpty(failedCollection) ? m('.w-container', m('.w-row.u-margintop-30.u-text-center', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.fontsize-large.u-marginbottom-30', ['You Have Not Backed Any Campaign']), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', m('a.btn.btn-large[href=\'/en/explore\']', {
-            config: m.route,
-            onclick: function onclick() {
-                m.route('/explore');
-            }
-        }, 'SUPPORT NOW!')), m('.w-col.w-col-3')])]), m('.w-col.w-col-3')])) : [m.component(userContributedBox, {
-            title: 'Projects in progress',
-            collection: onlineCollection,
-            pagination: ctrl.onlinePages
-        }), m.component(userContributedBox, {
-            title: 'Successful Projects',
-            collection: successfulCollection,
-            pagination: ctrl.successfulPages
-        }), m.component(userContributedBox, {
-            title: 'Non-funded projects',
-            collection: failedCollection,
-            pagination: ctrl.failedPages
-        })]);
-    }
-};
-
-var UserOwnerBox = {
-    view: function view(ctrl, args) {
-        var project = args.project,
-            user = args.user;
-
-        return m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Dados do apoiador ' : 'Dados do usuário ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + '"]', 'Não é você?')]), m('.fontsize-base.fontweight-semibold', user.name), m('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]);
-    }
-};
-
-var userSettings = {
-    controller: function controller(args) {
-        var deleteFormSubmit = void 0;
-        var user = args.user,
-            bankAccount = m.prop({}),
-            fields = {
-            owner_document: m.prop(user.owner_document || ''),
-            country_id: m.prop(user.address.country_id || ''),
-            street: m.prop(user.address.street || ''),
-            number: m.prop(user.address.number || ''),
-            city: m.prop(user.address.city || ''),
-            zipcode: m.prop(user.address.zipcode || ''),
-            complement: m.prop(user.address.complement || ''),
-            neighbourhood: m.prop(user.address.neighbourhood || ''),
-            state: m.prop(user.address.state || ''),
-            phonenumber: m.prop(user.address.phonenumber || ''),
-            name: m.prop(user.name || ''),
-            agency: m.prop(''),
-            bank_id: m.prop(''),
-            agency_digit: m.prop(''),
-            account: m.prop(''),
-            account_digit: m.prop(''),
-            bank_account_id: m.prop(''),
-            state_inscription: m.prop(''),
-            birth_date: m.prop(user.birth_date ? h.momentify(user.birth_date) : ''),
-            account_type: m.prop(user.account_type || ''),
-            errors: m.prop([]),
-            bank_account_type: m.prop('')
-        },
-            fieldHasError = function fieldHasError(fieldName) {
-            var fieldWithError = _$1.findWhere(fields.errors(), {
-                field: fieldName
-            });
-
-            return fieldWithError ? m.component(inlineError, {
-                message: fieldWithError.message
-            }) : '';
-        },
-            loading = m.prop(false),
-            user_id = args.userId,
-            error = m.prop(''),
-            countries = m.prop(),
-            states = m.prop(),
-            loader = m.prop(true),
-            showSuccess = m.prop(false),
-            showError = m.prop(false),
-            countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
-            statesLoader = postgrest$1.loader(models.state.getPageOptions()),
-            phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
-            documentMask = _$1.partial(h.mask, '999.999.999-99'),
-            documentCompanyMask = _$1.partial(h.mask, '99.999.999/9999-99'),
-            zipcodeMask = _$1.partial(h.mask, '99999-999'),
-            birthDayMask = _$1.partial(h.mask, '99/99/9999'),
-            isCnpj = m.prop(false),
-            creditCards = m.prop(),
-            toDeleteCard = m.prop(-1),
-            bankInput = m.prop(''),
-            bankCode = m.prop('-1'),
-            banks = m.prop(),
-            banksLoader = postgrest$1.loader(models.bank.getPageOptions()),
-            showOtherBanks = h.toggleProp(false, true),
-            showOtherBanksInput = m.prop(false),
-            popularBanks = [{
-            id: '51',
-            code: '001',
-            name: 'Banco do Brasil S.A.'
-        }, {
-            id: '131',
-            code: '341',
-            name: 'Itaú Unibanco S.A.'
-        }, {
-            id: '122',
-            code: '104',
-            name: 'Caixa Econômica Federal'
-        }, {
-            id: '104',
-            code: '033',
-            name: 'Banco Santander  (Brasil)  S.A.'
-        }, {
-            id: '127',
-            code: '399',
-            name: 'HSBC Bank Brasil S.A. - Banco Múltiplo'
-        }, {
-            id: '23',
-            code: '237',
-            name: 'Banco Bradesco S.A.'
-        }],
-            deleteCard = function deleteCard(id) {
-            return function () {
-                toDeleteCard(id);
-                // We must redraw here to update the action output of the hidden form on the DOM.
-                m.redraw(true);
-                deleteFormSubmit();
-                return false;
-            };
-        },
-            setCardDeletionForm = function setCardDeletionForm(el, isInit) {
-            if (!isInit) {
-                deleteFormSubmit = function deleteFormSubmit() {
-                    return el.submit();
-                };
-            }
-        },
-            updateUserData = function updateUserData(user_id) {
-            var userData = {
-                country_id: fields.country_id(),
-                address_street: fields.street(),
-                address_number: fields.number(),
-                address_city: fields.city(),
-                address_zip_code: fields.zipcode(),
-                address_complement: fields.complement(),
-                address_state: fields.state(),
-                address_neighbourhood: fields.neighbourhood(),
-                phone_number: fields.phonenumber(),
-                cpf: fields.owner_document(),
-                name: fields.name(),
-                account_type: fields.account_type(),
-                birth_date: fields.birth_date(),
-                bank_account_attributes: {
-                    owner_name: fields.name(),
-                    owner_document: fields.owner_document(),
-                    bank_id: bankCode(),
-                    input_bank_number: bankInput(),
-                    agency_digit: fields.agency_digit(),
-                    agency: fields.agency(),
-                    account: fields.account(),
-                    account_digit: fields.account_digit(),
-                    account_type: fields.bank_account_type()
-                }
-            };
-
-            if (fields.bank_account_id()) {
-                userData.bank_account_attributes['id'] = fields.bank_account_id().toString();
-            }
-
-            return m.request({
-                method: 'PUT',
-                url: '/users/' + user_id + '.json',
-                data: {
-                    user: userData
-                },
-                config: h.setCsrfToken
-            }).then(function () {
-                loading(false);
-                showSuccess(true);
-                m.redraw();
-            }).catch(function (err) {
-                if (_$1.isArray(err.errors)) {
-                    error(err.errors.join('<br>'));
-                } else {
-                    error('Error updating information.');
-                }
-                loading(false);
-                showError(true);
-                m.redraw();
-            });
-        },
-            validateDocument = function validateDocument() {
-            var document = fields.owner_document(),
-                striped = String(document).replace(/[\.|\-|\/]*/g, '');
-            var isValid = false,
-                errorMessage = '';
-
-            if (document.length > 14) {
-                return h.validateCnpj(document);
-            } else if (document.length > 0) {
-                return h.validateCpf(striped);
-            }
-            return void 0;
-        },
-            onSubmit = function onSubmit() {
-            // TODO: this form validation should be abstracted/merged together with others
-            if (!validateDocument()) {
-                fields.errors().push({ field: 'owner_document', message: 'CPF/CNPJ inválido' });
-                error('CPF/CNPJ inválido');
-                showError(true);
-            } else {
-                loading(true);
-                updateUserData(user_id);
-            }
-
-            m.redraw();
-            return false;
-        },
-            applyZipcodeMask = _$1.compose(fields.zipcode, zipcodeMask),
-            applyBirthDateMask = _$1.compose(fields.birth_date, birthDayMask),
-            applyPhoneMask = _$1.compose(fields.phonenumber, phoneMask),
-            applyDocumentMask = function applyDocumentMask(value) {
-            if (value.length > 14) {
-                isCnpj(true);
-                fields.owner_document(documentCompanyMask(value));
-            } else {
-                isCnpj(false);
-                fields.owner_document(documentMask(value));
-            }
-
-            return;
-        },
-            handleError = function handleError() {
-            error(true);
-            loader(false);
-            m.redraw();
-        };
-
-        userVM.getUserBankAccount(user_id).then(function (data) {
-            if (!_$1.isEmpty(_$1.first(data))) {
-                bankAccount(_$1.first(data));
-                fields.bank_account_id(bankAccount().bank_account_id);
-                fields.account(bankAccount().account);
-                fields.account_digit(bankAccount().account_digit);
-                fields.agency(bankAccount().agency);
-                fields.agency_digit(bankAccount().agency_digit);
-                fields.bank_id(bankAccount().bank_id);
-                fields.bank_account_type(bankAccount().account_type);
-                bankCode(bankAccount().bank_id);
-            }
-        }).catch(handleError);
-
-        banksLoader.load().then(banks).catch(handleError);
-        userVM.getUserCreditCards(args.userId).then(creditCards).catch(handleError);
-        countriesLoader.load().then(function (data) {
-            return countries(_$1.sortBy(data, 'name_en'));
-        });
-        statesLoader.load().then(states);
-
-        return {
-            handleError: handleError,
-            applyDocumentMask: applyDocumentMask,
-            applyZipcodeMask: applyZipcodeMask,
-            applyPhoneMask: applyPhoneMask,
-            countries: countries,
-            states: states,
-            fields: fields,
-            loader: loader,
-            showSuccess: showSuccess,
-            showError: showError,
-            user: user,
-            onSubmit: onSubmit,
-            error: error,
-            creditCards: creditCards,
-            deleteCard: deleteCard,
-            toDeleteCard: toDeleteCard,
-            setCardDeletionForm: setCardDeletionForm,
-            bankAccount: bankAccount,
-            bankInput: bankInput,
-            banks: banks,
-            showOtherBanks: showOtherBanks,
-            showOtherBanksInput: showOtherBanksInput,
-            bankCode: bankCode,
-            popularBanks: popularBanks,
-            applyBirthDateMask: applyBirthDateMask,
-            loading: loading,
-            fieldHasError: fieldHasError
-        };
-    },
-    view: function view(ctrl, args) {
-        var user = ctrl.user,
-            bankAccount = ctrl.bankAccount(),
-            fields = ctrl.fields;
-
-        console.log(fields.bank_account_type());
-
-        return m('[id=\'settings-tab\']', [ctrl.showSuccess() ? m.component(popNotification, {
-            message: 'Your information has been updated'
-        }) : '', ctrl.showError() ? m.component(popNotification, {
-            message: m.trust(ctrl.error()),
-            error: true
-        }) : '', m('form.w-form', {
-            onsubmit: ctrl.onSubmit
-        }, [m('div', [m('.w-container', m('.w-col.w-col-10.w-col-push-1',
-        //( _.isEmpty(fields.name()) && _.isEmpty(fields.owner_document()) ? '' : m(UserOwnerBox, {user: user}) ),
-        m('.w-form.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Financial data'), m('.fontsize-small.u-marginbottom-20', ['This will be the information for transferring funds raised on the platform or reimbursement of support made via bank wire for non-funded projects.']), m('.divider.u-marginbottom-20'), m('.w-row', [m('.w-col.w-col-6.w-sub-col', m('.input.select.required.user_bank_account_bank_id', [m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
-            name: 'user[bank_account_attributes][bank_id]',
-            onchange: m.withAttr('value', fields.account_type)
-        }, [m('option[value=\'pf\']', { selected: fields.account_type() === 'pf' }, 'Pessoa fisica'), m('option[value=\'pj\']', { selected: fields.account_type() === 'pj' }, 'Pessoa juririca'), m('option[value=\'mei\']', { selected: fields.account_type() === 'mei' }, 'Pessoa juridica - MEI')])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', 'Full name' + (fields.account_type() == 'pf' ? '' : '/Razão Social')), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
-            value: fields.name(),
-            name: 'user[name]',
-            onchange: m.withAttr('value', fields.name)
-        })]), m('.w-col.w-col-6', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', '' + (fields.account_type() == 'pf' ? 'CPF' : 'CNPJ')), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
-            value: fields.owner_document(),
-            class: ctrl.fieldHasError('owner_document') ? 'error' : false,
-            name: 'user[cpf]',
-            onchange: m.withAttr('value', ctrl.applyDocumentMask),
-            onkeyup: m.withAttr('value', ctrl.applyDocumentMask)
-        }), ctrl.fieldHasError('owner_document')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', fields.account_type() == 'pf' ? [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'Date of birth'), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
-            value: fields.birth_date(),
-            name: 'user[birth_date]',
-            onchange: m.withAttr('value', ctrl.applyBirthDateMask),
-            onkeyup: m.withAttr('value', ctrl.applyBirthDateMask)
-        })] : [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'State Registration'), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
-            value: fields.state_inscription(),
-            name: 'user[state_inscription]',
-            onchange: m.withAttr('value', fields.state_inscription)
-        })])])])]), m('.w-row', [m('.w-col.w-col-6.w-sub-col' + (ctrl.showOtherBanksInput() ? '.w-hidden' : '') + '[id=\'bank_select\']', m('.input.select.required.user_bank_account_bank_id', [m('label.field-label', 'Bank'), m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
-            name: 'user[bank_account_attributes][bank_id]',
-            onchange: function onchange(e) {
-                m.withAttr('value', ctrl.bankCode)(e);
-                ctrl.showOtherBanksInput(ctrl.bankCode() == '0');
-            }
-        }, [m('option[value=\'\']', { selected: fields.bank_id() === '' }), _$1.map(ctrl.popularBanks, function (bank) {
-            return fields.bank_id() != bank.id ? m('option[value=\'' + bank.id + '\']', {
-                selected: fields.bank_id() == bank.id
-            }, bank.code + ' . ' + bank.name) : '';
-        }), fields.bank_id() === '' || _$1.find(ctrl.popularBanks, function (bank) {
-            return bank.id === fields.bank_id();
-        }) ? '' : m('option[value=\'' + fields.bank_id() + '\']', {
-            selected: true
-        }, bankAccount.bank_code + ' . ' + bankAccount.bank_name), m('option[value=\'0\']', 'Other')]), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']', ' Select a bank')])), ctrl.showOtherBanksInput() ? m('.w-col.w-col-6.w-sub-col', m('.w-row.u-marginbottom-20[id=\'bank_search\']', m('.w-col.w-col-12', [m('.input.string.optional.user_bank_account_input_bank_number', [m('label.field-label', 'Bank Number (3 numbers)'), m('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
-            name: 'user[bank_account_attributes][input_bank_number]',
-            value: ctrl.bankInput(),
-            onchange: m.withAttr('value', ctrl.bankInput)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_input_bank_number\']', ' Invalid bank number')]), m('a.w-hidden-small.w-hidden-tiny.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
-            onclick: ctrl.showOtherBanks.toggle
-        }, ['Busca por nome  ', m.trust('&nbsp;'), m.trust('&gt;')]), m('a.w-hidden-main.w-hidden-medium.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
-            onclick: ctrl.showOtherBanks.toggle
-        }, ['Busca por nome  ', m.trust('&nbsp;'), m.trust('&gt;')])]))) : '', ctrl.showOtherBanks() ? m('.w-row[id=\'bank_search_list\']', m('.w-col.w-col-12', m('.select-bank-list[data-ix=\'height-0-on-load\']', {
-            style: {
-                'height': '395px'
-            }
-        }, m('.card.card-terciary', [m('.fontsize-small.fontweight-semibold.u-marginbottom-10.u-text-center', 'Selecione o seu banco abaixo'), m('.fontsize-smaller', [m('.w-row.card.card-secondary.fontweight-semibold', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('div', 'Número')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('div', 'Nome'))]), !_$1.isEmpty(ctrl.banks()) ? _$1.map(ctrl.banks(), function (bank) {
-            return m('.w-row.card.fontsize-smallest', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('a.link-hidden.bank-resource-link[data-code=\'' + bank.code + '\'][data-id=\'' + bank.id + '\'][href=\'javascript:void(0)\']', {
-                onclick: function onclick() {
-                    ctrl.bankInput(bank.code);
-                    ctrl.showOtherBanks.toggle();
-                }
-            }, bank.code)), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('a.link-hidden.bank-resource-link[data-code=\'' + bank.code + '\'][data-id=\'' + bank.id + '\'][href=\'javascript:void(0)\']', {
-                onclick: function onclick() {
-                    ctrl.bankInput(bank.code);
-                    ctrl.showOtherBanks.toggle();
-                }
-            }, bank.code + ' . ' + bank.name))]);
-        }) : ''])])))) : '', m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency\']', 'Agência'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_agency\'][type=\'text\']', {
-            value: fields.agency(),
-            name: 'user[bank_account_attributes][agency]',
-            onchange: m.withAttr('value', fields.agency)
-        })]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']', 'Dígito agência'), m('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
-            value: fields.agency_digit(),
-            name: 'user[bank_account_attributes][agency_digit]',
-            onchange: m.withAttr('value', fields.agency_digit)
-        })])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'Tipo de conta'), m('.input.select.required.user_bank_account_account_type', [m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_account_type\']', {
-            name: 'user[bank_account_attributes][account_type]',
-            onchange: m.withAttr('value', fields.bank_account_type)
-        }, [m('option[value=\'conta_corrente\']', { selected: fields.bank_account_type() === 'conta_corrente' }, 'Conta corrente'), m('option[value=\'conta_poupanca\']', { Selected: fields.bank_account_type() === 'conta_poupanca' }, 'Conta poupança'), m('option[value=\'conta_corrente_conjunta\']', { selected: fields.bank_account_type() === 'conta_corrente_conjunta' }, 'Conta corrente conjunta'), m('option[value=\'conta_poupanca_conjunta\']', { Selected: fields.bank_account_type() === 'conta_poupanca_conjunta' }, 'Conta poupança conjunta')])])]), m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']', 'No. da conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
-            value: fields.account(),
-            onchange: m.withAttr('value', fields.account),
-            name: 'user[bank_account_attributes][account]'
-        })]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']', 'Dígito conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
-            value: fields.account_digit(),
-            onchange: m.withAttr('value', fields.account_digit),
-            name: 'user[bank_account_attributes][account_digit]'
-        })])]))]), bankAccount.bank_account_id ? m('input[id=\'user_bank_account_attributes_id\'][type=\'hidden\']', {
-            name: 'user[bank_account_attributes][id]',
-            value: fields.bank_account_id()
-        }) : '']), m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Endereço'), m('.w-row', [m('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m('label.field-label', 'País'), m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
-            onchange: m.withAttr('value', fields.country_id)
-        }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
-            return m('option' + (country.id == fields.country_id() ? '[selected="selected"]' : ''), {
-                value: country.id
-            }, country.name_en);
-        }) : ''])]), m('.w-col.w-col-6')]), m('.w-row', [m('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Endereço'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
-            value: fields.street(),
-            onchange: m.withAttr('value', fields.street)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_street\']', ' translation missing: pt.simple_form.validation_texts.user.address_street')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'Número'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
-            value: fields.number(),
-            onchange: m.withAttr('value', fields.number)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_number\']', ' translation missing: pt.simple_form.validation_texts.user.address_number')]), m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Complemento'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
-            value: fields.complement(),
-            onchange: m.withAttr('value', fields.complement)
-        })])]))]), m('.w-row', [m('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Bairro'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
-            value: fields.neighbourhood(),
-            onchange: m.withAttr('value', fields.neighbourhood)
-        })]), m('.input.string.optional.user_address_city.w-col.w-col-6', [m('label.field-label', 'Cidade'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
-            value: fields.city(),
-            onchange: m.withAttr('value', fields.city)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_city\']', ' translation missing: pt.simple_form.validation_texts.user.address_city')])]), m('.w-row', [m('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Estado'), m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
-
-            onchange: m.withAttr('value', fields.state)
-        }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
-            return m('option[value=\'' + state.acronym + '\']' + (state.acronym == fields.state() ? '[selected="selected"]' : ''), {
-                value: state.acronym
-            }, state.name);
-        }) : '', m('option[value=\'outro / other\']', 'Outro / Other')]), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_state\']', ' translation missing: pt.simple_form.validation_texts.user.address_state')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'CEP'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
-            value: fields.zipcode(),
-            onchange: m.withAttr('value', fields.zipcode)
-        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_address_zip_code\']', ' translation missing: pt.simple_form.validation_texts.user.address_zip_code')]), m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Telefone'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
-            value: fields.phonenumber(),
-            onchange: m.withAttr('value', fields.phonenumber),
-            onkeyup: m.withAttr('value', function (value) {
-                return ctrl.applyPhoneMask(value);
-            })
-        })])]))])]), args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Cartões de crédito'), m('.fontsize-small.u-marginbottom-20', ['Caso algum projeto que você tenha apoiado ', m('b', 'com Cartão de Crédito'), ' não seja bem-sucedido, nós efetuaremos o reembolso ', m('b', 'automaticamente'), ' no cartão utilizado para efetuar o apoio. ']), m('.divider.u-marginbottom-20'), m('.w-row.w-hidden-tiny.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', 'Cartão')), m('.w-col.w-col-5.w-col-small-5', m('.fontweight-semibold.fontsize-small', 'Operadora')), m('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
-            return m('.w-row.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', ['XXXX XXXX XXXX', m.trust('&nbsp;'), card.last_digits])), m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold.u-marginbottom-10', card.card_brand.toUpperCase())), m('.w-col.w-col-2.w-col-small-2', m('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', { onclick: ctrl.deleteCard(card.id) }, 'Remover'))]);
-        }), m('form.w-hidden', { action: '/pt/users/' + user.id + '/credit_cards/' + ctrl.toDeleteCard(), method: 'POST', config: ctrl.setCardDeletionForm }, [m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'), m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']')])]))), m('div', m('.w-container' + (args.useFloatBtn ? '.w-section.save-draft-btn-section' : ''), m('.w-row', [m('.w-col.w-col-4.w-col-push-4', ctrl.loading() ? h.loader() : m('input.btn.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Salvar\']')), m('.w-col.w-col-4')])))])])]);
-    }
-};
-
-var userNotifications = {
-    controller: function controller(args) {
-        var contributedProjects = m.prop(),
-            projectReminders = m.prop(),
-            user_id = args.userId,
-            showNotifications = h.toggleProp(false, true),
-            error = m.prop(false);
-
-        userVM.getUserProjectReminders(user_id).then(projectReminders).catch(function (err) {
-            error(true);
-            m.redraw();
-        });
-
-        userVM.getUserContributedProjects(user_id, null).then(contributedProjects).catch(function (err) {
-            error(true);
-            m.redraw();
-        });
-
-        return {
-            projects: contributedProjects,
-            showNotifications: showNotifications,
-            projectReminders: projectReminders,
-            error: error
-        };
-    },
-    view: function view(ctrl, args) {
-        var user = args.user,
-            reminders = ctrl.projectReminders();
-        var projects_collection = ctrl.projects();
-
-        return m('[id=\'notifications-tab\']', ctrl.error() ? m.component(inlineError, {
-            message: 'Error loading page.'
-        }) : m('form.simple_form.edit_user[accept-charset=\'UTF-8\'][action=\'/en/users/' + user.id + '\'][method=\'post\'][novalidate=\'novalidate\']', [m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'patch\']'), m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'notifications\']'), m('.w-container', [m('.w-row', m('.w-col.w-col-10.w-col-push-1', m('.w-form.card.card-terciary', [m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Newsletters:')), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[newsletter]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.newsletter ? '[checked=\'checked\']' : '') + '[id=\'user_newsletter\'][name=user[newsletter]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-base.fontweight-semibold[for=\'checkbox\']', ' JVN Newsletter (weekly)'), m('div', ['Featured Projects and Blog Posts', m.trust('&nbsp;')])]))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Projects you have supported:')), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[subscribed_to_project_posts]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.subscribed_to_project_posts ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_project_posts\'][name=user[subscribed_to_project_posts]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-base.fontweight-semibold', ' I want to receive project updates'), m('.u-marginbottom-20', m('a.alt-link[href=\'javascript:void(0);\']', {
-            onclick: ctrl.showNotifications.toggle
-        }, ' Manage notifications from ' + user.total_contributed_projects + ' projects')), ctrl.showNotifications() ? m('ul.w-list-unstyled.u-radius.card.card-secondary[id=\'notifications-box\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
-            return m('li', m('.w-checkbox.w-clearfix', [m('input[id=\'unsubscribes_' + project.project_id + '\'][type=\'hidden\'][value=\'\']', {
-                name: 'unsubscribes[' + project.project_id + ']'
-            }), m('input.w-checkbox-input' + (project.unsubscribed ? '' : '[checked=\'checked\']') + '[type=\'checkbox\'][value=\'1\'][id=\'user_unsubscribes_' + project.project_id + '\']', {
-                name: 'unsubscribes[' + project.project_id + ']'
-            }), m('label.w-form-label.fontsize-small', project.project_name)]));
-        }) : '']) : '']))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Social:')), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[subscribed_to_friends_contributions]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.subscribed_to_friends_contributions ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_friends_contributions\'][name=user[subscribed_to_friends_contributions]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-small', 'A friend supported or launched a project')])), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[subscribed_to_new_followers]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.subscribed_to_new_followers ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_new_followers\'][name=user[subscribed_to_new_followers]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-small', 'A friend started following me.')]))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Project Reminders:')), m('.w-col.w-col-8', [!_$1.isEmpty(reminders) ? _$1.map(reminders, function (reminder) {
-            return m('.w-checkbox.w-clearfix', [m('input[id=\'user_reminders_' + reminder.project_id + '\'][type=\'hidden\'][value=\'false\']', {
-                name: 'user[reminders][' + reminder.project_id + ']'
-            }), m('input.w-checkbox-input[checked=\'checked\'][type=\'checkbox\'][value=\'1\'][id=\'user_reminders_' + reminder.project_id + '\']', {
-                name: 'user[reminders][' + reminder.project_id + ']'
-            }), m('label.w-form-label.fontsize-small', reminder.project_name)]);
-        }) : ''])])]))), m('.u-margintop-30', m('.w-container', m('.w-row', m('.w-col.w-col-4.w-col-push-4', m('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'Save\']')))))])]));
-    }
-};
-
-var usersEdit = {
-    controller: function controller(args) {
-        var userDetails = m.prop({}),
-            userId = args.user_id.split('-')[0],
-            hash = m.prop(window.location.hash),
-            displayTabContent = function displayTabContent(user) {
-            var tabs = {
-                '#projects': m(userCreated, {
-                    userId: userId,
-                    showDraft: true
-                }),
-                '#contributions': m(userPrivateContributed, {
-                    userId: userId,
-                    user: user
-                }),
-                '#about_me': m(userAboutEdit, {
-                    userId: userId,
-                    user: user
-                }),
-                '#settings': m(userSettings, {
-                    userId: userId,
-                    user: user
-                }),
-                '#notifications': m(userNotifications, {
-                    userId: userId,
-                    user: user
-                })
-            };
-
-            hash(window.location.hash);
-
-            if (_$1.isEmpty(hash()) || hash() === '#_=_') {
-                hash('#contributions');
-                return tabs['#contributions'];
-            }
-
-            return tabs[hash()];
-        };
-
-        h.redrawHashChange();
-        userVM.fetchUser(userId, true, userDetails);
-        return {
-            displayTabContent: displayTabContent,
-            hash: hash,
-            userDetails: userDetails
-        };
-    },
-    view: function view(ctrl, args) {
-        var user = ctrl.userDetails();
-
-        return m('div', [m(userHeader, {
-            user: user,
-            hideDetails: true
-        }), !_$1.isEmpty(user) ? [m('nav.dashboard-nav.u-text-center', {
-            style: {
-                'z-index': '10',
-                position: 'relative'
-            }
-        }, m('.w-container', [m('a.dashboard-nav-link' + (ctrl.hash() === '#contributions' ? '.selected' : '') + '[data-target=\'#dashboard_contributions\'][href=\'#contributions\'][id=\'dashboard_contributions_link\']', 'Backed'), m('a.dashboard-nav-link' + (ctrl.hash() === '#projects' ? '.selected' : '') + '[data-target=\'#dashboard_projects\'][href=\'#projects\'][id=\'dashboard_projects_link\']', 'Created'), m('a.dashboard-nav-link' + (ctrl.hash() === '#about_me' ? '.selected' : '') + '[data-target=\'#dashboard_about_me\'][href=\'#about_me\'][id=\'dashboard_about_me_link\']', 'About You'),
-        // m(`a.dashboard-nav-link${(ctrl.hash() === '#settings' ? '.selected' : '')}[data-target='#dashboard_settings'][href='#settings'][id='dashboard_settings_link']`,
-        //     'Data & Address'
-        // ),
-        m('a.dashboard-nav-link' + (ctrl.hash() === '#notifications' ? '.selected' : '') + '[data-target=\'#dashboard_notifications\'][href=\'#notifications\'][id=\'dashboard_notifications_link\']', 'Notifications'), m('a.dashboard-nav-link.u-right-big-only[href=\'/en/users/' + user.id + '\']', {
-            config: m.route,
-            onclick: function onclick() {
-                m.route('/users/' + user.id, {
-                    user_id: user.id
-                });
-            }
-        }, 'Go to the public profile')])), m('section.section', m('.w-container', m('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))] : '']);
-    }
-};
-
 var I18nScope$20 = _$1.partial(h.i18nScope, 'projects.contributions.edit.errors');
-var I18nIntScope$1 = _$1.partial(h.i18nScope, 'projects.contributions.edit_international.errors');
+var I18nIntScope = _$1.partial(h.i18nScope, 'projects.contributions.edit_international.errors');
 
 var paymentVM = function paymentVM() {
     var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'aon';
@@ -8134,7 +7311,7 @@ var paymentVM = function paymentVM() {
     };
 
     var scope = function scope(data) {
-        return isInternational() ? I18nIntScope$1(data) : I18nScope$20(data);
+        return isInternational() ? I18nIntScope(data) : I18nScope$20(data);
     };
 
     var getLocale = function getLocale() {
@@ -8518,7 +7695,109 @@ var paymentVM = function paymentVM() {
     };
 };
 
-var I18nScope$21 = _.partial(h.i18nScope, 'projects.faq');
+var I18nScope$21 = _$1.partial(h.i18nScope, 'projects.contributions');
+
+var rewardSelectCard = {
+    controller: function controller(args) {
+        var setInput = function setInput(el, isInitialized) {
+            return !isInitialized ? el.focus() : null;
+        };
+        var isSelected = function isSelected(currentReward) {
+            return currentReward.id === rewardVM.selectedReward().id;
+        };
+        var selectedDestination = m.prop('');
+        var queryRewardId = h.getParams('reward_id');
+
+        var submitContribution = function submitContribution(event) {
+            var valueFloat = h.monetaryToFloat(rewardVM.contributionValue);
+            var shippingFee = rewardVM.hasShippingOptions(rewardVM.selectedReward()) ? rewardVM.shippingFeeForCurrentReward(selectedDestination) : {
+                value: 0
+            };
+
+            if (!selectedDestination() && rewardVM.hasShippingOptions(rewardVM.selectedReward())) {
+                rewardVM.error('Please select a valid freight option.');
+            } else if (valueFloat < rewardVM.selectedReward().minimum_value + shippingFee.value) {
+                rewardVM.error('The support amount for this reward must be at least Rs' + rewardVM.selectedReward().minimum_value + ' + freight Rs' + h.formatNumber(shippingFee.value));
+            } else {
+                rewardVM.error('');
+                h.navigateTo('/projects/' + projectVM.currentProject().project_id + '/contributions/fallback_create?contribution%5Breward_id%5D=' + rewardVM.selectedReward().id + '&contribution%5Bvalue%5D=' + valueFloat + '&contribution%5Bshipping_fee_id%5D=' + shippingFee.id);
+            }
+
+            return false;
+        };
+
+        var selectDestination = function selectDestination(destination) {
+            selectedDestination(destination);
+            var shippingFee = rewardVM.shippingFeeForCurrentReward(selectedDestination) ? Number(rewardVM.shippingFeeForCurrentReward(selectedDestination).value) : 0;
+            var rewardMinValue = Number(rewardVM.selectedReward().minimum_value);
+            rewardVM.applyMask(shippingFee + rewardMinValue + ',00');
+        };
+
+        var normalReward = function normalReward(reward) {
+            if (_$1.isEmpty(reward)) {
+                return {
+                    id: null,
+                    description: 'Thank you. I just want to help the project.',
+                    minimum_value: 10,
+                    shipping_options: null,
+                    row_order: -999999
+                };
+            }
+
+            return reward;
+        };
+
+        if (args.reward.id === Number(queryRewardId)) {
+            rewardVM.selectReward(args.reward).call();
+        }
+
+        rewardVM.getStates();
+
+        return {
+            normalReward: normalReward,
+            isSelected: isSelected,
+            setInput: setInput,
+            submitContribution: submitContribution,
+            selectDestination: selectDestination,
+            selectedDestination: selectedDestination,
+            locationOptions: rewardVM.locationOptions,
+            states: rewardVM.getStates(),
+            selectReward: rewardVM.selectReward,
+            error: rewardVM.error,
+            applyMask: rewardVM.applyMask,
+            contributionValue: rewardVM.contributionValue
+        };
+    },
+    view: function view(ctrl, args) {
+        var reward = ctrl.normalReward(args.reward);
+
+        return m('span.radio.w-radio.w-clearfix.back-reward-radio-reward', {
+            class: ctrl.isSelected(reward) ? 'selected' : '',
+            onclick: ctrl.selectReward(reward)
+        }, m('label[for="contribution_reward_id_' + reward.id + '"]', [m('input.radio_buttons.optional.w-input.text-field.w-radio-input.back-reward-radio-button[id="contribution_reward_id_' + reward.id + '"][type="radio"][value="' + reward.id + '"]', {
+            checked: ctrl.isSelected(reward),
+            name: 'contribution[reward_id]'
+        }), m('label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for="contribution_reward_' + reward.id + '"]', 'Rs ' + h.formatNumber(reward.minimum_value) + ' or more'), !ctrl.isSelected(reward) ? '' : m('.w-row.back-reward-money', [rewardVM.hasShippingOptions(reward) ? m('.w-sub-col.w-col.w-col-4', [m('.fontcolor-secondary.u-marginbottom-10', 'Delivery place'), m('select.positive.text-field.w-select', {
+            onchange: m.withAttr('value', ctrl.selectDestination)
+        }, _$1.map(ctrl.locationOptions(reward, ctrl.selectedDestination), function (option) {
+            return m('option[value="' + option.value + '"]', [option.name + ' ', option.value != '' ? '+Rs' + option.fee : null]);
+        }))]) : '', m('.w-sub-col.w-col.w-clearfix', {
+            class: rewardVM.hasShippingOptions(reward) ? 'w-col-4' : 'w-col-8'
+        }, [m('.fontcolor-secondary.u-marginbottom-10', 'Value of support'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('.back-reward-input-reward.medium.placeholder', 'Rs')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.back-reward-input-reward.medium.w-input', {
+            autocomplete: 'off',
+            min: reward.minimum_value,
+            placeholder: reward.minimum_value,
+            type: 'tel',
+            config: ctrl.setInput,
+            onkeyup: m.withAttr('value', ctrl.applyMask),
+            value: ctrl.contributionValue()
+        }))]), m('.fontsize-smaller.text-error.u-marginbottom-20.w-hidden', [m('span.fa.fa-exclamation-triangle'), ' Support amount is incorrect'])]), m('.submit-form.w-col.w-col-4', m('button.btn.btn-medium.u-margintop-30', {
+            onclick: ctrl.submitContribution
+        }, ['Continue  ', m('span.fa.fa-chevron-right')]))]), ctrl.error().length > 0 && ctrl.isSelected(reward) ? m('.text-error', [m('br'), m('span.fa.fa-exclamation-triangle'), ' ' + ctrl.error()]) : '', m('.fontsize-smaller.fontweight-semibold', reward.title), m('.back-reward-reward-description', [m('.fontsize-smaller.u-marginbottom-10.fontcolor-secondary', reward.description), m('.u-marginbottom-20.w-row', [!reward.deliver_at ? '' : m('.w-col.w-col-6', [m('.fontsize-smallest.fontcolor-secondary', 'Estimated delivery time:'), m('.fontsize-smallest', h.momentify(reward.deliver_at, 'MMM/YYYY'))]), !rewardVM.hasShippingOptions(reward) && reward.shipping_options !== 'presential' ? '' : m('.w-col.w-col-6', [m('.fontsize-smallest.fontcolor-secondary', 'Send:'), m('.fontsize-smallest', I18n$1.t('shipping_options.' + reward.shipping_options, I18nScope$21()))])])])]));
+    }
+};
+
+var I18nScope$22 = _.partial(h.i18nScope, 'projects.faq');
 
 var faqBox = {
     controller: function controller(args) {
@@ -8541,8 +7820,8 @@ var faqBox = {
             var updatedQuestions = {};
             _.each(questions, function (quest, idx) {
                 _.extend(updatedQuestions, defineProperty({}, idx + 1, {
-                    question: I18n$1.t(tKey() + '.questions.' + idx + '.question', I18nScope$21()),
-                    answer: I18n$1.t(tKey() + '.questions.' + idx + '.answer', I18nScope$21({ userLink: '/users/' + user().id,
+                    question: I18n$1.t(tKey() + '.questions.' + idx + '.question', I18nScope$22()),
+                    answer: I18n$1.t(tKey() + '.questions.' + idx + '.answer', I18nScope$22({ userLink: '/users/' + user().id,
                         userName: user().name
                     }))
                 }));
@@ -8564,7 +7843,7 @@ var faqBox = {
     view: function view(ctrl, args) {
         return m('.faq-box.w-hidden-small.w-hidden-tiny.card.u-radius', [m('.w-row.u-marginbottom-30', [m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', m('img[width=\'30\']', {
             src: args.mode === 'aon' ? '/assets/aon-badge.png' : '/assets/flex-badge.png'
-        })), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', m('.w-inline-block.fontsize-smallest.w-inline-block.fontcolor-secondary', I18n$1.t(ctrl.tKey() + '.description', I18nScope$21())))]), m('.u-marginbottom-20.fontsize-small.fontweight-semibold', I18n$1.t('' + (args.vm.isInternational() ? 'international_title' : 'title'), I18nScope$21())), m('ul.w-list-unstyled', _.map(ctrl.scopedQuestions(), function (question, idx) {
+        })), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', m('.w-inline-block.fontsize-smallest.w-inline-block.fontcolor-secondary', I18n$1.t(ctrl.tKey() + '.description', I18nScope$22())))]), m('.u-marginbottom-20.fontsize-small.fontweight-semibold', I18n$1.t('' + (args.vm.isInternational() ? 'international_title' : 'title'), I18nScope$22())), m('ul.w-list-unstyled', _.map(ctrl.scopedQuestions(), function (question, idx) {
             return [m('li#faq_question_' + idx + '.fontsize-smaller.alt-link.list-question', {
                 onclick: ctrl.selectQuestion(idx)
             }, m('span', [m('span.faq-box-arrow'), ' ' + question.question])), m('li.list-answer', {
@@ -8574,7 +7853,1508 @@ var faqBox = {
     }
 };
 
-var I18nScope$23 = _.partial(h.i18nScope, 'projects.contributions.edit.errors');
+var projectsContribution = {
+    controller: function controller() {
+        var rewards = function rewards() {
+            return _$1.union([{
+                id: null,
+                description: 'Obrigado. Eu só quero ajudar o projeto.',
+                minimum_value: 10,
+                shipping_options: null,
+                row_order: -9999999
+            }], projectVM.rewardDetails());
+        };
+
+        var submitContribution = function submitContribution() {
+            var valueFloat = h.monetaryToFloat(rewardVM.contributionValue);
+
+            if (valueFloat < rewardVM.selectedReward().minimum_value) {
+                rewardVM.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + rewardVM.selectedReward().minimum_value);
+            } else {
+                rewardVM.error('');
+                h.navigateTo('/projects/' + projectVM.currentProject().project_id + '/contributions/fallback_create?contribution%5Breward_id%5D=' + rewardVM.selectedReward().id + '&contribution%5Bvalue%5D=' + valueFloat);
+            }
+
+            return false;
+        };
+
+        projectVM.getCurrentProject();
+
+        return {
+            paymentVM: paymentVM(projectVM.currentProject().mode),
+            project: projectVM.currentProject,
+            submitContribution: submitContribution,
+            sortedRewards: function sortedRewards() {
+                return _$1.sortBy(rewards(), function (reward) {
+                    return Number(reward.row_order);
+                });
+            }
+        };
+    },
+    view: function view(ctrl) {
+        var project = ctrl.project;
+
+        return m('#contribution-new', project && !_$1.isUndefined(project()) ? [m('.w-section.section-product.' + project().mode), m(projectHeaderTitle, {
+            project: project
+        }), m('.w-section.header-cont-new', m('.w-container', m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', 'Choose the reward and then the value of the support'))), m('.section', m('.w-container', m('.w-row', [m('.w-col.w-col-8', m('.w-form.back-reward-form', m('form.simple_form.new_contribution[accept-charset="UTF-8"][action="/en/projects/' + project().id + '/contributions/fallback_create"][id="contribution_form"][method="get"][novalidate="novalidate"]', { onsubmit: ctrl.submitContribution }, [m('input[name="utf8"][type="hidden"][value="✓"]'), _$1.map(ctrl.sortedRewards(), function (reward) {
+            return m(rewardSelectCard, { reward: reward });
+        })]))), m('.w-col.w-col-4', m.component(faqBox, {
+            mode: project().mode,
+            vm: ctrl.paymentVM,
+            faq: ctrl.paymentVM.faq(),
+            projectUserId: project().user.id
+        }))])))] : '');
+    }
+};
+
+//       weak
+var userHeader = {
+    view: function view(ctrl, args) {
+        var user = args.user,
+            hideDetails = args.hideDetails,
+            profileImage = userVM.displayImage(user),
+            coverImage = userVM.displayCover(user);
+
+        return m('.hero-' + (hideDetails ? 'small' : 'half'), [m('.w-container.content-hero-profile', m('.w-row.u-text-center', m('.w-col.w-col-8.w-col-push-2', [hideDetails ? '' : m('.u-marginbottom-20', m('.avatar_wrapper', m('img.thumb.big.u-round[alt=\'User\'][src=\'' + profileImage + '\']'))), m('.fontsize-larger.fontweight-semibold.u-marginbottom-20', userVM.displayName(user)), hideDetails ? '' : m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base', ['Joined on ' + h.momentify(user.created_at, 'MMMM YYYY'), m('br'), user.total_contributed_projects == 0 ? 'Has not yet backed any campaigns' : 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'), user.total_published_projects > 0 ? ' And already created ' + h.pluralize(user.total_published_projects, ' campaign', ' campaigns') : ''])]))), m('.hero-profile', { style: 'background-image:url(\'' + coverImage + '\');' })]);
+    }
+};
+
+var inlineError = {
+    view: function view(ctrl, args) {
+        return m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle', m('span', ' ' + args.message));
+    }
+};
+
+/**
+ * window.c.loadMoreBtn component
+ * Button to paginate collection
+ *
+ * Example of use:
+ * view: () => {
+ *   ...
+ *   m.component(c.loadMoreBtn, {collection: collection, cssClass: 'class'})
+ *   ...
+ * }
+ */
+var loadMoreBtn = {
+    view: function view(ctrl, args) {
+        var collection = args.collection,
+            cssClass = args.cssClass;
+        return m('.w-col.w-col-2' + cssClass, [!collection.isLoading() ? collection.isLastPage() ? '' : m('button#load-more.btn.btn-medium.btn-terciary', {
+            onclick: collection.nextPage
+        }, 'Load more') : h.loader()]);
+    }
+};
+
+var userCreated = {
+    controller: function controller(args) {
+        var user_id = args.userId,
+            showDraft = args.showDraft || false,
+            error = m.prop(false),
+            pages = postgrest$1.paginationVM(models.project),
+            loader = m.prop(true),
+            contextVM = postgrest$1.filtersVM({
+            project_user_id: 'eq',
+            state: 'in'
+        });
+
+        var states = ['online', 'waiting_funds', 'successful', 'failed'];
+        if (showDraft) {
+            states.push('draft');
+        }
+        contextVM.state(states).project_user_id(user_id).order({
+            updated_at: 'desc'
+        });
+
+        models.project.pageSize(9);
+        pages.firstPage(contextVM.parameters()).then(function () {
+            loader(false);
+        }).catch(function (err) {
+            error(true);
+            loader(false);
+            m.redraw();
+        });
+
+        return {
+            projects: pages,
+            loader: loader,
+            error: error
+        };
+    },
+    view: function view(ctrl, args) {
+        var projects_collection = ctrl.projects.collection();
+
+        return m('.content[id=\'created-tab\']', ctrl.error() ? m.component(inlineError, {
+            message: 'Error loading projects.'
+        }) : !ctrl.loader() ? [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
+            return m.component(projectCard, {
+                project: project,
+                ref: 'user_contributed',
+                showFriends: false
+            });
+        }) : m('.w-container', m('.u-margintop-30.u-text-center.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.fontsize-large.u-marginbottom-30', 'It`s Time To Fund Your Idea'), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', m('a.btn.btn-large[href=\'/start\']', 'GET STARTED FOR FREE')), m('.w-col.w-col-3')])]), m('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, {
+            collection: ctrl.projects,
+            cssClass: '.w-col-push-5'
+        })]) : ''] : h.loader());
+    }
+};
+
+var userContributed = {
+    controller: function controller(args) {
+        var contributedProjects = m.prop(),
+            user_id = args.userId,
+            pages = postgrest$1.paginationVM(models.project),
+            error = m.prop(false),
+            loader = m.prop(true),
+            contextVM = postgrest$1.filtersVM({
+            project_id: 'in'
+        });
+
+        userVM.getPublicUserContributedProjects(user_id, null).then(function (data) {
+            contributedProjects(data);
+            if (!_$1.isEmpty(contributedProjects())) {
+                contextVM.project_id(_$1.pluck(contributedProjects(), 'project_id')).order({
+                    online_date: 'desc'
+                });
+
+                models.project.pageSize(9);
+                pages.firstPage(contextVM.parameters()).then(function () {
+                    loader(false);
+                });
+            } else {
+                loader(false);
+            }
+        }).catch(function (err) {
+            error(true);
+            loader(false);
+            m.redraw();
+        });
+
+        return {
+            projects: pages,
+            error: error,
+            loader: loader
+        };
+    },
+    view: function view(ctrl, args) {
+        var projects_collection = ctrl.projects.collection();
+        return ctrl.error() ? m.component(inlineError, { message: 'Error loading projects.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
+            return m.component(projectCard, {
+                project: project,
+                ref: 'user_contributed',
+                showFriends: false
+            });
+        }) : m('.w-container', m('.u-margintop-30.u-text-center.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.fontsize-large.u-marginbottom-30', 'No campaigns backed yet')]), m('.w-col.w-col-3')])), !_$1.isEmpty(projects_collection) ? m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, { collection: ctrl.projects, cssClass: '.w-col-push-5' })]) : '']);
+    }
+};
+
+var userCard = {
+    controller: function controller(args) {
+        var userDetails = m.prop({}),
+            user_id = args.userId;
+
+        userVM.fetchUser(user_id, true, userDetails);
+
+        return {
+            userDetails: userDetails,
+            displayModal: h.toggleProp(false, true)
+        };
+    },
+    view: function view(ctrl) {
+        var user = ctrl.userDetails(),
+            contactModalC = [ownerMessageContent, ctrl.userDetails],
+            profileImage = userVM.displayImage(user);
+
+        return m('#user-card', m('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [m('.w-row', [m('.w-col.w-col-4.w.col-small-4.w-col-tiny-4.w-clearfix', m('img.thumb.u-round[itemprop=\'image\'][src=\'' + profileImage + '\'][width=\'100\']')), m('.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m('.fontsize-small.fontweight-semibold.lineheight-tighter[itemprop=\'name\']', m('a.link-hidden[href="/users/' + user.id + '"]', userVM.displayName(user))), m('.fontsize-smallest.lineheight-looser[itemprop=\'address\']', user.address_city), m('.fontsize-smallest', h.pluralize(user.total_published_projects, ' campaign', ' campaigns') + ' Created'), m('.fontsize-smallest', 'Backed ' + h.pluralize(user.total_contributed_projects, ' campaign', ' campaigns'))])]), m('.project-author-contacts', [m('ul.w-list-unstyled.fontsize-smaller.fontweight-semibold', [!_$1.isEmpty(user.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + user.facebook_link + '"][target="_blank"]', 'Facebook Profile')]) : '', !_$1.isEmpty(user.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + user.twitter_username + '"][target="_blank"]', 'Twitter Profile')]) : '', _$1.map(user.links, function (link) {
+            return m('li', [m('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', link.link)]);
+        })])]), ctrl.displayModal() ? m.component(modalBox, {
+            displayModal: ctrl.displayModal,
+            content: contactModalC
+        }) : '', m(UserFollowBtn, { follow_id: user.id, following: user.follwing_this_user, enabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10', disabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10' }), !_$1.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', { onclick: ctrl.displayModal.toggle }, 'Send Message') : '']));
+    }
+};
+
+var userAbout = {
+    controller: function controller(args) {
+        var userDetails = m.prop({}),
+            loader = m.prop(true),
+            error = m.prop(false),
+            user_id = args.userId;
+
+        userVM.fetchUser(user_id, true, userDetails).then(function () {
+            loader(false);
+        }).catch(function (err) {
+            error(true);
+            loader(false);
+            m.redraw();
+        });
+
+        return {
+            userDetails: userDetails,
+            error: error,
+            loader: loader
+        };
+    },
+    view: function view(ctrl, args) {
+        var user = ctrl.userDetails();
+        return ctrl.error() ? m.component(inlineError, { message: 'Error loading data.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'about-tab\']', m('.w-container[id=\'about-content\']', m('.w-row', [m('.w-col.w-col-8', m('.fontsize-base', user.about_html ? m.trust(user.about_html) : '')), m('.w-col.w-col-4', user.id ? m.component(userCard, { userId: user.id }) : h.loader)])));
+    }
+};
+
+var usersShow = {
+    controller: function controller(args) {
+        var userDetails = m.prop({}),
+            user_id = args.user_id.split('-')[0],
+            hash = m.prop(window.location.hash),
+            displayTabContent = function displayTabContent(user) {
+            var tabs = {
+                '#created': m.component(userCreated, { userId: user.id }),
+                '#contributed': m.component(userContributed, { userId: user.id }),
+                '#about': m.component(userAbout, { userId: user.id })
+            };
+
+            hash(window.location.hash);
+
+            if (_$1.isEmpty(hash()) || hash() === '#_=_') {
+                if (user.total_published_projects > 0) {
+                    hash('#created');
+                    return tabs['#created'];
+                } else if (user.total_contributed_projects > 0) {
+                    hash('#contributed');
+                    return tabs['#contributed'];
+                }
+
+                hash('#about');
+                return tabs['#about'];
+            }
+
+            return tabs[hash()];
+        };
+
+        h.redrawHashChange();
+
+        userVM.fetchUser(user_id, true, userDetails);
+
+        return {
+            displayTabContent: displayTabContent,
+            hash: hash,
+            userDetails: userDetails
+        };
+    },
+    view: function view(ctrl, args) {
+        var user = ctrl.userDetails();
+
+        return m('div', [m.component(userHeader, { user: user }), m('nav.project-nav.u-text-center.u-marginbottom-30.profile', { style: { 'z-index': '10', position: 'relative' } }, m('.w-container[data-anchor=\'created\']', [!_$1.isEmpty(user) ? user.is_owner_or_admin ? m('a.dashboard-nav-link.dashboard[href=\'/en/users/' + user.id + '/edit\']', { config: m.route,
+            onclick: function onclick() {
+                m.route('/users/edit/' + user.id, { user_id: user.id });
+            } }, [m('span.fa.fa-cog'), m.trust('&nbsp;'), ' Edit Profile']) : '' : h.loader(), m('a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#contributed' ? 'selected' : '') + '\']', ['Backed ', m.trust('&nbsp;'), m('span.badge', user.total_contributed_projects)]), m('a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#created' ? 'selected' : '') + '\']', ['Created ', m.trust('&nbsp;'), m('span.badge', user.total_published_projects)]), m('a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ' + (ctrl.hash() === '#about' ? 'selected' : '') + '\']', 'About')])), m('section.section', m('.w-container', m('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))]);
+    }
+};
+
+// TODO: Define error pattern that comes from server-side and allow the lib
+// to define what fields are coming with errors from the back-end
+var generateErrorInstance = function generateErrorInstance() {
+    var fields = m.prop([]);
+    var submissionError = m.prop(false);
+    var submissionErrorMsg = m.prop('');
+    var fieldIdxValue = function fieldIdxValue(fieldName, idx, initialValue) {
+        return _$1.reduce(fields(), function (memo, field) {
+            return field[0] === fieldName ? field[idx] : memo;
+        }, initialValue);
+    };
+
+    var setError = function setError(fieldName, flag) {
+        var updated = _$1.map(fields(), function (field) {
+            return field[0] === fieldName ? [field[0], field[1], flag] : field;
+        });
+
+        fields(updated);
+    };
+
+    var hasError = function hasError(fieldName) {
+        return fieldIdxValue(fieldName, 2, false);
+    };
+
+    var getErrorMsg = function getErrorMsg(fieldName) {
+        return fieldIdxValue(fieldName, 1, '');
+    };
+
+    var e = function e(fieldOrArray) {
+        var errorMessage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+        if (Array.isArray(fieldOrArray)) {
+            _$1.map(fieldOrArray, function (field) {
+                field.push(false);
+                console.log('Will push: ', field);
+                return fields().push(field);
+            });
+        } else {
+            fields().push([fieldOrArray, errorMessage, false]);
+        }
+    };
+
+    e.fields = fields;
+    e.setSubmissionError = submissionErrorMsg;
+    e.hasSubmissionError = function () {
+        return submissionError() === true;
+    };
+    e.displaySubmissionError = function () {
+        if (submissionError()) {
+            return m('.card.card-error.u-radius.zindex-10.u-marginbottom-30.fontsize-smaller', m('.u-marginbottom-10.fontweight-bold', m.trust(submissionErrorMsg())));
+        }
+
+        return null;
+    };
+    e.submissionError = function (flag) {
+        if (_$1.isUndefined(flag)) {
+            return e.displaySubmissionError();
+        }
+
+        submissionError(flag);
+    };
+
+    e.hasError = hasError;
+    e.inlineError = function (field, flag) {
+        if (_$1.isUndefined(flag)) {
+            if (hasError(field)) {
+                return m(inlineError, { message: getErrorMsg(field) });
+            }
+
+            return null;
+        }
+        setError(field, flag);
+    };
+
+    e.resetFieldErrors = function () {
+        return _$1.map(fields(), function (field) {
+            return field[2] = false;
+        });
+    };
+
+    e.resetErrors = function () {
+        e.resetFieldErrors();
+        submissionError(false);
+    };
+
+    return e;
+};
+
+var e$1 = generateErrorInstance();
+
+var fields = {
+    password: m.prop(''),
+    current_password: m.prop(''),
+    uploaded_image: m.prop(''),
+    cover_image: m.prop(''),
+    email: m.prop(''),
+    permalink: m.prop(''),
+    public_name: m.prop(''),
+    facebook_link: m.prop(''),
+    twitter: m.prop(''),
+    links: m.prop([]),
+    about_html: m.prop(''),
+    email_confirmation: m.prop('')
+};
+
+var mapRailsErrors = function mapRailsErrors(rails_errors) {
+    var parsedErrors = void 0;
+    try {
+        parsedErrors = JSON.parse(rails_errors);
+    } catch (e$1) {
+        parsedErrors = {};
+    }
+    var extractAndSetErrorMsg = function extractAndSetErrorMsg(label, fieldArray) {
+        var value = _$1.first(_$1.compact(_$1.map(fieldArray, function (field) {
+            return _$1.first(parsedErrors[field]);
+        })));
+
+        if (value) {
+            e$1(label, value);
+            e$1.inlineError(label, true);
+        }
+    };
+
+    //extractAndSetErrorMsg("about_html", ["user.about_html", "about_html"]);
+    //extractAndSetErrorMsg("public_name", ["user.public_name", "public_name"]);
+
+    return e$1;
+};
+
+var userAboutVM = {
+    fields: fields,
+    mapRailsErrors: mapRailsErrors
+};
+
+var projectEditSaveBtn = {
+    view: function view(ctrl, args) {
+        return m('.w-section.save-draft-btn-section', [m('.w-row', [m('.w-col.w-col-4.w-col-push-4', args.loading() ? h.loader() : [m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'), m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Save"]', {
+            onclick: args.onSubmit
+        })]), m('.w-col.w-col-4')])]);
+    }
+};
+
+var userAboutEdit = {
+    controller: function controller(args) {
+        var parsedErrors = userAboutVM.mapRailsErrors(args.rails_errors);
+        var deleteUser = void 0;
+        var user = args.user || {},
+            fields = {
+            password: m.prop(''),
+            current_password: m.prop(''),
+            uploaded_image: m.prop(userVM.displayImage(user)),
+            cover_image: m.prop(user.profile_cover_image || ''),
+            email: m.prop(''),
+            permalink: m.prop(user.permalink || ''),
+            public_name: m.prop(user.public_name || ''),
+            facebook_link: m.prop(user.facebook_link || ''),
+            twitter: m.prop(user.twitter_username || ''),
+            links: m.prop(user.links || []),
+            about_html: m.prop(user.about_html || ''),
+            email_confirmation: m.prop('')
+        },
+            passwordHasError = m.prop(false),
+            emailHasError = m.prop(false),
+            showEmailForm = h.toggleProp(false, true),
+            showSuccess = m.prop(false),
+            showError = m.prop(false),
+            errors = m.prop(),
+            loading = m.prop(false),
+            uploading = m.prop(false),
+            errorsArray = m.prop([]),
+            pushErrosMessage = function pushErrosMessage() {
+            errors(errorsArray().join('<br/>'));
+        },
+            updateFieldsFromUser = function updateFieldsFromUser() {
+            userVM.fetchUser(args.userId, false).then(function (dataResponse) {
+                var data = _$1.first(dataResponse);
+                fields.uploaded_image(userVM.displayImage(data));
+                fields.cover_image(data.profile_cover_image);
+                fields.permalink(data.permalink);
+                fields.public_name(data.public_name);
+                fields.facebook_link(data.facebook_link);
+                fields.twitter(data.twitter_username);
+                fields.links(data.links);
+                fields.about_html(data.about_html);
+            });
+        },
+            uploadImage = function uploadImage() {
+            var userUploadedImageEl = window.document.getElementById('user_uploaded_image'),
+                userCoverImageEl = window.document.getElementById('user_cover_image'),
+                formData = new FormData();
+
+            if (userUploadedImageEl.files[0] || !args.hideCoverImg && userCoverImageEl.files[0]) {
+                formData.append('uploaded_image', userUploadedImageEl.files[0]);
+                if (!args.hideCoverImg) {
+                    formData.append('cover_image', userCoverImageEl.files[0]);
+                }
+
+                uploading(true);
+                m.redraw();
+
+                return m.request({
+                    method: 'POST',
+                    url: '/users/' + user.id + '/upload_image.json',
+                    data: formData,
+                    config: h.setCsrfToken,
+                    serialize: function serialize(data) {
+                        return data;
+                    }
+                }).then(function (data) {
+                    fields.uploaded_image(data.uploaded_image);
+                    fields.cover_image(data.cover_image);
+                    uploading(false);
+                }).catch(function (err) {
+                    if (_$1.isArray(err.errors)) {
+                        errorsArray(errorsArray().concat(err.errors));
+                    } else {
+                        errors('Error updating information.');
+                    }
+                    pushErrosMessage();
+                    showError(true);
+                    uploading(false);
+                });
+            }
+
+            return void 0;
+        },
+            updateUser = function updateUser() {
+            var userData = {
+                current_password: fields.current_password(),
+                password: fields.password(),
+                email: fields.email(),
+                permalink: fields.permalink(),
+                public_name: fields.public_name(),
+                facebook_link: fields.facebook_link(),
+                twitter: fields.twitter(),
+                about_html: fields.about_html(),
+                links_attributes: linkAttributes()
+            };
+
+            if (args.publishingUserAbout) {
+                userData.publishing_user_about = true;
+            }
+
+            loading(true);
+            uploadImage();
+
+            return m.request({
+                method: 'PUT',
+                url: '/users/' + user.id + '.json',
+                data: {
+                    user: userData
+                },
+                config: h.setCsrfToken
+            }).then(function () {
+                showSuccess(true);
+                updateFieldsFromUser();
+                loading(false);
+                m.redraw();
+            }).catch(function (err) {
+                if (parsedErrors) {
+                    parsedErrors.resetFieldErrors();
+                }
+                parsedErrors = userAboutVM.mapRailsErrors(err.errors_json);
+                errors('Error updating information. ');
+
+                showError(true);
+                loading(false);
+                m.redraw();
+            });
+        },
+            removeLinks = [],
+            addLink = function addLink() {
+            return fields.links().push({
+                link: ''
+            });
+        },
+            removeLink = function removeLink(linkId, idx) {
+            return function () {
+                fields.links()[idx]._destroy = true;
+                return false;
+            };
+        },
+            linkAttributes = function linkAttributes() {
+            return _$1.reduce(fields.links(), function (memo, item, index) {
+                memo[index.toString()] = item;
+                return memo;
+            }, {});
+        },
+            validateEmailConfirmation = function validateEmailConfirmation() {
+            if (fields.email() !== fields.email_confirmation()) {
+                emailHasError(true);
+            } else {
+                emailHasError(false);
+            }
+            return !emailHasError();
+        },
+            validatePassword = function validatePassword() {
+            var pass = String(fields.password());
+            if (pass.length > 0 && pass.length <= 5) {
+                passwordHasError(true);
+            }
+
+            return !passwordHasError();
+        },
+            setDeleteForm = function setDeleteForm(el, isInit) {
+            if (!isInit) {
+                deleteUser = function deleteUser() {
+                    return el.submit();
+                };
+            }
+        },
+            deleteAccount = function deleteAccount() {
+            if (window.confirm('Are you sure you want to deactivate your account?')) {
+                deleteUser();
+            }
+
+            return false;
+        },
+            onSubmit = function onSubmit(e) {
+            e.preventDefault();
+            if (!validateEmailConfirmation()) {
+                errors('Email confirmation is incorrect.');
+                showError(true);
+            } else if (!validatePassword()) {
+                errors('New password is incorrect.');
+                showError(true);
+            } else {
+                updateUser();
+            }
+            return false;
+        };
+        // Temporary fix for the menu selection bug. Should be fixed/removed as soon as we route all tabs from mithril.
+        setTimeout(m.redraw, 0);
+
+        return {
+            removeLinks: removeLinks,
+            removeLink: removeLink,
+            addLink: addLink,
+            fields: fields,
+            loading: loading,
+            showSuccess: showSuccess,
+            showError: showError,
+            errors: errors,
+            uploading: uploading,
+            onSubmit: onSubmit,
+            emailHasError: emailHasError,
+            showEmailForm: showEmailForm,
+            validateEmailConfirmation: validateEmailConfirmation,
+            passwordHasError: passwordHasError,
+            validatePassword: validatePassword,
+            deleteAccount: deleteAccount,
+            setDeleteForm: setDeleteForm,
+            parsedErrors: parsedErrors
+        };
+    },
+    view: function view(ctrl, args) {
+        var user = args.user || {},
+            fields = ctrl.fields;
+        return m('#about-tab.content', [ctrl.showSuccess() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
+            message: 'Your information has been updated'
+        }) : '', ctrl.showError() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
+            message: m.trust(ctrl.errors()),
+            error: true
+        }) : '', m('form.simple_form.w-form', {
+            onsubmit: ctrl.onSubmit
+        }, [m('input[name="utf8"][type="hidden"][value="✓"]'), m('input[name="_method"][type="hidden"][value="patch"]'), m('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m('div', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', [!user.is_admin ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', 'Your profile address'), m('label.field-label.fontsize-smallest.fontcolor-secondary', 'Your public profile may have a custom URL. Choose an easy to save!    ')]), m('.w-col.w-col-7', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', m('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
+            name: 'user[permalink]',
+            value: fields.permalink(),
+            onchange: m.withAttr('value', fields.permalink)
+        })), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover', m('.fontcolor-secondary.fontsize-smaller', '  .myjvn.com'))]))]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Email'), m('.fontsize-small.u-marginbottom-30', 'Keep this email updated as it is the channel of communication between you, the JVN team and the team of projects you have supported. '), m('.fontsize-base.u-marginbottom-40', [m('span.fontweight-semibold.card.u-radius', user.email), m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
+            onclick: function onclick() {
+                ctrl.showEmailForm.toggle();
+            }
+        }, 'Change e-mail')]), m((ctrl.showEmailForm() ? '' : '.w-hidden') + '.u-marginbottom-20.w-row[id=\'email_update_form\']', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'New email'), m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
+            class: ctrl.emailHasError() ? 'error' : '',
+            value: fields.email(),
+            onfocus: function onfocus() {
+                return ctrl.emailHasError(false);
+            },
+            onchange: m.withAttr('value', fields.email)
+        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', 'Confirm new email'), m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
+            class: ctrl.emailHasError() ? 'error' : '',
+            value: fields.email_confirmation(),
+            onfocus: function onfocus() {
+                return ctrl.emailHasError(false);
+            },
+            onblur: ctrl.validateEmailConfirmation,
+            onchange: m.withAttr('value', fields.email_confirmation)
+        })]), ctrl.emailHasError() ? m(inlineError, {
+            message: 'Email confirmation is incorrect.'
+        }) : ''])]), m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Name in public profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', 'This is the name that users will see on your profile.')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[id="user_public_name"][type="text"]', {
+            name: 'user[public_name]',
+            class: ctrl.parsedErrors.hasError('public_name') ? 'error' : false,
+            value: fields.public_name(),
+            onchange: m.withAttr('value', fields.public_name)
+        }), ctrl.parsedErrors.inlineError('public_name'))]), m('.w-form', [m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Profile picture'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  This image will be used as your profile thumbnail (PNG, JPG size 280x280)')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_uploaded_image.field_with_hint', [m('label.field-label'), m('span.hint', m('img[alt="User avatar"][src="' + fields.uploaded_image() + '"]')), m('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', {
+            name: 'user[uploaded_image]',
+            class: ctrl.parsedErrors.hasError('uploaded_image') ? 'error' : false
+        }), ctrl.parsedErrors.inlineError('uploaded_image')]))]), args.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Profile Cover Image'), m('label.field-label.fontsize-smallest.fontcolor-secondary', '  This image will be used as the background of your public profile header (PNG or JPG). If you do not submit any images here, we will use your profile image as an alternative.')]), m('.w-col.w-col-4.w-sub-col', m('.input.file.optional.user_cover_image', [m('label.field-label'), m('span.hint', user.profile_cover_image ? m('img', {
+            src: fields.cover_image()
+        }) : ''), m('input.file.optional.w-input.text-field[id="user_cover_image"][type="file"]', {
+            name: 'user[cover_image]'
+        })]))])]), m('.w-row', m('.w-col', m('.card.card-terciary.u-marginbottom-30', [m('label.field-label.fontweight-semibold', 'About'), m('label.field-label.fontsize-smallest.fontcolor-secondary.u-marginbottom-20', 'Talk about yourself and try to provide the most relevant information so visitors can get to know you better. '), m('.w-form', m('.preview-container.u-marginbottom-40', {
+            class: ctrl.parsedErrors.hasError('about_html') ? 'error' : false
+        }, h.redactor('user[about_html]', fields.about_html)), ctrl.parsedErrors.inlineError('about_html'))]))), m('.w-form.card.card-terciary.u-marginbottom-30', [m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Facebook profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', ' Paste your profile link')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
+            name: 'user[facebook_link]',
+            value: fields.facebook_link(),
+            onchange: m.withAttr('value', fields.facebook_link)
+        }))]), m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', '  Twitter profile'), m('label.field-label.fontsize-smallest.fontcolor-secondary', ' Paste your profile link')]), m('.w-col.w-col-7', m('input.string.optional.w-input.text-field.positive[type="text"]', {
+            name: 'user[twitter]',
+            value: fields.twitter(),
+            onchange: m.withAttr('value', fields.twitter)
+        }))])]), m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold[for="name-8"]', ' Presence on the internet'), m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')]), m('.w-col.w-col-7', [m('.w-row', [fields.links() && fields.links().length <= 0 ? '' : m('.link', _$1.map(fields.links(), function (link, idx) {
+            var toRemove = link._destroy;
+
+            return m('div', {
+                key: idx,
+                class: toRemove ? 'w-hidden' : 'none'
+            }, [m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', m('input.string.w-input.text-field.w-input.text-field][type="text"][value="' + link.link + '"]', {
+                class: link.link === '' ? 'positive' : 'optional',
+                name: 'user[links_attributes][' + idx + '][link]',
+                onchange: m.withAttr('value', function (val) {
+                    return fields.links()[idx].link = val;
+                })
+            })), m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [m('a.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border', {
+                onclick: ctrl.removeLink(link.id, idx)
+            })])]);
+        }))]), m('.w-row', [m('.w-col.w-col-6.w-col-push-6', m('a.btn.btn-small.btn-terciary', {
+            onclick: ctrl.addLink
+        }, m('span.translation_missing', 'Add Link')))])])])), args.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontsize-base.fontweight-semibold', 'Change my password'), m('.fontsize-small.u-marginbottom-20', 'In order for the password to be changed you must confirm your current password.'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', ' current password'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_current_password\'][name=\'user[current_password]\'][type=\'password\']', {
+            value: fields.current_password(),
+            onchange: m.withAttr('value', fields.current_password)
+        })]), m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold', ' New password'), m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
+            class: ctrl.passwordHasError() ? 'error' : '',
+            value: fields.password(),
+            onfocus: function onfocus() {
+                return ctrl.passwordHasError(false);
+            },
+            onblur: ctrl.validatePassword,
+            onchange: m.withAttr('value', fields.password)
+        }), !ctrl.passwordHasError() ? '' : m(inlineError, {
+            message: 'Your new password must be at least 6 characters.'
+        })])])])), args.hideDisableAcc || user.total_published_projects > 0 ? '' : m('.w-form.card.card-terciary.u-marginbottom-30', m('.w-row.u-marginbottom-10', [m('.fontweight-semibold.fontsize-smaller', 'Disable my account'), m('.fontsize-smallest', 'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'), m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '\'][rel=\'nofollow\']', {
+            onclick: ctrl.deleteAccount
+        }, 'Disable my Catarse account'), m('form.w-hidden', {
+            action: '/en/users/' + user.id,
+            method: 'post',
+            config: ctrl.setDeleteForm
+        }, [m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')])]))]))), m(projectEditSaveBtn, {
+            loading: ctrl.loading,
+            onSubmit: ctrl.onSubmit
+        }))])]);
+    }
+};
+
+var I18nScope$23 = _$1.partial(h.i18nScope, 'payment.state');
+
+var userContributedBox = {
+    controller: function controller() {
+        var toggleDelivery = function toggleDelivery(projectId, contribution) {
+            userVM.toggleDelivery(projectId, contribution).then(function () {
+                var lastStatus = contribution.reward_sent_at ? 'delivered' : 'undelivered';
+                contribution.delivery_status = contribution.delivery_status == 'received' ? lastStatus : 'received'; // so we don't have to reload the page
+            });
+        };
+
+        return {
+            toggleAnonymous: userVM.toggleAnonymous,
+            toggleDelivery: toggleDelivery
+        };
+    },
+    view: function view(ctrl, args) {
+        var collection = args.collection,
+            pagination = args.pagination,
+            title = args.title;
+
+        return !_$1.isEmpty(collection) ? m('.section-one-column.u-marginbottom-30', [m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center', title), m('.w-row.w-hidden-small.w-hidden-tiny.card.card-secondary', [m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', 'Projects I supported')), m('.w-col.w-col-2', m('.fontsize-small.fontweight-semibold', 'Value of support')), m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', 'Support Status')), m('.w-col.w-col-4', m('.fontsize-small.fontweight-semibold', 'Reward'))]), _$1.map(collection, function (contribution) {
+            return m('.w-row.card', [m('.w-col.w-col-3', m('.w-row', [m('.w-col.w-col-4.u-marginbottom-10', m('a[href=\'/' + contribution.permalink + '\']', m('img.thumb-project.u-radius[alt=\'' + contribution.project_name + '\'][src=\'' + contribution.project_image + '\'][width=\'50\']'))), m('.w-col.w-col-8', m('.fontsize-small.fontweight-semibold', m('a.alt-link[href=\'/' + contribution.permalink + '\']', contribution.project_name)))])), m('.w-col.w-col-2.u-marginbottom-10', m('.fontsize-base.inline-block', [m('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Value of support'), ' Rs ' + contribution.value])), m('.w-col.w-col-3.u-marginbottom-10', [m('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold', 'Status'), m('.fontsize-smaller.fontweight-semibold', [m('.lineheight-tighter'), m('span.fa.fa-circle.fontsize-smallest.' + (contribution.state === 'paid' ? 'text-success' : contribution.state === 'pending' ? 'text-waiting' : 'text-error'), m.trust('&nbsp;')), I18n$1.t(contribution.state, I18nScope$23({
+                date: h.momentify(contribution[contribution.state + '_at'])
+            }))]), m('.fontsize-smallest', contribution.installments > 1 ? contribution.installments + ' x Rs ' + contribution.installment_value + ' ' : '', contribution.payment_method === 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito'), contributionVM.canShowReceipt(contribution) ? m('a.btn.btn-inline.btn-small.u-margintop-10.btn-terciary[href=\'https://www.catarse.me/pt/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/receipt\'][target=\'__blank\']', 'View Receipt') : '', contributionVM.canShowSlip(contribution) ? m('a.btn.btn-inline.btn-small.u-margintop-10[href=\'' + contribution.gateway_data.boleto_url + '\'][target=\'__blank\']', 'Imprimir boleto') : '', contributionVM.canGenerateSlip(contribution) ? m('a.btn.btn-inline.btn-small.u-margintop-10[href=\'https://www.catarse.me/pt/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/second_slip\'][target=\'__blank\']', 'Gerar 2a via') : '', m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [m('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']' + (contribution.anonymous ? '[checked=\'checked\']' : '') + '[value=\'1\']', {
+                onclick: function onclick() {
+                    return ctrl.toggleAnonymous(contribution.project_id, contribution);
+                }
+            }), m('label.w-form-label', 'I want my support not to be public')])]), m('.w-col.w-col-3', m('.fontsize-smallest', [m('span.w-hidden-main.w-hidden-medium.fontweight-semibold', 'Reward'), contribution.reward_id ? [m('.fontsize-smallest.fontweight-semibold', contribution.reward_title), m('.fontsize-smallest.fontcolor-secondary', m.trust(h.simpleFormat(contribution.reward_description)))] : ' You have not selected a reward']), contribution.deliver_at ? m('.fontsize-smallest.lineheight-looser', [m('span.fontweight-semibold', 'Estimated delivery: '), h.momentify(contribution.deliver_at, 'MMMM/YYYY')]) : '', contributionVM.canBeDelivered(contribution) ? m('.fontsize-smallest', [m('span.fontweight-semibold', 'Delivery status:'), m.trust('&nbsp;'), h.contributionStatusBadge(contribution)]) : ''), m(rewardReceiver, {
+                contribution: contribution
+            })]);
+        }), m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, {
+            collection: pagination,
+            cssClass: '.w-col-push-5'
+        })])]) : m('div', '');
+    }
+};
+
+var userPrivateContributed = {
+    controller: function controller(args) {
+        var user_id = args.userId,
+            onlinePages = postgrest$1.paginationVM(models.userContribution),
+            successfulPages = postgrest$1.paginationVM(models.userContribution),
+            failedPages = postgrest$1.paginationVM(models.userContribution),
+            error = m.prop(false),
+            loader = m.prop(true),
+            handleError = function handleError() {
+            error(true);
+            loader(false);
+            m.redraw();
+        },
+            contextVM = postgrest$1.filtersVM({
+            user_id: 'eq',
+            state: 'in',
+            project_state: 'in'
+        });
+
+        models.userContribution.pageSize(9);
+        contextVM.user_id(user_id).order({
+            created_at: 'desc'
+        }).state(['refunded', 'pending_refund', 'paid', 'refused', 'pending']);
+
+        contextVM.project_state(['online', 'waiting_funds']);
+        onlinePages.firstPage(contextVM.parameters()).then(function () {
+            loader(false);
+        }).catch(handleError);
+
+        contextVM.project_state(['failed']);
+        failedPages.firstPage(contextVM.parameters()).then(function () {
+            loader(false);
+        }).catch(handleError);
+
+        contextVM.project_state(['successful']).state(['paid', 'refunded', 'pending_refund']);
+        successfulPages.firstPage(contextVM.parameters()).then(function () {
+            loader(false);
+        }).catch(handleError);
+
+        return {
+            onlinePages: onlinePages,
+            successfulPages: successfulPages,
+            failedPages: failedPages,
+            error: error,
+            loader: loader
+        };
+    },
+    view: function view(ctrl, args) {
+        var onlineCollection = ctrl.onlinePages.collection(),
+            successfulCollection = ctrl.successfulPages.collection(),
+            failedCollection = ctrl.failedPages.collection();
+
+        return m('.content[id=\'private-contributed-tab\']', ctrl.error() ? m.component(inlineError, {
+            message: 'Error loading projects.'
+        }) : ctrl.loader() ? h.loader() : _$1.isEmpty(onlineCollection) && _$1.isEmpty(successfulCollection) && _$1.isEmpty(failedCollection) ? m('.w-container', m('.w-row.u-margintop-30.u-text-center', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.fontsize-large.u-marginbottom-30', ['You Have Not Backed Any Campaign']), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', m('a.btn.btn-large[href=\'/en/explore\']', {
+            config: m.route,
+            onclick: function onclick() {
+                m.route('/explore');
+            }
+        }, 'SUPPORT NOW!')), m('.w-col.w-col-3')])]), m('.w-col.w-col-3')])) : [m.component(userContributedBox, {
+            title: 'Projects in progress',
+            collection: onlineCollection,
+            pagination: ctrl.onlinePages
+        }), m.component(userContributedBox, {
+            title: 'Successful Projects',
+            collection: successfulCollection,
+            pagination: ctrl.successfulPages
+        }), m.component(userContributedBox, {
+            title: 'Non-funded projects',
+            collection: failedCollection,
+            pagination: ctrl.failedPages
+        })]);
+    }
+};
+
+var UserOwnerBox = {
+    view: function view(ctrl, args) {
+        var project = args.project,
+            user = args.user;
+
+        return m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Supporter data ' : 'User data ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + '"]', 'No, and you?')]), m('.fontsize-base.fontweight-semibold', user.name), m('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]);
+    }
+};
+
+var e$2 = generateErrorInstance();
+
+var fields$1 = {
+    owner_document: m.prop(''),
+    country_id: m.prop(''),
+    street: m.prop(''),
+    number: m.prop(''),
+    city: m.prop(''),
+    zipcode: m.prop(''),
+    complement: m.prop(''),
+    neighbourhood: m.prop(''),
+    state: m.prop(''),
+    phonenumber: m.prop(''),
+    name: m.prop(''),
+    agency: m.prop(''),
+    bank_id: m.prop(''),
+    agency_digit: m.prop(''),
+    account: m.prop(''),
+    account_digit: m.prop(''),
+    bank_account_id: m.prop(''),
+    state_inscription: m.prop(''),
+    birth_date: m.prop(''),
+    account_type: m.prop(''),
+    bank_account_type: m.prop('')
+};
+
+var mapRailsErrors$1 = function mapRailsErrors(rails_errors) {
+    var parsedErrors = void 0;
+    try {
+        parsedErrors = JSON.parse(rails_errors);
+    } catch (e$2) {
+        parsedErrors = {};
+    }
+    var extractAndSetErrorMsg = function extractAndSetErrorMsg(label, fieldArray) {
+        var value = _$1.first(_$1.compact(_$1.map(fieldArray, function (field) {
+            return _$1.first(parsedErrors[field]);
+        })));
+
+        if (value) {
+            e$2(label, value);
+            e$2.inlineError(label, true);
+        }
+    };
+
+    extractAndSetErrorMsg("owner_document", ["user.cpf", "cpf"]);
+    extractAndSetErrorMsg("country_id", ["user.country_id", "country_id"]);
+    extractAndSetErrorMsg("street", ["user.address_street", "address_street"]);
+    extractAndSetErrorMsg("number", ["user.address_number", "address_number"]);
+    extractAndSetErrorMsg("city", ["user.address_city", "address_city"]);
+    extractAndSetErrorMsg("zipcode", ["user.address_zip_code", "address_zip_code"]);
+    extractAndSetErrorMsg("complement", ["user.address_complement", "address_complement"]);
+    extractAndSetErrorMsg("neighbourhood", ["user.address_neighbourhood", "address_neighbourhood"]);
+    extractAndSetErrorMsg("state", ["user.address_state", "address_state"]);
+    extractAndSetErrorMsg("phonenumber", ["user.phone_number", "phone_number"]);
+    extractAndSetErrorMsg("name", ["user.name", "name"]);
+    extractAndSetErrorMsg("agency", ["user.bank_account.agency", "bank_account.agency"]);
+    extractAndSetErrorMsg("agency_digit", ["user.bank_account.agency_digit", "bank_account.agency_digit"]);
+    extractAndSetErrorMsg("account", ["user.bank_account.account", "bank_account.account"]);
+    extractAndSetErrorMsg("account_digit", ["user.bank_account.account_digit", "bank_account.account_digit"]);
+    extractAndSetErrorMsg("bank_account_type", ["user.bank_account.account_type", "bank_account.account_type"]);
+    extractAndSetErrorMsg("bank_id", ["user.bank_account.bank", "bank_account.bank"]);
+    extractAndSetErrorMsg("birth_date", ["user.birth_date", "birth_date"]);
+    extractAndSetErrorMsg("account_type", ["user.account_type", "account_type"]);
+
+    return e$2;
+};
+
+var userSettingsVM = {
+    fields: fields$1,
+    mapRailsErrors: mapRailsErrors$1
+};
+
+var userSettings = {
+    controller: function controller(args) {
+        var parsedErrors = userSettingsVM.mapRailsErrors(args.rails_errors);
+        var deleteFormSubmit = void 0;
+        var user = args.user,
+            bankAccount = m.prop({}),
+            fields = {
+            owner_document: m.prop(user.owner_document || ''),
+            country_id: m.prop(user.address.country_id || 36),
+            street: m.prop(user.address.street || ''),
+            number: m.prop(user.address.number || ''),
+            city: m.prop(user.address.city || ''),
+            zipcode: m.prop(user.address.zipcode || ''),
+            complement: m.prop(user.address.complement || ''),
+            neighbourhood: m.prop(user.address.neighbourhood || ''),
+            state: m.prop(user.address.state || ''),
+            phonenumber: m.prop(user.address.phonenumber || ''),
+            name: m.prop(user.name || ''),
+            agency: m.prop(''),
+            bank_id: m.prop(''),
+            agency_digit: m.prop(''),
+            account: m.prop(''),
+            account_digit: m.prop(''),
+            bank_account_id: m.prop(''),
+            state_inscription: m.prop(''),
+            birth_date: m.prop(user.birth_date ? h.momentify(user.birth_date) : ''),
+            account_type: m.prop(user.account_type || ''),
+            bank_account_type: m.prop('')
+        },
+            loading = m.prop(false),
+            user_id = args.userId,
+            error = m.prop(''),
+            countries = m.prop(),
+            states = m.prop(),
+            loader = m.prop(true),
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
+            statesLoader = postgrest$1.loader(models.state.getPageOptions()),
+            phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
+            documentMask = _$1.partial(h.mask, '999.999.999-99'),
+            documentCompanyMask = _$1.partial(h.mask, '99.999.999/9999-99'),
+            zipcodeMask = _$1.partial(h.mask, '99999-999'),
+            birthDayMask = _$1.partial(h.mask, '99/99/9999'),
+            creditCards = m.prop(),
+            toDeleteCard = m.prop(-1),
+            bankInput = m.prop(''),
+            bankCode = m.prop('-1'),
+            banks = m.prop(),
+            banksLoader = postgrest$1.loader(models.bank.getPageOptions()),
+            showOtherBanks = h.toggleProp(false, true),
+            showOtherBanksInput = m.prop(false),
+            popularBanks = [{
+            id: '51',
+            code: '001',
+            name: 'Banco do Brasil S.A.'
+        }, {
+            id: '131',
+            code: '341',
+            name: 'Itaú Unibanco S.A.'
+        }, {
+            id: '122',
+            code: '104',
+            name: 'Caixa Econômica Federal'
+        }, {
+            id: '104',
+            code: '033',
+            name: 'Banco Santander  (Brasil)  S.A.'
+        }, {
+            id: '127',
+            code: '399',
+            name: 'HSBC Bank Brasil S.A. - Banco Múltiplo'
+        }, {
+            id: '23',
+            code: '237',
+            name: 'Banco Bradesco S.A.'
+        }],
+            deleteCard = function deleteCard(id) {
+            return function () {
+                toDeleteCard(id);
+                // We must redraw here to update the action output of the hidden form on the DOM.
+                m.redraw(true);
+                deleteFormSubmit();
+                return false;
+            };
+        },
+            setCardDeletionForm = function setCardDeletionForm(el, isInit) {
+            if (!isInit) {
+                deleteFormSubmit = function deleteFormSubmit() {
+                    return el.submit();
+                };
+            }
+        },
+            updateUserData = function updateUserData(user_id) {
+            var userData = {
+                country_id: fields.country_id(),
+                address_street: fields.street(),
+                address_number: fields.number(),
+                address_city: fields.city(),
+                address_zip_code: fields.zipcode(),
+                address_complement: fields.complement(),
+                address_state: fields.state(),
+                address_neighbourhood: fields.neighbourhood(),
+                phone_number: fields.phonenumber(),
+                cpf: fields.owner_document(),
+                name: fields.name(),
+                account_type: fields.account_type(),
+                birth_date: fields.birth_date()
+            };
+
+            if (args.publishingUserSettings) {
+                userData.publishing_user_settings = true;
+            }
+
+            if (args.publishingUserSettings || !_$1.isEmpty(fields.account()) || !_$1.isEmpty(fields.account_digit()) || !_$1.isEmpty(bankCode()) && bankCode() != '-1' || !_$1.isEmpty(fields.agency())) {
+                userData.bank_account_attributes = {
+                    owner_name: fields.name(),
+                    owner_document: fields.owner_document(),
+                    bank_id: bankCode(),
+                    input_bank_number: bankInput(),
+                    agency_digit: fields.agency_digit(),
+                    agency: fields.agency(),
+                    account: fields.account(),
+                    account_digit: fields.account_digit(),
+                    account_type: fields.bank_account_type()
+                };
+
+                if (fields.bank_account_id()) {
+                    userData.bank_account_attributes.id = fields.bank_account_id().toString();
+                }
+            }
+
+            return m.request({
+                method: 'PUT',
+                url: '/users/' + user_id + '.json',
+                data: {
+                    user: userData
+                },
+                config: h.setCsrfToken
+            }).then(function () {
+                if (parsedErrors) {
+                    parsedErrors.resetFieldErrors();
+                }
+                loading(false);
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+            }).catch(function (err) {
+                if (parsedErrors) {
+                    parsedErrors.resetFieldErrors();
+                }
+                parsedErrors = userSettingsVM.mapRailsErrors(err.errors_json);
+                error('Erro ao atualizar informações.');
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+        },
+            onSubmit = function onSubmit() {
+            loading(true);
+            updateUserData(user_id);
+
+            m.redraw();
+            return false;
+        },
+            applyZipcodeMask = _$1.compose(fields.zipcode, zipcodeMask),
+            applyBirthDateMask = _$1.compose(fields.birth_date, birthDayMask),
+            applyPhoneMask = _$1.compose(fields.phonenumber, phoneMask),
+            applyDocumentMask = function applyDocumentMask(value) {
+            if (fields.account_type() != 'pf') {
+                fields.owner_document(documentCompanyMask(value));
+            } else {
+                fields.owner_document(documentMask(value));
+            }
+        },
+            handleError = function handleError() {
+            error(true);
+            loader(false);
+            m.redraw();
+        };
+
+        userVM.getUserBankAccount(user_id).then(function (data) {
+            if (!_$1.isEmpty(_$1.first(data))) {
+                bankAccount(_$1.first(data));
+                fields.bank_account_id(bankAccount().bank_account_id);
+                fields.account(bankAccount().account);
+                fields.account_digit(bankAccount().account_digit);
+                fields.agency(bankAccount().agency);
+                fields.agency_digit(bankAccount().agency_digit);
+                fields.bank_id(bankAccount().bank_id);
+                fields.bank_account_type(bankAccount().account_type);
+                bankCode(bankAccount().bank_id);
+            } else {
+                fields.bank_account_type('conta_corrente');
+            }
+        }).catch(handleError);
+
+        banksLoader.load().then(banks).catch(handleError);
+        userVM.getUserCreditCards(args.userId).then(creditCards).catch(handleError);
+        countriesLoader.load().then(function (data) {
+            return countries(_$1.sortBy(data, 'name_en'));
+        });
+        statesLoader.load().then(states);
+
+        if (parsedErrors.hasError('country_id')) {
+            parsedErrors.inlineError('country_id', false);
+        }
+
+        return {
+            handleError: handleError,
+            applyDocumentMask: applyDocumentMask,
+            applyZipcodeMask: applyZipcodeMask,
+            applyPhoneMask: applyPhoneMask,
+            countries: countries,
+            states: states,
+            fields: fields,
+            loader: loader,
+            showSuccess: showSuccess,
+            showError: showError,
+            user: user,
+            onSubmit: onSubmit,
+            error: error,
+            creditCards: creditCards,
+            deleteCard: deleteCard,
+            toDeleteCard: toDeleteCard,
+            setCardDeletionForm: setCardDeletionForm,
+            bankAccount: bankAccount,
+            bankInput: bankInput,
+            banks: banks,
+            showOtherBanks: showOtherBanks,
+            showOtherBanksInput: showOtherBanksInput,
+            bankCode: bankCode,
+            popularBanks: popularBanks,
+            applyBirthDateMask: applyBirthDateMask,
+            loading: loading,
+            parsedErrors: parsedErrors
+        };
+    },
+    view: function view(ctrl, args) {
+        var user = ctrl.user,
+            bankAccount = ctrl.bankAccount(),
+            fields = ctrl.fields,
+            hasContributedOrPublished = user.total_contributed_projects >= 1 || user.total_published_projects >= 1,
+            disableFields = user.is_admin_role ? false : hasContributedOrPublished && !_$1.isEmpty(user.name) && !_$1.isEmpty(user.owner_document);
+
+        return m('[id=\'settings-tab\']', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: 'Your information has been updated',
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: m.trust(ctrl.error()),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '', m('form.w-form', {
+            onsubmit: ctrl.onSubmit
+        }, [m('div', [m('.w-container', m('.w-col.w-col-10.w-col-push-1',
+        // ( _.isEmpty(fields.name()) && _.isEmpty(fields.owner_document()) ? '' : m(UserOwnerBox, {user: user}) ),
+        m('.w-form.card.card-terciary', [m('.fontsize-base.fontweight-semibold', 'Dados financeiros'), m('.fontsize-small.u-marginbottom-20', [m.trust('Essa serão as informações que utilizaremos para transferências bancárias. <strong>Importante:</strong> Nome completo/Razão social e CPF/CNPJ não poderão ser modificados após a publicação de um projeto ou a confirmação de um apoio.')]), m('.divider.u-marginbottom-20'), m('.w-row', [m('.w-col.w-col-6.w-sub-col', m('.input.select.required.user_bank_account_bank_id', [m('select.select.required.w-input.text-field.bank-select.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_bank_id\']', {
+            name: 'user[bank_account_attributes][bank_id]',
+            onchange: m.withAttr('value', fields.account_type),
+            disabled: disableFields
+        }, [m('option[value=\'pf\']', {
+            selected: fields.account_type() === 'pf'
+        }, 'Pessoa Física'), m('option[value=\'pj\']', {
+            selected: fields.account_type() === 'pj'
+        }, 'Pessoa Jurídica'), m('option[value=\'mei\']', {
+            selected: fields.account_type() === 'mei'
+        }, 'Pessoa Jurídica (Micro Empreendedor Individual - MEI)')])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', 'Nome completo' + (fields.account_type() == 'pf' ? '' : '/Razão Social')), m('input.string.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
+            value: fields.name(),
+            name: 'user[name]',
+            class: ctrl.parsedErrors.hasError('name') ? 'error' : false,
+            onchange: m.withAttr('value', fields.name),
+            disabled: disableFields
+        }), ctrl.parsedErrors.inlineError('name')]), m('.w-col.w-col-6', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', '' + (fields.account_type() == 'pf' ? 'CPF' : 'CNPJ')), m('input.string.tel.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+            value: fields.owner_document(),
+            class: ctrl.parsedErrors.hasError('owner_document') ? 'error' : false,
+            disabled: disableFields,
+            name: 'user[cpf]',
+            onchange: m.withAttr('value', ctrl.applyDocumentMask),
+            onkeyup: m.withAttr('value', ctrl.applyDocumentMask)
+        }), ctrl.parsedErrors.inlineError('owner_document')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', fields.account_type() == 'pf' ? [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'Data de nascimento'), m('input.string.tel.required.w-input.text-field.positive' + (disableFields && !_$1.isEmpty(user.birth_date) ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+            value: fields.birth_date(),
+            name: 'user[birth_date]',
+            class: ctrl.parsedErrors.hasError('birth_date') ? 'error' : false,
+            disabled: disableFields && !_$1.isEmpty(user.birth_date),
+            onchange: m.withAttr('value', ctrl.applyBirthDateMask),
+            onkeyup: m.withAttr('value', ctrl.applyBirthDateMask)
+        }), ctrl.parsedErrors.inlineError('birth_date')] : [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', 'Inscrição Estadual'), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+            value: fields.state_inscription(),
+            class: ctrl.parsedErrors.hasError('state_inscription') ? 'error' : false,
+            name: 'user[state_inscription]',
+            onchange: m.withAttr('value', fields.state_inscription)
+        }), ctrl.parsedErrors.inlineError('state_inscription')])])])]), m('.w-row', [m('.w-col.w-col-6.w-sub-col' + (ctrl.showOtherBanksInput() ? '.w-hidden' : '') + '[id=\'bank_select\']', m('.input.select.required.user_bank_account_bank_id', [m('label.field-label', 'Banco'), m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
+            name: 'user[bank_account_attributes][bank_id]',
+            class: ctrl.parsedErrors.hasError('bank_id') ? 'error' : false,
+            onchange: function onchange(e) {
+                m.withAttr('value', ctrl.bankCode)(e);
+                ctrl.showOtherBanksInput(ctrl.bankCode() == '0');
+            }
+        }, [m('option[value=\'\']', {
+            selected: fields.bank_id() === ''
+        }), _$1.map(ctrl.popularBanks, function (bank) {
+            return fields.bank_id() != bank.id ? m('option[value=\'' + bank.id + '\']', {
+                selected: fields.bank_id() == bank.id
+            }, bank.code + ' . ' + bank.name) : '';
+        }), fields.bank_id() === '' || _$1.find(ctrl.popularBanks, function (bank) {
+            return bank.id === fields.bank_id();
+        }) ? '' : m('option[value=\'' + fields.bank_id() + '\']', {
+            selected: true
+        }, bankAccount.bank_code + ' . ' + bankAccount.bank_name), m('option[value=\'0\']', 'Outro')]), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']', ' Selecione um banco'), ctrl.parsedErrors.inlineError('bank_id')])), ctrl.showOtherBanksInput() ? m('.w-col.w-col-6.w-sub-col', m('.w-row.u-marginbottom-20[id=\'bank_search\']', m('.w-col.w-col-12', [m('.input.string.optional.user_bank_account_input_bank_number', [m('label.field-label', 'Número do banco (3 números)'), m('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
+            name: 'user[bank_account_attributes][input_bank_number]',
+            value: ctrl.bankInput(),
+            onchange: m.withAttr('value', ctrl.bankInput)
+        }), m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_input_bank_number\']', ' Número do banco inválido')]), m('a.w-hidden-small.w-hidden-tiny.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
+            onclick: ctrl.showOtherBanks.toggle
+        }, ['Busca por nome  ', m.trust('&nbsp;'), m.trust('&gt;')]), m('a.w-hidden-main.w-hidden-medium.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
+            onclick: ctrl.showOtherBanks.toggle
+        }, ['Busca por nome  ', m.trust('&nbsp;'), m.trust('&gt;')])]))) : '', ctrl.showOtherBanks() ? m('.w-row[id=\'bank_search_list\']', m('.w-col.w-col-12', m('.select-bank-list[data-ix=\'height-0-on-load\']', {
+            style: {
+                height: '395px'
+            }
+        }, m('.card.card-terciary', [m('.fontsize-small.fontweight-semibold.u-marginbottom-10.u-text-center', 'Selecione o seu banco abaixo'), m('.fontsize-smaller', [m('.w-row.card.card-secondary.fontweight-semibold', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('div', 'Número')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('div', 'Nome'))]), !_$1.isEmpty(ctrl.banks()) ? _$1.map(ctrl.banks(), function (bank) {
+            return m('.w-row.card.fontsize-smallest', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('a.link-hidden.bank-resource-link[data-code=\'' + bank.code + '\'][data-id=\'' + bank.id + '\'][href=\'javascript:void(0)\']', {
+                onclick: function onclick() {
+                    ctrl.bankInput(bank.code);
+                    ctrl.showOtherBanks.toggle();
+                }
+            }, bank.code)), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('a.link-hidden.bank-resource-link[data-code=\'' + bank.code + '\'][data-id=\'' + bank.id + '\'][href=\'javascript:void(0)\']', {
+                onclick: function onclick() {
+                    ctrl.bankInput(bank.code);
+                    ctrl.showOtherBanks.toggle();
+                }
+            }, bank.code + ' . ' + bank.name))]);
+        }) : ''])])))) : '', m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency\']', 'Agência'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_agency\'][type=\'text\']', {
+            value: fields.agency(),
+            class: ctrl.parsedErrors.hasError('agency') ? 'error' : false,
+            name: 'user[bank_account_attributes][agency]',
+            onchange: m.withAttr('value', fields.agency)
+        }), ctrl.parsedErrors.inlineError('agency')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']', 'Dígito agência'), m('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
+            value: fields.agency_digit(),
+            class: ctrl.parsedErrors.hasError('agency_digit') ? 'error' : false,
+            name: 'user[bank_account_attributes][agency_digit]',
+            onchange: m.withAttr('value', fields.agency_digit)
+        }), ctrl.parsedErrors.inlineError('agency_digit')])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.field-label.fontweight-semibold', 'Tipo de conta'), m('.input.select.required.user_bank_account_account_type', [m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_account_type\']', {
+            name: 'user[bank_account_attributes][account_type]',
+            class: ctrl.parsedErrors.hasError('account_type') ? 'error' : false,
+            onchange: m.withAttr('value', fields.bank_account_type)
+        }, [m('option[value=\'conta_corrente\']', {
+            selected: fields.bank_account_type() === 'conta_corrente'
+        }, 'Conta corrente'), m('option[value=\'conta_poupanca\']', {
+            Selected: fields.bank_account_type() === 'conta_poupanca'
+        }, 'Conta poupança'), m('option[value=\'conta_corrente_conjunta\']', {
+            selected: fields.bank_account_type() === 'conta_corrente_conjunta'
+        }, 'Conta corrente conjunta'), m('option[value=\'conta_poupanca_conjunta\']', {
+            selected: fields.bank_account_type() === 'conta_poupanca_conjunta'
+        }, 'Conta poupança conjunta')]), ctrl.parsedErrors.inlineError('account_type')])]), m('.w-col.w-col-6', m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']', 'No. da conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
+            value: fields.account(),
+            class: ctrl.parsedErrors.hasError('account') ? 'error' : false,
+            onchange: m.withAttr('value', fields.account),
+            name: 'user[bank_account_attributes][account]'
+        }), ctrl.parsedErrors.inlineError('account')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']', 'Dígito conta'), m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
+            value: fields.account_digit(),
+            class: ctrl.parsedErrors.hasError('account_digit') ? 'error' : false,
+            onchange: m.withAttr('value', fields.account_digit),
+            name: 'user[bank_account_attributes][account_digit]'
+        }), ctrl.parsedErrors.inlineError('account_digit')])]))]), bankAccount.bank_account_id ? m('input[id=\'user_bank_account_attributes_id\'][type=\'hidden\']', {
+            name: 'user[bank_account_attributes][id]',
+            value: fields.bank_account_id()
+        }) : '']), m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Endereço'), m('.fontsize-small.u-marginbottom-20.u-marginbottom-20', ['Os dados abaixo serão utilizados para envio de recompensas e para emissão de Nota Fiscal, caso aplicável.']), m('.w-row', [m('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m('label.field-label', 'País'), m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
+            onchange: m.withAttr('value', fields.country_id),
+            class: ctrl.parsedErrors.hasError('country_id') ? 'error' : false
+        }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
+            return m('option' + (country.id == fields.country_id() ? '[selected="selected"]' : ''), {
+                value: country.id
+            }, country.name_en);
+        }) : '']), ctrl.parsedErrors.inlineError('country_id')]), m('.w-col.w-col-6')]), m('.w-row', [m('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Endereço'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
+            value: fields.street(),
+            class: ctrl.parsedErrors.hasError('street') ? 'error' : false,
+            onchange: m.withAttr('value', fields.street)
+        }), ctrl.parsedErrors.inlineError('street')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'Número'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
+            value: fields.number(),
+            class: ctrl.parsedErrors.hasError('number') ? 'error' : false,
+            onchange: m.withAttr('value', fields.number)
+        }), ctrl.parsedErrors.inlineError('number')]), m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Complemento'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
+            value: fields.complement(),
+            class: ctrl.parsedErrors.hasError('complement') ? 'error' : false,
+            onchange: m.withAttr('value', fields.complement)
+        }), ctrl.parsedErrors.inlineError('complement')])]))]), m('.w-row', [m('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Bairro'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
+            value: fields.neighbourhood(),
+            class: ctrl.parsedErrors.hasError('neighbourhood') ? 'error' : false,
+            onchange: m.withAttr('value', fields.neighbourhood)
+        }), ctrl.parsedErrors.inlineError('neighbourhood')]), m('.input.string.optional.user_address_city.w-col.w-col-6', [m('label.field-label', 'Cidade'), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
+            value: fields.city(),
+            class: ctrl.parsedErrors.hasError('city') ? 'error' : false,
+            onchange: m.withAttr('value', fields.city)
+        }), ctrl.parsedErrors.inlineError('city')])]), m('.w-row', [m('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m('label.field-label', 'Estado'), m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
+            class: ctrl.parsedErrors.hasError('state') ? 'error' : false,
+            onchange: m.withAttr('value', fields.state)
+        }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
+            return m('option[value=\'' + state.acronym + '\']' + (state.acronym == fields.state() ? '[selected="selected"]' : ''), {
+                value: state.acronym
+            }, state.name);
+        }) : '', m('option[value=\'outro / other\']', 'Outro / Other')]), ctrl.parsedErrors.inlineError('state')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', 'CEP'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
+            value: fields.zipcode(),
+            class: ctrl.parsedErrors.hasError('zipcode') ? 'error' : false,
+            onchange: m.withAttr('value', fields.zipcode)
+        }), ctrl.parsedErrors.inlineError('zipcode')]), m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', 'Telefone'), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
+            value: fields.phonenumber(),
+            onchange: m.withAttr('value', fields.phonenumber),
+            class: ctrl.parsedErrors.hasError('phonenumber') ? 'error' : false,
+            onkeyup: m.withAttr('value', function (value) {
+                return ctrl.applyPhoneMask(value);
+            })
+        }), ctrl.parsedErrors.inlineError('phonenumber')])]))])]), args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', 'Cartões de crédito'), m('.fontsize-small.u-marginbottom-20', ['Caso algum projeto que você tenha apoiado ', m('b', 'com Cartão de Crédito'), ' não seja bem-sucedido, nós efetuaremos o reembolso ', m('b', 'automaticamente'), ' no cartão utilizado para efetuar o apoio. ']), m('.divider.u-marginbottom-20'), m('.w-row.w-hidden-tiny.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', 'Cartão')), m('.w-col.w-col-5.w-col-small-5', m('.fontweight-semibold.fontsize-small', 'Operadora')), m('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
+            return m('.w-row.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', ['XXXX XXXX XXXX', m.trust('&nbsp;'), card.last_digits])), m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold.u-marginbottom-10', card.card_brand.toUpperCase())), m('.w-col.w-col-2.w-col-small-2', m('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', {
+                onclick: ctrl.deleteCard(card.id)
+            }, 'Remover'))]);
+        }), m('form.w-hidden', {
+            action: '/en/users/' + user.id + '/credit_cards/' + ctrl.toDeleteCard(),
+            method: 'POST',
+            config: ctrl.setCardDeletionForm
+        }, [m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'), m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']')])]))), m(projectEditSaveBtn, {
+            loading: ctrl.loading,
+            onSubmit: ctrl.onSubmit
+        })])])]);
+    }
+};
+
+var userNotifications = {
+    controller: function controller(args) {
+        var contributedProjects = m.prop(),
+            projectReminders = m.prop(),
+            user_id = args.userId,
+            showNotifications = h.toggleProp(false, true),
+            error = m.prop(false);
+
+        userVM.getUserProjectReminders(user_id).then(projectReminders).catch(function (err) {
+            error(true);
+            m.redraw();
+        });
+
+        userVM.getUserContributedProjects(user_id, null).then(contributedProjects).catch(function (err) {
+            error(true);
+            m.redraw();
+        });
+
+        return {
+            projects: contributedProjects,
+            showNotifications: showNotifications,
+            projectReminders: projectReminders,
+            error: error
+        };
+    },
+    view: function view(ctrl, args) {
+        var user = args.user,
+            reminders = ctrl.projectReminders();
+        var projects_collection = ctrl.projects();
+
+        return m('[id=\'notifications-tab\']', ctrl.error() ? m.component(inlineError, {
+            message: 'Error loading page.'
+        }) : m('form.simple_form.edit_user[accept-charset=\'UTF-8\'][action=\'/en/users/' + user.id + '\'][method=\'post\'][novalidate=\'novalidate\']', [m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'), m('input[name=\'_method\'][type=\'hidden\'][value=\'patch\']'), m('input[name=\'authenticity_token\'][type=\'hidden\'][value=\'' + h.authenticityToken() + '\']'), m('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'notifications\']'), m('.w-container', [m('.w-row', m('.w-col.w-col-10.w-col-push-1', m('.w-form.card.card-terciary', [m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Newsletters:')), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[newsletter]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.newsletter ? '[checked=\'checked\']' : '') + '[id=\'user_newsletter\'][name=user[newsletter]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-base.fontweight-semibold[for=\'checkbox\']', ' JVN Newsletter (weekly)'), m('div', ['Featured Projects and Blog Posts', m.trust('&nbsp;')])]))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Projects you have supported:')), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[subscribed_to_project_posts]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.subscribed_to_project_posts ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_project_posts\'][name=user[subscribed_to_project_posts]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-base.fontweight-semibold', ' I want to receive project updates'), m('.u-marginbottom-20', m('a.alt-link[href=\'javascript:void(0);\']', {
+            onclick: ctrl.showNotifications.toggle
+        }, ' Manage notifications from ' + user.total_contributed_projects + ' projects')), ctrl.showNotifications() ? m('ul.w-list-unstyled.u-radius.card.card-secondary[id=\'notifications-box\']', [!_$1.isEmpty(projects_collection) ? _$1.map(projects_collection, function (project) {
+            return m('li', m('.w-checkbox.w-clearfix', [m('input[id=\'unsubscribes_' + project.project_id + '\'][type=\'hidden\'][value=\'\']', {
+                name: 'unsubscribes[' + project.project_id + ']'
+            }), m('input.w-checkbox-input' + (project.unsubscribed ? '' : '[checked=\'checked\']') + '[type=\'checkbox\'][value=\'1\'][id=\'user_unsubscribes_' + project.project_id + '\']', {
+                name: 'unsubscribes[' + project.project_id + ']'
+            }), m('label.w-form-label.fontsize-small', project.project_name)]));
+        }) : '']) : '']))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Social:')), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[subscribed_to_friends_contributions]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.subscribed_to_friends_contributions ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_friends_contributions\'][name=user[subscribed_to_friends_contributions]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-small', 'A friend supported or launched a project')])), m('.w-col.w-col-8', m('.w-checkbox.w-clearfix', [m('input[name=user[subscribed_to_new_followers]][type=\'hidden\'][value=\'0\']'), m('input.w-checkbox-input' + (user.subscribed_to_new_followers ? '[checked=\'checked\']' : '') + '[id=\'user_subscribed_to_new_followers\'][name=user[subscribed_to_new_followers]][type=\'checkbox\'][value=\'1\']'), m('label.w-form-label.fontsize-small', 'A friend started following me.')]))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4', m('.fontweight-semibold.fontsize-small.u-marginbottom-10', 'Project Reminders:')), m('.w-col.w-col-8', [!_$1.isEmpty(reminders) ? _$1.map(reminders, function (reminder) {
+            return m('.w-checkbox.w-clearfix', [m('input[id=\'user_reminders_' + reminder.project_id + '\'][type=\'hidden\'][value=\'false\']', {
+                name: 'user[reminders][' + reminder.project_id + ']'
+            }), m('input.w-checkbox-input[checked=\'checked\'][type=\'checkbox\'][value=\'1\'][id=\'user_reminders_' + reminder.project_id + '\']', {
+                name: 'user[reminders][' + reminder.project_id + ']'
+            }), m('label.w-form-label.fontsize-small', reminder.project_name)]);
+        }) : ''])])]))), m('.u-margintop-30', m('.w-container', m('.w-row', m('.w-col.w-col-4.w-col-push-4', m('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'Save\']')))))])]));
+    }
+};
+
+var usersEdit = {
+    controller: function controller(args) {
+        var userDetails = m.prop({}),
+            userId = args.user_id.split('-')[0],
+            hash = m.prop(window.location.hash),
+            displayTabContent = function displayTabContent(user) {
+            var tabs = {
+                '#projects': m(userCreated, {
+                    userId: userId,
+                    showDraft: true
+                }),
+                '#contributions': m(userPrivateContributed, {
+                    userId: userId,
+                    user: user
+                }),
+                '#about_me': m(userAboutEdit, {
+                    userId: userId,
+                    user: user
+                }),
+                '#settings': m(userSettings, {
+                    userId: userId,
+                    user: user
+                }),
+                '#notifications': m(userNotifications, {
+                    userId: userId,
+                    user: user
+                })
+            };
+
+            hash(window.location.hash);
+
+            if (_$1.isEmpty(hash()) || hash() === '#_=_') {
+                hash('#contributions');
+                return tabs['#contributions'];
+            }
+
+            return tabs[hash()];
+        };
+
+        h.redrawHashChange();
+        userVM.fetchUser(userId, true, userDetails);
+        return {
+            displayTabContent: displayTabContent,
+            hash: hash,
+            userDetails: userDetails
+        };
+    },
+    view: function view(ctrl, args) {
+        var user = ctrl.userDetails();
+
+        return m('div', [m(userHeader, {
+            user: user,
+            hideDetails: true
+        }), !_$1.isEmpty(user) ? [m('nav.dashboard-nav.u-text-center', {
+            style: {
+                'z-index': '10',
+                position: 'relative'
+            }
+        }, m('.w-container', [m('a.dashboard-nav-link' + (ctrl.hash() === '#contributions' ? '.selected' : '') + '[data-target=\'#dashboard_contributions\'][href=\'#contributions\'][id=\'dashboard_contributions_link\']', 'Backed'), m('a.dashboard-nav-link' + (ctrl.hash() === '#projects' ? '.selected' : '') + '[data-target=\'#dashboard_projects\'][href=\'#projects\'][id=\'dashboard_projects_link\']', 'Created'), m('a.dashboard-nav-link' + (ctrl.hash() === '#about_me' ? '.selected' : '') + '[data-target=\'#dashboard_about_me\'][href=\'#about_me\'][id=\'dashboard_about_me_link\']', 'About You'),
+        // m(`a.dashboard-nav-link${(ctrl.hash() === '#settings' ? '.selected' : '')}[data-target='#dashboard_settings'][href='#settings'][id='dashboard_settings_link']`,
+        //     'Data & Address'
+        // ),
+        m('a.dashboard-nav-link' + (ctrl.hash() === '#notifications' ? '.selected' : '') + '[data-target=\'#dashboard_notifications\'][href=\'#notifications\'][id=\'dashboard_notifications_link\']', 'Notifications'), m('a.dashboard-nav-link.u-right-big-only[href=\'/en/users/' + user.id + '\']', {
+            config: m.route,
+            onclick: function onclick() {
+                m.route('/users/' + user.id, {
+                    user_id: user.id
+                });
+            }
+        }, 'Go to the public profile')])), m('section.section', m('.w-container', m('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())))] : '']);
+    }
+};
+
+var I18nScope$26 = _.partial(h.i18nScope, 'projects.contributions.edit.errors');
 
 var paymentSlip = {
     controller: function controller(args) {
@@ -9115,7 +9895,7 @@ var creditCardInput = {
     }
 };
 
-var I18nScope$24 = _$1.partial(h.i18nScope, 'projects.contributions.edit');
+var I18nScope$27 = _$1.partial(h.i18nScope, 'projects.contributions.edit');
 var I18nIntScope$3 = _$1.partial(h.i18nScope, 'projects.contributions.edit_international');
 
 var paymentCreditCard = {
@@ -9261,7 +10041,7 @@ var paymentCreditCard = {
         };
 
         var scope = function scope(attr) {
-            return vm.isInternational() ? I18nIntScope$3(attr) : I18nScope$24(attr);
+            return vm.isInternational() ? I18nIntScope$3(attr) : I18nScope$27(attr);
         };
 
         vm.getInstallments(args.contribution_id).then(function () {
@@ -9380,14 +10160,14 @@ var paymentCreditCard = {
     }
 };
 
-var I18nScope$22 = _$1.partial(h.i18nScope, 'projects.contributions.edit');
+var I18nScope$25 = _$1.partial(h.i18nScope, 'projects.contributions.edit');
 var I18nIntScope$2 = _$1.partial(h.i18nScope, 'projects.contributions.edit_international');
 
 var paymentForm = {
     controller: function controller(args) {
         var isSlip = m.prop(false),
             scope = function scope() {
-            return args.vm.isInternational() ? I18nIntScope$2() : I18nScope$22();
+            return args.vm.isInternational() ? I18nIntScope$2() : I18nScope$25();
         };
 
         var scrollTo = function scrollTo(el, isInit) {
@@ -9418,11 +10198,11 @@ var paymentForm = {
     }
 };
 
-var I18nScope$19 = _.partial(h.i18nScope, 'projects.contributions.edit');
-var I18nIntScope = _.partial(h.i18nScope, 'projects.contributions.edit_international');
+var I18nScope$24 = _$1.partial(h.i18nScope, 'projects.contributions.edit');
+var I18nIntScope$1 = _$1.partial(h.i18nScope, 'projects.contributions.edit_international');
 
 var projectsPayment = {
-    controller: function controller(args) {
+    controller: function controller() {
         var project = projectVM.getCurrentProject(),
             mode = project.mode,
             projectUserId = project.user.id,
@@ -9431,38 +10211,17 @@ var projectsPayment = {
             contribution = contributionVM.getCurrentContribution(),
             reward = m.prop(contribution().reward),
             value = contribution().value,
-            phoneMask = _.partial(h.mask, '(99) 9999-99999'),
-            documentMask = _.partial(h.mask, '999.999.999-99'),
-            documentCompanyMask = _.partial(h.mask, '99.999.999/9999-99'),
-            zipcodeMask = _.partial(h.mask, '99999-999'),
+            phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
+            documentMask = _$1.partial(h.mask, '999.999.999-99'),
+            documentCompanyMask = _$1.partial(h.mask, '99.999.999/9999-99'),
+            zipcodeMask = _$1.partial(h.mask, '99999-999'),
             isCnpj = m.prop(false),
             currentUserID = h.getUserID(),
             user = userVM.getCurrentUser();
 
-        if (_.contains([41679, 40191, 40271, 38768, 42815, 43002, 42129, 41867, 39655], project.project_id)) {
-            window.$zopim && window.$zopim.livechat || function (d, s) {
-                var z = window.$zopim = function (c) {
-                    z._.push(c);
-                },
-                    $$$1 = z.s = d.createElement(s),
-                    e = d.getElementsByTagName(s)[0];z.set = function (o) {
-                    z.set._.push(o);
-                };z._ = [];z.set._ = [];$$$1.async = !0;$$$1.setAttribute('charset', 'utf-8');$$$1.src = '//v2.zopim.com/?2qPtIfZX0Exh5Szx5JUoUxWKqrTQI5Tm';z.t = +new Date();$$$1.type = 'text/javascript';e.parentNode.insertBefore($$$1, e);
-            }(document, 'script');
-            setTimeout(function t() {
-                var c = window.$zopim && window.$zopim.livechat;
-                if (c) {
-                    var u = h.getUser();
-                    if (u) {
-                        c.setEmail(u.email);
-                        c.setName(u.name);
-                    }
-                    window.zE && window.zE.hide();
-                } else {
-                    setTimeout(t, 1000);
-                }
-            }, 1000);
-        }
+        var shippingFee = function shippingFee() {
+            return _$1.findWhere(rewardVM.fees(), { id: contribution().shipping_fee_id });
+        };
 
         var validateForm = function validateForm() {
             if (vm.validate()) {
@@ -9472,7 +10231,7 @@ var projectsPayment = {
         };
 
         var fieldHasError = function fieldHasError(fieldName) {
-            var fieldWithError = _.findWhere(vm.fields.errors(), {
+            var fieldWithError = _$1.findWhere(vm.fields.errors(), {
                 field: fieldName
             });
 
@@ -9497,9 +10256,9 @@ var projectsPayment = {
             }
         };
 
-        var applyZipcodeMask = _.compose(vm.fields.zipCode, zipcodeMask);
+        var applyZipcodeMask = _$1.compose(vm.fields.zipCode, zipcodeMask);
 
-        var applyPhoneMask = _.compose(vm.fields.phone, phoneMask);
+        var applyPhoneMask = _$1.compose(vm.fields.phone, phoneMask);
 
         var addressChange = function addressChange(fn) {
             return function (e) {
@@ -9508,20 +10267,25 @@ var projectsPayment = {
                     act: vm.isInternational ? 'contribution_address_br' : 'contribution_address_int'
                 });
 
-                if (_.isFunction(fn)) {
+                if (_$1.isFunction(fn)) {
                     fn(e);
                 }
             };
         };
 
         var scope = function scope(attr) {
-            return vm.isInternational() ? I18nIntScope(attr) : I18nScope$19(attr);
+            return vm.isInternational() ? I18nIntScope$1(attr) : I18nScope$24(attr);
         };
 
-        if (_.isNull(currentUserID)) {
+        var isLongDescription = function isLongDescription(reward) {
+            return reward.description && reward.description.length > 110;
+        };
+
+        if (_$1.isNull(currentUserID)) {
             return h.navigateToDevise();
         }
 
+        rewardVM.getFees(reward()).then(rewardVM.fees);
         vm.similityExecute(contribution().id);
 
         return {
@@ -9542,10 +10306,13 @@ var projectsPayment = {
             isCnpj: isCnpj,
             vm: vm,
             user: user,
-            project: project
+            project: project,
+            shippingFee: shippingFee,
+            isLongDescription: isLongDescription,
+            toggleDescription: h.toggleProp(false, true)
         };
     },
-    view: function view(ctrl, args) {
+    view: function view(ctrl) {
         var user = ctrl.user(),
             project = ctrl.project;
 
@@ -9553,14 +10320,14 @@ var projectsPayment = {
             style: {
                 display: 'none'
             }
-        }, [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest', ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_.extend({ value: Number(ctrl.value).toFixed() }))))), m('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + project.project_id + '/contributions/new"]', I18n$1.t('selected_reward.edit', ctrl.scope()))])])), m('.w-container', m('.w-row', [m('.w-col.w-col-8', [!_.isEmpty(ctrl.vm.fields.errors()) ? m('.card.card-error.u-radius.zindex-10.u-marginbottom-30.fontsize-smaller', m('.u-marginbottom-10.fontweight-bold', [I18n$1.t('errors.global', ctrl.scope()), m('.errors', _.map(ctrl.vm.fields.errors(), function (error) {
+        }, [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest', ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_$1.extend({ value: Number(ctrl.value).toFixed() }))))), m('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + project.project_id + '/contributions/new"]', I18n$1.t('selected_reward.edit', ctrl.scope()))])])), m('.w-container', m('.w-row', [m('.w-col.w-col-8', [!_$1.isEmpty(ctrl.vm.fields.errors()) ? m('.card.card-error.u-radius.zindex-10.u-marginbottom-30.fontsize-smaller', m('.u-marginbottom-10.fontweight-bold', [I18n$1.t('errors.global', ctrl.scope()), m('.errors', _$1.map(ctrl.vm.fields.errors(), function (error) {
             return m('p', error.message);
         }))])) : '', m('.w-form', [m('form.u-marginbottom-40', [m('.u-marginbottom-40.u-text-center-small-only', [m('.fontweight-semibold.lineheight-tight.fontsize-large', I18n$1.t('title', ctrl.scope())), m('.fontsize-smaller', I18n$1.t('required', ctrl.scope()))]), user.name && user.owner_document ? m(UserOwnerBox, { user: user, project: project }) : '', m('.w-row.u-marginbottom-30', [m('.w-col.w-col-7.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'country\']', ['Parents / ', m('em', 'Country'), ' *']), m('select.w-select.text-field[id=\'country\']', {
             onfocus: ctrl.vm.resetFieldError('userCountryId'),
             class: ctrl.fieldHasError('userCountryId') ? 'error' : false,
             onchange: m.withAttr('value', ctrl.vm.fields.userCountryId),
             value: ctrl.vm.fields.userCountryId()
-        }, _.map(ctrl.vm.fields.countries(), function (country, idx) {
+        }, _$1.map(ctrl.vm.fields.countries(), function (country, idx) {
             return m('option', {
                 value: country.id,
                 key: idx,
@@ -9586,9 +10353,9 @@ var projectsPayment = {
             onchange: m.withAttr('value', ctrl.vm.fields.anonymous),
             checked: ctrl.vm.fields.anonymous()
         }), m('label.w-form-label.fontsize-smallest[for=\'anonymous\']', I18n$1.t('fields.anonymous', ctrl.scope()))]), ctrl.vm.fields.anonymous() ? m('.card.card-message.u-radius.zindex-10.fontsize-smallest', m('div', [m('span.fontweight-bold', [I18n$1.t('anonymous_confirmation_title', ctrl.scope()), m('br')]), m('br'), I18n$1.t('anonymous_confirmation', ctrl.scope())])) : ''])]), m('.u-marginbottom-40', m('.w-form', [m('label.field-label.fontweight-semibold[for=\'street\']', I18n$1.t('fields.street', ctrl.scope())), m('input.w-input.text-field[id=\'street\']', {
+            type: 'text',
             onfocus: ctrl.vm.resetFieldError('street'),
             class: ctrl.fieldHasError('street') ? 'error' : false,
-            type: 'text',
             onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.street)),
             value: ctrl.vm.fields.street(),
             placeholder: 'My Home Street'
@@ -9639,7 +10406,7 @@ var projectsPayment = {
             class: ctrl.fieldHasError('userState') ? 'error' : false,
             onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.userState)),
             value: ctrl.vm.fields.userState()
-        }, _.map(ctrl.vm.fields.states(), function (state, idx) {
+        }, _$1.map(ctrl.vm.fields.states(), function (state, idx) {
             return m('option', {
                 value: state.acronym,
                 selected: state.acronym === ctrl.vm.fields.userState()
@@ -9659,7 +10426,13 @@ var projectsPayment = {
             contribution_id: ctrl.contribution().id,
             project_id: projectVM.currentProject().project_id,
             user_id: user.id
-        }) : '']), m('.w-col.w-col-4', [m('.w-hidden-small.w-hidden-tiny.card.u-radius.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m('.w-clearfix.u-marginbottom-20', [m('.fontsize-larger.text-success.u-left', 'Rs ' + Number(ctrl.value).toFixed()), m('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', I18n$1.t('selected_reward.edit', ctrl.scope()))]), m('.back-payment-info-reward', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest', ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_.extend({ value: Number(ctrl.value).toFixed() })))))])]), m.component(faqBox, {
+        }) : '']), m('.w-col.w-col-4', [m('.w-hidden-small.w-hidden-tiny.card.u-radius.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m('.w-clearfix.u-marginbottom-20', [m('.fontsize-larger.text-success.u-left', 'Rs ' + Number(ctrl.value).toFixed()), m('a.fontsize-small.link-hidden.u-right.fontweight-semibold[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', I18n$1.t('selected_reward.edit', ctrl.scope()))]), m('.back-payment-info-reward', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest.fontweight-semibold', ctrl.reward().title), m('.fontsize-smallest.reward-description.opened.fontcolor-secondary', {
+            class: ctrl.isLongDescription(ctrl.reward()) ? ctrl.toggleDescription() ? 'extended' : '' : 'extended'
+        }, ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_$1.extend({ value: Number(ctrl.value).toFixed() }))))), ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
+            onclick: ctrl.toggleDescription.toggle
+        }, [ctrl.toggleDescription() ? 'menos ' : 'mais ', m('span.fa.fa-angle-down', {
+            class: ctrl.toggleDescription() ? 'reversed' : ''
+        })]) : '']), !_$1.isEmpty(ctrl.reward().deliver_at) ? [m('.fontcolor-secondary.fontsize-smallest.u-margintop-10', [m('span.fontweight-semibold', 'Entrega prevista: '), h.momentify(ctrl.reward().deliver_at, 'MMM/YYYY')])] : '', ctrl.reward() && ctrl.shippingFee() ? [m('.fontcolor-secondary.fontsize-smallest', [m('span.fontweight-semibold', 'Envio: '), I18n$1.t('shipping_options.' + ctrl.reward().shipping_options, { scope: 'projects.contributions' })])] : '']), m.component(faqBox, {
             mode: ctrl.mode,
             vm: ctrl.vm,
             faq: ctrl.vm.faq(),
@@ -9722,7 +10495,7 @@ var projectsReward = {
     view: function view(ctrl, args) {
         var project = ctrl.project;
 
-        return m('#project-rewards', [m('.w-section.page-header.u-text-center', [m('.w-container', [m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['per ', project().user ? project().user.name : project().owner_name ? project().owner_name : ''])])]), m('.w-section.header-cont-new', m('.w-container', m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', 'Choose the reward and then the value of the support'))), m('.section[id=\'new-contribution\']', m('.w-container', m('.w-row', [m('.w-col.w-col-8', m('.w-form.back-reward-form', m('form.simple_form.new_contribution', {
+        return m('#project-rewards', [m('.w-section.page-header.u-text-center', [m('.w-container', [m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)), m('h2.fontsize-base.lineheight-looser[itemprop="author"]', ['by ', project().user ? project().user.name : project().owner_name ? project().owner_name : ''])])]), m('.w-section.header-cont-new', m('.w-container', m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', 'Choose the reward and then the value of the support'))), m('.section[id=\'new-contribution\']', m('.w-container', m('.w-row', [m('.w-col.w-col-8', m('.w-form.back-reward-form', m('form.simple_form.new_contribution', {
             onsubmit: ctrl.submitContribution
         }, _$1.map(ctrl.rewards, function (reward, index) {
             var isSelected = ctrl.isSelected(reward),
@@ -9745,7 +10518,7 @@ var projectsReward = {
     }
 };
 
-var I18nScope$25 = _$1.partial(h.i18nScope, 'projects.publish');
+var I18nScope$28 = _$1.partial(h.i18nScope, 'projects.publish');
 
 var publish = {
     controller: function controller(args) {
@@ -9801,17 +10574,16 @@ var publish = {
         var project = _$1.first(ctrl.projectDetails()),
             account = _$1.first(ctrl.projectAccount()),
             flexTerms = function flexTerms(project) {
-            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span.fontweight-semibold', 'Regras da modalidade FLEX')]), m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign term (discounting the JVN fee) and must comply with the execution of the campaign and with the delivery of the rewards offered regardless of how much to collect.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span.fontweight-semibold', 'Goal of collection')]), m('div', 'The goal can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span.fontweight-semibold', 'Rates')]), m('div', ['At the end of the campaign, we will charge 5% + online payment portal charge of ', m('span.fontweight-semibold', 'total amount collected.')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span.fontweight-semibold', 'Campaign deadline')]), m('div', 'Once set, the closing period can not be changed. If you started the campaign with the deadline, you must set it during the campaign, and you can leave the campaign open for a maximum of 12 months.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span.fontweight-semibold', 'Deadline for transfer')]), m('div', 'When the deadline for your campaign comes to an end, you should verify your bank details. After this confirmation, JVN will deposit into your checking account within 10 business days. The amount deposited will already be considering the 5% + online payment portal charge discount of the fee.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span.fontweight-semibold', 'What can and can not change on the campaign page from publication?')]), [m('div', [m('span.fontweight-semibold', 'You may not:'), ' Change the type of funding, campaign name, campaign URL, category chosen, collection goal, deadline (if you have already defined it), rewards where existing support is available, and registered bank account.\
-                    ', m('br'), m('br'), m('span.fontweight-semibold', 'You may: '), 'Edit the content of the campaign description, change the main campaign video, campaign image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span.fontweight-semibold', 'Responsibility of JVN')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible for:'), ' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the campaign in the platform and by guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible for:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the projects registered.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span.fontweight-semibold', 'Your responsibilities')]), m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold'), 'It is your responsibility for all aspects of campaign formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the campaign, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawing online campaign')]), m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our ', m('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
+            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span.fontweight-semibold', 'What can and can not change on the campaign page after publication?')]), m('div', [m('span.fontweight-semibold', 'You can not change'), ': The name of the person responsible for the campaign, the financing method, the title of the campaign, the URL of the campaign, the category of the campaign, the collection goal, the deadline, and the rewards that has supporters.', m('br'), m('br'), m('span.fontweight-semibold', 'You can change'), ': The main video of the campaign, the content of the description, the campaign image, the rewards where there are no supports made, in addition to adding new rewards during the collection'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span.fontweight-semibold', 'FLEX Rules')]), m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign deadline (discounting the JVN fee) and must comply with the execution of the campaign and with the delivery of the rewards offered regardless of how much you collect.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span.fontweight-semibold', 'Goal of collection')]), m('div', 'The goal can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span.fontweight-semibold', 'Rates')]), m('div', ['At the end of the campaign, we will charge 5% ', m('span.fontweight-semibold', 'Total amount collected.')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span.fontweight-semibold', 'Campaign deadline')]), m('div', 'Once set, the closing period can not be changed. If you started the campaign with the deadline, you should set it during the campaign, and you can leave the campaign open for a maximum of 12 months.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span.fontweight-semibold', 'Deadline for transfer')]), m('div', m.trust('When the deadline for your project comes to an end, you should verify your bank details. You may change the Bank, Account and the Agency <strong>Only if the new registered account is owned by you</strong>. Upon confirmation, Catarse will deposit into your checking account within 10 business days. The amount deposited will already be considering the 5% discount of the fee.'))]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span.fontweight-semibold', 'Responsibility of JVN')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible:'), ' The technological development of the platform, attendance of doubts and problems (both of supporters and directors), for hosting the campaign in the platform and for guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible:'), ' Financing, disclosure and execution, nor for the delivery of rewards of the registered campaigns.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span.fontweight-semibold', 'Your responsibilities')]), m('div', 'It is your responsibility to receive the money from the campaign and everything related to formatting the campaign, planning and publicizing the fundraising campaign, mobilizing supporters, executing the campaign, communicating with supporters, and producing and delivering rewards within the estimated time frame.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from published campaign')]), m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
         },
             terms = function terms(project) {
-            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span.fontweight-semibold', 'Rules of the All-or-nothing mode')]), m('div', ['You chose the all-or-nothing campaign. In this way, you will only receive the funds raised ', m('span.fontweight-semibold', 'if it reaches or exceeds the collection goal'), '. Otherwise, all of your supporters will be reimbursed. You will be responsible for delivering the rewards offered if your project reaches the collection goal.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Goal of collection')]), m('div', 'The goal can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Rates')]), m('div', ['We will charge 5% + online payment portal charge of ', m('span.fontweight-semibold', 'total amount collected'), ' for your campaign if it reaches or exceeds the target within the campaign deadline. If the campaign does not reach the goal, no fee will be charged.', m('span.fontweight-semibold')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Campaign deadline')]), m('div', 'Your campaign will be in collection in JVN until the day ' + h.momentify(ctrl.expiresAt()) + ' at 11:50 p.m. This deadline can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Transfer and refund rules')]), m('div', ['When the deadline for your campaign comes to an end, you should verify your bank details. After this confirmation, JVN will deposit the amount collected, with the discount of the rate, into your checking account within 10 business days. If the campaign does not reach 100% of the target by the deadline, JVN will reimburse the supporters. '])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'What can and can not change on the campaign page after publication?')]), [m('div', [m('span.fontweight-semibold', 'You can not:'), ' Change the name of your campaign, the URL (link) of your campaign, the category chosen, the type of financing, the bank account, the collection goal, the term chosen and the rewards where existing support already exists.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'You will be able to: '), 'Edit the content of the campaign description, change the main campaign video, campaign image, effect phrase, rewards where there are no supports made, and add new rewards during fundraising.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Responsibility of JVN')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible:'), ' By the technological development of the platform, attendance of doubts and problems (both of supporters and directors), by hosting the project in the platform and by guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible for:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the campaigns registered.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Your responsibilities')]), m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold'), 'It is your responsibility for all aspects of campaign formatting, planning and dissemination of the fundraising campaign, mobilizing supporters, executing the campaign, producing and delivering rewards within the estimated deadline, and communicating with supporters.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawing online campaing')]), m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
+            return [m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '1/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'What can and can not change on the campaign page after publication?')]), m('div', [m('span.fontweight-semibold', 'You can not change'), ': The name of the person in charge of the campaign, the funding mode, campaign title, campaign URL, campaign category, collection goal, chosen deadline and rewards that has supporters. ', m('br'), m('br'), m('span.fontweight-semibold', 'You can change'), ': The main video of the campaign, the content of the description, the campaign image, the rewards where there are no supports made, in addition to adding new rewards during the collection'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '2/9'), ' ', m('span.fontweight-semibold', 'All or Nothing (AON) rules')]), m('div', ['You chose the AON campaign. In this way, you will only receive the funds collected ', m('span.fontweight-semibold', 'ff it reaches or exceeds the collection goal'), '. Otherwise, all of your supporters will be reimbursed. You will be responsible for delivering the rewards offered if your campaig reaches the collection goal.'])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '3/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Goal of collection')]), m('div', 'The goal can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '4/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Rates')]), m('div', ['We charge 5%', m('span.fontweight-semibold', 'Total amount collected'), ' for your campaign if it reaches or exceeds the target within the campaign deadline. If the campaign does not reach the goal, no fee will be charged.', m('span.fontweight-semibold')])]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '5/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Campaign deadline')]), m('div', 'Your campaign will be in collection in JVN until the day ' + h.momentify(ctrl.expiresAt()) + ' at 23h59min59s.This deadline can not be changed after the campaign has been published.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '6/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Transfer and refund rules'), m('div', [m.trust('When the deadline for your campaign comes to an end, you should verify your bank details. You may change the Bank, Account and the Agency <strong>Only if the new registered account is owned by you</strong>. After this confirmation, Catarse will deposit the amount collected, already discounted the fee, into your account in 10 business days. If the project does not reach 100% of the target by the deadline, the Catarse will reimburse the supporters. <a href="http://suporte.catarse.me/hc/pt-br/articles/202365507" target="blank">Learn more about the repayment process</a>')])]), m('div', '')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '7/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Responsibility of JVN')]), [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible:'), ' The technological development of the platform, attendance of doubts and problems (both of supporters and directors), for hosting the campaign on the platform and for ensuring the security of financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the campaign registered.'])]]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '8/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Your responsibilities')]), m('div', 'It is your responsibility to receive the money from the campaign and everything related to formatting the campaign, planning and publicizing the fundraising campaign, mobilizing supporters, executing the campaign, communicating with supporters, and producing and delivering rewards within the estimated time frame.')]), m('.w-col.w-col-11', [m('div', [m('span.fontsize-smallest.fontcolor-secondary', '9/9'), ' ', m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from published campaign')]), m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' and ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])])];
         };
 
         return [!ctrl.l() && !ctrl.accountL() ? [project.is_owner_or_admin ? m.component(projectDashboardMenu, {
             project: m.prop(project),
             hidePublish: true
-        }) : '', m('.w-section.section-product.' + project.mode), m('.w-section.section', [m('.w-container', [m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.u-text-center', [m('img.u-marginbottom-20[src=\'/assets/catarse_bootstrap/launch-icon.png\'][width=\'94\']'), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', 'Ready to launch your campaign?'), m('.fontsize-base.u-marginbottom-30', 'We haveve prepared a list with important information for you to check before putting your campaign online!')])]), m('.w-col.w-col-3')])])]), m('.divider'), m('.w-section.section-one-column.bg-gray.section.before-footer', [m('.w-container', [m('.card.medium.u-marginbottom-60.card-terciary', [m('.w-row', [m('.w-col.w-col-6.w-clearfix', [m('img.card-project-thumb.u-right[src=' + project.large_image + ']')]), m('.w-col.w-col-6', [m('.u-marginbottom-30.fontsize-base', [m('div', [m('span.fontweight-semibold', 'Title: '), project.name]), m('div', [m('span.fontweight-semibold', 'Link: '), 'www.myjvn.com/' + project.permalink]), m('div', [m('span.fontweight-semibold', 'Type: '), I18n$1.t(project.mode, I18nScope$25())]), m('div', [m('span.fontweight-semibold', 'Goal: '), 'Rs ' + h.formatNumber(project.goal, 2, 3)]), project.online_days !== null ? m('div', [m('span.fontweight-semibold', 'Deadline: ' + project.online_days + ' ' + (project.online_days > 1 ? 'days' : 'day'))]) : ''
+        }) : '', m('.w-section.section-product.' + project.mode), m('.w-section.section', [m('.w-container', [m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [m('.u-text-center', [m('img.u-marginbottom-20[src=\'/assets/catarse_bootstrap/launch-icon.png\'][width=\'94\']'), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', 'Ready to launch your campaign?'), m('.fontsize-base.u-marginbottom-30', 'We have prepared a list with important information for you to check before putting your campaign online!')])]), m('.w-col.w-col-3')])])]), m('.divider'), m('.w-section.section-one-column.bg-gray.section.before-footer', [m('.w-container', [m('.card.medium.u-marginbottom-60.card-terciary', [m('.w-row', [m('.w-col.w-col-6.w-clearfix', [m('img.card-project-thumb.u-right[src=' + project.large_image + ']')]), m('.w-col.w-col-6', [m('.u-marginbottom-30.fontsize-base', [m('div', [m('span.fontweight-semibold', 'Title: '), project.name]), m('div', [m('span.fontweight-semibold', 'Link: '), 'www.myjvn.com/' + project.permalink]), m('div', [m('span.fontweight-semibold', 'Type: '), I18n$1.t(project.mode, I18nScope$28())]), m('div', [m('span.fontweight-semibold', 'Goal: '), 'Rs ' + h.formatNumber(project.goal, 2, 3)]), project.online_days !== null ? m('div', [m('span.fontweight-semibold', 'Deadline: ' + project.online_days + ' ' + (project.online_days > 1 ? 'days' : 'day'))]) : ''
         // m('div', [m('span.fontweight-semibold', 'Responsável: '), account.owner_name])
         // m('div', [m('span.fontweight-semibold', 'CPF/CNPJ: '), account.owner_document])
         ])])]), m('.u-text-center', [m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', [m('.divider.u-marginbottom-10'), m('.fontsize-small.fontcolor-secondary', 'The above data can not be changed after the campaign goes online. If you need to make changes, navigate the sidebar and come back here when you are done!')]), m('.w-col.w-col-1')])])]), m('.card.medium.u-radius.u-marginbottom-60', [m('.u-text-center.u-marginbottom-60', [m('.fontsize-large.fontweight-semibold', 'Remember our rules'), m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.fontsize-small', ['Before posting, click on the circles below and confirm that you are aware of how JVN works.'])]), m('.w-col.w-col-2')])]), _$1.map(project.mode === 'flex' ? flexTerms(project) : terms(project), function (term, index) {
@@ -9869,7 +10641,7 @@ var startVM = function startVM(I18n) {
 
 // import youtubeLightbox from '../c/youtube-lightbox';
 // import slider from '../c/slider';
-var I18nScope$26 = _$1.partial(h.i18nScope, 'pages.start');
+var I18nScope$29 = _$1.partial(h.i18nScope, 'pages.start');
 
 var start = {
     controller: function controller() {
@@ -9915,7 +10687,7 @@ var start = {
         },
             linkToExternal = function linkToExternal(category) {
             var externalLinkCategories = I18n$1.translations[I18n$1.currentLocale()].projects.index.explore_categories;
-            return _$1.isUndefined(externalLinkCategories[category.id]) ? null : externalLinkCategories[category.id].link;
+            return _$1.isUndefined(externalLinkCategories[category.id]) ? null : externalLinkCategories[category.id].link + '?ref=ctrse_start';
         },
             loadCategoryProjects = function loadCategoryProjects(category) {
             selectedCategory(category);
@@ -10005,10 +10777,10 @@ var start = {
             });
         };
 
-        return m('#start', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$26())) }, [m('.w-section.hero-full.hero-start', [m('.w-container.u-text-center', [m('.fontsize-megajumbo.fontweight-semibold.u-marginbottom-40', I18n$1.t('slogan', I18nScope$26())), m('.w-row.u-marginbottom-40', [m('.w-col.w-col-4.w-col-push-4', [m('a.btn.btn-large.u-marginbottom-10[href="#start-form"]', {
+        return m('#start', { config: h.setPageTitle(I18n$1.t('header_html', I18nScope$29())) }, [m('.w-section.hero-full.hero-start', [m('.w-container.u-text-center', [m('.fontsize-megajumbo.fontweight-semibold.u-marginbottom-40', I18n$1.t('slogan', I18nScope$29())), m('.w-row.u-marginbottom-40', [m('.w-col.w-col-4.w-col-push-4', [m('a.btn.btn-large.u-marginbottom-10[href="#start-form"]', {
             config: h.scrollTo(),
             onclick: h.analytics.event({ cat: 'project_start', act: 'start_btnstart_click' })
-        }, I18n$1.t('submit', I18nScope$26()))])]), m('.w-row', _$1.isEmpty(stats) ? '' : [m('.w-col.w-col-4', [m('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m('p.fontsize-small.start-stats', I18n$1.t('header.people', I18nScope$26()))]), m('.w-col.w-col-4', [m('.fontsize-largest.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m('p.fontsize-small.start-stats', I18n$1.t('header.money', I18nScope$26()))]), m('.w-col.w-col-4', [m('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.fontsize-small.start-stats', I18n$1.t('header.success', I18nScope$26()))])])])]), m('.w-section.section', [m('.w-container', [m('.w-row', [m('.w-col.w-col-10.w-col-push-1.u-text-center', [m('.fontsize-larger.u-marginbottom-10.fontweight-semibold', I18n$1.t('page-title', I18nScope$26())), m('.fontsize-small', I18n$1.t('page-subtitle', I18nScope$26()))])]), m('.w-clearfix.how-row', [m('.w-hidden-small.w-hidden-tiny.how-col-01', [m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$26())), m('.fontsize-base', I18n$1.t('banner.2', I18nScope$26()))]), m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$26())), m('.fontsize-base', I18n$1.t('banner.4', I18nScope$26()))])]), m('.how-col-02'), m('.how-col-03', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.5', I18nScope$26())), m('.fontsize-base', I18n$1.t('banner.6', I18nScope$26())), m('.fontweight-semibold.fontsize-large.u-margintop-30', I18n$1.t('banner.7', I18nScope$26())), m('.fontsize-base', I18n$1.t('banner.8', I18nScope$26()))]), m('.w-hidden-main.w-hidden-medium.how-col-01', [m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$26())), m('.fontsize-base', I18n$1.t('banner.2', I18nScope$26()))]), m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$26())), m('.fontsize-base', I18n$1.t('banner.4', I18nScope$26()))])])])])]), m('.w-section.divider'),
+        }, I18n$1.t('submit', I18nScope$29()))])]), m('.w-row', _$1.isEmpty(stats) ? '' : [m('.w-col.w-col-4', [m('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m('p.fontsize-small.start-stats', I18n$1.t('header.people', I18nScope$29()))]), m('.w-col.w-col-4', [m('.fontsize-largest.lineheight-loose', stats.total_contributed.toString().slice(0, 2) + ' millions'), m('p.fontsize-small.start-stats', I18n$1.t('header.money', I18nScope$29()))]), m('.w-col.w-col-4', [m('.fontsize-largest.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.fontsize-small.start-stats', I18n$1.t('header.success', I18nScope$29()))])])])]), m('.w-section.section', [m('.w-container', [m('.w-row', [m('.w-col.w-col-10.w-col-push-1.u-text-center', [m('.fontsize-larger.u-marginbottom-10.fontweight-semibold', I18n$1.t('page-title', I18nScope$29())), m('.fontsize-small', I18n$1.t('page-subtitle', I18nScope$29()))])]), m('.w-clearfix.how-row', [m('.w-hidden-small.w-hidden-tiny.how-col-01', [m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$29())), m('.fontsize-base', I18n$1.t('banner.2', I18nScope$29()))]), m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$29())), m('.fontsize-base', I18n$1.t('banner.4', I18nScope$29()))])]), m('.how-col-02'), m('.how-col-03', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.5', I18nScope$29())), m('.fontsize-base', I18n$1.t('banner.6', I18nScope$29())), m('.fontweight-semibold.fontsize-large.u-margintop-30', I18n$1.t('banner.7', I18nScope$29())), m('.fontsize-base', I18n$1.t('banner.8', I18nScope$29()))]), m('.w-hidden-main.w-hidden-medium.how-col-01', [m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.1', I18nScope$29())), m('.fontsize-base', I18n$1.t('banner.2', I18nScope$29()))]), m('.info-howworks-backers', [m('.fontweight-semibold.fontsize-large', I18n$1.t('banner.3', I18nScope$29())), m('.fontsize-base', I18n$1.t('banner.4', I18nScope$29()))])])])])]), m('.w-section.divider'),
         // m('.w-section.section-large', [
         //     m('.w-container.u-text-center.u-marginbottom-60', [
         //         m('div', [
@@ -10036,7 +10808,7 @@ var start = {
         //     ])
         // ]),
 
-        m('.w-section.section-large.card-terciary', m('.w-container', [m('.u-text-center.u-marginbottom-40', [m('div', m('span.fontsize-largest.fontweight-semibold', I18n$1.t('mode.title', I18nScope$26()))), m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.fontsize-large.u-marginbottom-20', I18n$1.t('mode.subtitle', I18nScope$26()))), m('.w-col.w-col-1')])]), m('div', m('.flex-row.u-marginbottom-40', [m('.flex-column.card.u-radius.u-marginbottom-30', [m('.u-text-center.u-marginbottom-30', m('img[src=\'/assets/aon-badge.png\']')), m('.fontsize-large.flex-column.u-marginbottom-20', [I18n$1.t('mode.aon.info', I18nScope$26()), m.trust('&nbsp;')]), m('.fontsize-base.flex-column.fontcolor-secondary', I18n$1.t('mode.aon.info_2', I18nScope$26()))]), m('.flex-column.card.u-radius.u-marginbottom-30', [m('.u-text-center.u-marginbottom-30', m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/5632ebacd092957f34eaea9c_badge-flex.png\']')), m('.fontsize-large.flex-column.u-marginbottom-20', I18n$1.t('mode.flex.info', I18nScope$26())), m('.fontsize-base.flex-column.fontcolor-secondary', I18n$1.t('mode.flex.info_2', I18nScope$26()))])])), m('.u-text-center.u-marginbottom-30', [m('.fontsize-large.fontweight-semibold', I18n$1.t('mode.tax_info', I18nScope$26()))])])),
+        m('.w-section.section-large.card-terciary', m('.w-container', [m('.u-text-center.u-marginbottom-40', [m('div', m('span.fontsize-largest.fontweight-semibold', I18n$1.t('mode.title', I18nScope$29()))), m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.fontsize-large.u-marginbottom-20', I18n$1.t('mode.subtitle', I18nScope$29()))), m('.w-col.w-col-1')])]), m('div', m('.flex-row.u-marginbottom-40', [m('.flex-column.card.u-radius.u-marginbottom-30', [m('.u-text-center.u-marginbottom-30', m('img[src=\'/assets/aon-badge.png\']')), m('.fontsize-large.flex-column.u-marginbottom-20', [I18n$1.t('mode.aon.info', I18nScope$29()), m.trust('&nbsp;')]), m('.fontsize-base.flex-column.fontcolor-secondary', I18n$1.t('mode.aon.info_2', I18nScope$29()))]), m('.flex-column.card.u-radius.u-marginbottom-30', [m('.u-text-center.u-marginbottom-30', m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/5632ebacd092957f34eaea9c_badge-flex.png\']')), m('.fontsize-large.flex-column.u-marginbottom-20', I18n$1.t('mode.flex.info', I18nScope$29())), m('.fontsize-base.flex-column.fontcolor-secondary', I18n$1.t('mode.flex.info_2', I18nScope$29()))])])), m('.u-text-center.u-marginbottom-30', [m('.fontsize-large.fontweight-semibold', I18n$1.t('mode.tax_info', I18nScope$29()))])])),
 
         // m('.w-section.section-large.bg-blue-one', [
         //     m('.w-container.u-text-center', [
@@ -10107,7 +10879,7 @@ var start = {
         //     onchange: h.analytics.event({ cat: 'project_start', act: 'start_testimonials_change' })
         // }),
         // m('.w-section.divider.u-margintop-30'),
-        m('.w-container', [m('.fontsize-larger.u-text-center.u-marginbottom-60.u-margintop-40', I18n$1.t('qa_title', I18nScope$26())), m('.w-row.u-marginbottom-60', [m('.w-col.w-col-6', _$1.map(ctrl.questions.col_1, function (question) {
+        m('.w-container', [m('.fontsize-larger.u-text-center.u-marginbottom-60.u-margintop-40', I18n$1.t('qa_title', I18nScope$29())), m('.w-row.u-marginbottom-60', [m('.w-col.w-col-6', _$1.map(ctrl.questions.col_1, function (question) {
             return m.component(landingQA, {
                 question: question.question,
                 answer: question.answer,
@@ -10124,7 +10896,7 @@ var start = {
                 h.analytics.oneTimeEvent({ cat: 'project_create', act: 'create_form_submit' })(e);
                 return ctrl.validateProjectForm();
             }
-        }, [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.fontsize-larger.fontcolor-negative.u-marginbottom-10', I18n$1.t('form.title', I18nScope$26())), m('input[name="utf8"][type="hidden"][value="✓"]'), m('input[name="authenticity_token"][type="hidden"][value="' + h.authenticityToken() + '"]'), m('input.w-input.text-field.medium.u-marginbottom-30[type="text"]', {
+        }, [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.fontsize-larger.fontcolor-negative.u-marginbottom-10', I18n$1.t('form.title', I18nScope$29())), m('input[name="utf8"][type="hidden"][value="✓"]'), m('input[name="authenticity_token"][type="hidden"][value="' + h.authenticityToken() + '"]'), m('input.w-input.text-field.medium.u-marginbottom-30[type="text"]', {
             name: 'project[name]',
             class: ctrl.projectNameError() ? 'error' : '',
             onfocus: function onfocus() {
@@ -10144,9 +10916,9 @@ var start = {
                 h.analytics.oneTimeEvent({ cat: 'project_create', act: 'create_form_change', lbl: 'category' })(e);
                 m.withAttr('value', ctrl.projectCategory)(e);
             }
-        }, [m('option[value="-1"]', I18n$1.t('form.select_default', I18nScope$26())), _$1.map(ctrl.categories(), function (category) {
+        }, [m('option[value="-1"]', I18n$1.t('form.select_default', I18nScope$29())), _$1.map(ctrl.categories(), function (category) {
             return m('option[value="' + category.id + '"]', { selected: ctrl.projectCategory() === category.id }, category.name);
-        })])]), m('.w-col.w-col-2'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4.w-col-push-4.u-margintop-40', [m('input[type="submit"][value="' + I18n$1.t('form.submit', I18nScope$26()) + '"].w-button.btn.btn-large')])]), m('.w-row.u-marginbottom-80', ctrl.projectNameError() || ctrl.projectCategoryError() ? m.component(inlineError, { message: 'Please check the fields above again!' }) : '')])])])]);
+        })])]), m('.w-col.w-col-2'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-4.w-col-push-4.u-margintop-40', [m('input[type="submit"][value="' + I18n$1.t('form.submit', I18nScope$29()) + '"].w-button.btn.btn-large')])]), m('.w-row.u-marginbottom-80', ctrl.projectNameError() || ctrl.projectCategoryError() ? m.component(inlineError, { message: 'Please check the fields above again!' }) : '')])])])]);
     }
 };
 
@@ -10166,7 +10938,9 @@ var teamTotal = {
     },
     view: function view(ctrl, args) {
         return m('#team-total-static.w-section.section-one-column.section.u-margintop-40.u-text-center.u-marginbottom-20', [ctrl.vm.collection().map(function (teamTotal) {
-            return m('.w-container', [m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.fontsize-base.u-marginbottom-30', 'Today we are ' + teamTotal.member_count + ' people scattered over ' + teamTotal.total_cities + ' cities in ' + teamTotal.countries.length + ' countries (' + teamTotal.countries.toString() + ')! JVN is independent, open-source, and built with love. Our passion is to build an environment where more and more projects can come to life.'), m('.fontsize-larger.lineheight-tight.text-success', 'Our team, together, has already Rs' + h.formatNumber(teamTotal.total_amount) + ' for ' + teamTotal.total_contributed_projects + ' campaigns!')]), m('.w-col.w-col-2')])]);
+            return m('.w-container', [m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.fontsize-base.u-marginbottom-30',
+            // `Today we are ${teamTotal.member_count} people scattered over ${teamTotal.total_cities} cities in ${teamTotal.countries.length} countries (${teamTotal.countries.toString()})! JVN is independent, open-source, and built with love. Our passion is to build an environment where more and more projects can come to life.`
+            'Today we are ' + teamTotal.member_count + ' people.JVN is independent, open-source, and built with love. Our passion is to build an environment where more and more campaigns can come to life.'), m('.fontsize-larger.lineheight-tight.text-success', 'Our team, together, has already supported Rs' + h.formatNumber(teamTotal.total_amount) + ' for ' + teamTotal.total_contributed_projects + ' campaigns!')]), m('.w-col.w-col-2')])]);
         })]);
     }
 };
@@ -10214,7 +10988,7 @@ var team = {
  *     balance: {user_id: 123, amount: 123} // userBalance struct
  * })
  */
-var I18nScope$28 = _$1.partial(h.i18nScope, 'users.balance');
+var I18nScope$31 = _$1.partial(h.i18nScope, 'users.balance');
 
 var userBalanceRequestModelContent = {
     controller: function controller(args) {
@@ -10246,7 +11020,7 @@ var userBalanceRequestModelContent = {
         var balance = args.balance;
 
         return ctrl.loadBankA() ? h.loader() : m('div', _$1.map(ctrl.bankAccounts(), function (item) {
-            return [m('.modal-dialog-header', [m('.fontsize-large.u-text-center', I18n$1.t('withdraw', I18nScope$28()))]), ctrl.displayDone() ? m('.modal-dialog-content.u-text-center', [m('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m('p.fontsize-large', I18n$1.t('sucess_message', I18nScope$28()))]) : m('.modal-dialog-content', [m('.fontsize-base.u-marginbottom-20', [m('span.fontweight-semibold', 'Value:'), m.trust('&nbsp;'), m('span.text-success', 'Rs ' + h.formatNumber(balance.amount, 2, 3))]), m('.fontsize-base.u-marginbottom-10', [m('span', { style: { 'font-weight': ' 600' } }, I18n$1.t('bank.account', I18nScope$28()))]), m('.fontsize-small.u-marginbottom-10', [m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.name', I18nScope$28())), m.trust('&nbsp;'), item.owner_name]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.cpf_cnpj', I18nScope$28())), m.trust('&nbsp;'), item.owner_document]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.bank_name', I18nScope$28())), m.trust('&nbsp;'), item.bank_name]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.agency', I18nScope$28())), m.trust('&nbsp;'), item.agency + '-' + item.agency_digit]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.account', I18nScope$28())), m.trust('&nbsp;'), item.account + '-' + item.account_digit])])]), !ctrl.displayDone() ? m('.modal-dialog-nav-bottom', [m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [ctrl.requestLoader() ? h.loader() : m('a.btn.btn-large.btn-request-fund[href="js:void(0);"]', { onclick: ctrl.requestFund }, 'Request withdrawal')]), m('.w-col.w-col-3')])]) : ''];
+            return [m('.modal-dialog-header', [m('.fontsize-large.u-text-center', I18n$1.t('withdraw', I18nScope$31()))]), ctrl.displayDone() ? m('.modal-dialog-content.u-text-center', [m('.fa.fa-check-circle.fa-5x.text-success.u-marginbottom-40'), m('p.fontsize-large', I18n$1.t('sucess_message', I18nScope$31()))]) : m('.modal-dialog-content', [m('.fontsize-base.u-marginbottom-20', [m('span.fontweight-semibold', 'Value:'), m.trust('&nbsp;'), m('span.text-success', 'Rs ' + h.formatNumber(balance.amount, 2, 3))]), m('.fontsize-base.u-marginbottom-10', [m('span', { style: { 'font-weight': ' 600' } }, I18n$1.t('bank.account', I18nScope$31()))]), m('.fontsize-small.u-marginbottom-10', [m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.name', I18nScope$31())), m.trust('&nbsp;'), item.owner_name]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.cpf_cnpj', I18nScope$31())), m.trust('&nbsp;'), item.owner_document]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.bank_name', I18nScope$31())), m.trust('&nbsp;'), item.bank_name]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.agency', I18nScope$31())), m.trust('&nbsp;'), item.agency + '-' + item.agency_digit]), m('div', [m('span.fontcolor-secondary', I18n$1.t('bank.account', I18nScope$31())), m.trust('&nbsp;'), item.account + '-' + item.account_digit])])]), !ctrl.displayDone() ? m('.modal-dialog-nav-bottom', [m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-6', [ctrl.requestLoader() ? h.loader() : m('a.btn.btn-large.btn-request-fund[href="js:void(0);"]', { onclick: ctrl.requestFund }, 'Request withdrawal')]), m('.w-col.w-col-3')])]) : ''];
         }));
     }
 };
@@ -10260,7 +11034,7 @@ var userBalanceRequestModelContent = {
  *     user_id: 123,
  * })
  */
-var I18nScope$27 = _$1.partial(h.i18nScope, 'users.balance');
+var I18nScope$30 = _$1.partial(h.i18nScope, 'users.balance');
 
 var userBalance = {
     controller: function controller(args) {
@@ -10278,11 +11052,11 @@ var userBalance = {
         return m('.w-section.section.user-balance-section', [ctrl.displayModal() ? m.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: balanceRequestModalC
-        }) : '', m('.w-container', [m('.w-row', [m('.w-col.w-col-8.u-text-center-small-only.u-marginbottom-20', [m('.fontsize-larger', [I18n.t('totals', I18nScope$27()), m('span.text-success', 'Rs ' + h.formatNumber(balance.amount, 2, 3))])]), m('.w-col.w-col-4', [m('a[class="r-fund-btn w-button btn btn-medium u-marginbottom-10 ' + (balance.amount <= 0 ? 'btn-inactive' : '') + '"][href="js:void(0);"]', { onclick: balance.amount > 0 ? ctrl.displayModal.toggle : 'js:void(0);' }, I18n.t('withdraw_cta', I18nScope$27()))])])])]);
+        }) : '', m('.w-container', [m('.w-row', [m('.w-col.w-col-8.u-text-center-small-only.u-marginbottom-20', [m('.fontsize-larger', [I18n.t('totals', I18nScope$30()), m('span.text-success', 'Rs ' + h.formatNumber(balance.amount, 2, 3))])]), m('.w-col.w-col-4', [m('a[class="r-fund-btn w-button btn btn-medium u-marginbottom-10 ' + (balance.amount <= 0 ? 'btn-inactive' : '') + '"][href="js:void(0);"]', { onclick: balance.amount > 0 ? ctrl.displayModal.toggle : 'js:void(0);' }, I18n.t('withdraw_cta', I18nScope$30()))])])])]);
     }
 };
 
-var I18nScope$29 = _.partial(h.i18nScope, 'users.balance');
+var I18nScope$32 = _.partial(h.i18nScope, 'users.balance');
 
 var userBalanceTrasactionRow = {
     controller: function controller(args) {
@@ -10300,7 +11074,7 @@ var userBalanceTrasactionRow = {
         var item = args.item,
             createdAt = h.momentFromString(item.created_at, 'YYYY-MM-DD');
 
-        return m('div[class=\'balance-card ' + (ctrl.expanded() ? 'card-detailed-open' : '') + '\']', m('.w-clearfix.card.card-clickable', [m('.w-row', [m('.w-col.w-col-2.w-col-tiny-2', [m('.fontsize-small.lineheight-tightest', createdAt.format('D MMM')), m('.fontsize-smallest.fontcolor-terciary', createdAt.format('YYYY'))]), m('.w-col.w-col-10.w-col-tiny-10', [m('.w-row', [m('.w-col.w-col-4', [m('div', [m('span.fontsize-smaller.fontcolor-secondary', I18n.t('debit', I18nScope$29())), m.trust('&nbsp;'), m('span.fontsize-base.text-error', 'Rs ' + h.formatNumber(Math.abs(item.debit), 2, 3))])]), m('.w-col.w-col-4', [m('div', [m('span.fontsize-smaller.fontcolor-secondary', I18n.t('credit', I18nScope$29())), m.trust('&nbsp;'), m('span.fontsize-base.text-success', 'Rs ' + h.formatNumber(item.credit, 2, 3))])]), m('.w-col.w-col-4', [m('div', [m('span.fontsize-smaller.fontcolor-secondary', I18n.t('totals', I18nScope$29())), m.trust('&nbsp;'), m('span.fontsize-base', 'Rs ' + h.formatNumber(item.total_amount, 2, 3))])])])])]), m('a.w-inline-block.arrow-admin.' + (ctrl.expanded() ? 'arrow-admin-opened' : '') + '.fa.fa-chevron-down.fontcolor-secondary[href="js:(void(0));"]', { onclick: ctrl.expanded.toggle })]), ctrl.expanded() ? m('.card', _.map(item.source, function (transaction) {
+        return m('div[class=\'balance-card ' + (ctrl.expanded() ? 'card-detailed-open' : '') + '\']', m('.w-clearfix.card.card-clickable', [m('.w-row', [m('.w-col.w-col-2.w-col-tiny-2', [m('.fontsize-small.lineheight-tightest', createdAt.format('D MMM')), m('.fontsize-smallest.fontcolor-terciary', createdAt.format('YYYY'))]), m('.w-col.w-col-10.w-col-tiny-10', [m('.w-row', [m('.w-col.w-col-4', [m('div', [m('span.fontsize-smaller.fontcolor-secondary', I18n.t('debit', I18nScope$32())), m.trust('&nbsp;'), m('span.fontsize-base.text-error', 'Rs ' + h.formatNumber(Math.abs(item.debit), 2, 3))])]), m('.w-col.w-col-4', [m('div', [m('span.fontsize-smaller.fontcolor-secondary', I18n.t('credit', I18nScope$32())), m.trust('&nbsp;'), m('span.fontsize-base.text-success', 'Rs ' + h.formatNumber(item.credit, 2, 3))])]), m('.w-col.w-col-4', [m('div', [m('span.fontsize-smaller.fontcolor-secondary', I18n.t('totals', I18nScope$32())), m.trust('&nbsp;'), m('span.fontsize-base', 'Rs ' + h.formatNumber(item.total_amount, 2, 3))])])])])]), m('a.w-inline-block.arrow-admin.' + (ctrl.expanded() ? 'arrow-admin-opened' : '') + '.fa.fa-chevron-down.fontcolor-secondary[href="js:(void(0));"]', { onclick: ctrl.expanded.toggle })]), ctrl.expanded() ? m('.card', _.map(item.source, function (transaction) {
             var pos = transaction.amount >= 0;
 
             return m('div', [m('.w-row.fontsize-small.u-marginbottom-10', [m('.w-col.w-col-2', [m('.text-' + (pos ? 'success' : 'error'), (pos ? '+' : '-') + ' Rs ' + h.formatNumber(Math.abs(transaction.amount), 2, 3))]), m('.w-col.w-col-10', [m('div', transaction.event_name + ' ' + transaction.origin_object.name)])]), m('.divider.u-marginbottom-10')]);
@@ -10398,7 +11172,7 @@ var userBalanceMain = {
     }
 };
 
-var I18nScope$31 = _.partial(h.i18nScope, 'layouts');
+var I18nScope$34 = _.partial(h.i18nScope, 'layouts');
 
 var menuSearch = {
     view: function view(ctrl, args) {
@@ -10406,7 +11180,7 @@ var menuSearch = {
     }
 };
 
-var I18nScope$32 = _$1.partial(h.i18nScope, 'layouts');
+var I18nScope$35 = _$1.partial(h.i18nScope, 'layouts');
 var menuProfile = {
     controller: function controller(args) {
         var contributedProjects = m.prop(),
@@ -10415,7 +11189,7 @@ var menuProfile = {
             user_id = args.user.user_id;
 
         var userName = function userName() {
-            var name = userDetails().public_name || userDetails().name;
+            var name = userVM.displayName(userDetails());
             if (name && !_$1.isEmpty(name)) {
                 return _$1.first(name.split(' '));
             }
@@ -10441,7 +11215,7 @@ var menuProfile = {
         }, [m('.user-name-menu', ctrl.userName()), m('img.user-avatar[alt=\'Thumbnail - ' + user.name + '\'][height=\'40\'][src=\'' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '\'][width=\'40\']')]), ctrl.toggleMenu() ? m('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' }, [m('.w-row', [m('.w-col.w-col-12', [m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', 'My History'), m('ul.w-list-unstyled.u-marginbottom-20', [m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#contributions\']', 'Support History')), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#projects\']', 'Projects Created')), m('li.w-hidden-main.w-hidden-medium.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#projects\']', 'Projects Created'))]), m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10', 'Settings'), m('ul.w-list-unstyled.u-marginbottom-20', [m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/connect-facebook/\']', 'Find friends')
         // m.trust('&nbsp;'),
         // m('span.badge.badge-success', 'Novidade')
-        ), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#about_me\']', 'Public Profile')), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#notifications\']', 'Notifications'))
+        ), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#about_me\']', 'Public Profile')), m('li.lineheight-looser', m('a.alt-link.fontsize-smaller[href=\'/en/users/' + user.id + '/edit#settings\']', 'Notifications'))
         //                                                 m('li.lineheight-looser',
         //                                                     m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
         //                                                         `Dados financeiros`
@@ -10469,14 +11243,13 @@ var menuProfile = {
     }
 };
 
-var I18nScope$30 = _$1.partial(h.i18nScope, 'layouts');
+var I18nScope$33 = _$1.partial(h.i18nScope, 'layouts');
 
 var menu = {
     controller: function controller(args) {
         var user = h.getUser(),
             menuCss = function menuCss() {
             var dynamicClasses = void 0;
-            console.log(args.withAlert);
 
             return (args.menuTransparency ? 'overlayer' : '') + ' ' + (args.withAlert || args.withFixedAlert ? 'with-global-alert' : '');
         },
@@ -10500,29 +11273,29 @@ var menu = {
     view: function view(ctrl, args) {
         return m('header.main-header', {
             class: ctrl.menuCss()
-        }, [m('.w-row', [m('.w-clearfix.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m('a.header-logo.w-inline-block[href=\'/?ref=ctrse_header\'][title=\'JVN\']', ctrl.homeAttrs(), m('img[alt=\'Logo big\'][src=\'/assets/catarse_bootstrap/logo_big.png\']')), args.menuShort ? '' : m('div#menu-components', [m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/start?ref=ctrse_header\']', { config: m.route }, I18n$1.t('header.submit', I18nScope$30())), m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/explore?ref=ctrse_header\']', { config: m.route }, 'Explore'), m.component(menuSearch)])]), m('.text-align-right.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [ctrl.user ? m.component(menuProfile, { user: ctrl.user }) : m('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/en/login?ref=ctrse_header\']', I18n$1.t('header.signin', I18nScope$30()))])]), args.menuShort ? '' : m('.header-controls-mobile.w-hidden-main.w-hidden-medium', [m('a.header-link.w-nav-link[href=\'/en/start?ref=ctrse_header\']', { onclick: function onclick() {
+        }, [m('.w-row', [m('.w-clearfix.w-col.w-col-8.w-col-small-8.w-col-tiny-8', [m('a.header-logo.w-inline-block[href=\'/?ref=ctrse_header\'][title=\'JVN\']', ctrl.homeAttrs(), m('img[alt=\'Logo big\'][src=\'/assets/catarse_bootstrap/logo_big.png\']')), args.menuShort ? '' : m('div#menu-components', [m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/start?ref=ctrse_header\']', { config: m.route }, I18n$1.t('header.submit', I18nScope$33())), m('a.w-hidden-small.w-hidden-tiny.header-link.w-nav-link[href=\'/explore?ref=ctrse_header\']', { config: m.route }, 'Explore'), m.component(menuSearch)])]), m('.text-align-right.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [ctrl.user ? m.component(menuProfile, { user: ctrl.user }) : m('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/en/login?ref=ctrse_header\']', I18n$1.t('header.signin', I18nScope$33()))])]), args.menuShort ? '' : m('.header-controls-mobile.w-hidden-main.w-hidden-medium', [m('a.header-link.w-nav-link[href=\'/en/start?ref=ctrse_header\']', { onclick: function onclick() {
                 return m.route('/start');
-            } }, I18n$1.t('header.submit', I18nScope$30())), m('a.header-link.w-nav-link[href=\'/en/explore?ref=ctrse_header\']', { onclick: function onclick() {
+            } }, I18n$1.t('header.submit', I18nScope$33())), m('a.header-link.w-nav-link[href=\'/en/explore?ref=ctrse_header\']', { onclick: function onclick() {
                 return m.route('/explore');
             } }, 'Explore')])]);
     }
 };
 
-var I18nScope$33 = _.partial(h.i18nScope, 'layouts.footer');
+var I18nScope$36 = _.partial(h.i18nScope, 'layouts.footer');
 var footer = {
     view: function view() {
-        return m('footer.main-footer.main-footer-neg', [m('section.w-container', m('.w-row', [m('.w-col.w-col-9', m('.w-row', [m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.w-hidden-tiny', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.contact', I18nScope$33())), m('a.link-footer[href=\'#?ref=ctrse_footer\']', [I18n$1.t('links.how_it_works', I18nScope$33()), m.trust('&nbsp;')]),
+        return m('footer.main-footer.main-footer-neg', [m('section.w-container', m('.w-row', [m('.w-col.w-col-9', m('.w-row', [m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.w-hidden-tiny', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.contact', I18nScope$36())), m('a.link-footer[href=\'#?ref=ctrse_footer\']', [I18n$1.t('links.how_it_works', I18nScope$36()), m.trust('&nbsp;')]),
         // m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
         //     ' JVN flex'
         // ),
-        m('a.link-footer[href=\'/team?ref=ctrse_footer\']', [I18n$1.t('links.team', I18nScope$33()), m.trust(' &lt;'), '3']), m('a.link-footer[href=\'http://facebook.com/JVNepal\'][target=\'blank\']', ' Facebook'),
+        m('a.link-footer[href=\'/team?ref=ctrse_footer\']', [I18n$1.t('links.team', I18nScope$36()), m.trust(' &lt;'), '3']), m('a.link-footer[href=\'http://facebook.com/JVNepal\'][target=\'blank\']', ' Facebook'),
         // m('a.link-footer[href=\'http://twitter.com/catarse\']',
         //     ' Twitter'
         // ),
         // m('a.link-footer[href=\'http://instagram.com/catarse\']',
         //     ' Instagram'
         // ),
-        m('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']', ' Github'), m('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']', ' Blog'), m('a.link-footer[href=\'/jobs?ref=ctrse_footer\']', I18n$1.t('links.jobs', I18nScope$33()))]), m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-firstcolumn', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.about', I18nScope$33())), m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/requests/new\'][target="_BLANK"]', I18n$1.t('links.contact', I18nScope$33())),
+        m('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']', ' Github'), m('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']', ' Blog'), m('a.link-footer[href=\'/jobs?ref=ctrse_footer\']', I18n$1.t('links.jobs', I18nScope$36()))]), m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-firstcolumn', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.about', I18nScope$36())), m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/requests/new\'][target="_BLANK"]', I18n$1.t('links.contact', I18nScope$36())),
         // m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
         //     [
         //         I18n.t('links.rate', I18nScope()),
@@ -10532,11 +11305,11 @@ var footer = {
         // m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
         //     I18n.t('links.press', I18nScope())
         // ),
-        m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/\'][target="_BLANK"]', I18n$1.t('links.help_support', I18nScope$33())), m('a.link-footer[href=\'/en/terms-of-use?ref=ctrse_footer\']', I18n$1.t('links.terms', I18nScope$33())), m('a.link-footer[href=\'/en/privacy-policy?ref=ctrse_footer\']', I18n$1.t('links.privacy', I18nScope$33()))]), m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-lastcolumn', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.sitemap', I18nScope$33())), m('a.w-hidden-small.w-hidden-tiny.link-footer[href=\'/en/start?ref=ctrse_footer\']', I18n$1.t('links.submit', I18nScope$33())), m('a.link-footer[href=\'/en/explore?ref=ctrse_footer\']', I18n$1.t('links.discover', I18nScope$33())), m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']', ' Blog'), m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'#\']', I18n$1.t('links.contact', I18nScope$33())), m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=score&ref=ctrse_footer\']', I18n$1.t('links.score', I18nScope$33())), m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=online&ref=ctrse_footer\']', I18n$1.t('links.online', I18nScope$33())), m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=finished&ref=ctrse_footer\']', I18n$1.t('links.finished', I18nScope$33()))])])), m('.w-col.w-col-3.column-social-media-footer', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.newsletter', I18nScope$33())), m('.w-form', m('form[accept-charset=\'UTF-8\'][action=\'' + h.getMailchimpUrl() + '\'][id=\'mailee-form\'][method=\'post\']', [m('.w-form.footer-newsletter', m('input.w-input.text-field.prefix[id=\'EMAIL\'][label=\'email\'][name=\'EMAIL\'][placeholder=\'' + I18n$1.t('texts.email', I18nScope$33()) + '\'][type=\'email\']')), m('button.w-inline-block.btn.btn-edit.postfix.btn-attached[style="padding:0;"]', m('img.footer-news-icon[alt=\'Icon newsletter\'][src=\'/assets/catarse_bootstrap/icon-newsletter.png\']'))])), m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.social', I18nScope$33())), m('.w-widget.w-widget-facebook.u-marginbottom-20', m('.facebook', m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']'))),
+        m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/\'][target="_BLANK"]', I18n$1.t('links.help_support', I18nScope$36())), m('a.link-footer[href=\'/en/terms-of-use?ref=ctrse_footer\']', I18n$1.t('links.terms', I18nScope$36())), m('a.link-footer[href=\'/en/privacy-policy?ref=ctrse_footer\']', I18n$1.t('links.privacy', I18nScope$36()))]), m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.footer-full-lastcolumn', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.sitemap', I18nScope$36())), m('a.w-hidden-small.w-hidden-tiny.link-footer[href=\'/en/start?ref=ctrse_footer\']', I18n$1.t('links.submit', I18nScope$36())), m('a.link-footer[href=\'/en/explore?ref=ctrse_footer\']', I18n$1.t('links.discover', I18nScope$36())), m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']', ' Blog'), m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'#\']', I18n$1.t('links.contact', I18nScope$36())), m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=score&ref=ctrse_footer\']', I18n$1.t('links.score', I18nScope$36())), m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=online&ref=ctrse_footer\']', I18n$1.t('links.online', I18nScope$36())), m('a.w-hidden-tiny.link-footer[href=\'/en/explore?filter=finished&ref=ctrse_footer\']', I18n$1.t('links.finished', I18nScope$36()))])])), m('.w-col.w-col-3.column-social-media-footer', [m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.newsletter', I18nScope$36())), m('.w-form', m('form[accept-charset=\'UTF-8\'][action=\'' + h.getMailchimpUrl() + '\'][id=\'mailee-form\'][method=\'post\']', [m('.w-form.footer-newsletter', m('input.w-input.text-field.prefix[id=\'EMAIL\'][label=\'email\'][name=\'EMAIL\'][placeholder=\'' + I18n$1.t('texts.email', I18nScope$36()) + '\'][type=\'email\']')), m('button.w-inline-block.btn.btn-edit.postfix.btn-attached[style="padding:0;"]', m('img.footer-news-icon[alt=\'Icon newsletter\'][src=\'/assets/catarse_bootstrap/icon-newsletter.png\']'))])), m('.footer-full-signature-text.fontsize-small', I18n$1.t('titles.social', I18nScope$36())), m('.w-widget.w-widget-facebook.u-marginbottom-20', m('.facebook', m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']'))),
         // m('.w-widget.w-widget-twitter', [
         //     m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
         // ]),
-        m('.u-margintop-30', [m('.footer-full-signature-text.fontsize-small', 'Change language'), m('[id=\'google_translate_element\']')])])])), m('.w-container', m('.footer-full-copyleft', [m('img.u-marginbottom-20[alt=\'Logo footer\'][src=\'/assets/logo-footer.png\']'), m('.lineheight-loose', m('a.link-footer-inline[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']', I18n$1.t('texts.copyleft', I18nScope$33()) + (' | ' + new Date().getFullYear() + ' | Open Source')))]))]);
+        m('.u-margintop-30', [m('.footer-full-signature-text.fontsize-small', 'Change language'), m('[id=\'google_translate_element\']')])])])), m('.w-container', m('.footer-full-copyleft', [m('img.u-marginbottom-20[alt=\'Logo footer\'][src=\'/assets/logo-footer.png\']'), m('.lineheight-loose', m('a.link-footer-inline[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']', I18n$1.t('texts.copyleft', I18nScope$36()) + (' | ' + new Date().getFullYear() + ' | Open Source')))]))]);
     }
 };
 
@@ -10558,7 +11331,7 @@ var UserFollowCard = {
     view: function view(ctrl, args) {
         var friend = ctrl.friend(),
             profile_img = _$1.isEmpty(friend.avatar) ? '/assets/catarse_bootstrap/user.jpg' : friend.avatar;
-        return m('.w-col.w-col-4', m('.card.card-backer.u-marginbottom-20.u-radius.u-text-center', [m('img.thumb.u-marginbottom-10.u-round[src=\'' + profile_img + '\']'), m('.fontsize-base.fontweight-semibold.lineheight-tight', m('a.link-hidden', { href: '/users/' + friend.friend_id }, friend.public_name || friend.name)), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', _$1.isNull(friend.city) ? '' : m('.fontsize-smaller.fontcolor-secondary.u-marginbottom-10', friend.city + ', ' + friend.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', friend.total_contributed_projects), ' Backed ', m.trust('&nbsp;'), '| ', m.trust('&nbsp;'), m('span.fontweight-semibold', friend.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', m.component(UserFollowBtn, { following: friend.following, follow_id: friend.friend_id })), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])]));
+        return m('.w-col.w-col-4', m('.card.card-backer.u-marginbottom-20.u-radius.u-text-center', [m('img.thumb.u-marginbottom-10.u-round[src=\'' + profile_img + '\']'), m('.fontsize-base.fontweight-semibold.lineheight-tight', m('a.link-hidden', { href: '/users/' + friend.friend_id }, userVM.displayName(friend))), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', _$1.isNull(friend.city) ? '' : m('.fontsize-smaller.fontcolor-secondary.u-marginbottom-10', friend.city + ', ' + friend.state)), m('.fontsize-smaller', [m('span.fontweight-semibold', friend.total_contributed_projects), ' Backed ', m.trust('&nbsp;'), '| ', m.trust('&nbsp;'), m('span.fontweight-semibold', friend.total_published_projects), ' Created']), m('.btn-bottom-card.w-row', [m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3'), m('.w-col.w-col-6.w-col-small-4.w-col-tiny-6', m.component(UserFollowBtn, { following: friend.following, follow_id: friend.friend_id })), m('.w-col.w-col-3.w-col-small-4.w-col-tiny-3')])]));
     }
 };
 
@@ -10742,7 +11515,7 @@ var FollowFoundFriends = {
     }
 };
 
-var I18nScope$34 = _$1.partial(h.i18nScope, 'projects.contributions');
+var I18nScope$37 = _$1.partial(h.i18nScope, 'projects.contributions');
 
 var thankYou = {
     controller: function controller(args) {
@@ -10773,12 +11546,12 @@ var thankYou = {
         };
     },
     view: function view(ctrl, args) {
-        return m('#thank-you', { config: ctrl.setEvents }, [m('.page-header.u-marginbottom-30', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', [m('.u-marginbottom-20.u-text-center', m('img.big.thumb.u-round[src=\'' + args.contribution.project.user_thumb + '\']')), m('#thank-you.u-text-center', !ctrl.isSlip ? [m('#creditcard-thank-you.fontsize-larger.text-success.u-marginbottom-20', I18n$1.t('thank_you.thank_you', I18nScope$34())), m('.fontsize-base.u-marginbottom-40', m.trust(I18n$1.t('thank_you.thank_you_text_html', I18nScope$34({
+        return m('#thank-you', { config: ctrl.setEvents }, [m('.page-header.u-marginbottom-30', m('.w-container', m('.w-row', m('.w-col.w-col-10.w-col-push-1', [m('.u-marginbottom-20.u-text-center', m('img.big.thumb.u-round[src=\'' + args.contribution.project.user_thumb + '\']')), m('#thank-you.u-text-center', !ctrl.isSlip ? [m('#creditcard-thank-you.fontsize-larger.text-success.u-marginbottom-20', I18n$1.t('thank_you.thank_you', I18nScope$37())), m('.fontsize-base.u-marginbottom-40', m.trust(I18n$1.t('thank_you.thank_you_text_html', I18nScope$37({
             total: args.contribution.project.total_contributions,
             email: args.contribution.contribution_email,
             link2: '/en/users/' + h.getUser().user_id + '/edit#contributions',
             link_email: '/en/users/' + h.getUser().user_id + '/edit#about_me'
-        })))), m(".fontsize-base.fontweight-semibold.u-marginbottom-20", "Share with your friends and help this project hit the goal!")] : [m('#slip-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n$1.t('thank_you_slip.thank_you', I18nScope$34())), m('.fontsize-base.u-marginbottom-40', m.trust(I18n$1.t('thank_you_slip.thank_you_text_html', I18nScope$34({
+        })))), m(".fontsize-base.fontweight-semibold.u-marginbottom-20", "Share with your friends and help this project hit the goal!")] : [m('#slip-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n$1.t('thank_you_slip.thank_you', I18nScope$37())), m('.fontsize-base.u-marginbottom-40', m.trust(I18n$1.t('thank_you_slip.thank_you_text_html', I18nScope$37({
             email: args.contribution.contribution_email,
             link_email: '/en/users/' + h.getUser().user_id + '/edit#about_me'
         }))))]), ctrl.isSlip ? '' : m('.w-row', [m('.w-hidden-small.w-hidden-tiny', [m('.w-sub-col.w-col.w-col-4', m.component(facebookButton, {
@@ -10803,14 +11576,14 @@ var thankYou = {
             height: '905px',
             frameborder: '0',
             style: 'overflow: hidden;'
-        }))) : [m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center', I18n$1.t('thank_you.project_recommendations', I18nScope$34())), m.component(projectRow, {
+        }))) : [m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center', I18n$1.t('thank_you.project_recommendations', I18nScope$37())), m.component(projectRow, {
             collection: ctrl.recommendedProjects,
             ref: 'ctrse_thankyou_r'
         })]))]);
     }
 };
 
-var I18nScope$35 = _$1.partial(h.i18nScope, 'users.edit.email_confirmation');
+var I18nScope$38 = _$1.partial(h.i18nScope, 'users.edit.email_confirmation');
 
 var CheckEmail = {
     controller: function controller(args) {
@@ -10838,7 +11611,6 @@ var CheckEmail = {
                     window.setTimeout(function () {
                         hideAlert(true);
                         m.redraw(true);
-                        console.log(data);
                     }, 4000);
                 });
             }
@@ -10849,7 +11621,7 @@ var CheckEmail = {
         if (user) {
             var userCreatedRecently = moment().isBefore(moment(user.created_at).add(2, 'days'));
 
-            return user && !userCreatedRecently && !user.email_active && !ctrl.hideAlert() ? m('.card-alert.section.u-text-center', { style: args.menuTransparency ? { 'padding-top': '100px' } : {} }, [m('.w-container', ctrl.confirmedEmail() ? [m('.fontsize-large.fontweight-semibold', I18n$1.t('confirmed_title', I18nScope$35())), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n$1.t('confirmed_sub', I18nScope$35()))] : [m('.fontsize-large.fontweight-semibold', _$1.isNull(user.name) ? "Hi" : I18n$1.t('hello', I18nScope$35({ name: user.name }))), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n$1.t('hello_sub', I18nScope$35())), m('.fontsize-base.u-marginbottom-10', I18n$1.t('hello_email', I18nScope$35({ email: user.email }))), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-3', [m('a.btn.btn-medium.btn-terciary.w-button[href="javacript:void(0);"]', {
+            return user && !userCreatedRecently && !user.email_active && !ctrl.hideAlert() ? m('.card-alert.section.u-text-center', { style: args.menuTransparency ? { 'padding-top': '100px' } : {} }, [m('.w-container', ctrl.confirmedEmail() ? [m('.fontsize-large.fontweight-semibold', I18n$1.t('confirmed_title', I18nScope$38())), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n$1.t('confirmed_sub', I18nScope$38()))] : [m('.fontsize-large.fontweight-semibold', _$1.isNull(user.name) ? "Hi" : I18n$1.t('hello', I18nScope$38({ name: user.name }))), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n$1.t('hello_sub', I18nScope$38())), m('.fontsize-base.u-marginbottom-10', I18n$1.t('hello_email', I18nScope$38({ email: user.email }))), m('.w-row', [m('.w-col.w-col-3'), m('.w-col.w-col-3', [m('button.btn.btn-medium.btn-terciary.w-button', {
                 onclick: ctrl.checkEmail
             }, 'Yes!')]), m('.w-col.w-col-3', [m('a.btn.btn-medium.w-button[href="/users/' + user.id + '/edit#about_me"]', 'Edit Email')]), m('.w-col.w-col-3')])])]) : m('div');
         }
@@ -10871,8 +11643,341 @@ var projectEditUserAbout = {
             useFloatBtn: true,
             hideDisableAcc: true,
             hideCoverImg: true,
-            hidePasswordChange: true
+            hidePasswordChange: true,
+            rails_errors: args.rails_errors,
+            publishingUserAbout: true
         }) : m('div', h.loader());
+    }
+};
+
+var editRewardCard = {
+    controller: function controller(args) {
+        var shipping_options = m.prop(args.reward.shipping_options),
+            reward = args.reward,
+            minimumValue = m.prop(args.reward.minimum_value),
+            title = m.prop(args.reward.title),
+            maximumContributions = m.prop(args.reward.maximum_contributions),
+            index = args.index,
+            showTips = h.toggleProp(false, true),
+            states = m.prop([]),
+            fees = m.prop([]),
+            statesLoader = rewardVM.statesLoader,
+            updateOptions = function updateOptions() {
+            if ((shipping_options() === 'national' || shipping_options() === 'international') && !_$1.contains(_$1.pluck(fees(), 'destination'), 'others')) {
+                fees().push({
+                    value: 0,
+                    destination: 'others'
+                });
+            }
+            if (shipping_options() === 'national') {
+                fees(_$1.reject(fees(), function (fee) {
+                    return fee.destination === 'international';
+                }));
+            } else if (shipping_options() === 'international' && !_$1.contains(_$1.pluck(fees(), 'destination'), 'international')) {
+                fees().push({
+                    value: 0,
+                    destination: 'international'
+                });
+            }
+        };
+
+        statesLoader.load().then(function (data) {
+            states(data);
+            states().unshift({
+                acronym: null,
+                name: 'state'
+            });
+
+            if (!args.reward.newReward) {
+                rewardVM.getFees(args.reward).then(function (feeData) {
+                    fees(feeData);
+                    updateOptions();
+                });
+            }
+        });
+
+        return {
+            minimumValue: minimumValue,
+            title: title,
+            maximumContributions: maximumContributions,
+            updateOptions: updateOptions,
+            showTips: showTips,
+            shipping_options: shipping_options,
+            states: states,
+            reward: reward,
+            index: index,
+            fees: fees
+        };
+    },
+    view: function view(ctrl) {
+        var reward = ctrl.reward,
+            index = ctrl.index,
+            newFee = {
+            value: null,
+            destination: null
+        },
+            fees = ctrl.fees();
+
+        return m('.w-row.card.card-terciary.u-marginbottom-20.card-edition.medium', [m('.w-col.w-col-5.w-sub-col', [m('.fontweight-semibold.fontsize-smallest.u-marginbottom-10', ['Edit reward', m.trust('&nbsp;'), m('a.link-edit.fa.fa-question-circle', {
+            onclick: function onclick() {
+                return ctrl.showTips.toggle();
+            }
+        })]), ctrl.showTips() ? m('.fontsize-smallest.fontcolor-secondary.reward-explanation.u-marginbottom-20', 'Describe the reward value and place a real delivery date forecast for the supporters. You can also limit a reward and when the limit is reached it appears as SOLD. If you want to change the order that the rewards appear in your project, simply do this by dragging them up or down.') : '']), m('.w-col.w-col-7', m('.card', m('.w-form', [m('.w-row', [m('.w-col.w-col-5', m('label.fontsize-smaller', 'Title:')), m('.w-col.w-col-7', m('input.w-input.text-field.positive[aria-required=\'true\'][autocomplete=\'off\'][type=\'tel\'][id=\'project_rewards_attributes_' + index + '_title\']', {
+            name: 'project[rewards_attributes][' + index + '][title]',
+            value: ctrl.title(),
+            onchange: m.withAttr('value', ctrl.title)
+        }))]), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-5', m('label.fontsize-smaller', 'Minimum value:')), m('.w-col.w-col-7', [m('.w-row', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3.text-field.positive.prefix.no-hover', m('.fontsize-smallest.fontcolor-secondary.u-text-center', 'Rs')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.string.tel.required.w-input.text-field.project-edit-reward.positive.postfix[aria-required=\'true\'][autocomplete=\'off\'][required=\'required\'][type=\'tel\'][id=\'project_rewards_attributes_' + index + '_minimum_value\']', {
+            name: 'project[rewards_attributes][' + index + '][minimum_value]',
+            value: ctrl.minimumValue(),
+            onchange: m.withAttr('value', ctrl.minimumValue)
+        }))]), m(".fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for='reward_minimum_value']", 'Enter a minimum value greater than or equal to 10')])]), m('.w-row', [m('.w-col.w-col-5', m('label.fontsize-smaller', 'Delivery forecast:')), m('.w-col.w-col-7', m('.w-row', m('.w-col.w-col-12', m('.w-row', [m('input[id=\'project_rewards_attributes_' + index + '_deliver_at_3i\'][type=\'hidden\'][value=\'1\']', {
+            name: 'project[rewards_attributes][' + index + '][deliver_at(3i)]'
+        }), m('select.date.required.w-input.text-field.w-col-6.positive[aria-required=\'true\'][discard_day=\'true\'][required=\'required\'][use_short_month=\'true\'][id=\'project_rewards_attributes_' + index + '_deliver_at_2i\']', {
+            name: 'project[rewards_attributes][' + index + '][deliver_at(2i)]'
+        }, [_$1.map(moment.monthsShort(), function (month, monthIndex) {
+            var selectedMonth = reward.deliver_at ? moment(reward.deliver_at).format('MMM') : moment().format('MMM');
+            return m('option[value=\'' + (monthIndex + 1) + '\']' + (selectedMonth === month ? "[selected='selected']" : ''), h.capitalize(month));
+        })]), m('select.date.required.w-input.text-field.w-col-6.positive[aria-required=\'true\'][discard_day=\'true\'][required=\'required\'][use_short_month=\'true\'][id=\'project_rewards_attributes_' + index + '_deliver_at_1i\']', {
+            name: 'project[rewards_attributes][' + index + '][deliver_at(1i)]'
+        }, [_$1.map(_$1.range(moment().year(), moment().year() + 6), function (year) {
+            return m('option[value=\'' + year + '\']' + (moment(reward.deliver_at).format('YYYY') === String(year) ? "[selected='selected']" : ''), year);
+        })])]))))]), m('.w-row', m('label.fontsize-smaller', 'Description:')), m('.w-row', [m('textarea.text.required.w-input.text-field.positive.height-medium[aria-required=\'true\'][placeholder=\'Write your reward\'][required=\'required\'][id=\'project_rewards_attributes_' + index + '_description\']', {
+            name: 'project[rewards_attributes][' + index + '][description]'
+        }, reward.description), m(".fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for='reward_description']", 'Please provide a description for the reward')]),
+
+        // m('.u-marginbottom-30.w-row', [
+        //     m('.w-col.w-col-3',
+        //         m("label.fontsize-smaller[for='field-2']",
+        //             'Type of delivery'
+        //         )
+        //     ),
+        //     m('.w-col.w-col-9', [
+        //         m(`select.positive.text-field.w-select[id='project_rewards_attributes_${index}_shipping_options']`, {
+        //             name: `project[rewards_attributes][${index}][shipping_options]`,
+        //             value: ctrl.shipping_options() || 'free',
+        //             onchange: (e) => {
+        //                 ctrl.shipping_options(e.target.value);
+        //                 ctrl.updateOptions();
+        //             }
+        //         }, [
+        //             m('option[value=\'international\']',
+        //                 'Frete Nacional e Internacional'
+        //             ),
+        //             m('option[value=\'national\']',
+        //                 'Frete Nacional'
+        //             ),
+        //             m('option[value=\'free\']',
+        //                 'Sem frete envolvido'
+        //             ),
+        //             m('option[value=\'presential\']',
+        //                 'Retirada presencial'
+        //             )
+        //         ]),
+        //
+        //         ((ctrl.shipping_options() === 'national' || ctrl.shipping_options() === 'international') ?
+        //             m('.card.card-terciary', [
+        //
+        //                 // state fees
+        //                 (_.map(fees, (fee, feeIndex) => [m(shippingFeeInput, {
+        //                     fee,
+        //                     fees: ctrl.fees,
+        //                     index,
+        //                     feeIndex,
+        //                     states: ctrl.states
+        //                 }),
+        //
+        //                 ])),
+        //                 m('.u-margintop-20',
+        //                     m("a.alt-link[href='#']", {
+        //                         onclick: () => {
+        //                             ctrl.fees().push(newFee);
+        //                             return false;
+        //                         }
+        //                     },
+        //                         'Adicionar destino'
+        //                     )
+        //                 )
+        //             ]) : '')
+        //     ])
+        // ]),
+        m('.w-row.u-marginbottom-20', [m('.w-col.w-col-5', m('.w-checkbox', [m('.w-checkbox-input', m('input.limit_reward[type=\'checkbox\'][id=\'limit_reward\']', {
+            checked: reward.limited(),
+            onclick: function onclick() {
+                reward.limited.toggle();
+            }
+        })), m('label.w-form-label', 'Limit reward')])), reward.limited() ? m('.w-col.w-col-7.reward_maximum_contributions', m('input.string.tel.optional.w-input.text-field.u-marginbottom-30.positive[placeholder=\'Available quantity\'][type=\'tel\'][id=\'project_rewards_attributes_' + index + '_maximum_contributions\']', {
+            name: 'project[rewards_attributes][' + index + '][maximum_contributions]',
+            value: ctrl.maximumContributions(),
+            onchange: m.withAttr('value', ctrl.maximumContributions)
+        })) : '']), m('.w-row.u-margintop-30', [reward.newReward ? '' : m('.w-col.w-col-5.w-col-small-5.w-col-tiny-5.w-sub-col-middle', m("input.w-button.btn-terciary.btn.btn-small.reward-close-button[type='submit'][value='Close']", {
+            onclick: function onclick() {
+                reward.edit.toggle();
+            }
+        })), m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1', [m('input[id=\'project_rewards_attributes_' + index + '__destroy\'][type=\'hidden\'][value=\'false\']', {
+            name: 'project[rewards_attributes][' + index + '][_destroy]'
+        }), m("a.remove_fields.existing[data-confirm='Are you sure?'][href='#']", m('.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border'))])])])))]);
+    }
+};
+
+var I18nScope$39 = _$1.partial(h.i18nScope, 'projects.reward_fields');
+
+var dashboardRewardCard = {
+    controller: function controller() {
+        var availableCount = function availableCount(reward) {
+            return reward.maximum_contributions - reward.paid_count;
+        };
+
+        return {
+            availableCount: availableCount
+        };
+    },
+    view: function view(ctrl, args) {
+        var reward = args.reward;
+        return m('.w-row.card-persisted.card.card-terciary.u-marginbottom-20.medium.sortable', [m('.w-sub-col.w-col.w-col-5', [m('span.fontcolor-secondary.fontsize-smallest', 'Link to direct support'), m('.u-marginbottom-20.w-row', m('.w-col.w-col-12', m.component(copyTextInput, {
+            value: 'http://www.myjvn.com/projects/' + args.project_id + '/contributions/new?reward_id=' + reward.id
+        }))), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-20', 'The link above leads to the contribution page with this reward already selected.')]), m('.w-col.w-col-7', m('.card', [m('.w-row', [m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.fontsize-base.fontweight-semibold', 'For Rs ' + reward.minimum_value + ' or more')), rewardVM.canEdit(reward, args.project_state, args.user) ? m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1', m("a.show_reward_form[href='javascript:void(0);']", {
+            onclick: function onclick() {
+                reward.edit.toggle();
+            }
+        }, m('.btn.btn-small.btn-terciary.fa.fa-lg.fa-edit.btn-no-border'))) : '']), m('.fontsize-smaller.u-marginbottom-20.fontweight-semibold', reward.paid_count + ' supporters'), m('.fontsize-small.fontweight-semibold', reward.title), m('.fontsize-small.fontcolor-secondary', m.trust(h.simpleFormat(h.strip(reward.description)))), reward.limited() ? ctrl.availableCount(reward) <= 0 ? m('.u-margintop-10', m('span.badge.badge-gone.fontsize-smaller', 'Out of stock')) : m('.u-margintop-10', m('span.badge.badge-attention.fontsize-smaller', [m('span.fontweight-bold', 'Limited '), ' (' + ctrl.availableCount(reward) + ' in ' + reward.maximum_contributions + ' Available)'])) : '', reward.deliver_at ? m('.fontsize-smallest', [m('b', 'Estimated delivery: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : '']))]);
+    }
+};
+
+var projectEditReward = {
+    controller: function controller(args) {
+        var rewards = m.prop([]),
+            loading = m.prop(false),
+            error = m.prop(false),
+            errors = m.prop([]),
+            showSuccess = m.prop(false),
+            availableCount = function availableCount(reward) {
+            return reward.maximum_contributions - reward.paid_count;
+        },
+            updateRewardData = function updateRewardData() {
+            var data = $('#reward_form').serialize();
+            loading(true);
+            // m.request won't serialize params properly here
+            return $.ajax({
+                type: 'PATCH',
+                url: '/en/projects/' + args.project_id + '\'',
+                data: data,
+                dataType: 'JSON'
+            }).done(function () {
+                error(false);
+                showSuccess(true);
+            }).fail(function (json) {
+                error(true);
+                showSuccess(false);
+                var messages = JSON.parse(json.responseText).errors.join('</br>');
+                errors(messages);
+            }).always(function () {
+                loading(false);
+                m.redraw();
+            });
+        },
+            onSubmit = function onSubmit() {
+            updateRewardData();
+
+            return false;
+        },
+            newReward = {
+            id: null,
+            minimum_value: null,
+            title: null,
+            deliver_at: null,
+            description: null,
+            paid_count: 0,
+            edit: m.prop(true),
+            limited: h.toggleProp(false, true),
+            maximum_contributions: null,
+            newReward: true,
+            row_order: 999999999 + rewards().length * 20 // we need large and spaced apart numbers
+        };
+
+        var updateRewardSortPosition = function updateRewardSortPosition(rewardId, position) {
+            return m.request({
+                method: 'POST',
+                url: '/en/projects/' + args.project_id + '/rewards/' + rewardId + '/sort?reward[row_order_position]=' + position,
+                config: function config(xhr) {
+                    if (h.authenticityToken()) {
+                        xhr.setRequestHeader('X-CSRF-Token', h.authenticityToken());
+                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    }
+                }
+            });
+        };
+
+        var setSorting = function setSorting(el, isInit) {
+            if (!isInit && window.$) {
+                window.$(el).sortable({
+                    update: function update(event, ui) {
+                        var rewardId = ui.item[0].id;
+                        updateRewardSortPosition(rewardId, ui.item.index());
+                    }
+                });
+            }
+        };
+
+        rewardVM.fetchRewards(args.project_id).then(function () {
+            _$1.map(rewardVM.rewards(), function (reward) {
+                var limited = reward.maximum_contributions !== null;
+                _$1.extend(reward, {
+                    edit: h.toggleProp(false, true),
+                    limited: h.toggleProp(limited, !limited)
+                });
+                rewards().push(reward);
+            });
+
+            if (rewardVM.rewards().length === 0) {
+                rewards().push(newReward);
+            }
+        });
+        return {
+            loading: loading,
+            error: error,
+            errors: errors,
+            showSuccess: showSuccess,
+            rewards: rewards,
+            onSubmit: onSubmit,
+            user: userVM.fetchUser(args.user_id),
+            availableCount: availableCount,
+            newReward: newReward,
+            setSorting: setSorting
+        };
+    },
+    view: function view(ctrl, args) {
+        return m("[id='dashboard-rewards-tab']", m('.w-section.section', m('.w-container', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: 'Rewards successfully saved'
+        }) : '', ctrl.error() ? m.component(popNotification, {
+            message: ctrl.errors(),
+            error: true
+        }) : '', m('.w-row', m('.w-col.w-col-10.w-col-push-1', m('form.simple_form.project-form.w-form[id=\'reward_form\']', {
+            onsubmit: ctrl.onSubmit
+        }, [m("input[name='utf8'][type='hidden'][value='✓']"), m("input[name='_method'][type='hidden'][value='patch']"), m('input[name="authenticity_token"][type="hidden"][value=' + h.authenticityToken() + ']'), m('input[id=\'project_id\'][name=\'project_id\'][type=\'hidden\'][value=\'' + args.project_id + '\']'), m("input[id='anchor'][name='anchor'][type='hidden'][value='reward']"), m("[id='dashboard-rewards']", [ctrl.rewards().length === 0 ? '' : m(".ui-sortable[id='rewards']", {
+            config: ctrl.setSorting
+        }, [_$1.map(_$1.sortBy(ctrl.rewards(), function (reward) {
+            return Number(reward.row_order);
+        }), function (reward, index) {
+            return m('div[id=' + reward.id + ']', [m('.nested-fields', m('.reward-card', [!reward.edit() ? m(dashboardRewardCard, {
+                reward: reward,
+                user: ctrl.user(),
+                project_id: args.project_id,
+                project_state: args.project_state
+            }) : m(editRewardCard, {
+                reward: reward,
+                index: index
+            })])), m('input.ui-sortable-handle[id=\'project_rewards_attributes_' + index + '_id\'][type=\'hidden\']', {
+                name: 'project[rewards_attributes][' + index + '][id]',
+                value: reward.id
+            })]);
+        })])])])))]), rewardVM.canAdd(args.project_state) ? [m("a.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields[href='#']", {
+            onclick: function onclick() {
+                return ctrl.rewards().push(ctrl.newReward);
+            }
+        }, '+ Add reward'), m(projectEditSaveBtn, {
+            loading: ctrl.loading,
+            onSubmit: ctrl.onSubmit
+        })] : ''));
     }
 };
 
@@ -10887,7 +11992,999 @@ var projectEditUserSettings = {
             user: ctrl.user(),
             userId: args.user_id,
             hideCreditCards: true,
-            useFloatBtn: true
+            useFloatBtn: true,
+            rails_errors: args.rails_errors,
+            publishingUserSettings: true
+        }) : m('div', h.loader());
+    }
+};
+
+var mapRailsErrors$2 = function mapRailsErrors(rails_errors, errors_fields, e) {
+    var parsedErrors = void 0;
+    try {
+        parsedErrors = JSON.parse(rails_errors);
+    } catch (err) {
+        parsedErrors = {};
+    }
+    var extractAndSetErrorMsg = function extractAndSetErrorMsg(label, fieldArray) {
+        var value = _$1.first(_$1.compact(_$1.map(fieldArray, function (field) {
+            return _$1.first(parsedErrors[field]);
+        })));
+
+        if (value) {
+            e(label, value);
+            e.inlineError(label, true);
+        }
+    };
+
+    _$1.each(errors_fields, function (item, i) {
+        extractAndSetErrorMsg(item[0], item[1]);
+    });
+};
+
+var railsErrorsVM = {
+    mapRailsErrors: mapRailsErrors$2
+};
+
+var e$3 = generateErrorInstance();
+
+var fields$2 = {
+    tracker_snippet_html: m.prop(''),
+    user_id: m.prop(''),
+    public_tags: m.prop(''),
+    admin_tags: m.prop(''),
+    service_fee: m.prop(''),
+    name: m.prop(''),
+    permalink: m.prop(''),
+    category_id: m.prop(''),
+    city_id: m.prop(''),
+    city_name: m.prop('')
+};
+
+var fillFields = function fillFields(data) {
+    fields$2.tracker_snippet_html(data.tracker_snippet_html || '');
+    fields$2.user_id(data.user_id);
+    fields$2.admin_tags(data.admin_tag_list || '');
+    fields$2.public_tags(data.tag_list || '');
+    fields$2.service_fee(data.service_fee);
+    fields$2.name(data.name);
+    fields$2.permalink(data.permalink);
+    fields$2.category_id(data.category_id);
+    fields$2.city_id(data.city_id || '');
+    if (data.address.city) {
+        fields$2.city_name(data.address.city + ' - ' + data.address.state);
+    }
+};
+
+var updateProject$1 = function updateProject(project_id) {
+    var projectData = {
+        tracker_snippet_html: fields$2.tracker_snippet_html(),
+        user_id: fields$2.user_id(),
+        all_tags: fields$2.admin_tags(),
+        all_public_tags: fields$2.public_tags(),
+        service_fee: fields$2.service_fee(),
+        name: fields$2.name(),
+        permalink: fields$2.permalink(),
+        category_id: fields$2.category_id(),
+        city_id: fields$2.city_id };
+
+    return projectVM.updateProject(project_id, projectData);
+};
+
+var loadCategoriesOptionsTo = function loadCategoriesOptionsTo(prop, selected) {
+    var filters = postgrest$1.filtersVM;
+    models.category.getPage(filters({}).order({
+        name: 'asc'
+    }).parameters()).then(function (data) {
+        var mapped = _$1.map(data, function (item, index) {
+            return m('option[value=\'' + item.id + '\']', {
+                selected: selected == item.id
+            }, item.name);
+        });
+
+        prop(mapped);
+    });
+};
+
+var generateSearchCity = function generateSearchCity(prop) {
+    var filters = postgrest$1.filtersVM({
+        search_index: '@@'
+    }).order({ name: 'asc' });
+
+    var genSelectClickCity = function genSelectClickCity(city, citiesProp) {
+        return function () {
+            fields$2.city_name(city.name + ' - ' + city.acronym);
+            fields$2.city_id(city.id);
+            citiesProp('');
+        };
+    };
+
+    return function (event) {
+        var value = event.currentTarget.value;
+        filters.search_index(replaceDiacritics(value));
+        fields$2.city_name(value);
+
+        models.city.getPage(filters.parameters()).then(function (data) {
+            var map = _$1.map(data, function (item) {
+                return m('.table-row.fontsize-smallest.fontcolor-secondary', [m('.city-select.fontsize-smallest.link-hidden-light', {
+                    onclick: genSelectClickCity(item, prop)
+                }, item.name + ' - ' + item.acronym)]);
+            });
+
+            prop(m('.table-outer.search-pre-result', map));
+        }).catch(function (err) {
+            prop('');
+        });
+    };
+};
+
+var projectBasicsVM = {
+    fields: fields$2,
+    fillFields: fillFields,
+    updateProject: updateProject$1,
+    loadCategoriesOptionsTo: loadCategoriesOptionsTo,
+    e: e$3,
+    generateSearchCity: generateSearchCity
+};
+
+var inputCard = {
+    view: function view(ctrl, args) {
+        var cardClass = args.cardClass || '.w-row.u-marginbottom-30.card.card-terciary';
+
+        return m(cardClass, [m('.w-col.w-col-5.w-sub-col', [m('label.field-label.fontweight-semibold', args.label), args.label_hint ? m('label.hint.fontsize-smallest.fontcolor-secondary', args.label_hint) : '']), m('.w-col.w-col-7.w-sub-col', args.children)]);
+    }
+};
+
+var I18nScope$40 = _$1.partial(h.i18nScope, 'projects.dashboard_basics');
+
+var projectBasicsEdit = {
+    controller: function controller(args) {
+        var vm = projectBasicsVM,
+            mapErrors = [['name', ['name']], ['public_tags', ['public_tags']], ['permalink', ['permalink']], ['category_id', ['category']], ['city_id', ['city']]],
+            loading = m.prop(false),
+            cities = m.prop(),
+            categories = m.prop([]),
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            onSubmit = function onSubmit(event) {
+            loading(true);
+            m.redraw();
+            vm.updateProject(args.projectId).then(function (data) {
+                loading(false);
+                vm.e.resetFieldErrors();
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (showError()) {
+                    showError.toggle();
+                }
+            }).catch(function (err) {
+                if (err.errors_json) {
+                    railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
+                }
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+            return false;
+        };
+        if (args.rails_errors) {
+            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        }
+        vm.fillFields(args.project);
+        vm.loadCategoriesOptionsTo(categories, vm.fields.category_id());
+        return {
+            vm: vm,
+            onSubmit: onSubmit,
+            loading: loading,
+            categories: categories,
+            cities: cities,
+            showSuccess: showSuccess,
+            showError: showError
+        };
+    },
+    view: function view(ctrl, args) {
+        var _m;
+
+        var vm = ctrl.vm;
+        return m('#basics-tab', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: I18n$1.t('shared.successful_update'),
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: I18n$1.t('shared.failed_update'),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '',
+
+        // add pop notifications here
+        m('form.w-form', { onsubmit: ctrl.onSubmit }, [m('.w-container', [
+        // admin fields
+        args.user.is_admin ? m('.w-row', [m('.w-col.w-col-10.w-col-push-1', [m(inputCard, {
+            label: I18n$1.t('tracker_snippet_html', I18nScope$40()),
+            children: [m('textarea.text.optional.w-input.text-field.positive.medium', {
+                value: vm.fields.tracker_snippet_html(),
+                onchange: m.withAttr('value', vm.fields.tracker_snippet_html)
+            })]
+        }), m(inputCard, {
+            label: I18n$1.t('user_id', I18nScope$40()),
+            children: [m('input.string.optional.w-input.text-field.positive.medium[type="text"]', {
+                value: vm.fields.user_id(),
+                onchange: m.withAttr('value', vm.fields.user_id)
+            })]
+        }), m(inputCard, (_m = {
+            label: 'Admin Tags'
+        }, defineProperty(_m, 'label', I18n$1.t('admin_tags', I18nScope$40())), defineProperty(_m, 'label_hint', I18n$1.t('admin_tags_hint', I18nScope$40())), defineProperty(_m, 'children', [m('input.string.optional.w-input.text-field.positive.medium[type="text"]', {
+            value: vm.fields.admin_tags(),
+            onchange: m.withAttr('value', vm.fields.admin_tags)
+        })]), _m)), m(inputCard, {
+            label: I18n$1.t('service_fee', I18nScope$40()),
+            children: [m('input.string.optional.w-input.text-field.positive.medium[type="number"]', {
+                value: vm.fields.service_fee(),
+                onchange: m.withAttr('value', vm.fields.service_fee)
+            })]
+        })])]) : '', m('.w-row', [m('.w-col.w-col-10.w-col-push-1', [m(inputCard, {
+            label: I18n$1.t('name', I18nScope$40()),
+            label_hint: I18n$1.t('name_hint', I18nScope$40()),
+            children: [m('input.string.required.w-input.text-field.positive.medium[type="text"][maxlength="50"]', {
+                value: vm.fields.name(),
+                class: vm.e.hasError('name') ? 'error' : '',
+                onchange: m.withAttr('value', vm.fields.name)
+            }), vm.e.inlineError('name')]
+        }), m(inputCard, {
+            label: I18n$1.t('tags', I18nScope$40()),
+            label_hint: I18n$1.t('tags_hint', I18nScope$40()),
+            children: [m('input.string.optional.w-input.text-field.positive.medium[type="text"]', {
+                value: vm.fields.public_tags(),
+                class: vm.e.hasError('public_tags') ? 'error' : '',
+                onchange: m.withAttr('value', vm.fields.public_tags)
+            }), vm.e.inlineError('public_tags')]
+        }), m(inputCard, {
+            label: I18n$1.t('permalink', I18nScope$40()),
+            label_hint: I18n$1.t('permalink_hint', I18nScope$40()),
+            children: [m('.w-row', [m('.w-col.w-col-4.w-col-small-6.w-col-tiny6.text-field.prefix.no-hover.medium.prefix-permalink', {
+                class: vm.e.hasError('permalink') ? 'error' : ''
+            }, m('.fontcolor-secondary.u-text-center.fontcolor-secondary.u-text-center.fontsize-smallest', 'www.myjvn.com/')), m('.w-col.w-col-8.w-col-small-6.w-col-tiny-6', [m('input.string.required.w-input.text-field.postfix.positive.medium[type="text"]', {
+                value: vm.fields.permalink(),
+                class: vm.e.hasError('permalink') ? 'error' : '',
+                onchange: m.withAttr('value', vm.fields.permalink)
+            })])]), m('.w-row', vm.e.inlineError('permalink'))]
+        }), m(inputCard, {
+            label: I18n$1.t('category', I18nScope$40()),
+            label_hint: I18n$1.t('category_hint', I18nScope$40()),
+            children: [m('select.required.w-input.text-field.w-select.positive.medium', {
+                value: vm.fields.category_id(),
+                class: vm.e.hasError('category_id') ? 'error' : '',
+                onchange: m.withAttr('value', vm.fields.category_id)
+            }, ctrl.categories()), vm.e.inlineError('category_id')]
+        }), m(inputCard, {
+            label: I18n$1.t('city', I18nScope$40()),
+            label_hint: I18n$1.t('city_hint', I18nScope$40()),
+            children: [m('input.string.required.w-input.text-field.positive.medium[type="text"]', {
+                value: vm.fields.city_name(),
+                class: vm.e.hasError('city_id') ? 'error' : '',
+                onkeyup: vm.generateSearchCity(ctrl.cities)
+            }), vm.e.inlineError('city_id'), ctrl.cities()]
+        })])])]), m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })])]);
+    }
+};
+
+var projectEditBasic = {
+    controller: function controller(args) {
+        return {
+            user: userVM.fetchUser(args.user_id),
+            project: projectVM.fetchProject(args.project_id)
+        };
+    },
+    view: function view(ctrl, args) {
+        return ctrl.user() && ctrl.project() ? m(projectBasicsEdit, {
+            user: ctrl.user(),
+            userId: args.user_id,
+            projectId: args.project_id,
+            project: ctrl.project(),
+            rails_errors: args.rails_errors
+        }) : m('div', h.loader());
+    }
+};
+
+var e$4 = generateErrorInstance();
+
+var fields$3 = {
+    about_html: m.prop('')
+};
+
+var fillFields$1 = function fillFields(data) {
+    fields$3.about_html(data.about_html || '');
+};
+
+var updateProject$2 = function updateProject(project_id) {
+    var projectData = {
+        about_html: fields$3.about_html()
+    };
+
+    return projectVM.updateProject(project_id, projectData);
+};
+
+var projectDescriptionVM = {
+    fields: fields$3,
+    fillFields: fillFields$1,
+    updateProject: updateProject$2,
+    e: e$4
+};
+
+var bigInputCard = {
+    view: function view(ctrl, args) {
+        var cardClass = args.cardClass || '.w-row.u-marginbottom-30.card.card-terciary.padding-redactor-description.text.optional.project_about_html.field_with_hint';
+
+        return m(cardClass, { style: args.cardStyle || {} }, [m('div', [m('label.field-label.fontweight-semibold.fontsize-base', args.label), args.label_hint ? m('label.hint.fontsize-smallest.fontcolor-secondary', args.label_hint) : '']), m('div', args.children)]);
+    }
+};
+
+var I18nScope$41 = _$1.partial(h.i18nScope, 'projects.dashboard_description');
+
+var projectDescriptionEdit = {
+    controller: function controller(args) {
+        var vm = projectDescriptionVM,
+            mapErrors = [["about_html", ["about_html"]]],
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            loading = m.prop(false),
+            onSubmit = function onSubmit(event) {
+            loading(true);
+            m.redraw();
+            vm.updateProject(args.projectId).then(function (data) {
+                loading(false);
+                vm.e.resetFieldErrors();
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (showError()) {
+                    showError.toggle();
+                }
+            }).catch(function (err) {
+                if (err.errors_json) {
+                    railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
+                }
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+            return false;
+        };
+
+        if (args.rails_errors) {
+            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        }
+        vm.fillFields(args.project);
+
+        return {
+            onSubmit: onSubmit,
+            showSuccess: showSuccess,
+            showError: showError,
+            vm: vm,
+            loading: loading
+        };
+    },
+    view: function view(ctrl, args) {
+        var vm = ctrl.vm;
+        return m('#description-tab', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: I18n$1.t('shared.successful_update'),
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: I18n$1.t('shared.failed_update'),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '', m('form.w-form', { onsubmit: ctrl.onSubmit }, [m('.w-container', [m('.w-row', [m('.w-col.w-col-10.w-col-push-1', [m('.u-marginbottom-60.u-text-center', [m('.w-inline-block.card.fontsize-small.u-radius', [m.trust(I18n$1.t('description_alert', I18nScope$41()))])]), m(bigInputCard, {
+            label: I18n$1.t('description_label', I18nScope$41()),
+            label_hint: I18n$1.t('description_hint', I18nScope$41()),
+            children: [m('.preview-container', {
+                class: vm.e.hasError('about_html') ? 'error' : false
+            }, h.redactor('project[about_html]', vm.fields.about_html)), vm.e.inlineError('about_html')]
+        })])])]), m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })])]);
+    }
+};
+
+var projectEditDescription = {
+    controller: function controller(args) {
+        return {
+            user: userVM.fetchUser(args.user_id),
+            project: projectVM.fetchProject(args.project_id)
+        };
+    },
+    view: function view(ctrl, args) {
+        return ctrl.user() && ctrl.project() ? m(projectDescriptionEdit, {
+            user: ctrl.user(),
+            userId: args.user_id,
+            projectId: args.project_id,
+            project: ctrl.project(),
+            rails_errors: args.rails_errors
+        }) : m('div', h.loader());
+    }
+};
+
+var e$5 = generateErrorInstance();
+
+var fields$4 = {
+    budget: m.prop('')
+};
+
+var fillFields$2 = function fillFields(data) {
+    fields$4.budget(data.budget || '');
+};
+
+var updateProject$3 = function updateProject(project_id) {
+    var projectData = {
+        budget: fields$4.budget()
+    };
+
+    return projectVM.updateProject(project_id, projectData);
+};
+
+var projectBudgetVM = {
+    fields: fields$4,
+    fillFields: fillFields$2,
+    updateProject: updateProject$3,
+    e: e$5
+};
+
+var I18nScope$42 = _$1.partial(h.i18nScope, 'projects.dashboard_budget');
+
+var projectBudgetEdit = {
+    controller: function controller(args) {
+        var vm = projectBudgetVM,
+            mapErrors = [["budget", ["budget"]]],
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            loading = m.prop(false),
+            onSubmit = function onSubmit(event) {
+            loading(true);
+            m.redraw();
+            vm.updateProject(args.projectId).then(function (data) {
+                loading(false);
+                vm.e.resetFieldErrors();
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (showError()) {
+                    showError.toggle();
+                }
+            }).catch(function (err) {
+                if (err.errors_json) {
+                    railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
+                }
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+            return false;
+        };
+
+        if (args.rails_errors) {
+            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        }
+        vm.fillFields(args.project);
+
+        return {
+            onSubmit: onSubmit,
+            showSuccess: showSuccess,
+            showError: showError,
+            vm: vm,
+            loading: loading
+        };
+    },
+    view: function view(ctrl, args) {
+        var vm = ctrl.vm;
+        return m('#budget-tab', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: I18n$1.t('shared.successful_update'),
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: I18n$1.t('shared.failed_update'),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '', m('form.w-form', { onsubmit: ctrl.onSubmit }, [m('.w-container', [m('.w-row', [m('.w-col.w-col-10.w-col-push-1', [m('.u-marginbottom-60.u-text-center', [m('.w-inline-block.card.fontsize-small.u-radius', [m.trust(I18n$1.t('budget_alert', I18nScope$42()))])]), m(bigInputCard, {
+            cardStyle: { display: 'block' },
+            label: I18n$1.t('budget_label', I18nScope$42()),
+            children: [m('.preview-container', {
+                class: vm.e.hasError('budget') ? 'error' : false
+            }, h.redactor('project[budget]', vm.fields.budget)), vm.e.inlineError('budget')]
+        })])])]), m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })])]);
+    }
+};
+
+var projectEditBudget = {
+    controller: function controller(args) {
+        return {
+            user: userVM.fetchUser(args.user_id),
+            project: projectVM.fetchProject(args.project_id)
+        };
+    },
+    view: function view(ctrl, args) {
+        return ctrl.user() && ctrl.project() ? m(projectBudgetEdit, {
+            user: ctrl.user(),
+            userId: args.user_id,
+            projectId: args.project_id,
+            project: ctrl.project(),
+            rails_errors: args.rails_errors
+        }) : m('div', h.loader());
+    }
+};
+
+var e$6 = generateErrorInstance();
+
+var fields$5 = {
+    video_url: m.prop('')
+};
+
+var fillFields$3 = function fillFields(data) {
+    fields$5.video_url(data.video_url || '');
+};
+
+var updateProject$4 = function updateProject(project_id) {
+    var projectData = {
+        video_url: fields$5.video_url()
+    };
+
+    return projectVM.updateProject(project_id, projectData);
+};
+
+var projectVideoVM = {
+    fields: fields$5,
+    fillFields: fillFields$3,
+    updateProject: updateProject$4,
+    e: e$6
+};
+
+var I18nScope$43 = _$1.partial(h.i18nScope, 'projects.dashboard_video');
+
+var projectBudgetEdit$2 = {
+    controller: function controller(args) {
+        var vm = projectVideoVM,
+            mapErrors = [["video_url", ["video_url"]]],
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            loading = m.prop(false),
+            onSubmit = function onSubmit(event) {
+            loading(true);
+            vm.updateProject(args.projectId).then(function (data) {
+                loading(false);
+                vm.e.resetFieldErrors();
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (showError()) {
+                    showError.toggle();
+                }
+            }).catch(function (err) {
+                if (err.errors_json) {
+                    railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
+                }
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+            return false;
+        };
+
+        if (args.rails_errors) {
+            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        }
+        vm.fillFields(args.project);
+
+        return {
+            onSubmit: onSubmit,
+            showSuccess: showSuccess,
+            showError: showError,
+            vm: vm,
+            loading: loading
+        };
+    },
+    view: function view(ctrl, args) {
+        var vm = ctrl.vm;
+        return m('#video-tab', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: I18n$1.t('shared.successful_update'),
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: I18n$1.t('shared.failed_update'),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '', m('form.w-form', { onsubmit: ctrl.onSubmit }, [m('.w-container', [m('.w-row', [m('.w-col.w-col-10.w-col-push-1', [m('.u-marginbottom-60.u-text-center', [m('.w-inline-block.card.fontsize-small.u-radius', [m.trust(I18n$1.t('video_alert', I18nScope$43()))])]), m(inputCard, {
+            label: I18n$1.t('video_label', I18nScope$43()),
+            label_hint: I18n$1.t('video_hint', I18nScope$43()),
+            children: [m('input.string.required.w-input.text-field.positive.medium[type="text"]', {
+                value: vm.fields.video_url(),
+                class: vm.e.hasError('video_url') ? 'error' : '',
+                onchange: m.withAttr('value', vm.fields.video_url)
+            }), vm.e.inlineError('video_url')]
+        })])])]), m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })])]);
+    }
+};
+
+var projectEditVideo = {
+    controller: function controller(args) {
+        return {
+            user: userVM.fetchUser(args.user_id),
+            project: projectVM.fetchProject(args.project_id)
+        };
+    },
+    view: function view(ctrl, args) {
+        return ctrl.user() && ctrl.project() ? m(projectBudgetEdit$2, {
+            user: ctrl.user(),
+            userId: args.user_id,
+            projectId: args.project_id,
+            project: ctrl.project(),
+            rails_errors: args.rails_errors
+        }) : m('div', h.loader());
+    }
+};
+
+var e$7 = generateErrorInstance();
+
+var fields$6 = {
+    mode: m.prop(''),
+    online_days: m.prop(''),
+    goal: m.prop('')
+};
+
+var fillFields$4 = function fillFields(data) {
+    fields$6.mode(data.mode || 'aon');
+    fields$6.online_days(data.online_days || '');
+    fields$6.goal(data.goal);
+};
+
+var updateProject$5 = function updateProject(project_id) {
+    var projectData = {
+        mode: fields$6.mode(),
+        online_days: fields$6.online_days(),
+        goal: fields$6.goal()
+    };
+
+    return projectVM.updateProject(project_id, projectData);
+};
+
+var genClickChangeMode = function genClickChangeMode(mode) {
+    return function () {
+        fields$6.mode(mode);
+        fields$6.online_days('');
+        if (mode == 'flex') {
+            e$7.inlineError('online_days', false);
+        }
+    };
+};
+
+var projectGoalVM = {
+    fields: fields$6,
+    fillFields: fillFields$4,
+    updateProject: updateProject$5,
+    e: e$7,
+    genClickChangeMode: genClickChangeMode
+};
+
+var bigCard = {
+    view: function view(ctrl, args) {
+        var cardClass = '.card.medium.card-terciary.u-marginbottom-30';
+
+        return m(cardClass, [m('div.u-marginbottom-30', [m('label.fontweight-semibold.fontsize-base', args.label), args.label_hint ? m('.fontsize-small', args.label_hint) : '']), m('div', args.children)]);
+    }
+};
+
+var I18nScope$44 = _$1.partial(h.i18nScope, 'projects.dashboard_goal');
+
+var projectGoalEdit = {
+    controller: function controller(args) {
+        var vm = projectGoalVM,
+            mapErrors = [["mode", ["mode"]], ["goal", ["goal"]], ["online_days", ["online_days"]]],
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            showModeDiff = h.toggleProp(false, true),
+            showTaxesDiff = h.toggleProp(false, true),
+            applyGoalMask = _$1.compose(vm.fields.goal, h.applyMonetaryMask),
+            loading = m.prop(false),
+            onSubmit = function onSubmit(event) {
+            loading(true);
+            m.redraw();
+            vm.updateProject(args.projectId).then(function (data) {
+                loading(false);
+                vm.e.resetFieldErrors();
+                if (!showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (showError()) {
+                    showError.toggle();
+                }
+            }).catch(function (err) {
+                if (err.errors_json) {
+                    railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
+                }
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+            return false;
+        };
+
+        if (args.rails_errors) {
+            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        }
+        vm.fillFields(args.project);
+
+        return {
+            onSubmit: onSubmit,
+            showSuccess: showSuccess,
+            showError: showError,
+            showModeDiff: showModeDiff,
+            showTaxesDiff: showTaxesDiff,
+            vm: vm,
+            applyGoalMask: applyGoalMask,
+            loading: loading
+        };
+    },
+    view: function view(ctrl, args) {
+        var vm = ctrl.vm;
+        return m('#goal-tab', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: I18n$1.t('shared.successful_update'),
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: I18n$1.t('shared.failed_update'),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '', m('form.w-form', { onsubmit: ctrl.onSubmit }, [m('.w-container', [m('.w-row', [m('.w-col.w-col-10.w-col-push-1', [m(bigCard, {
+            label: I18n$1.t('mode_label', I18nScope$44()),
+            label_hint: I18n$1.t('mode_hint', I18nScope$44()),
+            children: [m('.flex-row.u-marginbottom-30', [m('a.choose-mode.choose-aon.w-inline-block.btn-select.flex-column.u-text-center[data-mode="aon"][href="javascript:void(0);"]', {
+                onclick: vm.genClickChangeMode('aon'),
+                class: vm.fields.mode() == 'aon' ? 'selected' : false
+            }, [m('img[alt="Badge aon"][src="/assets/catarse_bootstrap/badge-aon.png"]')]), m('a.choose-mode.choose-flex.w-inline-block.btn-select.flex-column.u-text-center[data-mode="flex"][href="javascript:void(0);"]', {
+                onclick: vm.genClickChangeMode('flex'),
+                class: vm.fields.mode() == 'flex' ? 'selected' : false
+            }, [m('img[alt="Badge flex"][src="/assets/catarse_bootstrap/badge-flex.png"]')])]), m('.u-text-center.fontsize-smaller', [m('a.mode-diff-toggle.link-hidden-light.fontweight-semibold[href="javscript:void(0);"]', { onclick: ctrl.showModeDiff.toggle }, ['See the difference between the models ', m('span.fa.fa-chevron-down')])]), ctrl.showModeDiff() ? m('.mode-diff.u-margintop-30', [m('.flex-row', [m('.w-hidden-small.w-hidden-tiny.fontsize-smaller.flex-column', m.trust(I18n$1.t('aon_diff_html', I18nScope$44()))), m('.w-hidden-small.w-hidden-tiny.fontsize-smaller.flex-column', m.trust(I18n$1.t('flex_diff_html', I18nScope$44())))]), m('.u-text-center.u-margintop-30', [m('.divider.u-marginbottom-20'), m('.fontsize-base', I18n$1.t('want_more', I18nScope$44())), m.trust(I18n$1.t('mode_diff_ebook', I18nScope$44()))])]) : '']
+        }), m(bigCard, {
+            label: I18n$1.t('goal_label', I18nScope$44()),
+            label_hint: I18n$1.t('goal_hint', I18nScope$44()),
+            children: [m('.w-row.u-marginbottom-30', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.w-row', [m('.w-col.w-col-4.w-col-small-6.w-col-tiny-6.text-field.prefix.no-hover.medium.prefix-permalink', [m('.fontcolor-secondary.u-text-center.fontsize-base.lineheight-tightest', 'Rs')]), m('.w-col.w-col-8.w-col-small-6.w-col-tiny-6.label-hide', [m('.input.tel.optional.project_goal', [m('label.field-label'), m('input.string.optional.w-input.text-field.postfix.positive.medium[autocomplete="off"][id="project-goal-input"][name="project[goal]"][type="tel"]', {
+                class: vm.e.hasError('goal') ? 'error' : false,
+                value: vm.fields.goal(),
+                maxlength: 14,
+                onkeyup: m.withAttr('value', ctrl.applyGoalMask)
+            })])])]), m('.u-text-center', vm.e.inlineError('goal'))]), m('.w-col.w-col-2')]), m('.u-text-center.fontsize-smaller.fontweight-semibold', [m('a.fee-toggle.link-hidden-light[href="javascript:void(0)"]', {
+                onclick: ctrl.showTaxesDiff.toggle
+            }, [I18n$1.t('goal_taxes_link', I18nScope$44()), m('span.fa.fa-chevron-down')])]), ctrl.showTaxesDiff() ? m('.fee-explanation.u-margintop-30', [m('.u-marginbottom-30', [m('.fontsize-small.fontweight-semibold', I18n$1.t('goal_taxes_label', I18nScope$44())), m('.fontsize-smaller', I18n$1.t('goal_' + vm.fields.mode() + '_taxes_hint', I18nScope$44()))]), m('.u-text-center.u-margintop-30', [m('.divider.u-marginbottom-20'), m('.fontsize-base', I18n$1.t('want_more', I18nScope$44())), m.trust(I18n$1.t('goal_taxes_watch_video_html', I18nScope$44()))])]) : '']
+        }), m(bigCard, {
+            label: I18n$1.t('online_days_label', I18nScope$44()),
+            label_hint: m.trust(I18n$1.t('online_days_' + vm.fields.mode() + '_hint', I18nScope$44())),
+            children: vm.fields.mode() == 'aon' ? [m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.w-row', [m('.w-col.w-col-8.label-hide', [m('.input.integer.optional.disabled.project_online_days', [m("label.field-label"), m('input.numeric.integer.optional.disabled.w-input.text-field.postfix.positive.medium[id="project_online_days"][name="project[online_days]"][type="number"]', {
+                onchange: m.withAttr('value', vm.fields.online_days),
+                value: vm.fields.online_days(),
+                class: vm.e.hasError('online_days') ? 'error' : false
+            })])]), m('.w-col.w-col-4', [m('.text-field.medium.prefix-permalink.u-text-center', [m('', 'days')])])]), vm.e.inlineError('online_days')])])] : [m('.flex-row', [m('a.choose-time.choose-unlimited.w-inline-block.btn-select.flex-column.u-text-center', {
+                class: _$1.isEmpty(vm.fields.online_days().toString()) ? 'selected' : '',
+                onclick: function onclick() {
+                    vm.fields.online_days('');
+                }
+            }, [m('.fontsize-base.fontweight-semibold.u-marginbottom-20', I18n$1.t('online_days_open', I18nScope$44())), m('.w-hidden-tiny', I18n$1.t('online_days_open_hint', I18nScope$44()))]), m('a.choose-time.choose-limited.w-inline-block.btn-select.flex-column.u-text-center', {
+                class: _$1.isEmpty(vm.fields.online_days().toString()) ? '' : 'selected',
+                onclick: function onclick() {
+                    vm.fields.online_days(1);
+                }
+            }, [m('.fontsize-base.fontweight-semibold.u-marginbottom-20', I18n$1.t('online_days_closed', I18nScope$44())), m('.w-hidden-tiny.u-marginbottom-30', I18n$1.t('online_days_closed_hint', I18nScope$44())), m('.w-row', [m('.w-col.w-col-6.label-hide', [m('.input.integer.optional.project_online_days', [m('label.field-label'), m('input.numeric.integer.optional.w-input.text-field.field.w-input.text-field.medium.prefix[id="project_online_days"][name="project[online_days]"][type="number"]', {
+                onchange: m.withAttr('value', vm.fields.online_days),
+                value: vm.fields.online_days(),
+                class: vm.e.hasError('online_days') ? 'error' : false
+            })])]), m('.w-col.w-col-6', [m('.text-field.medium.prefix-permalink', {
+                class: vm.e.hasError('online_days') ? 'error' : false
+            }, [m('', 'days')])])]), m('.w-row', vm.e.inlineError('online_days'))])])]
+        })])])]), m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })])]);
+    }
+};
+
+var projectEditGoal = {
+    controller: function controller(args) {
+        return {
+            user: userVM.fetchUser(args.user_id),
+            project: projectVM.fetchProject(args.project_id)
+        };
+    },
+    view: function view(ctrl, args) {
+        return ctrl.user() && ctrl.project() ? m(projectGoalEdit, {
+            user: ctrl.user(),
+            userId: args.user_id,
+            projectId: args.project_id,
+            project: ctrl.project(),
+            rails_errors: args.rails_errors
+        }) : m('div', h.loader());
+    }
+};
+
+var e$8 = generateErrorInstance();
+var currentProject$2 = m.prop({});
+
+var fields$7 = {
+    headline: m.prop(''),
+    uploaded_image: m.prop(''),
+    upload_files: m.prop(undefined)
+};
+
+var fillFields$5 = function fillFields(data) {
+    fields$7.headline(data.headline || '');
+    currentProject$2(data);
+};
+
+var reloadCurrentProject = function reloadCurrentProject() {
+    if (currentProject$2().id) {
+        projectVM.fetchProject(currentProject$2().id, false).then(function (data) {
+            currentProject$2(_.first(data));
+            m.redraw();
+        });
+    }
+};
+
+var prepareForUpload = function prepareForUpload(event) {
+    var formData = new FormData();
+    if (event.target.files[0]) {
+        formData.append('uploaded_image', event.target.files[0]);
+    }
+    fields$7.upload_files(formData);
+};
+
+var uploadImage = function uploadImage(project_id) {
+    if (_.isUndefined(fields$7.upload_files)) {
+        var deferred = m.deferred();
+        deferred.resolve({});
+        return deferred.promise;
+    } else {
+        return m.request({
+            method: 'POST',
+            url: '/projects/' + project_id + '/upload_image.json',
+            data: fields$7.upload_files(),
+            config: h.setCsrfToken,
+            serialize: function serialize(data) {
+                return data;
+            }
+        });
+    }
+};
+
+var updateProject$6 = function updateProject(project_id) {
+    var projectData = {
+        headline: fields$7.headline()
+    };
+
+    return projectVM.updateProject(project_id, projectData);
+};
+
+var projectCardVM = {
+    fields: fields$7,
+    fillFields: fillFields$5,
+    updateProject: updateProject$6,
+    e: e$8,
+    prepareForUpload: prepareForUpload,
+    uploadImage: uploadImage,
+    currentProject: currentProject$2,
+    reloadCurrentProject: reloadCurrentProject
+};
+
+var I18nScope$45 = _$1.partial(h.i18nScope, 'projects.dashboard_card');
+
+var projectCardEdit = {
+    controller: function controller(args) {
+        var vm = projectCardVM,
+            mapErrors = [["uploaded_image", ["uploaded_image"]], ["headline", ["headline"]]],
+            showSuccess = h.toggleProp(false, true),
+            showError = h.toggleProp(false, true),
+            loading = m.prop(false),
+            onSubmit = function onSubmit(event) {
+            loading(true);
+            m.redraw();
+            vm.uploadImage(args.projectId).then(function (uploaded) {
+                vm.updateProject(args.projectId).then(function (data) {
+                    loading(false);
+                    vm.e.resetFieldErrors();
+                    if (!showSuccess()) {
+                        showSuccess.toggle();
+                    }
+                    if (showError()) {
+                        showError.toggle();
+                    }
+                    vm.reloadCurrentProject();
+                }).catch(function (err) {
+                    if (err.errors_json) {
+                        railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
+                    }
+                    loading(false);
+                    if (showSuccess()) {
+                        showSuccess.toggle();
+                    }
+                    if (!showError()) {
+                        showError.toggle();
+                    }
+                });
+            }).catch(function (uploaderr) {
+                if (uploaderr.errors_json) {
+                    railsErrorsVM.mapRailsErrors(uploaderr.errors_json, mapErrors, vm.e);
+                }
+                loading(false);
+                if (showSuccess()) {
+                    showSuccess.toggle();
+                }
+                if (!showError()) {
+                    showError.toggle();
+                }
+            });
+            return false;
+        };
+
+        if (args.rails_errors) {
+            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        }
+        vm.fillFields(args.project);
+
+        return {
+            onSubmit: onSubmit,
+            showSuccess: showSuccess,
+            showError: showError,
+            vm: vm,
+            loading: loading
+        };
+    },
+    view: function view(ctrl, args) {
+        var vm = ctrl.vm;
+        return m('#card-tab', [ctrl.showSuccess() ? m.component(popNotification, {
+            message: I18n$1.t('shared.successful_update'),
+            toggleOpt: ctrl.showSuccess
+        }) : '', ctrl.showError() ? m.component(popNotification, {
+            message: I18n$1.t('shared.failed_update'),
+            toggleOpt: ctrl.showError,
+            error: true
+        }) : '', m('form.w-form', { onsubmit: ctrl.onSubmit }, [m('.w-section.section', [m('.w-container', [m('.w-row', [m('.w-col.w-col-8', [m(inputCard, {
+            label: I18n$1.t('uploaded_image_label', I18nScope$45()),
+            label_hint: I18n$1.t('uploaded_image_hint', I18nScope$45()),
+            children: [m('input.file.optional.w-input.text-field[id="project_uploaded_image"][name="project[uploaded_image]"][type="file"]', {
+                class: vm.e.hasError('uploaded_image') ? 'error' : false,
+                onchange: vm.prepareForUpload
+            }), vm.e.inlineError('uploaded_image')]
+        }), m(inputCard, {
+            label: I18n$1.t('headline_label', I18nScope$45()),
+            label_hint: I18n$1.t('headline_label_hint', I18nScope$45()),
+            children: [m('textarea.text.optional.w-input.text-field.positive[id="project_headline"][maxlength="100"][name="project[headline]"][rows="3"]', {
+                onchange: m.withAttr('value', vm.fields.headline),
+                class: vm.e.hasError('headline') ? 'error' : false
+            }, vm.fields.headline()), vm.e.inlineError('headline')]
+        })]), m(projectCard, { project: vm.currentProject(), type: 'small' })])])]), m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })])]);
+    }
+};
+
+var projectEditCard = {
+    controller: function controller(args) {
+        return {
+            user: userVM.fetchUser(args.user_id),
+            project: projectVM.fetchProject(args.project_id)
+        };
+    },
+    view: function view(ctrl, args) {
+        return ctrl.user() && ctrl.project() ? m(projectCardEdit, {
+            user: ctrl.user(),
+            userId: args.user_id,
+            projectId: args.project_id,
+            project: ctrl.project(),
+            rails_errors: args.rails_errors
         }) : m('div', h.loader());
     }
 };
@@ -10909,6 +13006,7 @@ var c = {
         ProjectsShow: projectsShow,
         UsersShow: usersShow,
         UsersEdit: usersEdit,
+        ProjectsContribution: projectsContribution,
         ProjectsPayment: projectsPayment,
         ProjectsReward: projectsReward,
         ThankYou: thankYou,
@@ -10921,11 +13019,18 @@ var c = {
         FollowFoundFriends: FollowFoundFriends,
         CheckEmail: CheckEmail,
         projectEditUserAbout: projectEditUserAbout,
-        projectEditUserSettings: projectEditUserSettings
+        projectEditUserSettings: projectEditUserSettings,
+        projectEditReward: projectEditReward,
+        projectEditBasic: projectEditBasic,
+        projectEditDescription: projectEditDescription,
+        projectEditBudget: projectEditBudget,
+        projectEditVideo: projectEditVideo,
+        projectEditGoal: projectEditGoal,
+        projectEditCard: projectEditCard
     }
 };
 
 return c;
 
 }(m,I18n,_,moment,$,postgrest,CatarseAnalytics,replaceDiacritics,Chart));
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3JjLyoqLyouanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7IiwicHJlRXhpc3RpbmdDb21tZW50IjoiLy8jIHNvdXJjZU1hcHBpbmdVUkw9ZGF0YTphcHBsaWNhdGlvbi9qc29uO2NoYXJzZXQ9dXRmLTg7YmFzZTY0LGV5SjJaWEp6YVc5dUlqb3pMQ0ptYVd4bElqcHVkV3hzTENKemIzVnlZMlZ6SWpwYlhTd2ljMjkxY21ObGMwTnZiblJsYm5RaU9sdGRMQ0p1WVcxbGN5STZXMTBzSW0xaGNIQnBibWR6SWpvaU96czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdJbjA9In0=
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3JjLyoqLyouanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OzsiLCJwcmVFeGlzdGluZ0NvbW1lbnQiOiIvLyMgc291cmNlTWFwcGluZ1VSTD1kYXRhOmFwcGxpY2F0aW9uL2pzb247Y2hhcnNldD11dGYtODtiYXNlNjQsZXlKMlpYSnphVzl1SWpvekxDSm1hV3hsSWpwdWRXeHNMQ0p6YjNWeVkyVnpJanBiWFN3aWMyOTFjbU5sYzBOdmJuUmxiblFpT2x0ZExDSnVZVzFsY3lJNlcxMHNJbTFoY0hCcGJtZHpJam9pT3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzN096czdPenM3T3pzaWZRPT0ifQ==

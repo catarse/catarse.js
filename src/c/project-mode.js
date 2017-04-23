@@ -24,7 +24,7 @@ const projectMode = {
             goal = (_.isNull(project.goal) ? 'not defined' : h.formatNumber(project.goal)),
             buildTooltip = el => m.component(tooltip, {
                 el,
-                text: (mode === 'aon') ? `You will only receive the resources if you reach or exceed the goal until ${h.momentify(project.zone_expires_at, 'DD/MM/YYYY')}.` : 'The director will receive all the resources when he closes the campaign, even if he has not reached this goal.',
+                text: (mode === 'aon') ? `You will only receive the resources if you reach or exceed the goal until ${h.momentify(project.zone_expires_at, 'DD/MM/YYYY')}.` : 'The campaign manager will receive all the resources when he closes the campaign, even if s/he has not reached this goal.',
                 width: 280
             });
 

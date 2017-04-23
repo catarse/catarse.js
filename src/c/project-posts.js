@@ -44,14 +44,14 @@ const projectPosts = {
             m('.w-container.u-margintop-20', [
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
-                    (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [
-                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of who has already supported his campaign and is also available for viewing on the site. You can choose to leave it public, or visible only to your supporters here on this tab.')
-                    ]) : '') : ''
-                    // m('.w-row.u-marginbottom-20', [
-                    //     m('.w-col.w-col-4.w-col-push-4', [
-                    //         m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/edit#posts']`, 'Edit Post')
-                    //     ])
-                    // ])
+                    (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny',[
+                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of those who have already supported your campaign and is also available for viewing on the website. You can choose to leave it public, or visible only to your supporters here on this tab.')
+                    ]) : '') : '',
+                    m('.w-row.u-marginbottom-20', [
+                        m('.w-col.w-col-4.w-col-push-4', [
+                            m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/posts']`, 'Write News')
+                        ])
+                    ])
                 ] : ''), (_.map(list.collection(), post => m('.w-row', [
                     m('.w-col.w-col-1'),
                     m('.w-col.w-col-10', [
@@ -61,7 +61,7 @@ const projectPosts = {
                                 m('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [
                                     m(`a.link-hidden[href="/projects/${post.project_id}/posts/${post.id}#posts"]`, post.title)
                                 ]),
-                                    (!_.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Post exclusivo para apoiadores.'))
+                                    (!_.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Exclusive post for supporters.'))
                             ]),
                             m('.divider.u-marginbottom-60')
                         ])

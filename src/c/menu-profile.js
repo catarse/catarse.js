@@ -12,7 +12,7 @@ const menuProfile = {
             user_id = args.user.user_id;
 
         const userName = () => {
-            const name = userDetails().public_name || userDetails().name;
+            const name = userVM.displayName(userDetails());
             if (name && !_.isEmpty(name)) {
                 return _.first(name.split(' '));
             }
@@ -90,7 +90,7 @@ const menuProfile = {
                                                     )
                                                 ),
                                                 m('li.lineheight-looser',
-                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#notifications']`,
+                                                    m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}/edit#settings']`,
                                                         'Notifications'
                                                     )
                                                 )

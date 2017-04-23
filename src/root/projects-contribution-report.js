@@ -164,14 +164,14 @@ const projectContributionReport = {
                     inputWrapperClass: '.w-input.text-field',
                     btnClass: '.btn.btn-medium',
                     vm: filterVM.full_text_index,
-                    placeholder: 'Busque por nome ou email do apoiador'
+                    placeholder: 'Search by name or email'
                 }
             },
             {
                 label: 'reward_filter',
                 component: FilterDropdown,
                 data: {
-                    label: 'Recompensa selecionada',
+                    label: 'Reward selected',
                     onchange: submit,
                     name: 'reward_id',
                     vm: filterVM.reward_id,
@@ -185,7 +185,7 @@ const projectContributionReport = {
                 data: {
                     custom_label: [InfoProjectContributionLegend, {
                         content: [ProjectContributionDeliveryLegendModal],
-                        text: 'Status da entrega'
+                        text: 'Delivery Status'
                     }],
                     onchange: submit,
                     name: 'delivery_status',
@@ -193,23 +193,23 @@ const projectContributionReport = {
                     wrapper_class: '.w-col.w-col-4',
                     options: [{
                         value: '',
-                        option: 'Todos'
+                        option: 'All'
                     },
                     {
                         value: 'undelivered',
-                        option: 'Não enviada'
+                        option: 'Not sent'
                     },
                     {
                         value: 'delivered',
-                        option: 'Enviada'
+                        option: 'Sent'
                     },
                     {
                         value: 'error',
-                        option: 'Erro no envio'
+                        option: 'Sending error'
                     },
                     {
                         value: 'received',
-                        option: 'Recebida'
+                        option: 'Received'
                     }
                     ]
                 }
@@ -219,7 +219,7 @@ const projectContributionReport = {
                 component: FilterDropdown,
                 data: {
                     custom_label: [InfoProjectContributionLegend, {
-                        text: 'Status do apoio',
+                        text: 'Support Status',
                         content: [ProjectContributionStateLegendModal, {
                             project
                         }]

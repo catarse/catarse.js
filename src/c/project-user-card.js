@@ -4,6 +4,7 @@ import h from '../h';
 import ownerMessageContent from './owner-message-content';
 import modalBox from './modal-box';
 import UserFollowBtn from './user-follow-btn';
+import userVM from '../vms/user-vm';
 
 const projectUserCard = {
     controller(args) {
@@ -40,7 +41,7 @@ const projectUserCard = {
                 }) : ''),
             m('.w-row', [
                 m('.w-col.w-col-4', [
-                    m(`img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="${userDetail.profile_img_thumbnail}"]`)
+                    m(`img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="${userVM.displayImage(userDetail)}"]`)
                 ]),
                 m('.w-col.w-col-8', [
                     m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [
@@ -48,7 +49,7 @@ const projectUserCard = {
                             onclick: () => {
                                 m.route(`/users/${userDetail.id}`, { user_id: userDetail.id });
                                 h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
-                            } }, (userDetail.public_name || userDetail.name))
+                            } }, userVM.displayName(userDetail))
                     ]),
                     m('.fontsize-smallest', [
                         h.pluralize(userDetail.total_published_projects, ' Created', ' Created'),
@@ -75,7 +76,7 @@ const projectUserCard = {
                                 disabledClass: 'a.w-button.btn.btn-terciary.btn-small.u-marginbottom-10',
                                 follow_id: userDetail.id,
                                 following: userDetail.following_this_user }),
-                            m('a.w-button.btn.btn-terciary.btn-small[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.sendMessage) }, 'Send message')
+                            m('a.w-button.btn.btn-terciary.btn-small[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.sendMessage) }, 'Send Message')
                         ] : ''),
                     args.project().is_admin_role ?
                         m('p', userDetail.email) : ''

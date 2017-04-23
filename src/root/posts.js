@@ -45,10 +45,10 @@ const posts = {
             },
             togglePreview = () => {
                 if (!validateTitle()) {
-                    errors('Título não pode ficar em branco.');
+                    errors('Title can not be empty');
                     showError(true);
                 } else if (!validateComment()) {
-                    errors('Mensagem não pode ficar em branco.');
+                    errors('Message can not be left blank.');
                     showError(true);
                 } else {
                     h.scrollTop();
@@ -60,7 +60,7 @@ const posts = {
             projectDetails = m.prop([]),
             rewardText = (rewardId) => {
                 const reward = _.find(rewardVM.rewards(), r => String(r.id) === String(rewardId));
-                return `Reward supporters Rs${reward.minimum_value} - ${`${reward.description.substring(0, 70)}...`}`;
+                return `Reward supporters Rs${reward.minimum_value} - ${reward.title ? reward.title : `${reward.description.substring(0, 70)}...`}`;
             },
             showRecipientes = (post) => {
                 if (post.recipients === 'public') {

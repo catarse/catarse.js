@@ -6,6 +6,7 @@ import h from '../h';
 import projectDataTable from './project-data-table';
 import projectDataChart from './project-data-chart';
 import UserFollowBtn from './user-follow-btn';
+import userVM from '../vms/user-vm';
 
 const projectContributions = {
     controller(args) {
@@ -109,7 +110,7 @@ const projectContributions = {
                                   `${Math.floor(stats.new_percent)}%`
                                  ),
                                 m('.fontsize-smallest',
-                                  'Supporters who had never supported a project in JVN'
+                                  'Supporters who had never supported a campaign in JVN'
                                  )
                             ]),
                             m('.w-col.w-col-6.w-col-small-6', [
@@ -121,7 +122,7 @@ const projectContributions = {
                                   `${Math.ceil(stats.returning_percent)}%`
                                  ),
                                 m('.fontsize-smallest',
-                                  'Supporters who had already supported a project in JVN'
+                                  'Supporters who had already supported a campaign in JVN'
                                  )
                             ])
                         ])
@@ -153,7 +154,7 @@ const projectContributions = {
                                 lbl: contribution.user_id,
                                 project: args.project()
                             })
-                        }, (contribution.data.public_name || contribution.data.name)),
+                        }, userVM.displayName(contribution.data)),
                         m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', `${h.selfOrEmpty(contribution.data.city)}, ${h.selfOrEmpty(contribution.data.state)}`),
                         m('.fontsize-smaller', [
                             m('span.fontweight-semibold', contribution.data.total_contributed_projects), ' Supported  |  ',
@@ -186,7 +187,7 @@ const projectContributions = {
                              }
                          }, [!ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
                              collection: ctrl.contributionsPerDay,
-                             label: 'Rs Collected per day',
+                             label: 'Rs collected per day',
                              dataKey: 'total_amount',
                              xAxis: (item) => h.momentify(item.paid_at),
                              emptyState: 'Unaccounted support'

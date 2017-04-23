@@ -298,29 +298,28 @@ const projectsExplore = {
                 m('.w-row', [
                     m('.w-col.w-col-2.w-col-push-5', [
                         (ctrl.projects().isLastPage() || ctrl.projects().isLoading() || _.isEmpty(projectsCollection)) ? '' : m('a.btn.btn-medium.btn-terciary[href=\'#loadMore\']', { onclick: () => { ctrl.projects().nextPage(); return false; } }, 'Load more')
-    ]),
-    ])
-    ])
-    ]),
-
-        m('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [
-            m('.w-container.u-text-center', [
-                m('img.u-marginbottom-20.icon-hero', {
-                    src: hasSpecialFooter
-                        ? ctrl.externalLinkCategories[categoryId()].icon
-                        : 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png'
-                }),
-                m('h2.fontsize-larger.u-marginbottom-60',
-                    hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'),
-                m('.w-row', [
-                    m('.w-col.w-col-4.w-col-push-4', [
-                        hasSpecialFooter
-                            ? m('a.w-button.btn.btn-large', { href: ctrl.externalLinkCategories[categoryId()].link }, ctrl.externalLinkCategories[categoryId()].cta)
-                            : m('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'LEARN HOW')
+                    ]),
+                ])
+            ])
+        ]),
+            m('.w-section.section-large.before-footer.u-margintop-80.bg-gray.divider', [
+                m('.w-container.u-text-center', [
+                    m('img.u-marginbottom-20.icon-hero', {
+                        src: hasSpecialFooter
+                                ? ctrl.externalLinkCategories[categoryId()].icon
+                                : 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png'
+                    }),
+                    m('h2.fontsize-larger.u-marginbottom-60',
+                        hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'),
+                    m('.w-row', [
+                        m('.w-col.w-col-4.w-col-push-4', [
+                            hasSpecialFooter
+                                ? m('a.w-button.btn.btn-large', { href: ctrl.externalLinkCategories[categoryId()].link+'?ref=ctrse_explore' }, ctrl.externalLinkCategories[categoryId()].cta)
+                                : m('a.w-button.btn.btn-large', { href: '/start?ref=ctrse_explore' }, 'Learn how')
+                        ])
                     ])
                 ])
             ])
-        ])
     ]);
     }
 };

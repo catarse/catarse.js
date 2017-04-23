@@ -10,6 +10,7 @@ import projectsDashboard from './root/projects-dashboard';
 import projectsExplore from './root/projects-explore';
 import projectsHome from './root/projects-home';
 import projectsShow from './root/projects-show';
+import projectsContribution from './root/projects-contribution';
 import usersShow from './root/users-show';
 import usersEdit from './root/users-edit';
 import projectsPayment from './root/projects-payment';
@@ -24,7 +25,14 @@ import FollowFoundFriends from './root/follow-found-friends';
 import thankYou from './root/thank-you';
 import CheckEmail from './root/check-email';
 import projectEditUserAbout from './root/project-edit-user-about';
+import projectEditReward from './root/project-edit-reward';
 import projectEditUserSettings from './root/project-edit-user-settings';
+import projectEditBasic from './root/project-edit-basic';
+import projectEditDescription from './root/project-edit-description';
+import projectEditBudget from './root/project-edit-budget';
+import projectEditVideo from './root/project-edit-video';
+import projectEditGoal from './root/project-edit-goal';
+import projectEditCard from './root/project-edit-card';
 import copyTextInput from './c/copy-text-input';
 
 const c = {
@@ -44,6 +52,7 @@ const c = {
         ProjectsShow: projectsShow,
         UsersShow: usersShow,
         UsersEdit: usersEdit,
+        ProjectsContribution: projectsContribution,
         ProjectsPayment: projectsPayment,
         ProjectsReward: projectsReward,
         ThankYou: thankYou,
@@ -56,7 +65,14 @@ const c = {
         FollowFoundFriends,
         CheckEmail,
         projectEditUserAbout,
-        projectEditUserSettings
+        projectEditUserSettings,
+        projectEditReward,
+        projectEditBasic,
+        projectEditDescription,
+        projectEditBudget,
+        projectEditVideo,
+        projectEditGoal,
+        projectEditCard
     }
 };
 

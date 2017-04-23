@@ -108,7 +108,7 @@ const inviteEmailsFromImport = {
                  m('.u-text-center.u-margintop-20', [
                      m('a.btn.btn-inline.btn-medium.w-button[href="javascript:void(0)"]', {
                          onclick: ctrl.submitInvites
-                     }, `To send ${ctrl.checkedList().length} Invitations`)
+                     }, `Send ${ctrl.checkedList().length} Invitations`)
                  ]) : (!ctrl.loading() ? 'Loading contacts...' : 'Sending invitations...'))
             ])
         ]);

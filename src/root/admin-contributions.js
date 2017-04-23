@@ -25,7 +25,7 @@ const adminContributions = {
             }, { // delivery_status
                 component: filterDropdown,
                 data: {
-                    label: 'Status da entrega',
+                    label: 'Delivery Status',
                     name: 'delivery_status',
                     vm: filterVM.delivery_status,
                     options: [{

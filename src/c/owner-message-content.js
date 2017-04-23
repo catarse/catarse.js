@@ -8,6 +8,7 @@ import postgrest from 'mithril-postgrest';
 import _ from 'underscore';
 import h from '../h';
 import models from '../models';
+import userVM from '../vms/user-vm';
 
 const ownerMessageContent = {
     controller(args) {
@@ -20,7 +21,7 @@ const ownerMessageContent = {
                 name: '',
                 email: ''
             },
-            from_name = m.prop(user.public_name),
+            from_name = m.prop(userVM.displayName(user)),
             from_email = m.prop(user.email),
             content = m.prop('');
 
@@ -109,7 +110,7 @@ const ownerMessageContent = {
                             ])) : ''),
                             m('.modal-dialog-nav-bottom',
                                 m('.w-row',
-                                    m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send message"]', {
+                                    m('.w-col.w-col-6.w-col-push-3', !ctrl.l() ? m('input.w-button.btn.btn-large[type="submit"][value="Send Message"]', {
                                         disabled: ctrl.submitDisabled()
                                     }) : h.loader())
                                 )
@@ -121,7 +122,7 @@ const ownerMessageContent = {
 
         return m('div', [
             m('.modal-dialog-header',
-                m('.fontsize-large.u-text-center', 'Send message')
+                m('.fontsize-large.u-text-center', 'Send Message')
             ),
             ctrl.sendSuccess() ? successMessage : contactForm
         ]);

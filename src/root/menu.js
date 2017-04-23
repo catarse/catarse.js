@@ -12,7 +12,6 @@ const menu = {
         const user = h.getUser(),
             menuCss = () => {
                 let dynamicClasses;
-                console.log(args.withAlert);
 
                 return `${args.menuTransparency ? 'overlayer' : ''} ${(args.withAlert || args.withFixedAlert) ? 'with-global-alert' : ''}`;
             },
