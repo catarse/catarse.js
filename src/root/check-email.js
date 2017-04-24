@@ -13,7 +13,7 @@ const CheckEmail = {
             user = userVM.fetchUser(userID),
             confirmedEmail = m.prop(false),
             hideAlert = m.prop(false);
-
+ 
         return {
             confirmedEmail,
             hideAlert,
