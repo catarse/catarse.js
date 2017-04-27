@@ -174,7 +174,7 @@ const editRewardCard = {
                                         })
                                     )
                                 ]),
-                                ctrl.minimumValueError() ? inlineError('Valor deve ser igual ou superior a R$10.') : '',
+                                ctrl.minimumValueError() ? inlineError('Value must be equal to or greater than Rs 100.') : '',
 
                                 m(".fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for='reward_minimum_value']",
                                     'Enter a minimum value greater than or equal to 10'
@@ -223,7 +223,7 @@ const editRewardCard = {
                                         ])
                                     )
                                 ),
-                                ctrl.deliverAtError() ? inlineError('Data de entrega não pode ser no passado.') : '',
+                                ctrl.deliverAtError() ? inlineError('Delivery date can not be in the past.') : '',
                             )
                         ]),
                         m('.w-row',

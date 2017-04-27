@@ -44,7 +44,7 @@ const projectEditReward = {
             },
             onSubmit = () => {
                 error(false);
-                errors('Erro ao salvar informações. Confira os dados informados.');
+                errors('Error saving information. Check the data reported.');
                 _.map(rewards(), (reward) => {
                     if (reward().validate) {
                         reward().validate();
@@ -182,7 +182,7 @@ const projectEditReward = {
                                 m('button.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields', {
                                     onclick: () => ctrl.rewards().push(m.prop(ctrl.newReward()))
                                 },
-                                    '+ Adicionar recompensa'
+                                    '+ Add reward'
                                 )
 
                             ] : '')

@@ -19,20 +19,20 @@ const downloadReports = {
                                             m('span.fa.fa-download',
                                                 m.trust('&nbsp;')
                                             ),
-                                            'Baixar relatórios'
+                                            'Download reports'
                                         ]),
                                         m('ul.w-list-unstyled', [
                                             m('li.fontsize-smaller.u-marginbottom-10',
                                                 m('div', [
-                                                    'Apoiadores confirmados ',
+                                                    'Confirmed Supporters ',
                                                     m.trust('&nbsp;'),
-                                                    m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;state=paid']`,
+                                                    m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;state=paid']`,
                                                         'CSV'
                                                     ),
                                                     m.trust('&nbsp;'),
                                                     '\\',
                                                     m.trust('&nbsp;'),
-                                                    m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;state=paid']`,
+                                                    m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;state=paid']`,
                                                         'XLS'
                                                     )
                                                 ])
@@ -40,16 +40,16 @@ const downloadReports = {
                                             m('li.divider.u-marginbottom-10'),
                                             m('li.fontsize-smaller.u-marginbottom-10',
                                                 m('div', [
-                                                    'Apoiadores pendentes',
+                                                    'Pending Supporters',
                                                     m.trust('&nbsp;'),
                                                     m.trust('&nbsp;'),
-                                                    m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;state=pending&amp;waiting_payment=true']`,
+                                                    m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;state=pending&amp;waiting_payment=true']`,
                                                         'CSV'
                                                     ),
                                                     m.trust('&nbsp;'),
                                                     '\\',
                                                     m.trust('&nbsp;'),
-                                                    m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;state=pending&amp;waiting_payment=true']`,
+                                                    m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;state=pending&amp;waiting_payment=true']`,
                                                         'XLS'
                                                     )
                                                 ])
@@ -57,16 +57,16 @@ const downloadReports = {
                                             m('li.divider.u-marginbottom-10'),
                                             m('li.fontsize-smaller.u-marginbottom-10',
                                                 m('div', [
-                                                    'Apoiadores que não selecionaram recompensa',
+                                                    'Supporters who did not select reward',
                                                     m.trust('&nbsp;'),
                                                     m.trust('&nbsp;'),
-                                                    m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;reward_id=0&amp;state=paid']`,
+                                                    m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;reward_id=0&amp;state=paid']`,
                                                         'CSV'
                                                     ),
                                                     m.trust('&nbsp;'),
                                                     '\\',
                                                     m.trust('&nbsp;'),
-                                                    m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;reward_id=0&amp;state=paid']`,
+                                                    m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;reward_id=0&amp;state=paid']`,
                                                         'XLS'
                                                     )
                                                 ])
@@ -75,14 +75,14 @@ const downloadReports = {
                                                 m('li.divider.u-marginbottom-10'),
                                                 m('li.fontsize-smaller.u-marginbottom-10',
                                                     m('div', [
-                                                        `R$ ${reward.minimum_value} ${reward.description.substring(0, 40)}...;`,
-                                                        m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;reward_id=${reward.id}&amp;state=paid']`,
+                                                        `Rs ${reward.minimum_value} ${reward.description.substring(0, 40)}...;`,
+                                                        m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.csv?project_id=${project.project_id}&amp;reward_id=${reward.id}&amp;state=paid']`,
                                                             'CSV'
                                                         ),
                                                         m.trust('&nbsp;'),
                                                         '\\',
                                                         m.trust('&nbsp;'),
-                                                        m(`a.alt-link[href='/pt/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;reward_id=${reward.id}&amp;state=paid']`,
+                                                        m(`a.alt-link[href='/en/reports/contribution_reports_for_project_owners.xls?project_id=${project.project_id}&amp;reward_id=${reward.id}&amp;state=paid']`,
                                                             'XLS'
                                                         )
                                                     ])
