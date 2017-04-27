@@ -145,8 +145,7 @@ const publish = {
                       ]),
                       m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
                   ])
-
-              ],
+            ],
 
               terms = project => [
                   m('.w-col.w-col-11', [
@@ -177,8 +176,7 @@ const publish = {
                           m('span', { style: { 'font-weight': ' 600' } }, 'Goal of collection')
                       ]),
                       m('div', 'The goal can not be changed after the campaign has been published.'),
-
-                  ]),
+                ]),
 
                   m('.w-col.w-col-11', [
                       m('div', [
@@ -241,8 +239,7 @@ const publish = {
                       ]),
                       m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' and ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
                   ])
-
-              ];
+            ];
 
         return [!ctrl.l() && !ctrl.accountL() ? [
             (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
