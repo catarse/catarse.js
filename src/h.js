@@ -737,7 +737,7 @@ const
             permalink = project.permalink;
         }
 
-        return `http://www.myjvn.com/${permalink}`;
+        return `http://www.grasruts.com/${permalink}`;
     },
     isHome = (): boolean => {
         const path = window.location.pathname;

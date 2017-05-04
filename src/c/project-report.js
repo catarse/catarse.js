@@ -78,7 +78,7 @@ const projectReport = {
                     [
                         'This project disrespects',
                         m.trust('&nbsp;'),
-                        m('a.alt-link[href=\'http://www.myjvn.com/rules\'][target=\'_blank\']',
+                        m('a.alt-link[href=\'http://www.grasruts.com/rules\'][target=\'_blank\']',
                             ' our rules? '
                           )
                     ]

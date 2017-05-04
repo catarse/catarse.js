@@ -255,7 +255,7 @@ const projectContributionReport = {
             if (!lReward()) {
                 options = _.map(rewards(), r => ({
                     value: r.id,
-                    option: `Rs ${h.formatNumber(r.minimum_value, 2, 3)} - ${r.description.substring(0, 20)}`
+                    option: `R$ ${h.formatNumber(r.minimum_value, 2, 3)} - ${(r.title ? r.title : r.description).substring(0, 20)}`
                 }));
             }
 

@@ -3,13 +3,14 @@ import _ from 'underscore';
 import h from '../h';
 import userVM from '../vms/user-vm';
 import userAboutVM from '../vms/user-about-vm';
+import railsErrorsVM from '../vms/rails-errors-vm';
 import popNotification from './pop-notification';
 import inlineError from './inline-error';
 import projectEditSaveBtn from './project-edit-save-btn';
 
 const userAboutEdit = {
     controller(args) {
-        let parsedErrors = userAboutVM.mapRailsErrors(args.rails_errors);
+        let parsedErrors = userAboutVM.mapRailsErrors(railsErrorsVM.railsErrors());
         let deleteUser;
         const user = args.user || {},
             fields = {
@@ -89,7 +90,7 @@ const userAboutEdit = {
                     });
                 }
 
-                return void(0);
+                return void (0);
             },
 
             updateUser = () => {
@@ -234,15 +235,15 @@ const userAboutEdit = {
                     m('.w-container',
                         m('.w-row',
                             m('.w-col.w-col-10.w-col-push-1', [!user.is_admin ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [
-                                    m('.w-col.w-col-5.w-sub-col', [
-                                        m('label.field-label.fontweight-semibold',
+                                m('.w-col.w-col-5.w-sub-col', [
+                                    m('label.field-label.fontweight-semibold',
                                             'Your profile address'
                                         ),
-                                        m('label.field-label.fontsize-smallest.fontcolor-secondary',
+                                    m('label.field-label.fontsize-smallest.fontcolor-secondary',
                                             'Your public profile may have a custom URL. Choose an easy to save!    '
                                         )
-                                    ]),
-                                    m('.w-col.w-col-7',
+                                ]),
+                                m('.w-col.w-col-7',
                                         m('.w-row', [
                                             m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6',
                                                 m('input.string.optional.w-input.text-field.text-field.positive.prefix[id="user_permalink"][type="text"]', {
@@ -252,28 +253,28 @@ const userAboutEdit = {
                                                 })
                                             ),
                                             m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.text-field.postfix.no-hover',
-                                                m('.fontcolor-secondary.fontsize-smaller', '  .myjvn.com')
+                                                m('.fontcolor-secondary.fontsize-smaller', '  .grasruts.com')
                                             )
                                         ])
                                     )
-                                ]),
+                            ]),
                                 m('.w-row.u-marginbottom-30.card.card-terciary', [
                                     m('.fontsize-base.fontweight-semibold',
                                         'Email'
                                     ),
                                     m('.fontsize-small.u-marginbottom-30',
-                                        'Keep this email updated as it is the channel of communication between you, the JVN team and the team of projects you have supported. '
+                                        'Keep this email updated as it is the channel of communication between you, the Grasruts team and the team of projects you have supported. '
                                     ),
                                     m('.fontsize-base.u-marginbottom-40', [
                                         m('span.fontweight-semibold.card.u-radius',
                                             user.email
                                         ),
                                         m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
-                                                onclick: () => {
-                                                    ctrl.showEmailForm.toggle();
-                                                }
-                                            },
-                                            'Change e-mail'
+                                            onclick: () => {
+                                                ctrl.showEmailForm.toggle();
+                                            }
+                                        },
+                                            'Change email'
                                         )
                                     ]),
                                     m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
@@ -461,8 +462,8 @@ const userAboutEdit = {
                                             m('.w-row', [
                                                 m('.w-col.w-col-6.w-col-push-6',
                                                     m('a.btn.btn-small.btn-terciary', {
-                                                            onclick: ctrl.addLink
-                                                        },
+                                                        onclick: ctrl.addLink
+                                                    },
                                                         m('span.translation_missing', 'Add Link')
                                                     )
                                                 )
@@ -515,8 +516,8 @@ const userAboutEdit = {
                                             'All your support will be converted into anonymous backups, your data will no longer be visible, you will automatically exit the system and your account will be permanently disabled.'
                                         ),
                                         m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}'][rel='nofollow']`, {
-                                                onclick: ctrl.deleteAccount
-                                            },
+                                            onclick: ctrl.deleteAccount
+                                        },
                                             'Disable my Catarse account'
                                         ),
                                         m('form.w-hidden', {

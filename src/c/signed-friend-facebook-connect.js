@@ -24,10 +24,10 @@ const SignedFriendFacebookConnect = {
                     m('.w-row', [
                         m('.w-col.w-col-8', [
                             m('.fontsize-largest.u-marginbottom-20', 'Find Amazing Campaigns With Your Friends'),
-                            m('.fontsize-small', 'Discover incredible campaigns with JVN and your Facebook network')
+                            m('.fontsize-small', 'Discover incredible campaigns with Grasruts and your Facebook network')
                         ]),
                         m('.w-col.w-col-4.u-text-center', [
-                            m('.fontsize-smallest.u-marginbottom-10', `${total} of your friends are in JVN!`),
+                            m('.fontsize-smallest.u-marginbottom-10', `${total} of your friends are in Grasruts!`),
                             m('.u-marginbottom-20', [
                                 _.map(ctrl.mapWithAvatar(), item => m(`img.thumb.small.u-round.u-marginbottom-10[src="${item.avatar}"]`)),
                             ]),

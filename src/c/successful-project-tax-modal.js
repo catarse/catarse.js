@@ -43,7 +43,7 @@ const successfulProjectTaxModal = {
                             m('.text-error', `- Rs ${h.formatNumber(pt.catarse_fee, 2)}`)
                         ]),
                         m('.w-col.w-col-8', [
-                            m('div', `JVN fee and means of payment (${h.formatNumber((pt.service_fee * 100), 2)}%) `)
+                            m('div', `Grasruts fee and means of payment (${h.formatNumber((pt.service_fee * 100), 2)}%) `)
                         ])
                     ]),
                     m('.divider.u-marginbottom-10'),

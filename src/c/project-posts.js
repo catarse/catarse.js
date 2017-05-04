@@ -45,7 +45,7 @@ const projectPosts = {
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
                     (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny',[
-                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in JVN is sent directly to the email of those who have already supported your campaign and is also available for viewing on the website. You can choose to leave it public, or visible only to your supporters here on this tab.')
+                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in Grasruts is sent directly to the email of those who have already supported your campaign and is also available for viewing on the website. You can choose to leave it public, or visible only to your supporters here on this tab.')
                     ]) : '') : '',
                     m('.w-row.u-marginbottom-20', [
                         m('.w-col.w-col-4.w-col-push-4', [

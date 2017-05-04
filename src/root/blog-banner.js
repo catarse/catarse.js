@@ -24,7 +24,7 @@ const blogBanner : Component = {
                             ),
                             m('.fontsize-large.u-marginbottom-60.text-success',
                                 m('a.link-hidden-success[href=\'https://medium.com/@myjvnepal\'][target=\'__blank\']',
-                                    'JVN Blogs'
+                                    'Grasruts Blogs'
                                 )
                             )
                         ]

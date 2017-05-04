@@ -25,7 +25,7 @@ const footer = {
                                                     ]
                                                 ),
                                                 // m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
-                                                //     ' JVN flex'
+                                                //     ' Grasruts flex'
                                                 // ),
                                                 m('a.link-footer[href=\'/team?ref=ctrse_footer\']',
                                                     [
@@ -135,12 +135,12 @@ const footer = {
                                     ),
                                     m('.w-widget.w-widget-facebook.u-marginbottom-20',
                                         m('.facebook',
-                                            m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']')
+                                            m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/grasruts\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']')
                                         )
                                     ),
-                                    // m('.w-widget.w-widget-twitter', [
-                                    //     m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
-                                    // ]),
+                                    m('.w-widget.w-widget-twitter', [
+                                        m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
+                                    ]),
                                     m('.u-margintop-30',
                                         [
                                             m('.footer-full-signature-text.fontsize-small',
