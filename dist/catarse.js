@@ -3261,7 +3261,7 @@ var projectCard = {
     view: function view(ctrl, args) {
         var project = args.project,
             projectOwnerName = project.user ? project.user.public_name || project.user.name : project.owner_public_name || project.owner_name,
-            projectAddress = project.address ? project.address.city + ' - ' + project.address.state_acronym : project.city_name + ' - ' + project.state_acronym;
+            projectAddress = project.address ? ' ' + project.address.city + ' - ' + project.address.state_acronym : ' ' + project.city_name + ' - ' + project.state_acronym;
 
         return m(ctrl.css().wrapper, [m(ctrl.css().innerWrapper, [m('a' + ctrl.css().thumb + '[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref),
@@ -6197,7 +6197,7 @@ var addressTag = {
                 lbl: address.city + ' ' + address.state_acronym,
                 project: project()
             })
-        }, [m('span.fa.fa-map-marker'), ' ' + address.city + ', ' + address.state_acronym]) : '';
+        }, [m('span.fa.fa-map-marker'), '  ' + address.city + ', ' + address.state_acronym]) : '';
     }
 };
 
