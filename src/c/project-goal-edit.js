@@ -1,7 +1,7 @@
 import m from 'mithril';
 import _ from 'underscore';
-import h from '../h';
 import I18n from 'i18n-js';
+import h from '../h';
 import railsErrorsVM from '../vms/rails-errors-vm';
 import projectGoalVM from '../vms/project-goal-vm';
 import popNotification from './pop-notification';
@@ -32,6 +32,7 @@ const projectGoalEdit = {
                     vm.e.resetFieldErrors();
                     if (!showSuccess()) { showSuccess.toggle(); }
                     if (showError()) { showError.toggle(); }
+                    railsErrorsVM.validatePublish();
                 }).catch((err) => {
                     if (err.errors_json) {
                         railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
@@ -95,7 +96,7 @@ const projectGoalEdit = {
                                         ])
                                     ]),
                                     m('.u-text-center.fontsize-smaller', [
-                                        m('a.mode-diff-toggle.link-hidden-light.fontweight-semibold[href="javscript:void(0);"]', { onclick: ctrl.showModeDiff.toggle }, [
+                                        m('a.mode-diff-toggle.link-hidden-light.fontweight-semibold[href="javascript:void(0);"]', { onclick: ctrl.showModeDiff.toggle }, [
                                             'See the difference between the models ',
                                             m('span.fa.fa-chevron-down')
                                         ])
