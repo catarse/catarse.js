@@ -95,8 +95,8 @@ const projectCard = {
                   project.user.public_name||project.user.name
               ) : (project.owner_public_name || project.owner_name)),
               projectAddress = (project.address ? (
-                  `${project.address.city} - ${project.address.state_acronym}`
-              ) : (`${project.city_name} - ${project.state_acronym}`));
+                  ` ${project.address.city} - ${project.address.state_acronym}`
+              ) : (` ${project.city_name} - ${project.state_acronym}`));
 
         return m(ctrl.css().wrapper, [
             m(ctrl.css().innerWrapper, [

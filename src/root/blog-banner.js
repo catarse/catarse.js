@@ -23,8 +23,8 @@ const blogBanner : Component = {
                                 m('img.u-marginbottom-10[alt=\'Icon blog\'][src=\'/assets/icon-blog.png\']')
                             ),
                             m('.fontsize-large.u-marginbottom-60.text-success',
-                                m('a.link-hidden-success[href=\'https://medium.com/@myjvnepal\'][target=\'__blank\']',
-                                    'JVN Blogs'
+                                m('a.link-hidden-success[href=\'https://medium.com/grasruts\'][target=\'__blank\']',
+                                    'Grasruts Blogs'
                                 )
                             )
                         ]

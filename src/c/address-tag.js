@@ -17,7 +17,7 @@ const addressTag = {
                 project: project()
             })
         }, [
-            m('span.fa.fa-map-marker'), ` ${address.city}, ${address.state_acronym}`
+            m('span.fa.fa-map-marker'), `  ${address.city}, ${address.state_acronym}`
         ]) : '';
     }
 };

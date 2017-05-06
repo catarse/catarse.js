@@ -84,7 +84,7 @@ const publish = {
                           ' ',
                           m('span.fontweight-semibold', 'FLEX Rules')
                       ]),
-                      m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign deadline (discounting the JVN fee) and must comply with the execution of the campaign and with the delivery of the rewards offered regardless of how much you collect.')
+                      m('div', 'You have chosen the flexible campaign. In this way, you will receive all the funds collected from the supporters at the end of the campaign deadline (discounting the Grasruts fee) and must comply with the execution of the campaign and with the delivery of the rewards offered regardless of how much you collect.')
                   ]),
                   m('.w-col.w-col-11', [
                       m('div', [
@@ -125,9 +125,9 @@ const publish = {
                       m('div', [
                           m('span.fontsize-smallest.fontcolor-secondary', '7/9'),
                           ' ',
-                          m('span.fontweight-semibold', 'Responsibility of JVN')
+                          m('span.fontweight-semibold', 'Responsibility of Grasruts')
                       ]),
-                      [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible:'), ' The technological development of the platform, attendance of doubts and problems (both of supporters and directors), for hosting the campaign in the platform and for guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible:'), ' Financing, disclosure and execution, nor for the delivery of rewards of the registered campaigns.'])]
+                      [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'Grasruts is responsible:'), ' The technological development of the platform, attendance of doubts and problems (both of supporters and directors), for hosting the campaign in the platform and for guaranteeing the security of the financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'Grasruts is not responsible:'), ' Financing, disclosure and execution, nor for the delivery of rewards of the registered campaigns.'])]
                   ]),
                   m('.w-col.w-col-11', [
                       m('div', [
@@ -143,10 +143,9 @@ const publish = {
                           ' ',
                           m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from published campaign')
                       ]),
-                      m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
+                      m('div', [m('span.fontweight-semibold'), 'Grasruts reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
                   ])
-
-              ],
+            ],
 
               terms = project => [
                   m('.w-col.w-col-11', [
@@ -177,8 +176,7 @@ const publish = {
                           m('span', { style: { 'font-weight': ' 600' } }, 'Goal of collection')
                       ]),
                       m('div', 'The goal can not be changed after the campaign has been published.'),
-
-                  ]),
+                ]),
 
                   m('.w-col.w-col-11', [
                       m('div', [
@@ -200,7 +198,7 @@ const publish = {
                           ' ',
                           m('span', { style: { 'font-weight': ' 600' } }, 'Campaign deadline')
                       ]),
-                      m('div', `Your campaign will be in collection in JVN until the day ${h.momentify(ctrl.expiresAt())} at 23h59min59s.This deadline can not be changed after the campaign has been published.`)
+                      m('div', `Your campaign will be in collection in Grasruts until the day ${h.momentify(ctrl.expiresAt())} at 23h59min59s.This deadline can not be changed after the campaign has been published.`)
                   ]),
 
                   m('.w-col.w-col-11', [
@@ -220,9 +218,9 @@ const publish = {
                       m('div', [
                           m('span.fontsize-smallest.fontcolor-secondary', '7/9'),
                           ' ',
-                          m('span', { style: { 'font-weight': ' 600' } }, 'Responsibility of JVN')
+                          m('span', { style: { 'font-weight': ' 600' } }, 'Responsibility of Grasruts')
                       ]),
-                      [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'JVN is responsible:'), ' The technological development of the platform, attendance of doubts and problems (both of supporters and directors), for hosting the campaign on the platform and for ensuring the security of financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'JVN is not responsible:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the campaign registered.'])]]),
+                      [m('div', [m('span.fontweight-semibold'), m('span.fontweight-semibold', 'Grasruts is responsible:'), ' The technological development of the platform, attendance of doubts and problems (both of supporters and directors), for hosting the campaign on the platform and for ensuring the security of financial transactions.\ ', m('br'), m('br'), m('span.fontweight-semibold', 'Grasruts is not responsible:'), ' Financing, dissemination and execution, nor for the delivery of rewards of the campaign registered.'])]]),
 
                   m('.w-col.w-col-11', [
                       m('div', [
@@ -239,10 +237,9 @@ const publish = {
                           ' ',
                           m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from published campaign')
                       ]),
-                      m('div', [m('span.fontweight-semibold'), 'JVN reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' and ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
+                      m('div', [m('span.fontweight-semibold'), 'Grasruts reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' and ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
                   ])
-
-              ];
+            ];
 
         return [!ctrl.l() && !ctrl.accountL() ? [
             (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
@@ -276,7 +273,7 @@ const publish = {
                             m('.w-col.w-col-6', [
                                 m('.u-marginbottom-30.fontsize-base', [
                                     m('div', [m('span.fontweight-semibold', 'Title: '), project.name]),
-                                    m('div', [m('span.fontweight-semibold', 'Link: '), `www.myjvn.com/${project.permalink}`]),
+                                    m('div', [m('span.fontweight-semibold', 'Link: '), `www.grasruts.com/${project.permalink}`]),
                                     m('div', [m('span.fontweight-semibold', 'Type: '), I18n.t(project.mode, I18nScope())]),
                                     m('div', [m('span.fontweight-semibold', 'Goal: '), `Rs ${h.formatNumber(project.goal, 2, 3)}`]),
                                     (project.online_days !== null) ? m('div', [m('span.fontweight-semibold', `Deadline: ${project.online_days} ${(project.online_days > 1) ? 'days' : 'day'}`)]) : ''
@@ -302,7 +299,7 @@ const publish = {
                             m('.w-row', [
                                 m('.w-col.w-col-2'),
                                 m('.w-col.w-col-8', [
-                                    m('.fontsize-small', ['Before posting, click on the circles below and confirm that you are aware of how JVN works.'])
+                                    m('.fontsize-small', ['Before posting, click on the circles below and confirm that you are aware of how Grasruts works.'])
                                 ]),
                                 m('.w-col.w-col-2')
                             ])

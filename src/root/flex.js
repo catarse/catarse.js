@@ -120,7 +120,7 @@ const Flex = {
                             m('.w-col.w-col-6', [
                                 m.component(landingQA, {
                                     question: 'What are the flexible mode fees? ',
-                                    answer: 'Like in JVN, sending a project costs nothing! The fee charged on the JVN flex service is 13% on the amount collected.'
+                                    answer: 'Like in Grasruts, sending a project costs nothing! The fee charged on the Grasruts flex service is 13% on the amount collected.'
                                 }),
                                 m.component(landingQA, {
                                     question: 'Where does the money from my project come from?',
@@ -159,16 +159,16 @@ const Flex = {
                     ])
                 ]), m('.w-section.section-one-column.bg-catarse-zelo.section-large[style="min-height: 50vh;"]', [
                     m('.w-container.u-text-center', [
-                        m('.w-editable.u-marginbottom-40.fontsize-larger.lineheight-tight.fontcolor-negative', 'Flex is an experiment and initiative of JVN, Nepal`s largest crowdfunding platform.'),
+                        m('.w-editable.u-marginbottom-40.fontsize-larger.lineheight-tight.fontcolor-negative', 'Flex is an experiment and initiative of Grasruts, Nepal`s largest crowdfunding platform.'),
                         m('.w-row.u-text-center', (ctrl.statsLoader()) ? h.loader() : [
                             m('.w-col.w-col-4', [
-                                m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'People have already supported at least 01 project in JVN')
+                                m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_contributors, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'People have already supported at least 01 project in Grasruts')
                             ]),
                             m('.w-col.w-col-4', [
-                                m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'Projects have already been funded in JVN')
+                                m('.fontsize-jumbo.text-success.lineheight-loose', h.formatNumber(stats.total_projects_success, 0, 3)), m('p.start-stats.fontsize-base.fontcolor-negative', 'Projects have already been funded in Grasruts')
                             ]),
                             m('.w-col.w-col-4', [
-                                m('.fontsize-jumbo.text-success.lineheight-loose', `${stats.total_contributed.toString().slice(0, 2)} millions`), m('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in JVN')
+                                m('.fontsize-jumbo.text-success.lineheight-loose', `${stats.total_contributed.toString().slice(0, 2)} millions`), m('p.start-stats.fontsize-base.fontcolor-negative', 'They were invested in ideas published in Grasruts')
                             ])
                         ])
                     ])
@@ -183,13 +183,13 @@ const Flex = {
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [
                                         m('div', [
                                             m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f66e05eb6144171d8edb_facebook-xxl.png\']'),
-                                            m(`a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.myjvn.com/flex?ref=facebook&title=${encodeURIComponent('Meet the new JVN Flex!')}"][target="_blank"]`, 'Share')
+                                            m(`a.w-button.btn.btn-large.btn-fb[href="http://www.facebook.com/sharer/sharer.php?u=http://www.grasruts.com/flex?ref=facebook&title=${encodeURIComponent('Meet the new Grasruts Flex!')}"][target="_blank"]`, 'Share')
                                         ])
                                     ]),
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                         m('div', [
                                             m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'),
-                                            m(`a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!')}http://www.myjvn.com/flex?ref=twitter"][target="_blank"]`, 'To tweet')
+                                            m(`a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!')}http://www.grasruts.com/flex?ref=twitter"][target="_blank"]`, 'To tweet')
                                         ])
                                     ])
                                 ])

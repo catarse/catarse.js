@@ -12,7 +12,7 @@ const I18nScope = _.partial(h.i18nScope, 'projects.contributions');
 const thankYou = {
     controller(args) {
         const recommendedProjects = userVM.getUserRecommendedProjects(),
-            isSlip = !_.isEmpty(args.contribution.slip_url);
+            isSlip = args.contribution && !_.isEmpty(args.contribution.slip_url);
 
         const setEvents = (el, isInitialized) => {
             if (!isInitialized) {
@@ -89,15 +89,15 @@ const thankYou = {
                                   m('.w-hidden-small.w-hidden-tiny',
                                       [
                                           m('.w-sub-col.w-col.w-col-4', m.component(facebookButton, {
-                                              url: `http://www.myjvn.com/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`,
+                                              url: `http://www.grasruts.com/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`,
                                               big: true
                                           })),
                                           m('.w-sub-col.w-col.w-col-4', m.component(facebookButton, {
                                               messenger: true,
                                               big: true,
-                                              url: `http://www.myjvn.com/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=messenger&utm_campaign=thanks_share`
+                                              url: `http://www.grasruts.com/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=messenger&utm_campaign=thanks_share`
                                           })),
-                                          m('.w-col.w-col-4', m(`a.btn.btn-large.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20${args.contribution.project.name}%20https://www.myjvn.com/${args.contribution.project.permalink}%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]`, [
+                                          m('.w-col.w-col-4', m(`a.btn.btn-large.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20${args.contribution.project.name}%20https://www.grasruts.com/${args.contribution.project.permalink}%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]`, [
                                               m('span.fa.fa-twitter'), ' Twitter'
                                           ]))
                                       ]

@@ -52,7 +52,7 @@ const projectsExplore = {
             if (currentFilter().keyName === 'all') {
                 hasHint = true;
                 hintText = 'Sorted By Popularity ';
-                tooltipText = 'Our popularity factor is a mix of JVN team`s selection with a value that is calculated by the speed of fund collection of the campaign';
+                tooltipText = 'Our popularity factor is a mix of Grasruts team`s selection with a value that is calculated by the speed of fund collection of the campaign';
             } else if (currentFilter().keyName === 'finished') {
                 hasHint = true;
                 hintText = 'Sorted By Rs Collected';
@@ -310,7 +310,7 @@ const projectsExplore = {
                                 : 'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/56f4414d3a0fcc0124ec9a24_icon-launch-explore.png'
                     }),
                     m('h2.fontsize-larger.u-marginbottom-60',
-                        hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on JVN!'),
+                        hasSpecialFooter ? ctrl.externalLinkCategories[categoryId()].title : 'Launch your campaign on Grasruts!'),
                     m('.w-row', [
                         m('.w-col.w-col-4.w-col-push-4', [
                             hasSpecialFooter

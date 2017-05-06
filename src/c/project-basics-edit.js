@@ -35,6 +35,7 @@ const projectBasicsEdit = {
                     vm.e.resetFieldErrors();
                     if (!showSuccess()) { showSuccess.toggle(); }
                     if (showError()) { showError.toggle(); }
+                    railsErrorsVM.validatePublish();
                 }).catch((err) => {
                     if (err.errors_json) {
                         railsErrorsVM.mapRailsErrors(err.errors_json, mapErrors, vm.e);
@@ -45,8 +46,8 @@ const projectBasicsEdit = {
                 });
                 return false;
             };
-        if (args.rails_errors) {
-            railsErrorsVM.mapRailsErrors(args.rails_errors, mapErrors, vm.e);
+        if (railsErrorsVM.railsErrors()) {
+            railsErrorsVM.mapRailsErrors(railsErrorsVM.railsErrors(), mapErrors, vm.e);
         }
         vm.fillFields(args.project);
         vm.loadCategoriesOptionsTo(categories, vm.fields.category_id());
@@ -155,7 +156,7 @@ const projectBasicsEdit = {
                                         m('.w-col.w-col-4.w-col-small-6.w-col-tiny6.text-field.prefix.no-hover.medium.prefix-permalink', {
                                             class: vm.e.hasError('permalink') ? 'error' : ''
                                         },
-                                          m('.fontcolor-secondary.u-text-center.fontcolor-secondary.u-text-center.fontsize-smallest', 'www.myjvn.com/')),
+                                          m('.fontcolor-secondary.u-text-center.fontcolor-secondary.u-text-center.fontsize-smallest', 'www.grasruts.com/')),
                                         m('.w-col.w-col-8.w-col-small-6.w-col-tiny-6', [
                                             m('input.string.required.w-input.text-field.postfix.positive.medium[type="text"]', {
                                                 value: vm.fields.permalink(),

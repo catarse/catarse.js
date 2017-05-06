@@ -25,7 +25,7 @@ const dashboardRewardCard = {
                 m('.u-marginbottom-20.w-row',
                     m('.w-col.w-col-12',
                         m.component(copyTextInput, {
-                            value: `http://www.myjvn.com/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
+                            value: `http://www.grasruts.com/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
                         }),
                     )
                 ),

@@ -18,14 +18,8 @@ const footer = {
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.contact', I18nScope())
                                                 ),
-                                                m('a.link-footer[href=\'#?ref=ctrse_footer\']',
-                                                    [
-                                                        I18n.t('links.how_it_works', I18nScope()),
-                                                        m.trust('&nbsp;')
-                                                    ]
-                                                ),
                                                 // m('a.link-footer[href=\'https://www.catarse.me/en/flex?ref=ctrse_footer\']',
-                                                //     ' JVN flex'
+                                                //     ' Grasruts flex'
                                                 // ),
                                                 m('a.link-footer[href=\'/team?ref=ctrse_footer\']',
                                                     [
@@ -34,19 +28,22 @@ const footer = {
                                                         '3'
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'http://facebook.com/JVNepal\'][target=\'blank\']',
+                                                m('a.link-footer[href=\'https://www.facebook.com/grasruts\'][target=\'__blank\']',
                                                     ' Facebook'
                                                 ),
-                                                // m('a.link-footer[href=\'http://twitter.com/catarse\']',
-                                                //     ' Twitter'
-                                                // ),
-                                                // m('a.link-footer[href=\'http://instagram.com/catarse\']',
-                                                //     ' Instagram'
-                                                // ),
-                                                m('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']',
+                                                m('a.link-footer[href=\'https://twitter.com/grasruts\'][target=\'__blank\']',
+                                                    ' Twitter'
+                                                ),
+                                                m('a.link-footer[href=\'http://instagram.com/catarse\'][target=\'__blank\']',
+                                                    ' Instagram'
+                                                ),
+                                                m('a.link-footer[href=\'https://www.pinterest.com/grasruts\'][target=\'__blank\']',
+                                                    ' Pinterest'
+                                                ),
+                                                m('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'__blank\']',
                                                     ' Github'
                                                 ),
-                                                m('a.link-footer[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']',
+                                                m('a.link-footer[href=\'https://medium.com/grasruts\'][target=\'__blank\']',
                                                     ' Blog'
                                                 ),
                                                 m('a.link-footer[href=\'/jobs?ref=ctrse_footer\']',
@@ -58,6 +55,12 @@ const footer = {
                                             [
                                                 m('.footer-full-signature-text.fontsize-small',
                                                     I18n.t('titles.about', I18nScope())
+                                                ),
+                                                m('a.link-footer[href=\'#?ref=ctrse_footer\']',
+                                                    [
+                                                        I18n.t('links.how_it_works', I18nScope()),
+                                                        m.trust('&nbsp;')
+                                                    ]
                                                 ),
                                                 m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/requests/new\'][target="_BLANK"]',
                                                     I18n.t('links.contact', I18nScope())
@@ -130,16 +133,16 @@ const footer = {
                                             ]
                                         )
                                     ),
-                                    m('.footer-full-signature-text.fontsize-small',
-                                        I18n.t('titles.social', I18nScope())
-                                    ),
-                                    m('.w-widget.w-widget-facebook.u-marginbottom-20',
-                                        m('.facebook',
-                                            m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/JVNepal\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']')
-                                        )
-                                    ),
+                                    // m('.footer-full-signature-text.fontsize-small',
+                                    //     I18n.t('titles.social', I18nScope())
+                                    // ),
+                                    // m('.w-widget.w-widget-facebook.u-marginbottom-20',
+                                    //     m('.facebook',
+                                    //         m('.fb-like[data-colorscheme=\'dark\'][data-href=\'http://facebook.com/grasruts\'][data-layout=\'button_count\'][data-send=\'false\'][data-show-faces=\'false\'][data-title=\'\'][data-width=\'260\']')
+                                    //     )
+                                    // ),
                                     // m('.w-widget.w-widget-twitter', [
-                                    //     m(`a.twitter-follow-button[href="httṕ://twitter.com/catarse"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
+                                    //     m(`a.twitter-follow-button[href="httṕ://twitter.com/grasruts"][data-button="blue"][data-text-color="#FFFFFF][data-link-color="#FFFFFF"][data-width="224px"]`)
                                     // ]),
                                     m('.u-margintop-30',
                                         [
