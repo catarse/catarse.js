@@ -63,7 +63,7 @@ const insights = {
         const lContributionsPerDay = loader(models.projectContributionsPerDay.getRowOptions(filtersVM.parameters()));
         lContributionsPerDay.load().then(contributionsPerDay);
 
-        const contributionsPerLocationTable = [['Estado', 'Apoios', 'R$ apoiados (% do total)']];
+        const contributionsPerLocationTable = [['state', 'Support', 'Rs Supported (% Of total)']];
         const buildPerLocationTable = contributions => (!_.isEmpty(contributions)) ? _.map(_.first(contributions).source, (contribution) => {
             const column = [];
 
@@ -71,7 +71,7 @@ const insights = {
             column.push(contribution.total_contributions);
             column.push([contribution.total_contributed, [// Adding row with custom comparator => read project-data-table description
                 m(`input[type="hidden"][value="${contribution.total_contributed}"`),
-                'R$ ',
+                'Rs ',
                 h.formatNumber(contribution.total_contributed, 2, 3),
                 m('span.w-hidden-small.w-hidden-tiny', ` (${contribution.total_on_percentage.toFixed(2)}%)`)
             ]]);
@@ -103,7 +103,7 @@ const insights = {
             column.push(contribution.total);
             column.push([contribution.total_amount, [
                 m(`input[type="hidden"][value="${contribution.total_contributed}"`),
-                'R$ ',
+                'Rs ',
                 h.formatNumber(contribution.total_amount, 2, 3),
                 m('span.w-hidden-small.w-hidden-tiny', ` (${contribution.total_on_percentage.toFixed(2)}%)`)
             ]]);
@@ -132,21 +132,21 @@ const insights = {
     view(ctrl) {
         const project = _.first(ctrl.projectDetails()) || {
                 user: {
-                    name: 'Realizador'
+                    name: 'Director'
                 }
             },
 
             buildTooltip = el => m.component(tooltip, {
                 el,
                 text: [
-                    'Informa de onde vieram os apoios de seu projeto. Saiba como usar essa tabela e planejar melhor suas ações de comunicação ',
-                    m(`a[href="${I18n.t('ref_table.help_url', I18nScope())}"][target='_blank']`, 'aqui.')
+                    'Tell us where the support came from your project. Learn how to use this table and better plan your communication actions ',
+                    m(`a[href="${I18n.t('ref_table.help_url', I18nScope())}"][target='_blank']`, 'on here.')
                 ],
                 width: 380
             });
 
         if (!ctrl.l()) {
-            project.user.name = project.user.name || 'Realizador';
+            project.user.name = project.user.name || 'Director';
         }
 
         return m('.project-insights', !ctrl.l() ? [
@@ -190,8 +190,7 @@ const insights = {
                                 }
                             }, [
                                 m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', [
-                                    I18n.t('visitors_per_day_label', I18nScope()),
-                                    h.newFeatureBadge()
+                                    I18n.t('visitors_per_day_label', I18nScope())
                                 ]),
                                 !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
                                     collection: ctrl.visitorsPerDay,

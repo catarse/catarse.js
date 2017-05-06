@@ -20,8 +20,8 @@ const loadMoreBtn = {
               (!collection.isLoading() ?
                (collection.isLastPage() ? '' : m('button#load-more.btn.btn-medium.btn-terciary', {
                    onclick: collection.nextPage
-               }, 'Carregar mais')) : h.loader())
-        ]);
+               }, 'Load more')) : h.loader())
+          ]);
     }
 };
 

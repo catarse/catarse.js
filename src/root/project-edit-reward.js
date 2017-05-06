@@ -24,7 +24,7 @@ const projectEditReward = {
                 // m.request won't serialize params properly here
                 return $.ajax({
                     type: 'PATCH',
-                    url: `/pt/projects/${args.project_id}'`,
+                    url: `/en/projects/${args.project_id}'`,
                     data,
                     dataType: 'JSON'
                 }).done(() => {
@@ -44,7 +44,7 @@ const projectEditReward = {
             },
             onSubmit = () => {
                 error(false);
-                errors('Erro ao salvar informações. Confira os dados informados.');
+                errors('Error saving information. Check the data reported.');
                 _.map(rewards(), (reward) => {
                     if (reward().validate) {
                         reward().validate();
@@ -72,7 +72,7 @@ const projectEditReward = {
 
         const updateRewardSortPosition = (rewardId, position) => m.request({
             method: 'POST',
-            url: `/pt/projects/${args.project_id}/rewards/${rewardId}/sort?reward[row_order_position]=${position}`,
+            url: `/en/projects/${args.project_id}/rewards/${rewardId}/sort?reward[row_order_position]=${position}`,
             config: (xhr) => {
                 if (h.authenticityToken()) {
                     xhr.setRequestHeader('X-CSRF-Token', h.authenticityToken());
@@ -131,7 +131,7 @@ const projectEditReward = {
             m('.w-section.section',
                 m('.w-container', [
                     (ctrl.showSuccess() ? m.component(popNotification, {
-                        message: 'Recompensas salvas com sucesso'
+                        message: 'Rewards successfully saved'
                     }) : ''),
                     (ctrl.error() ? m.component(popNotification, {
                         message: ctrl.errors(),
@@ -182,7 +182,7 @@ const projectEditReward = {
                                 m('button.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields', {
                                     onclick: () => ctrl.rewards().push(m.prop(ctrl.newReward()))
                                 },
-                                    '+ Adicionar recompensa'
+                                    '+ Add reward'
                                 )
 
                             ] : '')

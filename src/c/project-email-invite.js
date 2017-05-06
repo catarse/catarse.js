@@ -54,7 +54,7 @@ const projectEmailInvite = {
         const project = args.project;
 
         return m('.email-invite-box', [
-            (ctrl.showSuccess() ? m.component(popNotification, { message: 'Convites enviados.' }) : ''),
+            (ctrl.showSuccess() ? m.component(popNotification, {message: 'Invitations Sent.'}) : ''),
             (ctrl.loading() ? h.loader()
              : [
                  m('.w-form', [
@@ -68,7 +68,7 @@ const projectEmailInvite = {
                          //        m("._w-inline-block.fontsize-smallest", "Upload CSV")
                          //    ])
                          ]),
-                         m('textarea.positive.text-field.w-input[maxlength="5000"][placeholder="Adicione um ou mais emails, separados por linha."]', {
+                         m('textarea.positive.text-field.w-input[maxlength="5000"][placeholder="Add one or more emails, separated by line."]', {
                              onchange: m.withAttr('value', ctrl.emailText),
                              value: ctrl.emailText()
                          })
@@ -77,7 +77,7 @@ const projectEmailInvite = {
                  m('.u-text-center', [
                      m('a.btn.btn-inline.btn-medium.w-button[href="javascript:void(0)"]', {
                          onclick: ctrl.submitInvite
-                     }, 'Enviar convites')
+                     }, 'Send invitations')
                  ])
              ])
         ]);

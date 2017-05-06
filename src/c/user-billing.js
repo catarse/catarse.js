@@ -43,7 +43,7 @@ const userBilling = {
                 }
             },
             confirmDelete = (cardId) => {
-                const r = confirm('você tem certeza?');
+                const r = confirm('are you sure?');
                 if (r) {
                     return m.request({
                         method: 'DELETE',
@@ -113,7 +113,7 @@ const userBilling = {
                     if (_.isArray(err.errors)) {
                         error(err.errors.join('<br>'));
                     } else {
-                        error('Erro ao atualizar informações.');
+                        error('Error updating information.');
                     }
 
                     showError(true);
@@ -168,7 +168,7 @@ const userBilling = {
 
         return m('[id=\'billing-tab\']', [
             (ctrl.showSuccess() ? m.component(popNotification, {
-                message: 'As suas informações foram atualizadas'
+                message: 'Your information has been updated'
             }) : ''),
             (ctrl.showError() ? m.component(popNotification, {
                 message: m.trust(ctrl.error()),
@@ -180,24 +180,24 @@ const userBilling = {
                         m('input[id=\'anchor\'][name=\'anchor\'][type=\'hidden\'][value=\'billing\']'),
                         m('.w-form.card.card-terciary', [
                             m('.fontsize-base.fontweight-semibold',
-                                'Dados bancários'
+                                'Bank data'
                             ),
                             m('.fontsize-small.u-marginbottom-20', [
-                                'Caso algum projeto que você tenha apoiado ',
+                                'If any project you have supported ',
                                 m('b',
-                                    'com Boleto Bancário'
+                                    'With Boleto Bancaria'
                                 ),
-                                ' não seja bem-sucedido, nós efetuaremos o reembolso de seu pagamento ',
+                                ' Is not successful, we will refund your payment ',
                                 m('b',
-                                    'automaticamente'
+                                    'Automatically'
                                 ),
-                                ' na conta indicada abaixo.'
+                                ' In the account indicated below.'
                             ]),
                             m('.divider.u-marginbottom-20'),
                             m('.w-row', [
                                 m('.w-col.w-col-6.w-sub-col', [
                                     m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']',
-                                        'Nome do titular'
+                                        'Cardholder Name'
                                     ),
                                     m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
                                         value: fields.owner_name(),
@@ -207,7 +207,7 @@ const userBilling = {
                                 ]),
                                 m('.w-col.w-col-6', [
                                     m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']',
-                                        'CPF / CNPJ do titular'
+                                        'CPF / CNPJ of the holder'
                                     ),
                                     m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
                                         value: fields.owner_document(),
@@ -220,7 +220,7 @@ const userBilling = {
                                 m(`.w-col.w-col-6.w-sub-col${ctrl.showOtherBanksInput() ? '.w-hidden' : ''}[id='bank_select']`,
                                     m('.input.select.required.user_bank_account_bank_id', [
                                         m('label.field-label',
-                                            'Banco'
+                                            'Bank'
                                         ),
                                         m('select.select.required.w-input.text-field.bank-select.positive[id=\'user_bank_account_attributes_bank_id\']', {
                                             name: 'user[bank_account_attributes][bank_id]',
@@ -242,11 +242,11 @@ const userBilling = {
                                                 )
                                             ),
                                             m('option[value=\'0\']',
-                                                'Outro'
+                                                'Other'
                                             )
                                         ]),
                                         m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_bank_id\']',
-                                            ' Selecione um banco'
+                                            ' Select a bank'
                                         )
                                     ])
                                 ),
@@ -256,7 +256,7 @@ const userBilling = {
                                             m('.w-col.w-col-12', [
                                                 m('.input.string.optional.user_bank_account_input_bank_number', [
                                                     m('label.field-label',
-                                                        'Número do banco (3 números)'
+                                                        'Bank Number (3 numbers)'
                                                     ),
                                                     m('input.string.optional.w-input.text-field.bank_account_input_bank_number[id=\'user_bank_account_attributes_input_bank_number\'][maxlength=\'3\'][size=\'3\'][type=\'text\']', {
                                                         name: 'user[bank_account_attributes][input_bank_number]',
@@ -265,20 +265,20 @@ const userBilling = {
                                                     }),
                                                     m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle.w-hidden[data-error-for=\'user_bank_account_attributes_input_bank_number\']',
 
-                                                        ' Número do banco inválido'
+                                                        'Invalid bank number'
                                                     )
                                                 ]),
                                                 m('a.w-hidden-small.w-hidden-tiny.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
                                                     onclick: ctrl.showOtherBanks.toggle
                                                 }, [
-                                                    'Busca por nome  ',
+                                                    'Search by name  ',
                                                     m.trust('&nbsp;'),
                                                     m.trust('&gt;')
                                                 ]),
                                                 m('a.w-hidden-main.w-hidden-medium.alt-link.fontsize-smaller[href=\'javascript:void(0);\'][id=\'show_bank_list\']', {
                                                     onclick: ctrl.showOtherBanks.toggle
                                                 }, [
-                                                    'Busca por nome  ',
+                                                    'Search by name  ',
                                                     m.trust('&nbsp;'),
                                                     m.trust('&gt;')
                                                 ])
@@ -295,18 +295,18 @@ const userBilling = {
                                             },
                                                 m('.card.card-terciary', [
                                                     m('.fontsize-small.fontweight-semibold.u-marginbottom-10.u-text-center',
-                                                        'Selecione o seu banco abaixo'
+                                                        'Select your bank below'
                                                     ),
                                                     m('.fontsize-smaller', [
                                                         m('.w-row.card.card-secondary.fontweight-semibold', [
                                                             m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
                                                                 m('div',
-                                                                    'Número'
+                                                                    'Number'
                                                                 )
                                                             ),
                                                             m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
                                                                 m('div',
-                                                                    'Nome'
+                                                                    'Name'
                                                                 )
                                                             )
                                                         ]),
@@ -342,7 +342,7 @@ const userBilling = {
                                     m('.w-row', [
                                         m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [
                                             m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency\']',
-                                                'Agência'
+                                                'Agency'
                                             ),
                                             m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_agency\'][type=\'text\']', {
                                                 value: fields.agency(),
@@ -352,7 +352,7 @@ const userBilling = {
                                         ]),
                                         m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                             m('label.text.optional.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_agency_digit\']',
-                                                'Dígito agência'
+                                                'Agency digit'
                                             ),
                                             m('input.string.optional.w-input.text-field.positive[id=\'user_bank_account_attributes_agency_digit\'][type=\'text\']', {
                                                 value: fields.agency_digit(),
@@ -366,17 +366,17 @@ const userBilling = {
                             m('.w-row', [
                                 m('.w-col.w-col-6.w-sub-col', [
                                     m('label.field-label.fontweight-semibold',
-                                        'Tipo de conta'
+                                        'Account Type'
                                     ),
                                     m('p.fontsize-smaller.u-marginbottom-20',
-                                        'Só aceitamos conta corrente'
+                                        'We only accept checking account'
                                     )
                                 ]),
                                 m('.w-col.w-col-6',
                                     m('.w-row', [
                                         m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [
                                             m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account\']',
-                                                'No. da conta'
+                                                'Account No.'
                                             ),
                                             m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account\'][type=\'text\']', {
                                                 value: fields.account(),
@@ -386,7 +386,7 @@ const userBilling = {
                                         ]),
                                         m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                             m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_account_digit\']',
-                                                'Dígito conta'
+                                                'Account Digit'
                                             ),
                                             m('input.string.required.w-input.text-field.positive[id=\'user_bank_account_attributes_account_digit\'][type=\'text\']', {
                                                 value: fields.account_digit(),
@@ -407,7 +407,7 @@ const userBilling = {
                             m('.w-container',
                                 m('.w-row',
                                     m('.w-col.w-col-4.w-col-push-4',
-                                        m('input.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'Salvar\']')
+                                        m('input.btn.btn-large[name=\'commit\'][type=\'submit\'][value=\'To save\']')
                                     )
                                 )
                             )

@@ -74,14 +74,14 @@ const inviteEmailsFromImport = {
         return m('div', [
             m('.modal-dialog-header', [
                 m('.fontsize-large.u-text-center',
-                  'Convide seus amigos')
+                  'Invite your friends')
             ]),
             m('.modal-dialog-content', (!args.loadingContacts() && !ctrl.loading() ? [
                 m('.filter-area', [
                     m('.w-row.u-margintop-20', [
                         m('.w-sub-col.w-col.w-col-12', [
                             m('form[action="javascript:void(0);"]', [
-                                m('input.w-input.text-field[type="text"][placeholder="Busque pelo nome ou email."]', {
+                                m('input.w-input.text-field[type="text"][placeholder="Search by name or email."]', {
                                     onkeyup: m.withAttr('value', ctrl.filterTerm),
                                     onchange: (e) => { e.preventDefault(); }
                                 })
@@ -108,8 +108,8 @@ const inviteEmailsFromImport = {
                  m('.u-text-center.u-margintop-20', [
                      m('a.btn.btn-inline.btn-medium.w-button[href="javascript:void(0)"]', {
                          onclick: ctrl.submitInvites
-                     }, `Enviar ${ctrl.checkedList().length} convites`)
-                 ]) : (!ctrl.loading() ? 'carregando contatos...' : 'enviando convites...'))
+                     }, `Send ${ctrl.checkedList().length} Invitations`)
+                 ]) : (!ctrl.loading() ? 'Loading contacts...' : 'Sending invitations...'))
             ])
         ]);
     }

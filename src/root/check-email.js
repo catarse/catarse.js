@@ -13,7 +13,7 @@ const CheckEmail = {
             user = userVM.fetchUser(userID),
             confirmedEmail = m.prop(false),
             hideAlert = m.prop(false);
-
+ 
         return {
             confirmedEmail,
             hideAlert,
@@ -47,7 +47,7 @@ const CheckEmail = {
                     m('.fontsize-large.fontweight-semibold', I18n.t('confirmed_title', I18nScope())),
                     m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('confirmed_sub', I18nScope())),
                 ] : [
-                    m('.fontsize-large.fontweight-semibold', _.isNull(user.name) ? 'Olá' : I18n.t('hello', I18nScope({ name: user.name }))),
+                    m('.fontsize-large.fontweight-semibold', _.isNull(user.name)?"Hi":I18n.t('hello', I18nScope({name: user.name}))),
                     m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('hello_sub', I18nScope())),
                     m('.fontsize-base.u-marginbottom-10', I18n.t('hello_email', I18nScope({ email: user.email }))),
                     m('.w-row', [
@@ -55,10 +55,10 @@ const CheckEmail = {
                         m('.w-col.w-col-3', [
                             m('button.btn.btn-medium.btn-terciary.w-button', {
                                 onclick: ctrl.checkEmail
-                            }, 'Sim!')
+                            }, 'Yes!')
                         ]),
                         m('.w-col.w-col-3', [
-                            m(`a.btn.btn-medium.w-button[href="/users/${user.id}/edit#about_me"]`, 'Editar o email')
+                            m(`a.btn.btn-medium.w-button[href="/users/${user.id}/edit#about_me"]`,'Edit Email')
                         ]),
                         m('.w-col.w-col-3')
                     ])

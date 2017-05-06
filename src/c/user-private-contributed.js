@@ -60,28 +60,26 @@ const userPrivateContributed = {
             failedCollection = ctrl.failedPages.collection();
 
         return m('.content[id=\'private-contributed-tab\']', ctrl.error() ? m.component(inlineError, {
-            message: 'Erro ao carregar os projetos.'
-        }) : ctrl.loader() ? h.loader() :
+                message: 'Error loading projects.'
+            }) : ctrl.loader() ? h.loader() :
             (_.isEmpty(onlineCollection) && _.isEmpty(successfulCollection) && _.isEmpty(failedCollection)) ?
             m('.w-container',
                 m('.w-row.u-margintop-30.u-text-center', [
                     m('.w-col.w-col-3'),
                     m('.w-col.w-col-6', [
                         m('.fontsize-large.u-marginbottom-30', [
-                            'Você ainda não apoiou nenhum projeto no',
-                            m.trust('&nbsp;'),
-                            'Catarse...'
+                            'You Have Not Backed Any Campaign'
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-3'),
                             m('.w-col.w-col-6',
-                                m('a.btn.btn-large[href=\'/pt/explore\']', {
-                                    config: m.route,
-                                    onclick: () => {
-                                        m.route('/explore');
-                                    }
-                                },
-                                    'Apoie agora!'
+                                m('a.btn.btn-large[href=\'/en/explore\']', {
+                                        config: m.route,
+                                        onclick: () => {
+                                            m.route('/explore');
+                                        }
+                                    },
+                                    'SUPPORT NOW!'
                                 )
                             ),
                             m('.w-col.w-col-3')
@@ -92,17 +90,17 @@ const userPrivateContributed = {
             ) :
             [
                 m.component(userContributedBox, {
-                    title: 'Projetos em andamento',
+                    title: 'Projects in progress',
                     collection: onlineCollection,
                     pagination: ctrl.onlinePages
                 }),
                 m.component(userContributedBox, {
-                    title: 'Projetos bem-sucedidos',
+                    title: 'Successful Projects',
                     collection: successfulCollection,
                     pagination: ctrl.successfulPages
                 }),
                 m.component(userContributedBox, {
-                    title: 'Projetos não-financiados',
+                    title: 'Non-funded projects',
                     collection: failedCollection,
                     pagination: ctrl.failedPages
                 }),

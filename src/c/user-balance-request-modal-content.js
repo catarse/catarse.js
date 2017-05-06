@@ -53,9 +53,9 @@ const userBalanceRequestModelContent = {
                     m('p.fontsize-large', I18n.t('sucess_message', I18nScope()))
                 ]) : m('.modal-dialog-content', [
                     m('.fontsize-base.u-marginbottom-20', [
-                        m('span.fontweight-semibold', 'Valor:'),
+                        m('span.fontweight-semibold', 'Value:'),
                         m.trust('&nbsp;'),
-                        m('span.text-success', `R$ ${h.formatNumber(balance.amount, 2, 3)}`)
+                        m('span.text-success', `Rs ${h.formatNumber(balance.amount, 2, 3)}`)
                     ]),
                     m('.fontsize-base.u-marginbottom-10', [
                         m('span', { style: { 'font-weight': ' 600' } }, I18n.t('bank.account', I18nScope()))
@@ -97,7 +97,7 @@ const userBalanceRequestModelContent = {
                               h.loader()
                               : m('a.btn.btn-large.btn-request-fund[href="js:void(0);"]',
                                   { onclick: ctrl.requestFund },
-                                  'Solicitar saque'))
+                                  'Request withdrawal'))
                          ]),
                          m('.w-col.w-col-3')
                      ])

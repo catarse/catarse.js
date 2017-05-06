@@ -36,12 +36,12 @@ const UserFollowCard = {
                   m('.fontsize-smaller',
                       [
                           m('span.fontweight-semibold', friend.total_contributed_projects),
-                          ' apoiados ',
+                          ' Backed ',
                           m.trust('&nbsp;'),
                           '| ',
                           m.trust('&nbsp;'),
                           m('span.fontweight-semibold', friend.total_published_projects),
-                          ' criados'
+                          ' Created'
                       ]
               ),
                   m('.btn-bottom-card.w-row',

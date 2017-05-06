@@ -73,7 +73,7 @@ const adminResetPassword = {
     },
     view(ctrl, args) {
         const data = args.data,
-            btnValue = (ctrl.l()) ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = (ctrl.l()) ? 'please wait...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
@@ -93,7 +93,7 @@ const adminResetPassword = {
                     m(`input.w-button.btn.btn-small[type="submit"][value="${btnValue}"]`)
                 ] : (!ctrl.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
-                        m('p', 'Senha alterada com sucesso.')
+                        m('p', 'Password changed successfully.')
                     ])
                 ] : [
                     m('.w-form-error[style="display:block;"]', [

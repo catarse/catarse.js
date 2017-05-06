@@ -19,7 +19,7 @@ const rewardReceiver = {
         const contribution = args.contribution;
 
         return contributionVM.canBeDelivered(contribution) ?
-            m('.u-text-center.w-col.w-col-1', {
+            m('.u-text-center.w-col.w-col-2', {
                 onclick: () => ctrl.toggleDelivery(contribution.project_id, contribution)
             }, [
                 m('.fontsize-smallest',
@@ -28,7 +28,7 @@ const rewardReceiver = {
                     )
                 ),
                 m('.fontcolor-secondary.fontsize-smallest.lineheight-looser',
-                    'Recebi!'
+                    'Received?'
                 )
             ]) : m('');
     }

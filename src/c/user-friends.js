@@ -55,13 +55,13 @@ const userFriends = {
             m('.w-container', [
                 m('.w-row.u-marginbottom-40.card.u-radius.card-terciary', [
                     m('.w-col.w-col-7.w-col-small-6.w-col-tiny-6', [
-                        m('.fontsize-small', 'Comece agora! Siga todos os seus amigos ou somente alguns deles para descobrir projetos juntos!')
+                        m('.fontsize-small', 'Start now! Follow all your friends or just a few of them to discover projects together!')
                     ]),
                     m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [
                             (ctrl.allLoading() ? h.loader()
                              : m('a.w-button.btn.btn-medium', {
                                  onclick: ctrl.followAll
-                             }, `Siga todos os seus ${listVM.total() ? listVM.total() : ''} amigos`))
+                             }, `Follow all your ${listVM.total() ? listVM.total() : ''} friends`))
                     ])
                 ]),
                 m('.w-row', [

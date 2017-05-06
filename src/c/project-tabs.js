@@ -55,22 +55,22 @@ const projectTabs = {
                                 style: 'float: left;',
                                 onclick: h.analytics.event({
                                     cat: 'project_view', act: 'project_rewards_view', project: project() })
-                            }, 'Recompensas') : m(`a[id="rewards-link"][class="w-hidden-main w-hidden-medium dashboard-nav-link mf ${(h.hashMatch('#contribution_suggestions') ? 'selected' : '')}"][href="/${project().permalink}#contribution_suggestions"]`, {
+                            }, 'Rewards') : m(`a[id="rewards-link"][class="w-hidden-main w-hidden-medium dashboard-nav-link mf ${(h.hashMatch('#contribution_suggestions') ? 'selected' : '')}"][href="/${project().permalink}#contribution_suggestions"]`, {
                                 style: 'float: left;',
                                 onclick: h.analytics.event({
                                     cat: 'project_view', act: 'project_contribsuggestions_view', project: project() })
-                            }, 'Valores Sugeridos'),
+                            }, 'Suggested Values'),
                             m(`a[id="about-link"][class="dashboard-nav-link mf ${(h.hashMatch('#about') || h.hashMatch('') ? 'selected' : '')}"][href="#about"]`, {
                                 style: 'float: left;',
                                 onclick: h.analytics.event({
                                     cat: 'project_view', act: 'project_about_view', project: project() })
-                            }, 'Sobre'),
+                            }, 'About'),
                             m(`a[id="posts-link"][class="dashboard-nav-link mf ${(h.hashMatch('#posts') ? 'selected' : '')}"][href="/${project().permalink}#posts"]`, {
                                 style: 'float: left;',
                                 onclick: h.analytics.event({
                                     cat: 'project_view', act: 'project_posts_view', project: project() })
                             }, [
-                                'Novidades ',
+                                'News ',
                                 m('span.badge', project() ? project().posts_count : '')
                             ]),
                             m(`a[id="contributions-link"][class="w-hidden-small w-hidden-tiny dashboard-nav-link mf ${(h.hashMatch('#contributions') ? 'selected' : '')}"][href="#contributions"]`, {
@@ -78,7 +78,7 @@ const projectTabs = {
                                 onclick: h.analytics.event({
                                     cat: 'project_view', act: 'project_contributions_view', project: project() })
                             }, [
-                                'Apoiadores ',
+                                'Supporters ',
                                 m('span.badge.w-hidden-small.w-hidden-tiny', project() ? project().total_contributors : '-')
                             ]),
                             m(`a[id="comments-link"][class="dashboard-nav-link mf ${(h.hashMatch('#comments') ? 'selected' : '')}"][href="#comments"]`, {
@@ -86,8 +86,8 @@ const projectTabs = {
                                 onclick: h.analytics.event({
                                     cat: 'project_view', act: 'project_comments_view', project: project() })
                             }, [
-                                'Comentários ',
-                                project() ? m(`fb:comments-count[href="http://www.catarse.me/${project().permalink}"][class="badge project-fb-comment w-hidden-small w-hidden-tiny"][style="display: inline"]`, m.trust('&nbsp;')) : '-'
+                                'Comments ',
+                                project() ? m(`fb:comments-count[href="http://www.grasruts.com/${project().permalink}"][class="badge project-fb-comment w-hidden-small w-hidden-tiny"][style="display: inline"]`, m.trust('&nbsp;')) : '-'
                             ]),
                         ]),
                         project() ? m('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', project().open_for_contributions ? [
@@ -95,7 +95,7 @@ const projectTabs = {
                                 m('.w-col.w-col-6.w-col-medium-8', [
                                     m(`a.w-button.btn[href="/projects/${project().project_id}/contributions/new"]`, {
                                         onclick: h.analytics.event({ cat: 'contribution_create', act: 'contribution_floatingbtn_click', project: project() })
-                                    }, 'Apoiar ‍este projeto')
+                                    }, 'Support')
                                 ]),
                                 m('.w-col.w-col-6.w-col-medium-4', {
                                     onclick: h.analytics.event({ cat: 'project_view', act: 'project_floatingreminder_click', project: project() })

@@ -70,24 +70,24 @@ const paymentVM = (mode = 'aon') => {
     };
 
     const expMonthOptions = () => [
-            [null, 'Mês'],
-            [1, '01 - Janeiro'],
-            [2, '02 - Fevereiro'],
-            [3, '03 - Março'],
-            [4, '04 - Abril'],
-            [5, '05 - Maio'],
-            [6, '06 - Junho'],
-            [7, '07 - Julho'],
-            [8, '08 - Agosto'],
-            [9, '09 - Setembro'],
-            [10, '10 - Outubro'],
-            [11, '11 - Novembro'],
-            [12, '12 - Dezembro']
+            [null, 'Month'],
+            [1, '01 - January'],
+            [2, '02 - Feburary'],
+            [3, '03 - March'],
+            [4, '04 - April'],
+            [5, '05 - May'],
+            [6, '06 - June'],
+            [7, '07 - July'],
+            [8, '08 - August'],
+            [9, '09 - September'],
+            [10, '10 - October'],
+            [11, '11 - November'],
+            [12, '12 - December']
     ];
 
     const expYearOptions = () => {
         const currentYear = moment().year();
-        const yearsOptions = ['Ano'];
+        const yearsOptions = ['Year'];
         for (let i = currentYear; i <= currentYear + 25; i++) {
             yearsOptions.push(i);
         }
@@ -100,7 +100,7 @@ const paymentVM = (mode = 'aon') => {
 
     const getLocale = () => isInternational()
             ? { locale: 'en' }
-            : { locale: 'pt' };
+            : { locale: 'en' };
 
     const faq = () => I18n.translations[I18n.currentLocale()].projects.faq[mode],
         currentUser = h.getUser() || {},
@@ -131,10 +131,10 @@ const paymentVM = (mode = 'aon') => {
 
         if (document.length > 14) {
             isValid = h.validateCnpj(document);
-            errorMessage = 'CNPJ inválido.';
+            errorMessage = 'invalid CNPJ.';
         } else {
             isValid = h.validateCpf(striped);
-            errorMessage = 'CPF inválido.';
+            errorMessage = 'invalid CPF.';
         }
 
         if (!isValid) {
@@ -174,7 +174,6 @@ const paymentVM = (mode = 'aon') => {
             checkDocument();
             checkPhone();
         }
-
         return _.isEmpty(fields.errors());
     };
 
@@ -441,7 +440,7 @@ const paymentVM = (mode = 'aon') => {
         fields.userCountryId(countryId);
     });
     statesLoader.load().then((data) => {
-        fields.states().push({ acronym: null, name: 'Estado' });
+        fields.states().push({acronym: null, name: 'state'});
         _.map(data, state => fields.states().push(state));
     });
     usersVM.fetchUser(currentUser.user_id, false).then(populateForm);

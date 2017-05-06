@@ -48,7 +48,7 @@ const projectSuccessfulOnboardConfirmAccountError = {
                         }),
                         ctrl.error() ? m('.w-row', [
                             m('.w-col.w-col-6.w-col-push-3.u-text-center', [
-                                m('span.fontsize-smallest.text-error', 'Campo Obrigatório')
+                                m('span.fontsize-smallest.text-error', 'Required field')
                             ])
                         ]) : '',
                         m('.w-row', [

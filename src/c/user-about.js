@@ -27,7 +27,7 @@ const userAbout = {
     },
     view(ctrl, args) {
         const user = ctrl.userDetails();
-        return (ctrl.error() ? m.component(inlineError, { message: 'Erro ao carregar dados.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'about-tab\']',
+        return ( ctrl.error() ? m.component(inlineError, {message: 'Error loading data.'}) : ctrl.loader() ? h.loader() :  m('.content[id=\'about-tab\']',
             m('.w-container[id=\'about-content\']',
                 m('.w-row',
                     [

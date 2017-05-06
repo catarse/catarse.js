@@ -44,7 +44,7 @@ const adminRadioAction = {
                 selectedItem(newItem);
             } else {
                 error({
-                    message: 'Nenhum item atualizado'
+                    message: 'No items updated'
                 });
             }
             complete(true);
@@ -112,7 +112,7 @@ const adminRadioAction = {
     view(ctrl, args) {
         const data = args.data,
             item = args.item(),
-            btnValue = (ctrl.setLoader() || ctrl.getLoader()) ? 'por favor, aguarde...' : data.callToAction;
+            btnValue = (ctrl.setLoader() || ctrl.getLoader()) ? 'please wait...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
@@ -133,14 +133,14 @@ const adminRadioAction = {
                                 ctrl.setDescription(radio.description);
                             }
                         }),
-                        m(`label.w-form-label[for="r-${index}"]`, `R$${radio.minimum_value}`)
+                        m(`label.w-form-label[for="r-${index}"]`, `Rs${radio.minimum_value}`)
                     ])) : h.loader(),
-                    m('strong', 'Descrição'),
+                    m('strong', 'Description'),
                     m('p', ctrl.description()),
                     m(`input.w-button.btn.btn-small[type="submit"][value="${btnValue}"]`)
                 ] : (!ctrl.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
-                        m('p', 'Recompensa alterada com sucesso!')
+                        m('p', 'Reward changed successfully!')
                     ])
                 ] : [
                     m('.w-form-error[style="display:block;"]', [

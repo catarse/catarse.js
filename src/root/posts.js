@@ -45,10 +45,10 @@ const posts = {
             },
             togglePreview = () => {
                 if (!validateTitle()) {
-                    errors('Título não pode ficar em branco.');
+                    errors('Title can not be empty');
                     showError(true);
                 } else if (!validateComment()) {
-                    errors('Mensagem não pode ficar em branco.');
+                    errors('Message can not be left blank.');
                     showError(true);
                 } else {
                     h.scrollTop();
@@ -60,13 +60,13 @@ const posts = {
             projectDetails = m.prop([]),
             rewardText = (rewardId) => {
                 const reward = _.find(rewardVM.rewards(), r => String(r.id) === String(rewardId));
-                return `Apoiadores da recompensa R$${reward.minimum_value} - ${reward.title ? reward.title : `${reward.description.substring(0, 70)}...`}`;
+                return `Reward supporters Rs${reward.minimum_value} - ${reward.title ? reward.title : `${reward.description.substring(0, 70)}...`}`;
             },
             showRecipientes = (post) => {
                 if (post.recipients === 'public') {
-                    return 'Todo mundo (apoiadores e não apoiadores)';
+                    return 'Everyone (supporters and non-supporters)';
                 } else if (post.recipients === 'backers') {
-                    return 'Todos os apoiadores';
+                    return 'All supporters';
                 }
                 const reward = _.find(rewardVM.rewards(), r => r.id === post.reward_id);
                 if (reward) {
@@ -143,7 +143,7 @@ const posts = {
             }) : [
 
                 (ctrl.showSuccess() ? m.component(popNotification, {
-                    message: 'Mensagem enviada com sucesso'
+                    message: 'Message sent successfully'
                 }) : ''),
                 (ctrl.showError() ? m.component(popNotification, {
                     message: ctrl.errors(),
@@ -155,7 +155,7 @@ const posts = {
                             m('.w-col.w-col-3'),
                             m('.w-col.w-col-6',
                                 m('.fontsize-larger.fontweight-semibold.lineheight-tight',
-                                    'Envie uma novidade para seus apoiadores'
+                                    'Submit a news story to your supporters'
                                 )
                             ),
                             m('.w-col.w-col-3')
@@ -165,39 +165,39 @@ const posts = {
                     m('.w-row', [
                         m('.w-col.w-col-1'),
                         m('.w-col.w-col-10', [
-                            m('.u-marginbottom-60.u-text-center',
-                                m('._w-inline-block.card.fontsize-small.u-radius', [
-                                    m('span.fa.fa-lightbulb-o',
-                                        ''
-                                    ),
-                                    ' Veja ótimo motivos para ',
-                                    m('a.alt-link[href=\'https://catarse.attach.io/B1AHAGm1x\'][target=\'_blank\']',
-                                        'falar com seus apoiadores agora mesmo!'
-                                    )
-                                ])
-                            ),
+                            // m('.u-marginbottom-60.u-text-center',
+                            //     m('._w-inline-block.card.fontsize-small.u-radius', [
+                            //         m('span.fa.fa-lightbulb-o',
+                            //             ''
+                            //         ),
+                            //         ' Veja ótimo motivos para ',
+                            //         m('a.alt-link[href=\'https://catarse.attach.io/B1AHAGm1x\'][target=\'_blank\']',
+                            //             'falar com seus apoiadores agora mesmo!'
+                            //         )
+                            //     ])
+                            // ),
                             m('.card.card-terciary.medium.u-marginbottom-80.w-form', [
                                 m('form', [
                                     m('label.field-label.fontweight-semibold',
-                                        'Destinatários'
+                                        'Recipients'
                                     ),
                                     m('select.positive.text-field.w-select', {
                                         onchange: m.withAttr('value', ctrl.fields.reward_id)
                                     }, [
                                         m('option[value=\'-1\']', {
-                                            selected: true
-                                        },
-                                            'Todo mundo (apoiadores e não apoiadores)'
+                                                selected: true
+                                            },
+                                            'Everyone (supporters and non-supporters)'
                                         ),
                                         m('option[value=\'0\']',
-                                            'Todos os apoiadores'
+                                            'All supporters'
                                         ),
                                         (_.map(paidRewards, reward => m(`option[value='${reward.id}']`,
                                               ctrl.rewardText(reward.id)
                                             )))
                                     ]),
                                     m('label.field-label.fontweight-semibold',
-                                        'Título'
+                                        'Title'
                                     ),
                                     m('input.positive.text-field.w-input[id=\'post_title\'][maxlength=\'256\'][type=\'text\']', {
                                         name: 'posts[title]',
@@ -207,7 +207,7 @@ const posts = {
                                         onchange: m.withAttr('value', ctrl.fields.title)
                                     }),
                                     m('label.field-label.fontweight-semibold',
-                                        'Texto'
+                                        'Text'
                                     ),
                                     m('.preview-container.u-marginbottom-40', {
                                         class: ctrl.commentHasError() ? 'error' : '',
@@ -217,9 +217,9 @@ const posts = {
                                         m('.w-col.w-col-3'),
                                         m('._w-sub-col.w-col.w-col-6',
                                             m('button.btn.btn-large', {
-                                                onclick: ctrl.togglePreview
-                                            },
-                                                'Pré-visualizar'
+                                                    onclick: ctrl.togglePreview
+                                                },
+                                                'Preview'
                                             )
                                         ),
                                         m('.w-col.w-col-3')
@@ -227,23 +227,23 @@ const posts = {
                                 ])
                             ]),
                             m('.fontsize-large.fontweight-semibold.u-marginbottom-40',
-                                'Novidades já enviadas'
+                                'News already sent'
                             ),
                             m('.table-outer.u-marginbottom-60', [
                                 m('.fontsize-smaller.fontweight-semibold.header.table-row.w-row', [
                                     m('.table-col.w-col.w-col-5',
                                         m('div',
-                                            'Título'
+                                            'Title'
                                         )
                                     ),
                                     m('.table-col.u-text-center.w-col.w-col-3',
                                         m('div',
-                                            'Enviadas'
+                                            'Sent'
                                         )
                                     ),
                                     m('.table-col.u-text-center.w-col.w-col-3',
                                         m('div',
-                                            'Abertas'
+                                            'Open'
                                         )
                                     ),
                                     m('.table-col.w-col.w-col-1')
@@ -256,13 +256,13 @@ const posts = {
                                                 ),
                                             m('.fontcolor-secondary.fontsize-smallest', [
                                                 m('span.fontweight-semibold',
-                                                        'Enviada em: '
+                                                        'Sent in: '
                                                     ),
                                                 h.momentify(post.created_at, 'DD/MM/YYYY, h:mm A')
                                             ]),
                                             m('.fontcolor-secondary.fontsize-smallest', [
                                                 m('span.fontweight-semibold',
-                                                        'Destinatários: '
+                                                        'Recipients: '
                                                     ),
                                                 ctrl.showRecipientes(post)
                                             ])
@@ -285,7 +285,7 @@ const posts = {
                                             )
                                     ]))),
                                     m('form.w-hidden', {
-                                        action: `/pt/projects/${project.project_id}/posts/${ctrl.toDeletePost()}`,
+                                        action: `/en/projects/${project.project_id}/posts/${ctrl.toDeletePost()}`,
                                         method: 'POST',
                                         config: ctrl.setPostDeletionForm
                                     }, [

@@ -65,14 +65,14 @@ const thankYou = {
                                            I18nScope({
                                                total: args.contribution.project.total_contributions,
                                                email: args.contribution.contribution_email,
-                                               link2: `/pt/users/${h.getUser().user_id}/edit#contributions`,
-                                               link_email: `/pt/users/${h.getUser().user_id}/edit#about_me`
+                                               link2: `/en/users/${h.getUser().user_id}/edit#contributions`,
+                                               link_email: `/en/users/${h.getUser().user_id}/edit#about_me`
                                            })
                                           )
                                 )
                                ),
-                              m('.fontsize-base.fontweight-semibold.u-marginbottom-20',
-                                'Compartilhe com seus amigos e ajude esse projeto a bater a meta!'
+                              m(".fontsize-base.fontweight-semibold.u-marginbottom-20",
+                                "Share with your friends and help this project hit the goal!"
                                )
                           ] : [
                               m('#slip-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n.t('thank_you_slip.thank_you', I18nScope())),
@@ -80,7 +80,7 @@ const thankYou = {
                                 m.trust(I18n.t('thank_you_slip.thank_you_text_html',
                                                I18nScope({
                                                    email: args.contribution.contribution_email,
-                                                   link_email: `/pt/users/${h.getUser().user_id}/edit#about_me`
+                                                   link_email: `/en/users/${h.getUser().user_id}/edit#about_me`
                                                }))))
                           ]
                          ),
@@ -89,15 +89,15 @@ const thankYou = {
                                   m('.w-hidden-small.w-hidden-tiny',
                                       [
                                           m('.w-sub-col.w-col.w-col-4', m.component(facebookButton, {
-                                              url: `https://www.catarse.me/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`,
+                                              url: `http://www.grasruts.com/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=social&utm_campaign=project_share`,
                                               big: true
                                           })),
                                           m('.w-sub-col.w-col.w-col-4', m.component(facebookButton, {
                                               messenger: true,
                                               big: true,
-                                              url: `https://www.catarse.me/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=messenger&utm_campaign=thanks_share`
+                                              url: `http://www.grasruts.com/${args.contribution.project.permalink}?ref=ctrse_thankyou&utm_source=facebook.com&utm_medium=messenger&utm_campaign=thanks_share`
                                           })),
-                                          m('.w-col.w-col-4', m(`a.btn.btn-large.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20${args.contribution.project.name}%20https://www.catarse.me/${args.contribution.project.permalink}%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]`, [
+                                          m('.w-col.w-col-4', m(`a.btn.btn-large.btn-tweet.u-marginbottom-20[href="https://twitter.com/intent/tweet?text=Acabei%20de%20apoiar%20o%20projeto%20${args.contribution.project.name}%20https://www.grasruts.com/${args.contribution.project.permalink}%3Fref%3Dtwitter%26utm_source%3Dtwitter.com%26utm_medium%3Dsocial%26utm_campaign%3Dproject_share"][target="_blank"]`, [
                                               m('span.fa.fa-twitter'), ' Twitter'
                                           ]))
                                       ]
@@ -105,9 +105,9 @@ const thankYou = {
                                   m('.w-hidden-main.w-hidden-medium', [
                                       m('.u-marginbottom-30.u-text-center-small-only', m('button.btn.btn-large.btn-terciary.u-marginbottom-40', {
                                           onclick: ctrl.displayShareBox.toggle
-                                      }, 'Compartilhe')),
+                                      }, 'Share')),
                                       ctrl.displayShareBox() ? m(projectShareBox, {
-                                                         // Mocking a project m.prop
+                                          // Mocking a project m.prop
                                           project: m.prop({
                                               permalink: args.contribution.project.permalink,
                                               name: args.contribution.project.name

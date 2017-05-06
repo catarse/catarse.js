@@ -74,7 +74,7 @@ const projectDashboardMenu = {
             projectRoute = `/projects/${project.project_id}`,
             editRoute = `${projectRoute}/edit`,
             editLinkClass = hash => `dashboard-nav-link-left ${project.is_published ? 'indent' : ''} ${h.hashMatch(hash) ? 'selected' : ''}`;
-        const optionalOpt = m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)');
+        const optionalOpt = m('span.fontsize-smallest.fontcolor-secondary', ' (optional)');
 
         ctrl.body.className = ctrl.bodyToggleForNav();
 
@@ -97,9 +97,9 @@ const projectDashboardMenu = {
                             m(`a#dashboard_reports_link[class="dashboard-nav-link-left ${h.locationActionMatch('posts') ? 'selected' : ''}"][href="${projectRoute}/posts"]`, [
                                 m('span.fa.fa-bullhorn.fa-fw.fa-lg'),
                                 I18n.t('posts_tab', I18nScope()),
-                                project.posts_count > 0 ?
-                                m('span.badge', project.posts_count) :
-                                m('span.badge.badge-attention', 'Nenhuma')
+                                project.posts_count > 0
+                                ? m('span.badge', project.posts_count)
+                                : m('span.badge.badge-attention', 'None')
                             ])
                         ] : '')
                     ]),
@@ -116,17 +116,14 @@ const projectDashboardMenu = {
                                 ] : ''),
                                 m(`a#description_link[class="${editLinkClass('#description')}"][href="${editRoute}#description"]`, railsErrorsVM.errorsFor('description'), I18n.t('description_tab', linksScope())),
                                 m(`a#video_link[class="${editLinkClass('#video')}"][href="${editRoute}#video"]`, [railsErrorsVM.errorsFor('video'),
-                                    'Vídeo', m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)')
+                                    'Video', m('span.fontsize-smallest.fontcolor-secondary', ' (optinal)')
                                 ]),
                                 m(`a#budget_link[class="${editLinkClass('#budget')}"][href="${editRoute}#budget"]`, railsErrorsVM.errorsFor('budget'), I18n.t('budget_tab', linksScope())),
                                 m(`a#card_link[class="${editLinkClass('#card')}"][href="${editRoute}#card"]`, railsErrorsVM.errorsFor('card'), I18n.t('card_tab', linksScope())),
                                 m(`a#dashboard_reward_link[class="${editLinkClass('#reward')}"][href="${editRoute}#reward"]`, [railsErrorsVM.errorsFor('reward'),
-                                    'Recompensas', optionalOpt
+                                    'Rewards', optionalOpt
                                 ]),
-                                m(`a#dashboard_user_about_link[class="${editLinkClass('#user_about')}"][href="${editRoute}#user_about"]`, railsErrorsVM.errorsFor('user_about'), I18n.t('about_you_tab', linksScope())),
-                                ((project.is_published || project.state === 'draft') || project.is_admin_role ? [
-                                    m(`a#dashboard_user_settings_link[class="${editLinkClass('#user_settings')}"][href="${editRoute}#user_settings"]`, railsErrorsVM.errorsFor('user_settings'), I18n.t('account_tab', linksScope())),
-                                ] : ''), (!project.is_published ? [
+                                m(`a#dashboard_user_about_link[class="${editLinkClass('#user_about')}"][href="${editRoute}#user_about"]`, railsErrorsVM.errorsFor('user_about'), I18n.t('about_you_tab', linksScope())), (!project.is_published ? [
                                     m(`a#dashboard_preview_link[class="${editLinkClass('#preview')}"][href="${editRoute}#preview"]`, [
                                         m('span.fa.fa-fw.fa-eye.fa-lg'), I18n.t('preview_tab', linksScope())
                                     ]),

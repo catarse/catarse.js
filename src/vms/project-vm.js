@@ -24,11 +24,8 @@ const setProject = project_user_id => (data) => {
 
 const init = (project_id, project_user_id) => {
     vm.project_id(project_id);
-
     const lProject = postgrest.loaderWithToken(models.projectDetail.getRowOptions(vm.parameters()));
-
     fetchParallelData(project_id, project_user_id);
-
     return lProject.load().then(setProject(project_user_id));
 };
 
@@ -107,5 +104,4 @@ const projectVM = {
     fetchProject,
     updateProject
 };
-
 export default projectVM;

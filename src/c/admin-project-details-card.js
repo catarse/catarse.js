@@ -37,7 +37,7 @@ const adminProjectDetailsCard = {
                     m('span.fontcolor-secondary', 'Status:'), ' ',
                     m('span', {
                         class: statusTextObj.cssClass
-                    }, (ctrl.isFinalLap() && project.open_for_contributions ? 'RETA FINAL' : statusTextObj.text)), ' '
+                    }, (ctrl.isFinalLap() && project.open_for_contributions ? 'FINAL STRAIGHT' : statusTextObj.text)), ' '
                 ]), project.is_published ? [
                     m('.meter.u-margintop-20.u-marginbottom-10', [
                         m('.meter-fill', {
@@ -48,25 +48,25 @@ const adminProjectDetailsCard = {
                     ]),
                     m('.w-row', [
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
-                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'financiado'),
+                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Financed'),
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', `${progress}%`)
                         ]),
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
-                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'levantados'),
+                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Raised'),
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', [
-                                `R$ ${h.formatNumber(project.pledged, 2)}`,
+                                `Rs ${h.formatNumber(project.pledged, 2)}`,
                             ]),
                         ]),
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
-                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'apoios'),
+                            m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Supports'),
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', project.total_contributions)
                         ]),
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
                             (_.isNull(project.expires_at) ? [
-                                m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'iniciado há'),
+                                m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Initiated'),
                                 m('.fontweight-semibold.fontsize-large.lineheight-tight', `${elapsedTextObj.total} ${elapsedTextObj.unit}`)
                             ] : [
-                                m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'restam'),
+                                m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'Remain'),
                                 m('.fontweight-semibold.fontsize-large.lineheight-tight', `${remainingTextObj.total} ${remainingTextObj.unit}`)
                             ])
                         ])

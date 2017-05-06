@@ -13,7 +13,7 @@ const filterMain = {
                 })
             ]),
             m('.w-col.w-col-4', [
-                m(`input#filter-btn${btnClass}[type="submit"][value="Buscar"]`)
+                m(`input#filter-btn${btnClass}[type="submit"][value="To seek"]`)
             ])
         ]);
     }

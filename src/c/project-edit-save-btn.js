@@ -8,7 +8,7 @@ const projectEditSaveBtn = {
                 m('.w-col.w-col-4.w-col-push-4',
                   (args.loading() ? h.loader() : [
                       m('input[id="anchor"][name="anchor"][type="hidden"][value="about_me"]'),
-                      m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Salvar"]', {
+                      m('input.btn.btn.btn-large[name="commit"][type="submit"][value="Save"]', {
                           onclick: args.onSubmit
                       })
                   ])

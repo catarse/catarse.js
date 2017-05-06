@@ -64,11 +64,11 @@ const UserFollowBtn = {
                         onmouseover: () => ctrl.hover(true),
                         onmouseout: () => ctrl.hover(false)
                     },
-                         (ctrl.hover() ? 'Deixar de seguir' : 'Seguindo'));
+                         (ctrl.hover() ? 'Unfollow' : 'Following'));
             }
             return m(`a${disableClass}`,
                          { onclick: ctrl.follow },
-                         'Seguir');
+                         'Follow');
         }
         return m('');
     }

@@ -44,12 +44,12 @@ const projectPosts = {
             m('.w-container.u-margintop-20', [
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
-                    (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny', [
-                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'Toda novidade publicada no Catarse é enviada diretamente para o email de quem já apoiou seu projeto e também fica disponível para visualização no site. Você pode optar por deixá-la pública, ou visível somente para seus apoiadores aqui nesta aba.')
+                    (_.isEmpty(list.collection()) ? m('.w-hidden-small.w-hidden-tiny',[
+                        m('.fontsize-base.u-marginbottom-30.u-margintop-20', 'All news published in Grasruts is sent directly to the email of those who have already supported your campaign and is also available for viewing on the website. You can choose to leave it public, or visible only to your supporters here on this tab.')
                     ]) : '') : '',
                     m('.w-row.u-marginbottom-20', [
                         m('.w-col.w-col-4.w-col-push-4', [
-                            m(`a.btn.btn-edit.btn-small[href='/pt/projects/${project.project_id}/posts']`, 'Escrever novidade')
+                            m(`a.btn.btn-edit.btn-small[href='/en/projects/${project.project_id}/posts']`, 'Write News')
                         ])
                     ])
                 ] : ''), (_.map(list.collection(), post => m('.w-row', [
@@ -61,7 +61,7 @@ const projectPosts = {
                                 m('p.fontweight-semibold.fontsize-larger.u-text-center.u-marginbottom-30', [
                                     m(`a.link-hidden[href="/projects/${post.project_id}/posts/${post.id}#posts"]`, post.title)
                                 ]),
-                                    (!_.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Post exclusivo para apoiadores.'))
+                                    (!_.isEmpty(post.comment_html) ? m('.fontsize-base', m.trust(post.comment_html)) : m('.fontsize-base', 'Exclusive post for supporters.'))
                             ]),
                             m('.divider.u-marginbottom-60')
                         ])
@@ -86,10 +86,10 @@ const projectPosts = {
                                 ) : ''
                             : m('.w-col.w-col-2.w-col-push-5',
                                 (list.isLastPage() ?
-                                    list.collection().length === 0 ? 'Nenhuma novidade.' : ''
+                                    list.collection().length === 0 ? 'No news.' : ''
                                  : m('button#load-more.btn.btn-medium.btn-terciary', {
-                                     onclick: list.nextPage
-                                 }, 'Carregar mais'))
+                                    onclick: list.nextPage
+                                }, 'Load more'))
                             ) :
                             m('.w-col.w-col-2.w-col-push-5', h.loader())
                         ))

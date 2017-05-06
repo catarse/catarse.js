@@ -21,9 +21,9 @@ const rewardSelectCard = {
             };
 
             if (!selectedDestination() && rewardVM.hasShippingOptions(rewardVM.selectedReward())) {
-                rewardVM.error('Por favor, selecione uma opção de frete válida.');
+                rewardVM.error('Please select a valid freight option.');
             } else if (valueFloat < rewardVM.selectedReward().minimum_value + shippingFee.value) {
-                rewardVM.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${rewardVM.selectedReward().minimum_value} + frete R$${h.formatNumber(shippingFee.value)}`);
+                rewardVM.error(`The support amount for this reward must be at least Rs${rewardVM.selectedReward().minimum_value} + freight Rs${h.formatNumber(shippingFee.value)}`);
             } else {
                 rewardVM.error('');
                 const valueUrl = window.encodeURIComponent(String(valueFloat).replace('.', ','));
@@ -46,7 +46,7 @@ const rewardSelectCard = {
             if (_.isEmpty(reward)) {
                 return {
                     id: null,
-                    description: 'Obrigado. Eu só quero ajudar o projeto.',
+                    description: 'Thank you. I just want to help the project.',
                     minimum_value: 10,
                     shipping_options: null,
                     row_order: -999999
@@ -91,12 +91,12 @@ const rewardSelectCard = {
                     name: 'contribution[reward_id]'
                 }),
                 m(`label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for="contribution_reward_${reward.id}"]`,
-                    `R$ ${h.formatNumber(reward.minimum_value)} ou mais`
+                    `Rs ${h.formatNumber(reward.minimum_value)} or more`
                 ), !ctrl.isSelected(reward) ? '' : m('.w-row.back-reward-money', [
                     rewardVM.hasShippingOptions(reward) ?
                     m('.w-sub-col.w-col.w-col-4', [
                         m('.fontcolor-secondary.u-marginbottom-10',
-                            'Local de entrega'
+                            'Delivery place'
                         ),
                         m('select.positive.text-field.w-select', {
                             onchange: m.withAttr('value', ctrl.selectDestination)
@@ -104,7 +104,7 @@ const rewardSelectCard = {
                             _.map(ctrl.locationOptions(reward, ctrl.selectedDestination),
                                 option => m(`option[value="${option.value}"]`, [
                                     `${option.name} `,
-                                    option.value != '' ? `+R$${option.fee}` : null
+                                    option.value != '' ? `+Rs${option.fee}` : null
                                 ])
                             )
                         )
@@ -113,11 +113,11 @@ const rewardSelectCard = {
                         class: rewardVM.hasShippingOptions(reward) ?
                             'w-col-4' : 'w-col-8'
                     }, [
-                        m('.fontcolor-secondary.u-marginbottom-10', 'Valor do apoio'),
+                        m('.fontcolor-secondary.u-marginbottom-10', 'Value of support'),
                         m('.w-row.u-marginbottom-20', [
                             m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
                                 m('.back-reward-input-reward.medium.placeholder',
-                                    'R$'
+                                    'Rs'
                                 )
                             ),
                             m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
@@ -134,14 +134,14 @@ const rewardSelectCard = {
                         ]),
                         m('.fontsize-smaller.text-error.u-marginbottom-20.w-hidden', [
                             m('span.fa.fa-exclamation-triangle'),
-                            ' O valor do apoio está incorreto'
+                            ' Support amount is incorrect'
                         ])
                     ]),
                     m('.submit-form.w-col.w-col-4',
                         m('button.btn.btn-medium.u-margintop-30', {
                             onclick: ctrl.submitContribution
                         }, [
-                            'Continuar  ',
+                            'Continue  ',
                             m('span.fa.fa-chevron-right')
                         ])
                     )
@@ -157,11 +157,11 @@ const rewardSelectCard = {
                 m('.back-reward-reward-description', [
                     m('.fontsize-smaller.u-marginbottom-10.fontcolor-secondary', reward.description),
                     m('.u-marginbottom-20.w-row', [!reward.deliver_at ? '' : m('.w-col.w-col-6', [
-                        m('.fontsize-smallest.fontcolor-secondary', 'Entrega Prevista:'),
+                        m('.fontsize-smallest.fontcolor-secondary', 'Estimated delivery time:'),
                         m('.fontsize-smallest', h.momentify(reward.deliver_at, 'MMM/YYYY'))
                     ]),
                         (!rewardVM.hasShippingOptions(reward) && reward.shipping_options !== 'presential') ? '' : m('.w-col.w-col-6', [
-                            m('.fontsize-smallest.fontcolor-secondary', 'Envio:'),
+                            m('.fontsize-smallest.fontcolor-secondary', 'Send:'),
                             m('.fontsize-smallest', I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope()))
                         ])
                     ])

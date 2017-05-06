@@ -12,7 +12,7 @@ const filterNumberRange = {
                     })
                 ]),
                 m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [
-                    m('.fontsize-smaller.u-text-center.lineheight-looser', 'e')
+                    m('.fontsize-smaller.u-text-center.lineheight-looser', 'and')
                 ]),
                 m('.w-col.w-col-5.w-col-small-5.w-col-tiny-5', [
                     m('input.w-input.text-field.positive[type="text"]', {

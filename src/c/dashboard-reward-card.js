@@ -20,17 +20,17 @@ const dashboardRewardCard = {
         return m('.w-row.card-persisted.card.card-terciary.u-marginbottom-20.medium.sortable', [
             m('.w-sub-col.w-col.w-col-5', [
                 m('span.fontcolor-secondary.fontsize-smallest',
-                    'Link para apoio direto'
+                    'Link to direct support'
                 ),
                 m('.u-marginbottom-20.w-row',
                     m('.w-col.w-col-12',
                         m.component(copyTextInput, {
-                            value: `https://www.catarse.me/pt/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
+                            value: `http://www.grasruts.com/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
                         }),
                     )
                 ),
                 m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-20',
-                    'O link acima leva para a página de contribuição com essa recompensa já selecionada.'
+                    'The link above leads to the contribution page with this reward already selected.'
                 )
             ]),
             m('.w-col.w-col-7',
@@ -38,7 +38,7 @@ const dashboardRewardCard = {
                     m('.w-row', [
                         m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11',
                             m('.fontsize-base.fontweight-semibold',
-                                `Para R$ ${reward.minimum_value} ou mais`
+                                `For Rs ${reward.minimum_value} or more`
                             )
                         ),
                         (rewardVM.canEdit(reward, args.project_state, args.user) ?
@@ -53,7 +53,7 @@ const dashboardRewardCard = {
                             ) : '')
                     ]),
                     m('.fontsize-smaller.u-marginbottom-20.fontweight-semibold',
-                        `${reward.paid_count} apoiadores`
+                        `${reward.paid_count} supporters`
                     ),
                     m('.fontsize-small.fontweight-semibold',
                         reward.title
@@ -64,21 +64,21 @@ const dashboardRewardCard = {
                     (reward.limited() ? (ctrl.availableCount(reward) <= 0) ?
                         m('.u-margintop-10',
                             m('span.badge.badge-gone.fontsize-smaller',
-                                'Esgotada'
+                                'Out of stock'
                             )
                         ) :
                         m('.u-margintop-10',
                             m('span.badge.badge-attention.fontsize-smaller', [
                                 m('span.fontweight-bold',
-                                    'Limitada '
+                                    'Limited '
                                 ),
-                                ` (${ctrl.availableCount(reward)} de ${reward.maximum_contributions} disponíveis)`
+                                ` (${ctrl.availableCount(reward)} in ${reward.maximum_contributions} Available)`
                             ])
                         ) : ''),
 
 
-                    (reward.deliver_at ? m('.fontsize-smallest', [m('b', 'Estimativa de entrega: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : ''),
-                    m('.fontsize-smallest', m('b', 'Envio: '), I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope()))
+                    (reward.deliver_at ? m('.fontsize-smallest', [m('b', 'Estimated delivery: '), h.momentify(reward.deliver_at, 'MMM/YYYY')]) : '')
+                    // m('.fontsize-smallest', m('b', 'Send: '), I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope()))
 
                 ])
             )

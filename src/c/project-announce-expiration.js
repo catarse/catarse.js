@@ -17,7 +17,7 @@ const projectAnnounceExpiration = {
         const days = ctrl.days,
             expirationDate = moment().add(ctrl.days(), 'days').format('DD/MM/YYYY');
         return m("[id='dashboard-announce_expiration-tab']",
-            m(`form.simple_form.project-form.w-form[accept-charset='UTF-8'][action='/pt/flexible_projects/${args.project_id}'][id='expiration-form'][method='post'][novalidate='novalidate']`, [
+            m(`form.simple_form.project-form.w-form[accept-charset='UTF-8'][action='/en/flexible_projects/${args.project_id}'][id='expiration-form'][method='post'][novalidate='novalidate']`, [
                 m("input[name='utf8'][type='hidden'][value='✓']"),
                 m("input[name='_method'][type='hidden'][value='patch']"),
                 m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
@@ -30,10 +30,10 @@ const projectAnnounceExpiration = {
                                     m('.u-marginbottom-30.w-row', [
                                         m('.w-sub-col.w-col.w-col-6',
                                             m('.fontsize-small.u-marginbottom-10', [
-                                                'Em quantos dias, contados a partir de agora, você quer encerrar a sua arrecadação?',
+                                                'On how many days, from now on, do you want to close your collection?',
                                                 m('br'),
                                                 m('span.fontsize-smaller.fontweight-semibold',
-                                                    '(mínimo de 2 dias)'
+                                                    '(2 days minimum)'
                                                 )
                                             ])
                                         ),
@@ -52,7 +52,7 @@ const projectAnnounceExpiration = {
                                                 ),
                                                 m('.medium.no-hover.postfix.prefix-permalink.text-field.w-col.w-col-4.w-col-small-6.w-col-tiny-6',
                                                     m('.fontcolor-secondary.fontsize-base.lineheight-tightest.u-text-center',
-                                                        'Dias'
+                                                        'Days'
                                                     )
                                                 )
                                             ])
@@ -60,13 +60,13 @@ const projectAnnounceExpiration = {
                                     ]),
                                     m('.fontcolor-secondary.u-text-center', [
                                         m('.fontsize-smaller',
-                                            'Você poderá receber apoios até:'
+                                            'You can receive support until:'
                                         ),
                                         m('.fontsize-base', [
                                             m('span.expire-date',
                                                 expirationDate
                                             ),
-                                            ' as 23h59m'
+                                            ' at 23h59m'
                                         ])
                                     ])
                                 ])
@@ -86,7 +86,7 @@ const projectAnnounceExpiration = {
                                         e.preventDefault();
                                     }
                                 },
-                                    '  Confirmar'
+                                    '  Confirm'
                                 )
                             )
                         ])

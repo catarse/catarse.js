@@ -49,7 +49,7 @@ const paymentForm = {
                     class: ctrl.isSlip() ? 'selected' : ''
                 }, [
                     m('.fontsize-base.fontweight-semibold.u-marginbottom-20',
-                        'Boleto bancário'
+                        'Bank slip'
                     ),
                     m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/57299c6ef96a6e44489a7a07_boleto.png\'][width=\'48\']')
                 ]) : m('.flex-column')

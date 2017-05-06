@@ -5,8 +5,8 @@ import models from '../models';
 import h from '../h';
 import I18n from 'i18n-js';
 import startVM from '../vms/start-vm';
-import youtubeLightbox from '../c/youtube-lightbox';
-import slider from '../c/slider';
+// import youtubeLightbox from '../c/youtube-lightbox';
+// import slider from '../c/slider';
 import landingQA from '../c/landing-qa';
 import inlineError from '../c/inline-error';
 
@@ -100,7 +100,6 @@ const start = {
 
         statsLoader.load().then(stats);
         loadCategories();
-
         return {
             stats,
             categories,
@@ -158,7 +157,7 @@ const start = {
                             m('p.fontsize-small.start-stats', I18n.t('header.people', I18nScope()))
                         ]),
                         m('.w-col.w-col-4', [
-                            m('.fontsize-largest.lineheight-loose', `${stats.total_contributed.toString().slice(0, 2)} milhões`),
+                            m('.fontsize-largest.lineheight-loose', `${stats.total_contributed.toString().slice(0, 2)} millions`),
                             m('p.fontsize-small.start-stats', I18n.t('header.money', I18nScope()))
                         ]),
                         m('.w-col.w-col-4', [
@@ -208,32 +207,32 @@ const start = {
                 ])
             ]),
             m('.w-section.divider'),
-            m('.w-section.section-large', [
-                m('.w-container.u-text-center.u-marginbottom-60', [
-                    m('div', [
-                        m('span.fontsize-largest.fontweight-semibold', I18n.t('features.title', I18nScope()))
-                    ]),
-                    m('.w-hidden-small.w-hidden-tiny.fontsize-large.u-marginbottom-20', I18n.t('features.subtitle', I18nScope())),
-                    m('.w-hidden-main.w-hidden-medium.u-margintop-30', [
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_1', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_2', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_3', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_4', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_5', I18nScope())),
-                        m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_6', I18nScope()))
-                    ])
-                ]),
-                m('.w-container', [
-                    m('.w-tabs.w-hidden-small.w-hidden-tiny', [
-                        m('.w-tab-menu.w-col.w-col-4', _.map(ctrl.paneImages, (pane, idx) => m(`btn.w-tab-link.w-inline-block.tab-list-item${(idx === ctrl.selectedPane()) ? '.selected' : ''}`, {
-                            onclick: h.analytics.event({ cat: 'project_start', act: 'start_solution_click', lbl: pane.label }, ctrl.selectPane(idx))
-                        }, pane.label))),
-                        m('.w-tab-content.w-col.w-col-8', _.map(ctrl.paneImages, (pane, idx) => m('.w-tab-pane', [
-                            m(`img[src="${pane.src}"].pane-image${(idx === ctrl.selectedPane()) ? '.selected' : ''}`)
-                        ])))
-                    ])
-                ])
-            ]),
+            // m('.w-section.section-large', [
+            //     m('.w-container.u-text-center.u-marginbottom-60', [
+            //         m('div', [
+            //             m('span.fontsize-largest.fontweight-semibold', I18n.t('features.title', I18nScope()))
+            //         ]),
+            //         m('.w-hidden-small.w-hidden-tiny.fontsize-large.u-marginbottom-20', I18n.t('features.subtitle', I18nScope())),
+            //         m('.w-hidden-main.w-hidden-medium.u-margintop-30', [
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_1', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_2', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_3', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_4', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_5', I18nScope())),
+            //             m('.fontsize-large.u-marginbottom-30', I18n.t('features.feature_6', I18nScope()))
+            //         ])
+            //     ]),
+            //     m('.w-container', [
+            //         m('.w-tabs.w-hidden-small.w-hidden-tiny', [
+            //             m('.w-tab-menu.w-col.w-col-4', _.map(ctrl.paneImages, (pane, idx) => m(`btn.w-tab-link.w-inline-block.tab-list-item${(idx === ctrl.selectedPane()) ? '.selected' : ''}`, {
+            //                 onclick: h.analytics.event({ cat: 'project_start', act: 'start_solution_click', lbl: pane.label }, ctrl.selectPane(idx))
+            //             }, pane.label))),
+            //             m('.w-tab-content.w-col.w-col-8', _.map(ctrl.paneImages, (pane, idx) => m('.w-tab-pane', [
+            //                 m(`img[src="${pane.src}"].pane-image${(idx === ctrl.selectedPane()) ? '.selected' : ''}`)
+            //             ])))
+            //         ])
+            //     ])
+            // ]),
 
             m('.w-section.section-large.card-terciary',
                 m('.w-container',
@@ -264,7 +263,7 @@ const start = {
                                     m('.flex-column.card.u-radius.u-marginbottom-30',
                                         [
                                             m('.u-text-center.u-marginbottom-30',
-                                                m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/5632f334ec8a367d341b4bba_badge-aon.png\']')
+                                                m('img[src=\'/assets/aon-badge.png\']')
                                             ),
                                             m('.fontsize-large.flex-column.u-marginbottom-20',
                                                 [
@@ -297,12 +296,6 @@ const start = {
                             [
                                 m('.fontsize-large.fontweight-semibold',
                                     I18n.t('mode.tax_info', I18nScope())
-                                ),
-                                m('.fontsize-smallest.fontcolor-secondary',
-                                    [
-                                        I18n.t('mode.failed_info', I18nScope()),
-                                        m.trust(I18n.t('mode.more_link', I18nScope()))
-                                    ]
                                 )
                             ]
                         )
@@ -310,75 +303,75 @@ const start = {
                 )
             ),
 
-            m('.w-section.section-large.bg-blue-one', [
-                m('.w-container.u-text-center', [
-                    m('.fontsize-larger.lineheight-tight.fontcolor-negative.u-marginbottom-20', [
-                        I18n.t('video.title', I18nScope()),
-                        m('br'),
-                        I18n.t('video.subtitle', I18nScope())
-                    ]),
-                    m.component(youtubeLightbox, {
-                        src: I18n.t('video.src', I18nScope()),
-                        onclick: h.analytics.event({ cat: 'project_start', act: 'start_video_play' })
-                    })
-                ])
-            ]),
-            m('.w-hidden-small.w-hidden-tiny.section-categories', [
-                m('.w-container', [
-                    m('.u-text-center', [
-                        m('.w-row', [
-                            m('.w-col.w-col-10.w-col-push-1', [
-                                m('.fontsize-large.u-marginbottom-40.fontcolor-negative', I18n.t('categories.title', I18nScope()))
-                            ])
-                        ])
-                    ]),
-                    m('.w-tabs', [
-                        m('.w-tab-menu.u-text-center', _.map(ctrl.categories(), category => m(`a.w-tab-link.w-inline-block.btn-category.small.btn-inline${(ctrl.selectedCategoryIdx() === category.id) ? '.w--current' : ''}`, {
-                            onclick: h.analytics.event({ cat: 'project_start', act: 'start_category_click', lbl: category.name }, ctrl.selectCategory(category))
-                        }, [
-                            m('div', category.name)
-                        ]))),
-                        m('.w-tab-content.u-margintop-40', [
-                            m('.w-tab-pane.w--tab-active', [
-                                m('.w-row', (ctrl.selectedCategoryIdx() !== -1) ? _.map(ctrl.selectedCategory(), category => [
-                                    m('.w-col.w-col-5', [
-                                        m('.fontsize-jumbo.u-marginbottom-20', category.name),
-                                        m('a.w-button.btn.btn-medium.btn-inline.btn-dark[href="#start-form"]', {
-                                            config: h.scrollTo()
-                                        }, I18n.t('submit', I18nScope()))
-                                    ]),
-                                    m('.w-col.w-col-7', [
-                                        m('.fontsize-megajumbo.fontcolor-negative', `R$ ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
-                                        m('.fontsize-large.u-marginbottom-20', 'Doados para projetos'),
-                                        m('.fontsize-megajumbo.fontcolor-negative', (category.successful_projects) ? category.successful_projects : '...'),
-                                        m('.fontsize-large.u-marginbottom-30', 'Projetos financiados'),
-                                        !_.isEmpty(ctrl.featuredProjects()) ? _.map(ctrl.featuredProjects(), project => !_.isUndefined(project) ? m('.w-row.u-marginbottom-10', [
-                                            m('.w-col.w-col-1', [
-                                                m(`img.user-avatar[src="${h.useAvatarOrDefault(project.userThumb)}"]`)
-                                            ]),
-                                            m('.w-col.w-col-11', [
-                                                m('.fontsize-base.fontweight-semibold', project.user.name),
-                                                m('.fontsize-smallest', [
-                                                    I18n.t('categories.pledged', I18nScope({ pledged: h.formatNumber(project.pledged), contributors: project.total_contributors })),
-                                                    m(`a.link-hidden[href="/${project.permalink}"]`, project.name)
-                                                ])
-                                            ])
-                                        ]) : m('.fontsize-base', I18n.t('categories.loading_featured', I18nScope()))) : '',
-                                    ])
-                                ]) : '')
-                            ])
-                        ])
-                    ])
-                ])
-            ]),
-            m.component(slider, {
-                slides: testimonials(),
-                title: I18n.t('testimonials_title', I18nScope()),
-                slideClass: 'slide-testimonials-content',
-                wrapperClass: 'slide-testimonials',
-                onchange: h.analytics.event({ cat: 'project_start', act: 'start_testimonials_change' })
-            }),
-            m('.w-section.divider.u-margintop-30'),
+            // m('.w-section.section-large.bg-blue-one', [
+            //     m('.w-container.u-text-center', [
+            //         m('.fontsize-larger.lineheight-tight.fontcolor-negative.u-marginbottom-20', [
+            //             I18n.t('video.title', I18nScope()),
+            //             m('br'),
+            //             I18n.t('video.subtitle', I18nScope())
+            //         ]),
+            //         m.component(youtubeLightbox, {
+            //             src: I18n.t('video.src', I18nScope()),
+            //             onclick: h.analytics.event({ cat: 'project_start', act: 'start_video_play' })
+            //         })
+            //     ])
+            // ]),
+            // m('.w-hidden-small.w-hidden-tiny.section-categories', [
+            //     m('.w-container', [
+            //         m('.u-text-center', [
+            //             m('.w-row', [
+            //                 m('.w-col.w-col-10.w-col-push-1', [
+            //                     m('.fontsize-large.u-marginbottom-40.fontcolor-negative', I18n.t('categories.title', I18nScope()))
+            //                 ])
+            //             ])
+            //         ]),
+            //         m('.w-tabs', [
+            //             m('.w-tab-menu.u-text-center', _.map(ctrl.categories(), category => m(`a.w-tab-link.w-inline-block.btn-category.small.btn-inline${(ctrl.selectedCategoryIdx() === category.id) ? '.w--current' : ''}`, {
+            //                 onclick: h.analytics.event({ cat: 'project_start', act: 'start_category_click', lbl: category.name }, ctrl.selectCategory(category))
+            //             }, [
+            //                 m('div', category.name)
+            //             ]))),
+            //             m('.w-tab-content.u-margintop-40', [
+            //                 m('.w-tab-pane.w--tab-active', [
+            //                     m('.w-row', (ctrl.selectedCategoryIdx() !== -1) ? _.map(ctrl.selectedCategory(), category => [
+            //                         m('.w-col.w-col-5', [
+            //                             m('.fontsize-jumbo.u-marginbottom-20', category.name),
+            //                             m('a.w-button.btn.btn-medium.btn-inline.btn-dark[href="#start-form"]', {
+            //                                 config: h.scrollTo()
+            //                             }, I18n.t('submit', I18nScope()))
+            //                         ]),
+            //                         m('.w-col.w-col-7', [
+            //                             m('.fontsize-megajumbo.fontcolor-negative', `R$ ${category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...'}`),
+            //                             m('.fontsize-large.u-marginbottom-20', 'Doados para projetos'),
+            //                             m('.fontsize-megajumbo.fontcolor-negative', (category.successful_projects) ? category.successful_projects : '...'),
+            //                             m('.fontsize-large.u-marginbottom-30', 'Projetos financiados'),
+            //                             !_.isEmpty(ctrl.featuredProjects()) ? _.map(ctrl.featuredProjects(), project => !_.isUndefined(project) ? m('.w-row.u-marginbottom-10', [
+            //                                 m('.w-col.w-col-1', [
+            //                                     m(`img.user-avatar[src="${h.useAvatarOrDefault(project.userThumb)}"]`)
+            //                                 ]),
+            //                                 m('.w-col.w-col-11', [
+            //                                     m('.fontsize-base.fontweight-semibold', project.user.name),
+            //                                     m('.fontsize-smallest', [
+            //                                         I18n.t('categories.pledged', I18nScope({ pledged: h.formatNumber(project.pledged), contributors: project.total_contributors })),
+            //                                         m(`a.link-hidden[href="/${project.permalink}"]`, project.name)
+            //                                     ])
+            //                                 ])
+            //                             ]) : m('.fontsize-base', I18n.t('categories.loading_featured', I18nScope()))) : '',
+            //                         ])
+            //                     ]) : '')
+            //                 ])
+            //             ])
+            //         ])
+            //     ])
+            // ]),
+            // m.component(slider, {
+            //     slides: testimonials(),
+            //     title: I18n.t('testimonials_title', I18nScope()),
+            //     slideClass: 'slide-testimonials-content',
+            //     wrapperClass: 'slide-testimonials',
+            //     onchange: h.analytics.event({ cat: 'project_start', act: 'start_testimonials_change' })
+            // }),
+            // m('.w-section.divider.u-margintop-30'),
             m('.w-container', [
                 m('.fontsize-larger.u-text-center.u-marginbottom-60.u-margintop-40', I18n.t('qa_title', I18nScope())),
                 m('.w-row.u-marginbottom-60', [
@@ -396,7 +389,7 @@ const start = {
             ]),
             m('#start-form.w-section.section-large.u-text-center.bg-purple.before-footer', [
                 m('.w-container', [
-                    m('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Crie o seu rascunho gratuitamente!'),
+                    m('.fontsize-jumbo.fontcolor-negative.u-marginbottom-60', 'Create your campaign for FREE!'),
                     m('form[action="/projects/fallback_create"][method="GET"].w-row.w-form', {
                         onsubmit: (e) => {
                             h.analytics.oneTimeEvent({ cat: 'project_create', act: 'create_form_submit' })(e);
@@ -418,7 +411,7 @@ const start = {
                                         m.withAttr('value', ctrl.projectName)(e);
                                     }
                                 }),
-                                m('.fontsize-larger.fontcolor-negative.u-marginbottom-10', 'na categoria'),
+                                m('.fontsize-larger.fontcolor-negative.u-marginbottom-10', 'in category'),
                                 m('select.w-select.text-field.medium.u-marginbottom-40', {
                                     name: 'project[category_id]',
                                     class: ctrl.projectCategoryError() ? 'error' : '',
@@ -438,7 +431,7 @@ const start = {
                                     m(`input[type="submit"][value="${I18n.t('form.submit', I18nScope())}"].w-button.btn.btn-large`)
                                 ]),
                             ]),
-                            m('.w-row.u-marginbottom-80', (ctrl.projectNameError() || ctrl.projectCategoryError()) ? m.component(inlineError, { message: 'Por favor, verifique novamente os campos acima!' }) : '')
+                            m('.w-row.u-marginbottom-80', (ctrl.projectNameError() || ctrl.projectCategoryError()) ? m.component(inlineError, { message: 'Please check the fields above again!' }) : '')
                         ])
                 ])
             ])

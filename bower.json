@@ -1,12 +1,13 @@
 {
-  "name": "catarse.js",
-  "version": "1.0.32",
-  "homepage": "https://github.com/catarse/catarse.js",
+  "name": "jvnjs",
+  "version": "1.0.28",
+  "homepage": "https://github.com/sushant12/catarse.js",
   "authors": [
     "Diogo Biazus <diogo@biazus.me>",
-    "Vinícius Andrade <vchavesster@gmail.com>"
+    "Vinícius Andrade <vchavesster@gmail.com>",
+    "Sushant Bajracharya <sussyoung9@gmail.com>"
   ],
-  "description": "A set of components to use in Catarse interface",
+  "description": "A set of components to use in JVN interface",
   "main": "dist/catarse.js",
   "keywords": [
     "mithril",
@@ -21,7 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "mithril": "https://github.com/lhorie/mithril.js.git#0.2.4",
+    "mithril": "0.2.4",
     "mithril-postgrest": "2.0.0",
     "moment": "~2.10.3",
     "replace-diacritics": "https://raw.githubusercontent.com/yvg/js-replace-diacritics/master/replace-diacritics.js",

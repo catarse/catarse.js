@@ -77,5 +77,4 @@ const c = {
         projectEditCard
     }
 };
-
 export default c;

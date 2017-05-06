@@ -65,15 +65,15 @@ const projectCard = {
         const cardCopy = (project) => {
             if (project.expires_at) {
                 return isFinished(project) ? [
-                    m('.fontsize-smaller.fontweight-loose', 'Encerrado'),
+                    m('.fontsize-smaller.fontweight-loose', 'Closed'),
                     m('.fontsize-smallest.lineheight-tightest', h.momentify(project.expires_at))
                 ] : [
                     m('.fontsize-smaller.fontweight-semibold', `${remainingTextObj.total} ${remainingTextObj.unit}`),
-                    m('.fontsize-smallest.lineheight-tightest', (remainingTextObj.total > 1) ? 'Restantes' : 'Restante')
+                    m('.fontsize-smallest.lineheight-tightest', (remainingTextObj.total > 1) ? 'Remaining' : 'Remaining')
                 ];
             }
             return [
-                m('.fontsize-smallest.lineheight-tight', ['Iniciado há', m('br'), `${elapsedTextObj.total} ${elapsedTextObj.unit}`])
+                m('.fontsize-smallest.lineheight-tight', ['Started', m('br'), `${elapsedTextObj.total} ${elapsedTextObj.unit}`])
             ];
         };
 
@@ -95,8 +95,8 @@ const projectCard = {
                   project.user.public_name||project.user.name
               ) : (project.owner_public_name || project.owner_name)),
               projectAddress = (project.address ? (
-                  `${project.address.city} - ${project.address.state_acronym}`
-              ) : (`${project.city_name} - ${project.state_acronym}`));
+                  ` ${project.address.city} - ${project.address.state_acronym}`
+              ) : (` ${project.city_name} - ${project.state_acronym}`));
 
         return m(ctrl.css().wrapper, [
             m(ctrl.css().innerWrapper, [
@@ -147,8 +147,8 @@ const projectCard = {
                                 m('.fontsize-base.fontweight-semibold', `${Math.floor(project.progress)}%`)
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-center-small-only', [
-                                m('.fontsize-smaller.fontweight-semibold', `R$ ${h.formatNumber(project.pledged)}`),
-                                m('.fontsize-smallest.lineheight-tightest', 'Levantados')
+                                m('.fontsize-smaller.fontweight-semibold', `Rs ${h.formatNumber(project.pledged)}`),
+                                m('.fontsize-smallest.lineheight-tightest', I18n.t('contributed', I18nScope()))
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', ctrl.cardCopy(project)),
                         ])

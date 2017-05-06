@@ -256,7 +256,7 @@ const userSettings = {
 
         return m('[id=\'settings-tab\']', [
             (ctrl.showSuccess() ? m.component(popNotification, {
-                message: 'As suas informações foram atualizadas',
+                message: 'Your information has been updated',
                 toggleOpt: ctrl.showSuccess
             }) : ''),
             (ctrl.showError() ? m.component(popNotification, {
@@ -357,7 +357,6 @@ const userSettings = {
                                             ]))
                                         ])
                                     ])
-
                                 ]),
                                 m('.w-row', [
                                     m(`.w-col.w-col-6.w-sub-col${ctrl.showOtherBanksInput() ? '.w-hidden' : ''}[id='bank_select']`,
@@ -774,7 +773,7 @@ const userSettings = {
                                     )
                                 ]))),
                                 m('form.w-hidden', {
-                                    action: `/pt/users/${user.id}/credit_cards/${ctrl.toDeleteCard()}`,
+                                    action: `/en/users/${user.id}/credit_cards/${ctrl.toDeleteCard()}`,
                                     method: 'POST',
                                     config: ctrl.setCardDeletionForm
                                 }, [

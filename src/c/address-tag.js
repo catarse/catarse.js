@@ -9,8 +9,7 @@ const addressTag = {
                 state_acronym: '',
                 city: ''
             };
-
-        return !_.isNull(address) ? m(`a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light.u-marginbottom-10[href="/pt/explore?pg_search=${address.state_acronym}"]`, {
+        return !_.isNull(address) ? m(`a.btn.btn-inline.btn-small.btn-transparent.link-hidden-light.u-marginbottom-10[href="/en/explore?pg_search=${address.state_acronym}"]`, {
             onclick: h.analytics.event({
                 cat: 'project_view',
                 act: 'project_location_link',
@@ -18,7 +17,7 @@ const addressTag = {
                 project: project()
             })
         }, [
-            m('span.fa.fa-map-marker'), ` ${address.city}, ${address.state_acronym}`
+            m('span.fa.fa-map-marker'), `  ${address.city}, ${address.state_acronym}`
         ]) : '';
     }
 };

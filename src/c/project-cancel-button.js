@@ -27,7 +27,7 @@ const projectCancelButton = {
                         [
                             m('span.fa.fa-times-circle', ''),
                             m.trust('&nbsp;'),
-                            'Cancelar projeto'
+                            'Cancel Project'
                         ]
                     )
                 ))

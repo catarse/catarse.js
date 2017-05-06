@@ -19,16 +19,16 @@ const
     },
   	selfOrEmpty = (obj: any, emptyState: string = ''): any => obj || emptyState,
     setMomentifyLocale = (): void => {
-        moment.locale('pt', {
-            months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
-            monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_')
+        moment.locale('en', {
+            months: 'January_Feburary_Marçh_April_May_June_July_August_September_October_November_December'.split('_'),
+            monthsShort: 'jan_feb_mar_apr_may_jun_jul_aug_sep_oct_nov_dec'.split('_')
         });
     },
     existy = (x: any): boolean => x != null,
 
     momentify = (date: string, format: string): string => {
         format = format || 'DD/MM/YYYY';
-        return date ? moment(date).locale('pt').format(format) : 'no date';
+        return date ? moment(date).locale('en').format(format) : 'no date';
     },
 
     getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min,
@@ -194,13 +194,13 @@ const
                     _.map(fields, (field) => {
                         if (field.rule === 'email') {
                             if (!validateEmail(field.prop())) {
-                                validationErrors().push({ field: field.prop, message: 'E-mail inválido.' });
+                                validationErrors().push({field: field.prop, message: 'Invalid E-mail.'});
                             }
                         }
 
                         if (field.rule === 'text') {
                             if (field.prop().trim() === '') {
-                                validationErrors().push({ field: field.prop, message: 'O campo não pode ser vazio.' });
+                                validationErrors().push({field: field.prop, message: 'The field can not be empty.'});
                             }
                         }
                     });
@@ -220,10 +220,10 @@ const
     },
 
     translatedTimeUnits: {days: string, minutes: string, hours: string, seconds: string} = {
-        days: 'dias',
-        minutes: 'minutos',
-        hours: 'horas',
-        seconds: 'segundos'
+        days: 'days',
+        minutes: 'minutes',
+        hours: 'hours',
+        seconds: 'seconds'
     },
     // Object manipulation helpers
     translatedTime = (time: {unit: ?string, total: ?number}): {unit: string, total: ?number} => {
@@ -250,7 +250,7 @@ const
             num = number.toFixed(Math.max(0, ~~n));
         return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), `$&${s || ','}`);
     },
-    formatNumber = generateFormatNumber('.', ','),
+    formatNumber = generateFormatNumber(',', '.'),
 
     toggleProp = (defaultState: any, alternateState: any): Function => {
         const p = m.prop(defaultState);
@@ -405,7 +405,7 @@ const
     },
 
     navigateToDevise = () => {
-        window.location.href = '/pt/login';
+        window.location.href = '/en/login';
         return false;
     },
 
@@ -542,39 +542,39 @@ const
 
     projectStateTextClass = (state: string): {cssClass: string, text: string} => {
         const statusText = {
-            online: {
-                cssClass: 'text-success',
-                text: 'NO AR'
-            },
-            successful: {
-                cssClass: 'text-success',
-                text: 'FINANCIADO'
-            },
-            failed: {
-                cssClass: 'text-error',
-                text: 'NÃO FINANCIADO'
-            },
-            waiting_funds: {
-                cssClass: 'text-waiting',
-                text: 'AGUARDANDO'
-            },
-            rejected: {
-                cssClass: 'text-error',
-                text: 'RECUSADO'
-            },
-            draft: {
-                cssClass: '',
-                text: 'RASCUNHO'
-            },
-            in_analysis: {
-                cssClass: '',
-                text: 'EM ANÁLISE'
-            },
-            approved: {
-                cssClass: 'text-success',
-                text: 'APROVADO'
-            }
-        };
+                online: {
+                    cssClass: 'text-success',
+                    text: 'ONLINE'
+                },
+                successful: {
+                    cssClass: 'text-success',
+                    text: 'FINANCED'
+                },
+                failed: {
+                    cssClass: 'text-error',
+                    text: 'NOT FINANCED'
+                },
+                waiting_funds: {
+                    cssClass: 'text-waiting',
+                    text: 'WAITING FOR'
+                },
+                rejected: {
+                    cssClass: 'text-error',
+                    text: 'REFUSED'
+                },
+                draft: {
+                    cssClass: '',
+                    text: 'DRAFT'
+                },
+                in_analysis: {
+                    cssClass: '',
+                    text: 'IN ANALYSIS'
+                },
+                approved: {
+                    cssClass: 'text-success',
+                    text: 'APPROVED'
+                }
+            };
 
         return statusText[state];
     },
@@ -737,12 +737,12 @@ const
             permalink = project.permalink;
         }
 
-        return `https://www.catarse.me/${permalink}`;
+        return `http://www.grasruts.com/${permalink}`;
     },
     isHome = (): boolean => {
         const path = window.location.pathname;
 
-        return path == '/pt' || path == '/';
+        return path == '/en' || path == '/';
     },
     isProjectPage = (): boolean => {
         const path = window.location.pathname,
@@ -780,29 +780,29 @@ const
         formattingAdd: [
             {
                 tag: 'blockquote',
-                title: 'Citar',
+                title: 'To quote',
                 class: 'fontsize-base quote',
                 clear: true
             },
 
             {
                 tag: 'p',
-                title: 'Cabeçalho 1',
+                title: 'Header 1',
                 class: 'fontsize-larger fontweight-semibold',
                 clear: true
             },
             {
                 tag: 'p',
-                title: 'Cabeçalho 2',
+                title: 'Header 2',
                 class: 'fontsize-large',
                 clear: true
             }],
-        lang: 'pt_br',
-        maxHeight: 800,
-        minHeight: 300,
-        convertVideoLinks: true,
-        convertUrlLinks: true,
-        convertImageLinks: false,
+          lang: 'en',
+          maxHeight: 800,
+          minHeight: 300,
+          convertVideoLinks: true,
+          convertUrlLinks: true,
+          convertImageLinks: false,
           // You can specify, which ones plugins you need.
           // If you want to use plugins, you have add plugins to your
           // application.js and application.css files and uncomment the line below:
@@ -845,16 +845,16 @@ const
     contributionStatusBadge = (contribution: Object) => {
         const status = {
             delivered: m('span.fontsize-smallest.badge.badge-success',
-                'Enviada'
+                'Sent'
             ),
             received: m('span.fontsize-smallest.badge.badge-success',
-                'Recebida'
+                'Received'
             ),
             undelivered: m('span.fontsize-smallest.badge.badge-light',
-                'Não enviada'
+                'Not sent'
             ),
             error: m('span.fontsize-smallest.badge.badge-attention',
-                'Erro no envio'
+                'Error sending'
             )
         };
 
@@ -955,3 +955,4 @@ export default {
     setCsrfToken,
     userSignedIn
 };
+

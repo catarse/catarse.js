@@ -67,7 +67,7 @@ const copyTextInput = {
             m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', m('button.btn.btn-medium.btn-no-border.btn-terciary.fa.fa-clipboard.w-button', {
                 config: ctrl.setClickHandler
             })),
-            ctrl.showSuccess() ? m.component(popNotification, { message: 'Link copiado' }) : ''
+            ctrl.showSuccess() ? m.component(popNotification, {message: 'Link copied'}) : ''
         ]);
     }
 };

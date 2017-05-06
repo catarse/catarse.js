@@ -138,7 +138,7 @@ const projectsPayment = {
                                 `R$ ${formatedValue}`
                             ),
                             m(`a.alt-link.fontsize-smaller.u-right[href="/projects/${projectVM.currentProject().project_id}/contributions/new${ctrl.reward().id ? `?reward_id=${ctrl.reward().id}` : ''}"]`,
-                                'Editar'
+                                'Edit'
                             )
                         ]
                     ),
@@ -167,7 +167,7 @@ const projectsPayment = {
                         ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
                             onclick: ctrl.toggleDescription.toggle
                         }, [
-                            ctrl.toggleDescription() ? 'menos ' : 'mais ',
+                            ctrl.toggleDescription() ? 'less ' : 'more ',
                             m('span.fa.fa-angle-down', {
                                 class: ctrl.toggleDescription() ? 'reversed' : ''
                             })
@@ -175,7 +175,7 @@ const projectsPayment = {
                         ctrl.reward().deliver_at ? m('.fontcolor-secondary.fontsize-smallest.u-margintop-10',
                             [
                                 m('span.fontweight-semibold',
-                                    'Entrega prevista:'
+                                    'Estimated delivery time:'
                                 ),
                                 ` ${h.momentify(ctrl.reward().deliver_at, 'MMM/YYYY')}`
                             ]
@@ -183,7 +183,7 @@ const projectsPayment = {
                         (rewardVM.hasShippingOptions(ctrl.reward()) || ctrl.reward().shipping_options === 'presential')
                             ? m('.fontcolor-secondary.fontsize-smallest', [
                                 m('span.fontweight-semibold',
-                                    'Forma de envio: '
+                                    'Shipping method: '
                                 ),
                                 I18n.t(`shipping_options.${ctrl.reward().shipping_options}`, { scope: 'projects.contributions' })
                             ])
@@ -214,7 +214,7 @@ const projectsPayment = {
                                 m('.w-row.u-marginbottom-30', [
                                     m('.w-col.w-col-7.w-sub-col', [
                                         m('label.field-label.fontweight-semibold[for=\'country\']', [
-                                            'País / ',
+                                            'Parents / ',
                                             m('em', 'Country'),
                                             ' *'
                                         ]),
@@ -228,7 +228,7 @@ const projectsPayment = {
                                                 value: country.id,
                                                 key: idx,
                                                 selected: country.id === ctrl.vm.fields.userCountryId()
-                                            }, country.name_en))
+                                            }, country.name))
                                         ),
                                         ctrl.fieldHasError('userCountryId')
                                     ]),
@@ -245,7 +245,7 @@ const projectsPayment = {
                                             type: 'text',
                                             onchange: m.withAttr('value', ctrl.vm.fields.completeName),
                                             value: ctrl.vm.fields.completeName(),
-                                            placeholder: 'Nome Completo'
+                                            placeholder: 'Full name'
                                         }),
                                         ctrl.fieldHasError('completeName')
                                     ]),
@@ -296,7 +296,7 @@ const projectsPayment = {
                                     class: ctrl.fieldHasError('street') ? 'error' : false,
                                     onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.street)),
                                     value: ctrl.vm.fields.street(),
-                                    placeholder: 'Rua Da Minha Casa'
+                                    placeholder: 'My Home Street'
                                 }),
                                 ctrl.fieldHasError('street'),
                                 m('.w-row', ctrl.vm.isInternational() ? '' : [
@@ -324,7 +324,7 @@ const projectsPayment = {
                                             type: 'text',
                                             onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.addressComplement)),
                                             value: ctrl.vm.fields.addressComplement(),
-                                            placeholder: 'Residencial 123'
+                                            placeholder: 'Residential 123'
                                         }),
                                         ctrl.fieldHasError('addressComplement')
                                     ]),
@@ -369,7 +369,7 @@ const projectsPayment = {
                                             type: 'text',
                                             onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.city)),
                                             value: ctrl.vm.fields.city(),
-                                            placeholder: 'Cidade'
+                                            placeholder: 'City'
                                         }),
                                         ctrl.fieldHasError('city')
                                     ]),

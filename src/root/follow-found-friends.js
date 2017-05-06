@@ -15,7 +15,7 @@ const FollowFoundFriends = {
                         user
                     },
                     tabs = {
-                        '#creators': m.component(userCreators, c_opts),
+                        // '#creators': m.component(userCreators, c_opts),
                         '#friends': m.component(userFriends, c_opts),
                         '#follows': m.component(userFollows, c_opts),
                         '#followers': m.component(userFollowers, c_opts)
@@ -44,8 +44,8 @@ const FollowFoundFriends = {
                     m('.w-row.u-margintop-20.u-marginbottom-20', [
                         m('.w-col.w-col-1'),
                         m('.w-col.w-col-10.u-text-center', [
-                            m('.fontsize-larger.fontweight-semibold.u-marginbottom-10', 'Descubra projetos com seus amigos'),
-                            m('.fontsize-small', 'Siga os seus amigos e nós iremos te notificar sempre que eles lançarem ou apoiarem algum projeto')
+                            m('.fontsize-larger.fontweight-semibold.u-marginbottom-10', 'Discover projects with your friends'),
+                            m('.fontsize-small', 'Follow your friends and we will notify you whenever they launch or support any project')
                         ]),
                         m('.w-col.w-col-1')
                     ])
@@ -55,15 +55,15 @@ const FollowFoundFriends = {
             m('.project-nav',
               m('.u-text-center.w-container',
                   [
-                      m(`a[id="creators-link"][class="dashboard-nav-link ${h.hashMatch('#creators') ? 'selected' : ''}"] [href="#creators"]`,
-                      'Encontre realizadores'
-                     ),
+                     //  m(`a[id="creators-link"][class="dashboard-nav-link ${h.hashMatch('#creators') ? 'selected' : ''}"] [href="#creators"]`,
+                     //  'Find filmmakers'
+                     // ),
                       m(`a[id="friends-link"][class="dashboard-nav-link ${h.hashMatch('#friends') || h.hashMatch('') ? 'selected' : ''}"] [href="#friends"]`,
-                      'Encontre amigos'
+                      'Find friends'
                      ),
                       m(`a[id="follows-link"][class="dashboard-nav-link ${h.hashMatch('#follows') ? 'selected' : ''}"] [href="#follows"]`,
                           [
-                              'Seguindo',
+                              'Following',
                               m.trust('&nbsp;'),
                               m('span.w-hidden-small.w-hidden-tiny.badge',
                             ctrl.user.follows_count
@@ -72,7 +72,7 @@ const FollowFoundFriends = {
                      ),
                       m(`a[id="followers-link"][class="dashboard-nav-link ${h.hashMatch('#followers') ? 'selected' : ''}"] [href="#followers"]`,
                           [
-                              'Seguidores',
+                              'Followers',
                               m.trust('&nbsp;'),
                               m('span.w-hidden-small.w-hidden-tiny.badge',
                             ctrl.user.followers_count

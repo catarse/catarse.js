@@ -20,7 +20,7 @@ const projectsReward = {
             const valueFloat = h.monetaryToFloat(vm.contributionValue);
 
             if (valueFloat < vm.selectedReward().minimum_value) {
-                vm.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${vm.selectedReward().minimum_value}`);
+                vm.error(`The support amount for this reward must be at least Rs${vm.selectedReward().minimum_value}`);
             } else if (!h.getUser()) {
                 h.storeObject(storeKey, { value: valueFloat, reward: vm.selectedReward() });
 
@@ -63,7 +63,7 @@ const projectsReward = {
                 m('.w-container', [
                     m('h1.fontsize-larger.fontweight-semibold.project-name[itemprop="name"]', h.selfOrEmpty(project().name || project().project_name)),
                     m('h2.fontsize-base.lineheight-looser[itemprop="author"]', [
-                        'por ',
+                        'by ',
                         project().user ? project().user.name : project().owner_name ? project().owner_name : ''
                     ])
                 ])
@@ -71,7 +71,7 @@ const projectsReward = {
             m('.w-section.header-cont-new',
                     m('.w-container',
                         m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only',
-                            'Escolha a recompensa e em seguida o valor do apoio'
+                            'Choose the reward and then the value of the support'
                         )
                     )
                 ),
@@ -97,7 +97,7 @@ const projectsReward = {
                                                         checked: !!isSelected,
                                                     }),
                                                     m(`label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for='contribution_reward_${reward.id}']`,
-                                                                    reward.id === -1 ? 'Não quero recompensa' : `R$ ${reward.minimum_value} ou mais`
+                                                                    reward.id === -1 ? 'I do not want any reward' : `Rs ${reward.minimum_value} or more`
                                                                 ),
                                                     isSelected ? m('.w-row.back-reward-money',
                                                         [
@@ -107,7 +107,7 @@ const projectsReward = {
                                                                         [
                                                                             m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
                                                                                             m('.back-reward-input-reward.placeholder',
-                                                                                                'R$'
+                                                                                                'Rs'
                                                                                             )
                                                                                         ),
                                                                             m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
@@ -131,7 +131,7 @@ const projectsReward = {
                                                                         ),
                                                             m('.submit-form.w-col.w-col-4.w-col-small-4.w-col-tiny-4',
                                                                             m('button.btn.btn-large', [
-                                                                                'Continuar  ',
+                                                                                'Continue  ',
                                                                                 m('span.fa.fa-chevron-right')
                                                                             ])
                                                                         )
@@ -140,7 +140,7 @@ const projectsReward = {
                                                     m('.back-reward-reward-description',
                                                         [
                                                             m('.fontsize-smaller.u-marginbottom-10', reward.description),
-                                                            reward.deliver_at ? m('.fontsize-smallest.fontcolor-secondary', `Estimativa de entrega: ${h.momentify(reward.deliver_at, 'MMM/YYYY')}`) : ''
+                                                            reward.deliver_at ? m('.fontsize-smallest.fontcolor-secondary', `Estimated delivery: ${h.momentify(reward.deliver_at, 'MMM/YYYY')}`) : ''
                                                         ]
                                                                 )
                                                 ]

@@ -41,15 +41,15 @@ const landingSignup = {
             onsubmit: ctrl.submit
         }, [
             m('.w-col.w-col-5', [
-                m(`input${errorClasses}.w-input.text-field.medium[name="EMAIL"][placeholder="Digite seu email"][type="text"]`, {
+                m(`input${errorClasses}.w-input.text-field.medium[name="EMAIL"][placeholder="Type your e-mail"][type="text"]`, {
                     config: h.RDTracker('landing-flex'),
                     onchange: m.withAttr('value', ctrl.email),
                     value: ctrl.email()
                 }),
-                (ctrl.error() ? m('span.fontsize-smaller.text-error', 'E-mail inválido') : '')
+                (ctrl.error() ? m('span.fontsize-smaller.text-error', 'invalid E-mail') : '')
             ]),
             m('.w-col.w-col-3', [
-                m('input.w-button.btn.btn-large[type="submit"][value="Cadastrar"]')
+                m('input.w-button.btn.btn-large[type="submit"][value="Register"]')
             ])
         ]);
     }

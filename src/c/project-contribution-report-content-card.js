@@ -65,7 +65,7 @@ const projectContributionReportContentCard = {
             profileImg = (_.isEmpty(contribution.profile_img_thumbnail) ? '/assets/catarse_bootstrap/user.jpg' : contribution.profile_img_thumbnail),
             reward = contribution.reward || {
                 minimum_value: 0,
-                description: 'Nenhuma recompensa selecionada'
+                description: 'No reward selected'
             };
 
         return m(`.w-clearfix.card${ctrl.checked(contribution) ? '.card-alert' : ''}`, [
@@ -94,9 +94,9 @@ const projectContributionReportContentCard = {
                                     m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name),
                                     m('.fontsize-smallest.lineheight-looser', [
                                         (contribution.has_another ? [
-                                            m('a.link-hidden-light.badge.badge-light', '+1 apoio '),
+                                            m('a.link-hidden-light.badge.badge-light', '+1 support '),
                                         ] : ''),
-                                        (contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' Apoio não-público')) : '')
+                                        (contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' Non-public support')) : '')
                                     ]),
                                     m('.fontsize-smallest.lineheight-looser', (contribution.email))
                                 ]),
@@ -104,26 +104,26 @@ const projectContributionReportContentCard = {
                                     m('.lineheight-tighter', [
                                         m(`span.fa.fontsize-smallest.${ctrl.stateClass(contribution.state)}`),
                                         '   ',
-                                        m('span.fontsize-large', `R$ ${h.formatNumber(contribution.value, 2, 3)}`)
+                                        m('span.fontsize-large', `Rs ${h.formatNumber(contribution.value, 2, 3)}`)
                                     ])
                                 ]),
                                 m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [
                                     m('div',
                                         (contribution.delivery_status === 'error' ?
                                             m('span.badge.badge-attention.fontsize-smaller',
-                                                'Erro no envio'
+                                                'Error sending'
                                             ) : contribution.delivery_status === 'delivered' ?
                                             m('span.badge.badge-success.fontsize-smaller',
-                                                'Enviada'
+                                                'Sent'
                                             ) : contribution.delivery_status === 'received' ?
                                             m('span.fontsize-smaller.badge.badge-success', [
                                                 m('span.fa.fa-check-circle',
                                                     ''
                                                 ),
-                                                ' Recebida'
+                                                ' Received'
                                             ]) : '')
                                     ),
-                                    m('.fontsize-smallest.fontweight-semibold', `Recompensa: ${reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : ''}`),
+                                    m('.fontsize-smallest.fontweight-semibold', `Reward: ${reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : ''}`),
                                     m('.fontsize-smallest.fontweight-semibold',
                                         reward.title
                                     ),

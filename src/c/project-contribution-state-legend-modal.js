@@ -66,7 +66,7 @@ const ProjectContributionStateLegendModal = {
         return m('div', [
             m('.modal-dialog-header', [
                 m('.fontsize-large.u-text-center',
-                  'Status do apoio')
+                  'Support Status')
             ]),
             m('.modal-dialog-content', _.map(ctrl.stages[project_stage], (item, i) => m('.u-marginbottom-20', [
                 m('.fontsize-small.fontweight-semibold', [

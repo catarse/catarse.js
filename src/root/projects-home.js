@@ -65,7 +65,7 @@ const projectsHome = {
                     m('h1.fontcolor-negative.fontsize-megajumbo.u-marginbottom-20', m.trust(slide.title)),
                     m('h2.fontcolor-negative.fontsize-large', m.trust(slide.subtitle))
                 ]),
-                m('a.btn.btn-large.u-marginbottom-10.btn-inline', { href: slide.link }, slide.cta)
+                m('a.btn.btn-large.u-marginbottom-10.btn-inline', { href: slide.link, target: '__blank' }, slide.cta)
             ]);
 
             return {

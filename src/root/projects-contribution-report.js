@@ -27,56 +27,56 @@ const projectContributionReport = {
             reloadSelectOptions = (projectState) => {
                 let opts = [{
                     value: '',
-                    option: 'Todos'
+                    option: 'All'
                 }];
 
                 const optionsMap = {
                     online: [{
                         value: 'paid',
-                        option: 'Confirmado'
+                        option: 'Confirmed'
                     },
                     {
                         value: 'pending',
-                        option: 'Iniciado'
+                        option: 'Started'
                     },
                     {
                         value: 'refunded,chargeback,deleted,pending_refund',
-                        option: 'Contestado'
+                        option: 'Contested'
                     },
                     ],
                     waiting_funds: [{
                         value: 'paid',
-                        option: 'Confirmado'
+                        option: 'Confirmed'
                     },
                     {
                         value: 'pending',
-                        option: 'Iniciado'
+                        option: 'Started'
                     },
                     {
                         value: 'refunded,chargeback,deleted,pending_refund',
-                        option: 'Contestado'
+                        option: 'Contested'
                     },
                     ],
                     failed: [{
                         value: 'pending_refund',
-                        option: 'Reembolso em andamento'
+                        option: 'Refund in progress'
                     },
                     {
                         value: 'refunded',
-                        option: 'Reembolsado'
+                        option: 'Refunded'
                     },
                     {
                         value: 'paid',
-                        option: 'Reembolso não iniciado'
+                        option: 'Refund not started'
                     },
                     ],
                     successful: [{
                         value: 'paid',
-                        option: 'Confirmado'
+                        option: 'Confirmed'
                     },
                     {
                         value: 'refunded,chargeback,deleted,pending_refund',
-                        option: 'Contestado'
+                        option: 'Contested'
                     },
                     ]
                 };
@@ -85,6 +85,72 @@ const projectContributionReport = {
 
                 contributionStateOptions(opts);
             },
+            // filterBuilder = [{
+            //         component: FilterMain,
+            //         data: {
+            //             inputWrapperClass: '.w-input.text-field',
+            //             btnClass: '.btn.btn-medium',
+            //             vm: filterVM.full_text_index,
+            //             placeholder: 'Search by name or email of the supporter'
+            //         }
+            //     },
+            //     {
+            //         label: 'reward_filter',
+            //         component: FilterDropdown,
+            //         data: {
+            //             label: 'Reward selected',
+            //             name: 'reward_id',
+            //             vm: filterVM.reward_id,
+            //             wrapper_class: '._w-sub-col.w-col.w-col-4',
+            //             options: []
+            //         }
+            //     },
+            //     {
+            //         label: 'delivery_filter',
+            //         component: FilterDropdown,
+            //         data: {
+            //             label: 'Delivery status',
+            //             name: 'delivery_status',
+            //             vm: filterVM.delivery_status,
+            //             wrapper_class: '.w-col.w-col-4',
+            //             options: [{
+            //                     value: '',
+            //                     option: 'All'
+            //                 },
+            //                 {
+            //                     value: 'undelivered',
+            //                     option: 'Not sent'
+            //                 },
+            //                 {
+            //                     value: 'delivered',
+            //                     option: 'Sent'
+            //                 },
+            //                 {
+            //                     value: 'error',
+            //                     option: 'Error sending'
+            //                 },
+            //                 {
+            //                     value: 'received',
+            //                     option: 'Received'
+            //                 }
+            //             ]
+            //         }
+            //     },
+            //     {
+            //         label: 'payment_state',
+            //         component: FilterDropdown,
+            //         data: {
+            //             custom_label: [InfoProjectContributionStateLegend, {
+            //                 text: 'Support Status',
+            //                 project: project
+            //             }],
+            //             name: 'state',
+            //             vm: filterVM.state,
+            //             wrapper_class: '._w-sub-col.w-col.w-col-4',
+            //             options: contributionStateOptions
+            //         }
+            //     }
+            // ],
             submit = () => {
                 if (filterVM.reward_id() === 'null') {
                     listVM.firstPage(filterVM.withNullParameters()).then(null);
@@ -100,14 +166,14 @@ const projectContributionReport = {
                     inputWrapperClass: '.w-input.text-field',
                     btnClass: '.btn.btn-medium',
                     vm: filterVM.full_text_index,
-                    placeholder: 'Busque por nome ou email do apoiador'
+                    placeholder: 'Search by name or email'
                 }
             },
             {
                 label: 'reward_filter',
                 component: FilterDropdown,
                 data: {
-                    label: 'Recompensa selecionada',
+                    label: 'Reward selected',
                     onchange: submit,
                     name: 'reward_id',
                     vm: filterVM.reward_id,
@@ -121,7 +187,7 @@ const projectContributionReport = {
                 data: {
                     custom_label: [InfoProjectContributionLegend, {
                         content: [ProjectContributionDeliveryLegendModal],
-                        text: 'Status da entrega'
+                        text: 'Delivery Status'
                     }],
                     onchange: submit,
                     name: 'delivery_status',
@@ -129,23 +195,23 @@ const projectContributionReport = {
                     wrapper_class: '.w-col.w-col-4',
                     options: [{
                         value: '',
-                        option: 'Todos'
+                        option: 'All'
                     },
                     {
                         value: 'undelivered',
-                        option: 'Não enviada'
+                        option: 'Not sent'
                     },
                     {
                         value: 'delivered',
-                        option: 'Enviada'
+                        option: 'Sent'
                     },
                     {
                         value: 'error',
-                        option: 'Erro no envio'
+                        option: 'Sending error'
                     },
                     {
                         value: 'received',
-                        option: 'Recebida'
+                        option: 'Received'
                     }
                     ]
                 }
@@ -155,7 +221,7 @@ const projectContributionReport = {
                 component: FilterDropdown,
                 data: {
                     custom_label: [InfoProjectContributionLegend, {
-                        text: 'Status do apoio',
+                        text: 'Support Status',
                         content: [ProjectContributionStateLegendModal, {
                             project
                         }]
@@ -195,12 +261,12 @@ const projectContributionReport = {
 
             options.unshift({
                 value: null,
-                option: 'Sem recompensa'
+                option: 'No reward'
             });
 
             options.unshift({
                 value: '',
-                option: 'Todas'
+                option: 'All'
             });
 
             return options;

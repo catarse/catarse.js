@@ -30,8 +30,8 @@ const projectSidebar = {
                         incrementProgress = () => {
                             if (progress <= parseInt(project().progress)) {
                                 progressBar.style.width = `${progress}%`;
-                                pledgedEl.innerText = `R$ ${h.formatNumber(pledged)}`;
-                                contributorsEl.innerText = `${parseInt(contributors)} pessoas`;
+                                pledgedEl.innerText = `Rs ${h.formatNumber(pledged)}`;
+                                contributorsEl.innerText = `${parseInt(contributors)} people`;
                                 el.innerText = `${progress}%`;
                                 pledged += pledgedIncrement;
                                 contributors += contributorsIncrement;
@@ -91,11 +91,11 @@ const projectSidebar = {
                 m('.project-stats-inner', [
                     m('.project-stats-info', [
                         m('.u-marginbottom-20', [
-                            m('#pledged.fontsize-largest.fontweight-semibold.u-text-center-small-only', `R$ ${project().pledged ? h.formatNumber(project().pledged) : '0'}`),
+                            m('#pledged.fontsize-largest.fontweight-semibold.u-text-center-small-only', `Rs ${project().pledged ? h.formatNumber(project().pledged) : '0'}`),
                             m('.fontsize-small.u-text-center-small-only', [
                                 I18n.t('contributors_call', I18nScope()),
                                 m('span#contributors.fontweight-semibold', I18n.t('contributors_count', I18nScope({ count: project().total_contributors }))),
-                                (!project().expires_at && elapsed) ? ` em ${I18n.t(`datetime.distance_in_words.x_${elapsed.unit}`, { count: elapsed.total }, I18nScope())}` : ''
+                                (!project().expires_at && elapsed) ? ` in ${I18n.t(`datetime.distance_in_words.x_${elapsed.unit}`, { count: elapsed.total }, I18nScope())}` : ''
                             ])
                         ]),
                         m('.meter', [
@@ -148,7 +148,7 @@ const projectSidebar = {
                 m.component(categoryTag, { project }),
                 m('.u-marginbottom-30.u-text-center-small-only', m('button.btn.btn-inline.btn-medium.btn-terciary', {
                     onclick: ctrl.displayShareBox.toggle
-                }, 'Compartilhar este projeto')),
+                }, 'Share this project')),
                 ctrl.displayShareBox() ? m(projectShareBox, {
                     project,
                     displayShareBox: ctrl.displayShareBox

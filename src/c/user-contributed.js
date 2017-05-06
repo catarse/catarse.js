@@ -47,7 +47,7 @@ const userContributed = {
     },
     view(ctrl, args) {
         const projects_collection = ctrl.projects.collection();
-        return (ctrl.error() ? m.component(inlineError, { message: 'Erro ao carregar os projetos.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']',
+        return (ctrl.error() ? m.component(inlineError, { message: 'Error loading projects.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']',
             [
                   (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m.component(projectCard, {
                       project,
@@ -61,18 +61,7 @@ const userContributed = {
                                 m('.w-col.w-col-6',
                                     [
                                         m('.fontsize-large.u-marginbottom-30',
-                                                'Ora, ora... você ainda não apoiou nenhum projeto no Catarse!'),
-                                        m('.w-row',
-                                            [
-                                                m('.w-col.w-col-3'),
-                                                m('.w-col.w-col-6',
-                                                    m('a.btn.btn-large[href=\'/explore\']',
-                                                        'Que tal apoiar agora?'
-                                                    )
-                                                ),
-                                                m('.w-col.w-col-3')
-                                            ]
-                                        )
+                                                'No campaigns backed yet')
                                     ]
                                 ),
                                 m('.w-col.w-col-3')

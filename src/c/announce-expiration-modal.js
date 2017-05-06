@@ -5,14 +5,14 @@ const announceExpirationModal = {
         return m('div', [
             m('.modal-dialog-content', [
                 m('.fontsize-large.u-text-center.u-marginbottom-30.fontweight-semibold',
-                    'Você confirma?'
+                    'Do you confirm?'
                 ),
                 m('.fontsize-large.u-text-center.u-marginbottom-30', [
-                    'Sua arrecadação irá terminar no dia  ',
+                    'Your collection will end on  ',
                     m('span.expire-date',
                         args.expirationDate
                     ),
-                    ', as 23h59. Até lá, você pode captar recursos e seguir firme na sua campanha! Assim que o seu prazo chegar ao fim, você deverá confirmar os seus dados bancários. A partir de então, depositaremos o dinheiro na sua conta em até 10 dias úteis.'
+                    ', at 23h59. Until then, you can capture resources and stay strong in your campaign! Once your deadline has expired, you will need to confirm your bank details. We will then deposit the money into your account within 10 business days.'
                 ])
             ]),
             m('.modal-dialog-nav-bottom',
@@ -20,13 +20,13 @@ const announceExpirationModal = {
                     m('.w-col.w-col-2'),
                     m('.w-col.w-col-4', [
                         m("input[id='anchor'][name='anchor'][type='hidden'][value='announce_expiration']"),
-                        m("input.btn.btn.btn-large[id='budget-save'][name='commit'][type='submit'][value='Sim']")
+                        m("input.btn.btn.btn-large[id='budget-save'][name='commit'][type='submit'][value='Yes']")
                     ]),
                     m('.w-col.w-col-4',
                         m('button.btn.btn-large.btn-terciary', {
                             onclick: args.displayModal.toggle
                         },
-                            ' Não'
+                            ' No'
                         )
                     ),
                     m('.w-col.w-col-2')

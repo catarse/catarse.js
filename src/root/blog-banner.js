@@ -10,7 +10,6 @@ const blogBanner : Component = {
             error = m.prop(false);
 
         blogVM.getBlogPosts().then(posts).catch(error);
-
         return {posts, error};
     },
     view(ctrl, args) {
@@ -20,12 +19,12 @@ const blogBanner : Component = {
                 [
                     m('.u-text-center',
                         [
-                            m('a[href=\'http://blog.catarse.me\'][target=\'blank\']',
+                            m('a[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']',
                                 m('img.u-marginbottom-10[alt=\'Icon blog\'][src=\'/assets/icon-blog.png\']')
                             ),
                             m('.fontsize-large.u-marginbottom-60.text-success',
-                                m('a.link-hidden-success[href=\'http://blog.catarse.me\'][target=\'__blank\']',
-                                    'Blog do Catarse'
+                                m('a.link-hidden-success[href=\'https://medium.com/grasruts\'][target=\'__blank\']',
+                                    'Grasruts Blogs'
                                 )
                             )
                         ]
@@ -33,12 +32,11 @@ const blogBanner : Component = {
                     m('.w-row', _.map(ctrl.posts(), (post) => {
                         return m('.w-col.w-col-4.col-blog-post',
                             [
-                                m(`a.link-hidden.fontweight-semibold.fontsize-base.u-marginbottom-10[href="${post[1][1]}"][target=\'__blank\']`, post[0][1]),
-                                m('.fontsize-smaller.fontcolor-secondary.u-margintop-10', m.trust(`${h.strip(post[6][1].substr(0, 130))}...`))
+                                m(`a.link-hidden.fontweight-semibold.fontsize-base.u-marginbottom-10[href="${post[2][1]}"][target=\'__blank\']`, post[0][1])
                             ]
                         );
                     })),
-                    ctrl.error() ? m('.w-row', m('.w-col.w-col-12.u-text-center', 'Erro ao carregar posts...')) : ''
+                    ctrl.error() ? m('.w-row', m('.w-col.w-col-12.u-text-center', 'Error loading posts...')) : ''
                 ]
             )
         );

@@ -41,16 +41,16 @@ const projectFriends = {
             ]),
             m('p.fontsize-smallest.friend-namepile.lineheight-tighter', [
                 m('span.fontweight-semibold',
-                    _.map(ctrl.friendsSample(), user => user.data.name.split(' ')[0]).join(friendsCount > 2 ? ', ' : ' e ')
+                    _.map(ctrl.friendsSample(), user => user.data.name.split(' ')[0]).join(friendsCount > 2 ? ', ' : ' and ')
                 ),
                 (friendsCount > 2 ? [
-                    ' e ',
+                    ' and ',
                     m('span.fontweight-semibold',
-                        `mais ${friendsCount - ctrl.friendsSample().length}`
+                        `more ${friendsCount - ctrl.friendsSample().length}`
                     )
                 ] : ''),
                 (friendsCount > 1 ?
-                    ' apoiaram' : ' apoiou')
+                    ' Supported' : ' Supported')
             ])
         ]);
     }

@@ -89,7 +89,7 @@ const projectGoogleContactImport = {
                 onclick: ctrl.auth
             }, [
                 m('img[src=\'http://uploads.webflow.com/57ba58b4846cc19e60acdd5b/57bc339f77f314e23b94d44d_gmail-icon.png\'][width=\'25\']'),
-                m('._w-inline-block.fontsize-smallest', 'Contatos do gmail')
+                m('._w-inline-block.fontsize-smallest', 'Gmail contacts')
             ])
         ]);
     }
