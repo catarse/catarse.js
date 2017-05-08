@@ -183,7 +183,7 @@ const userBilling = {
                                 'Bank data'
                             ),
                             m('.fontsize-small.u-marginbottom-20', [
-                                'If any project you have supported ',
+                                'If any campaign you have supported ',
                                 m('b',
                                     'With Boleto Bancaria'
                                 ),

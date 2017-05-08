@@ -69,7 +69,7 @@ const liveStatistics = {
                 ])
             ]) : ''),
             m('.u-text-center.fontsize-large.u-marginbottom-10.fontcolor-negative', [
-                m('a.link-hidden.fontcolor-negative[href="https://github.com/catarse"][target="_blank"]', [
+                m('a.link-hidden.fontcolor-negative[href="https://github.com/jvn"][target="_blank"]', [
                     m('span.fa.fa-github', '.'), ' Open Source with pride! '
                 ])
             ]),

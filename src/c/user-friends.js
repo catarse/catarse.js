@@ -55,7 +55,7 @@ const userFriends = {
             m('.w-container', [
                 m('.w-row.u-marginbottom-40.card.u-radius.card-terciary', [
                     m('.w-col.w-col-7.w-col-small-6.w-col-tiny-6', [
-                        m('.fontsize-small', 'Start now! Follow all your friends or just a few of them to discover projects together!')
+                        m('.fontsize-small', 'Start now! Follow all your friends or just a few of them to discover campaigns together!')
                     ]),
                     m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [
                             (ctrl.allLoading() ? h.loader()

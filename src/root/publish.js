@@ -119,7 +119,7 @@ const publish = {
                           ' ',
                           m('span.fontweight-semibold', 'Deadline for transfer')
                       ]),
-                      m('div', m.trust('When the deadline for your project comes to an end, you should verify your bank details. You may change the Bank, Account and the Agency <strong>Only if the new registered account is owned by you</strong>. Upon confirmation, Catarse will deposit into your checking account within 10 business days. The amount deposited will already be considering the 5% discount of the fee.'))
+                      m('div', m.trust('When the deadline for your project comes to an end, you should verify your bank details. You may change the Bank, Account and the Agency <strong>Only if the new registered account is owned by you</strong>. Upon confirmation, Grasruts will deposit into your checking account within 10 business days. The amount deposited will already be considering the 5% discount of the fee.'))
                   ]),
                   m('.w-col.w-col-11', [
                       m('div', [
@@ -143,7 +143,7 @@ const publish = {
                           ' ',
                           m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from published campaign')
                       ]),
-                      m('div', [m('span.fontweight-semibold'), 'Grasruts reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' e ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
+                      m('div', [m('span.fontweight-semibold'), 'Grasruts reserves the right, in its sole discretion and once notified, to cancel campaigns and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' e ', m('a.alt-link[href=\'http://www.grasruts.com/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
                   ])
             ],
 
@@ -207,7 +207,7 @@ const publish = {
                           ' ',
                           m('span', { style: { 'font-weight': ' 600' } }, 'Transfer and refund rules'),
                           m('div', [
-                              m.trust('When the deadline for your campaign comes to an end, you should verify your bank details. You may change the Bank, Account and the Agency <strong>Only if the new registered account is owned by you</strong>. After this confirmation, Catarse will deposit the amount collected, already discounted the fee, into your account in 10 business days. If the project does not reach 100% of the target by the deadline, the Catarse will reimburse the supporters. <a href="http://suporte.catarse.me/hc/pt-br/articles/202365507" target="blank">Learn more about the repayment process</a>')
+                              m.trust('When the deadline for your campaign comes to an end, you should verify your bank details. You may change the Bank, Account and the Agency <strong>Only if the new registered account is owned by you</strong>. After this confirmation, Grasruts will deposit the amount collected, already discounted the fee, into your account in 10 business days. If the project does not reach 100% of the target by the deadline, the Grasruts will reimburse the supporters. <a href="http://suporte.catarse.me/hc/pt-br/articles/202365507" target="blank">Learn more about the repayment process</a>')
                           ])
                       ]),
                       m('div', '')
@@ -237,7 +237,7 @@ const publish = {
                           ' ',
                           m('span', { style: { 'font-weight': ' 600' } }, 'Withdrawals from published campaign')
                       ]),
-                      m('div', [m('span.fontweight-semibold'), 'Grasruts reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' and ', m('a.alt-link[href=\'http://www.catarse.me/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
+                      m('div', [m('span.fontweight-semibold'), 'Grasruts reserves the right, in its sole discretion and once notified, to cancel campaign and terminate the accounts of CAMPAIGN CREATORS that violate our', m('a.alt-link[href=\'http://suporte.catarse.me/hc/pt-br/articles/202387638-Diretrizes-para-cria%C3%A7%C3%A3o-de-projetos\'][target=\'_blank\']', 'Rules'), ' and ', m('a.alt-link[href=\'http://www.grasruts.com/terms-of-use\'][target=\'_blank\']', 'Terms of use'), '.'])
                   ])
             ];
 

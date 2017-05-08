@@ -26,12 +26,12 @@ const deleteProjectModalContent = {
                     deleteSuccess(true);
                 }).catch((err) => {
                     confirmed(false);
-                    error('Error deleting project. Please try again.');
+                    error('Error deleting campaign. Please try again.');
                     m.redraw();
                 });
             } else {
                 confirmed(false);
-                error('Please correct the following errors: To permanently delete the project you must fill in "Delete-draft".');
+                error('Please correct the following errors: To permanently delete the campaign you must fill in "Delete-draft".');
             }
             return false;
         };
@@ -61,7 +61,7 @@ const deleteProjectModalContent = {
                   [
                       m('.fontsize-base.u-marginbottom-60',
                           [
-                              'The project will be permanently deleted and all data you filled in the draft edition will not be retrieved.'
+                              'The campaign will be permanently deleted and all data you filled in the draft edition will not be retrieved.'
                           ]
                     ),
                       m('.fontsize-base.u-marginbottom-10',

@@ -47,7 +47,7 @@ const userContributed = {
     },
     view(ctrl, args) {
         const projects_collection = ctrl.projects.collection();
-        return (ctrl.error() ? m.component(inlineError, { message: 'Error loading projects.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']',
+        return (ctrl.error() ? m.component(inlineError, { message: 'Error loading campaigns.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']',
             [
                   (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m.component(projectCard, {
                       project,

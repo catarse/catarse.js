@@ -76,7 +76,7 @@ const projectReport = {
             [
                 m('.fontsize-small.u-marginbottom-20',
                     [
-                        'This project disrespects',
+                        'This campaign disrespects',
                         m.trust('&nbsp;'),
                         m('a.alt-link[href=\'http://www.grasruts.com/rules\'][target=\'_blank\']',
                             ' our rules? '
@@ -91,14 +91,14 @@ const projectReport = {
                       ) :
                 [
                     m('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']', { onclick: ctrl.checkLogin },
-                        'Report this project'
+                        'Report this campaign'
                       ),
                     ctrl.displayForm() ? m('#report-form.u-margintop-30',
                         m('.w-form',
                           m('form', { onsubmit: ctrl.sendReport, config: ctrl.checkScroll },
                               [
                                   m('.fontsize-small.fontweight-semibold.u-marginbottom-10',
-                                'Why are you denouncing this project?'
+                                'Why are you denouncing this campaign?'
                               ),
                                   m('select.w-select.text-field.positive[required=\'required\']', { onchange: m.withAttr('value', ctrl.reason) },
                                       [
@@ -111,8 +111,8 @@ const projectReport = {
                                           m('option[value=\'Slander, libel, defamation or discrimination\']',
                                               'Slander, libel, defamation or discrimination'
                                           ),
-                                          m('option[value=\'Prohibited project scope\']',
-                                              'Prohibited project scope'
+                                          m('option[value=\'Prohibited campaign scope\']',
+                                              'Prohibited campaign scope'
                                           ),
                                           m('option[value=\'Forbidden Rewards\']',
                                               'Forbidden Rewards'

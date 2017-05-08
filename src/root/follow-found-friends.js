@@ -44,8 +44,8 @@ const FollowFoundFriends = {
                     m('.w-row.u-margintop-20.u-marginbottom-20', [
                         m('.w-col.w-col-1'),
                         m('.w-col.w-col-10.u-text-center', [
-                            m('.fontsize-larger.fontweight-semibold.u-marginbottom-10', 'Discover projects with your friends'),
-                            m('.fontsize-small', 'Follow your friends and we will notify you whenever they launch or support any project')
+                            m('.fontsize-larger.fontweight-semibold.u-marginbottom-10', 'Discover campaigns with your friends'),
+                            m('.fontsize-small', 'Follow your friends and we will notify you whenever they launch or support any campaign')
                         ]),
                         m('.w-col.w-col-1')
                     ])

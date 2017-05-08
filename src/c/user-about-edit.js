@@ -265,7 +265,7 @@ const userAboutEdit = {
                                         'Email'
                                     ),
                                     m('.fontsize-small.u-marginbottom-30',
-                                        'Keep this email updated as it is the channel of communication between you, the Grasruts team and the team of projects you have supported. '
+                                        'Keep this email updated as it is the channel of communication between you, the Grasruts team and the team of campaigns you have supported. '
                                     ),
                                     m('.fontsize-base.u-marginbottom-40', [
                                         m('span.fontweight-semibold.card.u-radius',
@@ -520,7 +520,7 @@ const userAboutEdit = {
                                         m(`a.alt-link.fontsize-smaller[href='/en/users/${user.id}'][rel='nofollow']`, {
                                             onclick: ctrl.deleteAccount
                                         },
-                                            'Disable my Catarse account'
+                                            'Disable my Grasruts account'
                                         ),
                                         m('form.w-hidden', {
                                             action: `/en/users/${user.id}`,

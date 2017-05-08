@@ -40,7 +40,7 @@ const footer = {
                                                 m('a.link-footer[href=\'https://www.pinterest.com/grasruts\'][target=\'__blank\']',
                                                     ' Pinterest'
                                                 ),
-                                                m('a.link-footer[href=\'https://github.com/sushant12/catarse\'][target=\'__blank\']',
+                                                m('a.link-footer[href=\'https://github.com/sushant12/jvn\'][target=\'__blank\']',
                                                     ' Github'
                                                 ),
                                                 m('a.link-footer[href=\'https://medium.com/grasruts\'][target=\'__blank\']',
@@ -62,7 +62,7 @@ const footer = {
                                                         m.trust('&nbsp;')
                                                     ]
                                                 ),
-                                                m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/requests/new\'][target="_BLANK"]',
+                                                m('a.link-footer[href=\'https://grasruts.zendesk.com/hc/en-us/requests/new\'][target="_BLANK"]',
                                                     I18n.t('links.contact', I18nScope())
                                                 ),
                                                 // m('a.link-footer[href=\'http://crowdfunding.catarse.me/nossa-taxa?ref=ctrse_footer\']',
@@ -74,7 +74,7 @@ const footer = {
                                                 // m('a.link-footer[href=\'/press?ref=ctrse_footer\']',
                                                 //     I18n.t('links.press', I18nScope())
                                                 // ),
-                                                m('a.link-footer[href=\'https://jointventurenepal.zendesk.com/hc/en-us/\'][target="_BLANK"]',
+                                                m('a.link-footer[href=\'https://grasruts.zendesk.com/hc/en-us/\'][target="_BLANK"]',
                                                     I18n.t('links.help_support', I18nScope())
                                                 ),
                                                 m('a.link-footer[href=\'/en/terms-of-use?ref=ctrse_footer\']',
@@ -162,7 +162,7 @@ const footer = {
                         [
                             m('img.u-marginbottom-20[alt=\'Logo footer\'][src=\'/assets/logo-footer.png\']'),
                             m('.lineheight-loose',
-                                m('a.link-footer-inline[href=\'https://github.com/sushant12/catarse\'][target=\'blank\']',
+                                m('a.link-footer-inline[href=\'https://github.com/sushant12/jvn\'][target=\'blank\']',
                                     I18n.t('texts.copyleft', I18nScope()) + ` | ${new Date().getFullYear()} | Open Source`
                                 )
                             )

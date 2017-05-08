@@ -126,7 +126,7 @@ const displayName = (user) => {
 };
 
 const displayImage = (user) => {
-    const defaultImg = 'https://catarse.me/assets/catarse_bootstrap/user.jpg';
+    const defaultImg = 'https://grasruts.com/assets/catarse_bootstrap/user.jpg';
 
     if (user) {
         return user.profile_img_thumbnail || defaultImg;

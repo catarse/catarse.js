@@ -53,7 +53,7 @@ const userCreators = {
             m('.w-container', [
                 m('.w-row.u-marginbottom-40.card.u-radius.card-terciary', [
                     m('.w-col.w-col-7.w-col-small-6.w-col-tiny-6', [
-                        m('.fontsize-small', 'Follow the filmmakers you`ve already supported and know firsthand whenever they support projects or launch new campaigns!')
+                        m('.fontsize-small', 'Follow the filmmakers you`ve already supported and know firsthand whenever they support campaigns or launch new campaigns!')
                     ]),
                     m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [
                         (ctrl.allLoading() ? h.loader()

@@ -17,7 +17,7 @@ const Flex = {
             },
             addDisqus = (el, isInitialized) => {
                 if (!isInitialized) {
-                    h.discuss('https://catarse.me/flex', 'flex_page');
+                    h.discuss('https://grasruts.com/flex', 'flex_page');
                 }
             },
             flexVM = postgrest.filtersVM({
@@ -73,7 +73,7 @@ const Flex = {
                                 m('.w-col.w-col-6', [
                                     m('.u-text-center.u-marginbottom-20', [
                                         m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e393a01b66e250aca67cb_icon-zelo-com.png\'][width=\'210\']'), m('.fontsize-largest.lineheight-loose', 'Causes')
-                                    ]), m('p.fontsize-base', 'Flexibility for causes of impact! We will be open to campaigns of organizations or individuals for the collection of resources for personal causes, assistance projects, health, humanitarian aid, animal protection, socio-environmental entrepreneurship, activism or anything that unites people to do good.')
+                                    ]), m('p.fontsize-base', 'Flexibility for causes of impact! We will be open to campaigns of organizations or individuals for the collection of resources for personal causes, assistance campaigns, health, humanitarian aid, animal protection, socio-environmental entrepreneurship, activism or anything that unites people to do good.')
                                 ]), m('.w-col.w-col-6', [
                                     m('.u-text-center.u-marginbottom-20', [
                                         m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e3929a0daea230a5f12cd_icon-zelo-pessoal.png\'][width=\'210\']'), m('.fontsize-largest.lineheight-loose', 'Kitties')
@@ -98,7 +98,7 @@ const Flex = {
                             m('.w-col.w-col-6', [
                                 m('.u-text-center', [
                                     m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39fb01b66e250aca67e3_icon-curad.png\'][width=\'180\']')
-                                ]), m('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'You publish your project yourself'), m('p.u-text-center.fontsize-base', 'All projects enrolled in the flex come on the air. Agility and ease for you to capture resources through the internet.')
+                                ]), m('.fontsize-large.u-marginbottom-10.u-text-center.fontweight-semibold', 'You publish your project yourself'), m('p.u-text-center.fontsize-base', 'All campaigns enrolled in the flex come on the air. Agility and ease for you to capture resources through the internet.')
                             ]), m('.w-col.w-col-6', [
                                 m('.u-text-center', [
                                     m('img[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/560e39e77c013d4a3ee687d4_icon-time.png\'][width=\'180\']')
@@ -109,7 +109,7 @@ const Flex = {
                 ]),
                 m('.w-section.section', [
                     m('.w-container', [
-                        m('.w-editable.fontsize-larger.u-margintop-40.u-margin-bottom-40.u-text-center', 'Meet some of the first flex projects'),
+                        m('.w-editable.fontsize-larger.u-margintop-40.u-margin-bottom-40.u-text-center', 'Meet some of the first flex campaigns'),
                         ctrl.projectsLoader() ? h.loader() : m.component(projectRow, { collection: ctrl.projects, ref: 'ctrse_flex', wrapper: '.w-row.u-margintop-40' })
                     ])
                 ]),
@@ -128,19 +128,19 @@ const Flex = {
                                 }),
                                 m.component(landingQA, {
                                     question: 'What is the difference between the flexible and the "all or nothing"?',
-                                    answer: 'Currently Catarse uses only the "all or nothing" model, where you only get the money if you beat the collection goal within the term of the campaign. The flexible model is different because it allows the director to keep what he has collected, regardless of whether or not he reaches the project goal within the term of the campaign. There will be no time limit for campaigns. Our flexible system will be something new compared to the models that currently exist in the market.'
+                                    answer: 'Currently Grasruts uses only the "all or nothing" model, where you only get the money if you beat the collection goal within the term of the campaign. The flexible model is different because it allows the director to keep what he has collected, regardless of whether or not he reaches the project goal within the term of the campaign. There will be no time limit for campaigns. Our flexible system will be something new compared to the models that currently exist in the market.'
                                 }),
                             ]), m('.w-col.w-col-6', [
                                 m.component(landingQA, {
-                                    question: 'Can I enter projects for flexible mode already?',
+                                    question: 'Can I enter campaigns for flexible mode already?',
                                     answer: 'Yes. Register your email and learn how to register your project on flex!'
                                 }),
                                 m.component(landingQA, {
-                                    question: 'Why do you want to do the Catarse flex?',
-                                    answer: 'We believe that the Brazilian crowdfunding environment still has room for many actions, tests and experiments to really understand what people need. We dream of making collective financing a habit in Brazil. Catarse flex is another step in this direction.'
+                                    question: 'Why do you want to do the Grasruts flex?',
+                                    answer: 'We believe that the Brazilian crowdfunding environment still has room for many actions, tests and experiments to really understand what people need. We dream of making collective financing a habit in Brazil. Grasruts flex is another step in this direction.'
                                 }),
                                 m.component(landingQA, {
-                                    question: 'When will you launch Catarse flex?',
+                                    question: 'When will you launch Grasruts flex?',
                                     answer: 'We still do not know when we will open flex for the general public, but you can register your email on this page and receive special material on how to submit your project.'
                                 })
                             ])
@@ -175,7 +175,7 @@ const Flex = {
                 ]),
                 m('.w-section.section.bg-blue-one.fontcolor-negative', [
                     m('.w-container', [
-                        m('.fontsize-large.u-text-center.u-marginbottom-20', 'Recommend the Catarse flex for friends! '),
+                        m('.fontsize-large.u-text-center.u-marginbottom-20', 'Recommend the Grasruts flex for friends! '),
                         m('.w-row', [
                             m('.w-col.w-col-2'),
                             m('.w-col.w-col-8', [
@@ -189,7 +189,7 @@ const Flex = {
                                     m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                         m('div', [
                                             m('img.icon-share-mobile[src=\'https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/53a3f65105eb6144171d8eda_twitter-256.png\']'),
-                                            m(`a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Let`s build a new mode of crowdfunding for Catarse! Join us, sign up for your email!')}http://www.grasruts.com/flex?ref=twitter"][target="_blank"]`, 'To tweet')
+                                            m(`a.w-button.btn.btn-large.btn-tweet[href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Let`s build a new mode of crowdfunding for Grasruts! Join us, sign up for your email!')}http://www.grasruts.com/flex?ref=twitter"][target="_blank"]`, 'To tweet')
                                         ])
                                     ])
                                 ])
