@@ -6,7 +6,7 @@ A set of mithril components to use accross [JVN](https://github.com/sushant12/jv
 
 ## Development
 
-To start developing components to jvn.js you'll first have to globally install [gulp](http://gulpjs.com/), [bower](http://bower.io/) and [npm](https://www.npmjs.com/). 
+To start developing components to catarse.js you'll first have to globally install [gulp](http://gulpjs.com/), [bower](http://bower.io/) and [npm](https://www.npmjs.com/).
 
 Then, install all the project package dependencies by calling ```npm install && bower install```.
 
@@ -18,7 +18,7 @@ To watch source files without running through testing tasks, run:
 ```gulp --notest```
 
 To watch source files without running testing or linting tasks, run:
-```gulp --q``` 
+```gulp --q```
 
 To trigger a build cycle without watching files, run:
 ```gulp build```
@@ -30,7 +30,7 @@ Then, in you jvn repository, run:
 
 ## Flowtype && ES6
 
-Currently we are moving our code to ES6 + Flowtype. All new components should be written on this new paradigm. For doing such, we deeply recommend a clear understand of both [Flow](http://flowtype.org/), ES6 and [Babel](https://babeljs.io/) - our ES6 transpile tool. 
+Currently we are moving our code to ES6 + Flowtype. All new components should be written on this new paradigm. For doing such, we deeply recommend a clear understand of both [Flow](http://flowtype.org/), ES6 and [Babel](https://babeljs.io/) - our ES6 transpile tool.
 
 ## Troubleshooting
 
@@ -40,7 +40,7 @@ If you can't run `gulp` try to install it with `npm install -g gulp`
 
 Gulp compiles the code found inside the /src directory and outputs into the /dist folder as catarse.js and catarse.min.js
 
-There are 3 different folders: /c, /root and /vm. 
+There are 3 different folders: /c, /root and /vm.
 
 /c
 

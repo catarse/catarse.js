@@ -17,7 +17,7 @@ const Flex = {
             },
             addDisqus = (el, isInitialized) => {
                 if (!isInitialized) {
-                    h.discuss('https://grasruts.com/flex', 'flex_page');
+                    h.discuss('http://grasruts.com/flex', 'flex_page');
                 }
             },
             flexVM = postgrest.filtersVM({

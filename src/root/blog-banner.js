@@ -19,7 +19,7 @@ const blogBanner : Component = {
                 [
                     m('.u-text-center',
                         [
-                            m('a[href=\'https://medium.com/@myjvnepal\'][target=\'blank\']',
+                            m('a[href=\'https://medium.com/grasruts\'][target=\'blank\']',
                                 m('img.u-marginbottom-10[alt=\'Icon blog\'][src=\'/assets/icon-blog.png\']')
                             ),
                             m('.fontsize-large.u-marginbottom-60.text-success',

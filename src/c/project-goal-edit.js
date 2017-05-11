@@ -22,7 +22,7 @@ const projectGoalEdit = {
             showError = h.toggleProp(false, true),
             showModeDiff = h.toggleProp(false, true),
             showTaxesDiff = h.toggleProp(false, true),
-            applyGoalMask = _.compose(vm.fields.goal, h.applyMonetaryMask),
+            applyGoalMask = _.compose(vm.fields.goal, h.numbersOnlyMask),
             loading = m.prop(false),
             onSubmit = (event) => {
                 loading(true);
