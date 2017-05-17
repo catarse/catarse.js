@@ -34,7 +34,7 @@ const footer = {
                                                 m('a.link-footer[href=\'https://twitter.com/grasruts\'][target=\'__blank\']',
                                                     ' Twitter'
                                                 ),
-                                                m('a.link-footer[href=\'http://instagram.com/catarse\'][target=\'__blank\']',
+                                                m('a.link-footer[href=\'http://instagram.com/the_grasruts/\'][target=\'__blank\']',
                                                     ' Instagram'
                                                 ),
                                                 m('a.link-footer[href=\'https://www.pinterest.com/grasruts\'][target=\'__blank\']',

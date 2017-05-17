@@ -123,8 +123,8 @@ const projectsPayment = {
     view(ctrl) {
         const user = ctrl.user(),
               project = ctrl.project,
-              formatedValue = h.formatNumber(Number(ctrl.value), 2, 3);
-        console.log(formatedValue);
+              // formatedValue = h.formatNumber(Number(ctrl.value), 2, 3);
+              formatedValue = Number(ctrl.value);
 
         return m('#project-payment.w-section.w-clearfix.section', [
             m('.w-col',
@@ -135,7 +135,7 @@ const projectsPayment = {
                     m('.w-clearfix',
                         [
                             m('.fontsize-larger.text-success.u-left',
-                                `R$ ${formatedValue}`
+                                `Rs ${formatedValue}`
                             ),
                             m(`a.alt-link.fontsize-smaller.u-right[href="/projects/${projectVM.currentProject().project_id}/contributions/new${ctrl.reward().id ? `?reward_id=${ctrl.reward().id}` : ''}"]`,
                                 'Edit'
@@ -436,10 +436,10 @@ const projectsPayment = {
                                 m('.w-clearfix',
                                     [
                                         m('.fontsize-larger.text-success.u-left',
-                                            `R$ ${formatedValue}`
+                                            `Rs ${formatedValue}`
                                         ),
                                         m(`a.alt-link.fontsize-smaller.u-right[href="/projects/${projectVM.currentProject().project_id}/contributions/new${ctrl.reward().id ? `?reward_id=${ctrl.reward().id}` : ''}"]`,
-                                            'Editar'
+                                            'Edit'
                                         )
                                     ]
                                 ),

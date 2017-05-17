@@ -22,7 +22,6 @@ const projectRewardList = {
 
                 return false;
             };
-
         const setInput = (el, isInitialized) => (!isInitialized ? el.focus() : false);
 
         const selectDestination = (destination) => {

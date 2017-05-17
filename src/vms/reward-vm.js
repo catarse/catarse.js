@@ -59,14 +59,16 @@ const selectReward = reward => () => {
     if (selectedReward() !== reward) {
         error('');
         selectedReward(reward);
-        contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
+        // contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
+        contributionValue(h.numbersOnlyMask(`${reward.minimum_value}`));
         if (reward.id) {
             getFees(reward).then(fees);
         }
     }
 };
 
-const applyMask = _.compose(contributionValue, h.applyMonetaryMask);
+// const applyMask = _.compose(contributionValue, h.applyMonetaryMask);
+const applyMask = _.compose(contributionValue, h.numbersOnlyMask);
 
 const statesLoader = postgrest.loader(models.state.getPageOptions());
 const getStates = () => {
