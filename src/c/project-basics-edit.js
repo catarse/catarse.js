@@ -64,18 +64,49 @@ const projectBasicsEdit = {
         }
 
         vm.loadCategoriesOptionsTo(categories, vm.fields.category_id());
+
+        const addTag = tag => () => {
+            selectedTags().push(tag);
+            isEditingTags(false);
+            editTag('');
+            tagOptions([]);
+            return false;
+        };
+
+        const removeTag = tagToRemove => () => {
+            const updatedTags = _.reject(selectedTags(), tag => tag === tagToRemove);
+
+            selectedTags(updatedTags);
+
+            return false;
+        };
+
         const tagFilter = postgrest.filtersVM({
             slug: '@@'
         });
 
-        const triggerTagSearch = (tagString) => {
+        const triggerTagSearch = (e) => {
+            const tagString = e.target.value;
             editTag(tagString);
+            isEditingTags(true);
+            tagOptions([]);
             m.redraw();
 
+            const currentTagMatch = _.findWhere(tagOptions(), { slug: h.slugify(tagString) });
+            if (e.keyCode === 188) {
+                if (currentTagMatch) {
+                    addTag(currentTagMatch).call();
+                } else {
+                    addTag({ name: tagString.substr(0, tagString.length - 1).toLowerCase() }).call();
+                }
+
+                return false;
+            }
+
             const elapsedTime = new Date() - lastTime();
-            if (tagString.length >= 3 && (elapsedTime > 350)) {
+            if (tagString.length >= 2 && (elapsedTime > 350)) {
                 tagEditingLoading(true);
-                m.redraw();
+
                 models
                     .publicTags
                     .getPage(tagFilter.slug(h.slugify(tagString)).parameters())
@@ -85,20 +116,9 @@ const projectBasicsEdit = {
                         lastTime(new Date());
                         m.redraw();
                     });
+            } else {
+                tagOptions([]);
             }
-        };
-
-        const addTag = tag => () => {
-            selectedTags().push(tag);
-            isEditingTags(false);
-            editTag('');
-            return false;
-        };
-
-        const removeTag = tagToRemove => () => {
-            const updatedTags = _.reject(selectedTags(), tag => tag === tagToRemove);
-
-            selectedTags(updatedTags);
 
             return false;
         };
@@ -202,21 +222,19 @@ const projectBasicsEdit = {
                                 onclick: () => ctrl.isEditingTags(false),
                                 children: [
                                     m('input.string.optional.w-input.text-field.positive.medium[type="text"]', {
-                                        // value: vm.fields.public_tags(),
                                         value: ctrl.editTag(),
-                                        onfocus: () => ctrl.isEditingTags(true),
                                         class: vm.e.hasError('public_tags') ? 'error' : '',
-                                        onkeyup: m.withAttr('value', ctrl.triggerTagSearch)
+                                        onkeyup: ctrl.triggerTagSearch
                                     }),
                                     ctrl.isEditingTags() ? m('.options-list.table-outer',
-                                        ctrl.tagEditingLoading()
-                                            ? m('.fontsize-smaller.fontcolor-secondary', 'carregando...')
-                                            : _.map(ctrl.tagOptions(), tag => m('.dropdown-link',
-                                                { onclick: ctrl.addTag(tag) },
-                                                m('.fontsize-smaller',
-                                                    tag.name
-                                                )
-                                            ))
+                                         ctrl.tagEditingLoading()
+                                            ? m('.dropdown-link', m('.fontsize-smallest', 'Carregando...'))
+                                            : ctrl.tagOptions().length
+                                                ? _.map(ctrl.tagOptions(), tag => m('.dropdown-link',
+                                                    { onclick: ctrl.addTag(tag) },
+                                                    m('.fontsize-smaller', tag.name)
+                                                ))
+                                                : m('.dropdown-link', m('.fontsize-smallest', 'Nenhuma tag relacionada...'))
                                     ) : '',
                                     vm.e.inlineError('public_tags'),
                                     m('div.tag-choices',
