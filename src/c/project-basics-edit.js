@@ -34,6 +34,10 @@ const projectBasicsEdit = {
             isEditingTags = m.prop(false),
             tagEditingLoading = m.prop(false),
             onSubmit = () => {
+                if (isEditingTags()) {
+                    return false;
+                }
+
                 loading(true);
                 m.redraw();
                 const tagString = _.pluck(selectedTags(), 'name').join(',');
@@ -81,46 +85,41 @@ const projectBasicsEdit = {
             return false;
         };
 
-        const tagFilter = postgrest.filtersVM({
-            slug: '@@'
-        });
-
+        const searchTagsUrl = `${h.getApiHost()}/rpc/tag_search`;
+        const searchTags = tagString => m.request({ method: 'POST', data: { query: tagString, count: 1 }, url: searchTagsUrl });
+        let timer;
         const triggerTagSearch = (e) => {
             const tagString = e.target.value;
             editTag(tagString);
             isEditingTags(true);
             tagOptions([]);
-            m.redraw();
 
             const currentTagMatch = _.findWhere(tagOptions(), { slug: h.slugify(tagString) });
-            if (e.keyCode === 188) {
+            const keyCode = e.keyCode;
+
+            if (keyCode === 188 || keyCode === 13) {
                 if (currentTagMatch) {
                     addTag(currentTagMatch).call();
                 } else {
                     addTag({ name: tagString.substr(0, tagString.length - 1).toLowerCase() }).call();
                 }
-
-                return false;
             }
 
-            const elapsedTime = new Date() - lastTime();
-            if (tagString.length >= 2 && (elapsedTime > 350)) {
-                tagEditingLoading(true);
-
-                models
-                    .publicTags
-                    .getPage(tagFilter.slug(h.slugify(tagString)).parameters())
-                    .then((data) => {
-                        tagOptions(data);
-                        tagEditingLoading(false);
-                        lastTime(new Date());
-                        m.redraw();
-                    });
-            } else {
-                tagOptions([]);
+            if (timer) {
+                window.clearTimeout(timer);
             }
 
-            return false;
+            tagEditingLoading(true);
+            timer = setTimeout(() => {
+                if (tagString.length >= 2) {
+                    searchTags(tagString)
+                        .then((data) => {
+                            tagOptions(data);
+                            tagEditingLoading(false);
+                            m.redraw();
+                        });
+                }
+            }, 350);
         };
 
         return {
