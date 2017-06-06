@@ -39,7 +39,9 @@ const projectHeader = {
                 m('.w-row',
                     _.map(ctrl.projectContributions(), contribution => m.component(userContributionDetail, {
                         contribution,
-                        rewardDetails
+                        rewardDetails,
+                        project,
+                        userDetails: args.userDetails
                     }))
                 )
             ) : ''
