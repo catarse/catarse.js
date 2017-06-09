@@ -22,11 +22,11 @@ import projectEditTab from '../c/project-edit-tab';
 const I18nScope = _.partial(h.i18nScope, 'projects.edit');
 
 const projectEdit = {
-    controller(args) {
-        const { project_id, user_id } = args;
+    oninit(vnode) {
+        const { project_id, user_id } = vnode.attrs;
 
         const project = projectVM.fetchProject(project_id),
-            hash = m.prop(window.location.hash),
+            hash = console.warn("m.prop has been removed from mithril 1.0") || m.prop(window.location.hash),
             displayTabContent = () => {
                 const c_opts = {
                     project_id,
@@ -104,13 +104,13 @@ const projectEdit = {
             project
         };
     },
-    view(ctrl, args) {
-        const project = ctrl.project;
+    view(vnode) {
+        const project = vnode.state.project;
 
         return m('.project-dashboard-edit', [
             m(`.w-section.section-product.${project().mode}`),
-            ctrl.displayTabContent(),
-            (project() ? m.component(projectDashboardMenu, {
+            vnode.state.displayTabContent(),
+            (project() ? m(projectDashboardMenu, {
                 project
             }) : '')
         ]);

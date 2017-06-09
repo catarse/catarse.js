@@ -16,20 +16,20 @@ import m from 'mithril';
 import h from '../h';
 
 const landingQA = {
-    controller(args) {
+    oninit(vnode) {
         return {
             showAnswer: h.toggleProp(false, true)
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('.card.qa-card.u-marginbottom-20.u-radius.btn-terciary', [
             m('.fontsize-base', {
                 onclick: () => {
-                    ctrl.showAnswer.toggle();
-                    args.onclick && args.onclick();
+                    vnode.state.showAnswer.toggle();
+                    vnode.attrs.onclick && vnode.attrs.onclick();
                 }
-            }, args.question),
-            ctrl.showAnswer() ? m('p.u-margintop-20.fontsize-small', m.trust(args.answer)) : ''
+            }, vnode.attrs.question),
+            vnode.state.showAnswer() ? m('p.u-margintop-20.fontsize-small', m.trust(vnode.attrs.answer)) : ''
         ]);
     }
 };

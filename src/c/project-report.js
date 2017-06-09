@@ -10,15 +10,15 @@ import h from '../h';
 import projectVM from '../vms/project-vm';
 
 const projectReport = {
-    controller(args) {
+    oninit(vnode) {
         let displayForm = h.toggleProp(false, true),
-            sendSuccess = m.prop(false),
-            submitDisabled = m.prop(false),
+            sendSuccess = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            submitDisabled = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             user = h.getUser() || {},
-            email = m.prop(user.email),
-            details = m.prop(''),
-            reason = m.prop(''),
-            l = m.prop(false),
+            email = console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.email),
+            details = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+            reason = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+            l = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             storeReport = 'report',
             project = projectVM.currentProject(),
             hasPendingAction = project && (h.callStoredAction(storeReport) == project.project_id),
@@ -69,8 +69,8 @@ const projectReport = {
         };
     },
 
-    view(ctrl, args) {
-        const user = ctrl.user;
+    view(vnode) {
+        const user = vnode.state.user;
 
         return m('.card.card-terciary.u-radius',
             [
@@ -83,24 +83,24 @@ const projectReport = {
                           )
                     ]
                       ),
-                ctrl.sendSuccess() ?
+                vnode.state.sendSuccess() ?
                        m('.w-form',
                         m('p',
                           'Obrigado! A sua denúncia foi recebida.'
                         )
                       ) :
                 [
-                    m('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']', { onclick: ctrl.checkLogin },
+                    m('.a.w-button.btn.btn-medium.btn-terciary.btn-inline[href=\'javascript:void(0);\']', { onclick: vnode.state.checkLogin },
                         'Denunciar este projeto'
                       ),
-                    ctrl.displayForm() ? m('#report-form.u-margintop-30',
+                    vnode.state.displayForm() ? m('#report-form.u-margintop-30',
                         m('.w-form',
-                          m('form', { onsubmit: ctrl.sendReport, config: ctrl.checkScroll },
+                          m('form', { onsubmit: vnode.state.sendReport, config: vnode.state.checkScroll },
                               [
                                   m('.fontsize-small.fontweight-semibold.u-marginbottom-10',
                                 'Por que você está denunciando este projeto?'
                               ),
-                                  m('select.w-select.text-field.positive[required=\'required\']', { onchange: m.withAttr('value', ctrl.reason) },
+                                  m('select.w-select.text-field.positive[required=\'required\']', { onchange: m.withAttr('value', vnode.state.reason) },
                                       [
                                           m('option[value=\'\']',
                                     'Selecione um motivo'
@@ -128,8 +128,8 @@ const projectReport = {
                                   )
                                       ]
                               ),
-                                  m('textarea.w-input.text-field.positive.u-marginbottom-30', { placeholder: 'Por favor, dê mais detalhes que nos ajudem a identificar o problema', onchange: m.withAttr('value', ctrl.details) }),
-                                  m('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Enviar denúncia\']', { disabled: ctrl.submitDisabled() })
+                                  m('textarea.w-input.text-field.positive.u-marginbottom-30', { placeholder: 'Por favor, dê mais detalhes que nos ajudem a identificar o problema', onchange: m.withAttr('value', vnode.state.details) }),
+                                  m('input.w-button.btn.btn-medium.btn-inline.btn-dark[type=\'submit\'][value=\'Enviar denúncia\']', { disabled: vnode.state.submitDisabled() })
                               ]
                           )
                         )

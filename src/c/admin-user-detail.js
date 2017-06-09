@@ -20,7 +20,7 @@ import h from '../h';
 import postgrest from 'mithril-postgrest';
 
 const adminUserDetail = {
-    controller(args) {
+    oninit(vnode) {
         return {
             actions: {
                 reset: {
@@ -45,10 +45,10 @@ const adminUserDetail = {
             },
         };
     },
-    view(ctrl, args) {
-        const actions = ctrl.actions,
-              item = args.item,
-              details = args.details,
+    view(vnode) {
+        const actions = vnode.state.actions,
+              item = vnode.attrs.item,
+              details = vnode.attrs.details,
               addOptions = (builder, id) => _.extend({}, builder, {
                   requestOptions: {
                       url: (`/users/${id}/new_password`),
@@ -59,12 +59,12 @@ const adminUserDetail = {
         return m('#admin-contribution-detail-box', [
             m('.divider.u-margintop-20.u-marginbottom-20'),
             m('.w-row.u-marginbottom-30', [
-                m.component(adminResetPassword, {
+                m(adminResetPassword, {
                     data: addOptions(actions.reset, item.id),
                     item
                 }),
                 (item.deactivated_at) ?
-                    m.component(adminInputAction, { data: actions.reactivate, item }) : ''
+                    m(adminInputAction, { data: actions.reactivate, item }) : ''
             ]),
             m('.w-row.card.card-terciary.u-radius', [
                 m(adminNotificationHistory, {

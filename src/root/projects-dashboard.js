@@ -13,16 +13,16 @@ import projectVM from '../vms/project-vm';
 import projectDashboardMenu from '../c/project-dashboard-menu';
 
 const projectsDashboard = {
-    controller(args) {
-        projectVM.init(args.project_id, args.project_user_id);
+    oninit(vnode) {
+        projectVM.init(vnode.attrs.project_id, vnode.attrs.project_user_id);
 
         return projectVM;
     },
-    view(ctrl) {
-        const project = ctrl.currentProject;
+    view(vnode) {
+        const project = vnode.state.currentProject;
 
         return project().is_owner_or_admin ?
-            m.component(projectDashboardMenu, { project }) : '';
+            m(projectDashboardMenu, { project }) : '';
     }
 };
 

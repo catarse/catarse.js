@@ -13,14 +13,14 @@ import _ from 'underscore';
 import h from '../h';
 
 const adminResetPassword = {
-    controller(args) {
-        let builder = args.data,
-            complete = m.prop(false),
-            error = m.prop(false),
-            fail = m.prop(false),
+    oninit(vnode) {
+        let builder = vnode.attrs.data,
+            complete = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            fail = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             key = builder.property,
             data = {},
-            item = args.item;
+            item = vnode.attrs.item;
 
         builder.requestOptions.config = (xhr) => {
             if (h.authenticityToken()) {
@@ -28,10 +28,10 @@ const adminResetPassword = {
             }
         };
 
-        const l = m.prop(false),
+        const l = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             load = () => m.request(_.extend({}, { data }, builder.requestOptions)),
-            newPassword = m.prop(''),
-            error_message = m.prop('');
+            newPassword = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+            error_message = console.warn("m.prop has been removed from mithril 1.0") || m.prop('');
 
         const requestError = (err) => {
             l(false);
@@ -53,12 +53,7 @@ const adminResetPassword = {
             return false;
         };
 
-        const unload = (el, isinit, context) => {
-            context.onunload = function () {
-                complete(false);
-                error(false);
-            };
-        };
+        const unload = (el, isinit, context) => {};
 
         return {
             complete,
@@ -71,37 +66,43 @@ const adminResetPassword = {
             unload
         };
     },
-    view(ctrl, args) {
-        const data = args.data,
-            btnValue = (ctrl.l()) ? 'por favor, aguarde...' : data.callToAction;
+
+    view(vnode) {
+        const data = vnode.attrs.data,
+            btnValue = (vnode.state.l()) ? 'por favor, aguarde...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
-                onclick: ctrl.toggler.toggle
-            }, data.outerLabel), (ctrl.toggler()) ?
+                onclick: vnode.state.toggler.toggle
+            }, data.outerLabel), (vnode.state.toggler()) ?
             m('.dropdown-list.card.u-radius.dropdown-list-medium.zindex-10', {
-                config: ctrl.unload
+                config: vnode.state.unload
             }, [
                 m('form.w-form', {
-                    onsubmit: ctrl.submit
-                }, (!ctrl.complete()) ? [
+                    onsubmit: vnode.state.submit
+                }, (!vnode.state.complete()) ? [
                     m('label', data.innerLabel),
                     m(`input.w-input.text-field[type="text"][name="${data.property}"][placeholder="${data.placeholder}"]`, {
-                        onchange: m.withAttr('value', ctrl.newPassword),
-                        value: ctrl.newPassword()
+                        onchange: m.withAttr('value', vnode.state.newPassword),
+                        value: vnode.state.newPassword()
                     }),
                     m(`input.w-button.btn.btn-small[type="submit"][value="${btnValue}"]`)
-                ] : (!ctrl.error()) ? [
+                ] : (!vnode.state.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
                         m('p', 'Senha alterada com sucesso.')
                     ])
                 ] : [
                     m('.w-form-error[style="display:block;"]', [
-                        m('p', ctrl.error_message())
+                        m('p', vnode.state.error_message())
                     ])
                 ])
             ]) : ''
         ]);
+    },
+
+    onremove: function () {
+        complete(false);
+        error(false);
     }
 };
 

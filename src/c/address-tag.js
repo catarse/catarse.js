@@ -3,8 +3,8 @@ import _ from 'underscore';
 import h from '../h';
 
 const addressTag = {
-    view(ctrl, args) {
-        const project = args.project,
+    view(vnode) {
+        const project = vnode.attrs.project,
             address = project().address || {
                 state_acronym: '',
                 city: ''

@@ -15,8 +15,8 @@
 import m from 'mithril';
 
 const categoryButton = {
-    view(ctrl, args) {
-        const category = args.category;
+    view(vnode) {
+        const category = vnode.attrs.category;
 
         return m('.w-col.w-col-2.w-col-small-6.w-col-tiny-6', [
             m(`a.w-inline-block.btn-category[href='#by_category_id/${category.id}']`, [

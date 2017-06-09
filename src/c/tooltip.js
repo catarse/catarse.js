@@ -22,13 +22,13 @@ import m from 'mithril';
 import h from '../h';
 
 const tooltip = {
-    controller(args) {
-        let parentHeight = m.prop(0),
-            width = m.prop(args.width || 280),
-            top = m.prop(0),
-            left = m.prop(0),
-            opacity = m.prop(0),
-            parentOffset = m.prop({ top: 0, left: 0 }),
+    oninit(vnode) {
+        let parentHeight = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            width = console.warn("m.prop has been removed from mithril 1.0") || m.prop(vnode.attrs.width || 280),
+            top = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            left = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            opacity = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            parentOffset = console.warn("m.prop has been removed from mithril 1.0") || m.prop({ top: 0, left: 0 }),
             tooltip = h.toggleProp(0, 1),
             toggle = () => {
                 tooltip.toggle();
@@ -70,17 +70,17 @@ const tooltip = {
             setParentPosition
         };
     },
-    view(ctrl, args) {
-        const width = ctrl.width();
-        return m(args.el, {
-            onclick: ctrl.toggle,
-            config: ctrl.setParentPosition,
+    view(vnode) {
+        const width = vnode.state.width();
+        return m(vnode.attrs.el, {
+            onclick: vnode.state.toggle,
+            config: vnode.state.setParentPosition,
             style: { cursor: 'pointer' }
-        }, ctrl.tooltip() ? [
-            m(`.tooltip.dark[style="width: ${width}px; top: ${ctrl.top()}px; left: ${ctrl.left()}px;"]`, {
-                config: ctrl.setPosition
+        }, vnode.state.tooltip() ? [
+            m(`.tooltip.dark[style="width: ${width}px; top: ${vnode.state.top()}px; left: ${vnode.state.left()}px;"]`, {
+                config: vnode.state.setPosition
             }, [
-                m('.fontsize-smallest', args.text)
+                m('.fontsize-smallest', vnode.attrs.text)
             ])
         ] : '');
     }

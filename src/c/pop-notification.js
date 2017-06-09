@@ -2,8 +2,8 @@ import m from 'mithril';
 import h from '../h';
 
 const popNotification = {
-    controller(args) {
-        const displayNotification = args.toggleOpt || h.toggleProp(true, false),
+    oninit(vnode) {
+        const displayNotification = vnode.attrs.toggleOpt || h.toggleProp(true, false),
             setPopTimeout = () => {
                 setTimeout(() => { displayNotification(false); m.redraw(); }, 3000);
             };
@@ -12,16 +12,16 @@ const popNotification = {
             setPopTimeout
         };
     },
-    view(ctrl, args) {
-        return (ctrl.displayNotification() ? m('.flash.w-clearfix.card.card-notification.u-radius.zindex-20', {
-            config: ctrl.setPopTimeout,
-            class: args.error ? 'card-error' : ''
+    view(vnode) {
+        return vnode.state.displayNotification() ? m('.flash.w-clearfix.card.card-notification.u-radius.zindex-20', {
+            config: vnode.state.setPopTimeout,
+            class: vnode.attrs.error ? 'card-error' : ''
         }, [
             m('img.icon-close[src="/assets/catarse_bootstrap/x.png"][width="12"][alt="fechar"]', {
-                onclick: ctrl.displayNotification.toggle
+                onclick: vnode.state.displayNotification.toggle
             }),
-            m('.fontsize-small', m.trust(args.message))
-        ]) : m('span'));
+            m('.fontsize-small', m.trust(vnode.attrs.message))
+        ]) : m('span');
     }
 };
 

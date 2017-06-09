@@ -18,15 +18,15 @@ import UserFollowCard from '../c/user-follow-card';
 import loadMoreBtn from '../c/load-more-btn';
 
 const userFriends = {
-    controller(args) {
+    oninit(vnode) {
         models.userFriend.pageSize(9);
 
         const userFriendVM = postgrest.filtersVM({ user_id: 'eq' }),
-            user = args.user,
+            user = vnode.attrs.user,
             friendListVM = postgrest.paginationVM(models.userFriend, 'following.asc,total_contributed_projects.desc', {
                 Prefer: 'count=exact'
             }),
-            allLoading = m.prop(false),
+            allLoading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             followAll = () => {
                 allLoading(true);
                 const l = postgrest.loaderWithToken(models.followAllFriends.postOptions({}));
@@ -49,8 +49,8 @@ const userFriends = {
             allLoading
         };
     },
-    view(ctrl, args) {
-        const listVM = ctrl.friendListVM;
+    view(vnode) {
+        const listVM = vnode.state.friendListVM;
         return m('.w-section.bg-gray.before-footer.section', [
             m('.w-container', [
                 m('.w-row.u-marginbottom-40.card.u-radius.card-terciary', [
@@ -58,14 +58,14 @@ const userFriends = {
                         m('.fontsize-small', 'Comece agora! Siga todos os seus amigos ou somente alguns deles para descobrir projetos juntos!')
                     ]),
                     m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [
-                            (ctrl.allLoading() ? h.loader()
+                            (vnode.state.allLoading() ? h.loader()
                              : m('a.w-button.btn.btn-medium', {
-                                 onclick: ctrl.followAll
+                                 onclick: vnode.state.followAll
                              }, `Siga todos os seus ${listVM.total() ? listVM.total() : ''} amigos`))
                     ])
                 ]),
                 m('.w-row', [
-                    _.map(listVM.collection(), friend => m.component(UserFollowCard, { friend })),
+                    _.map(listVM.collection(), friend => m(UserFollowCard, { friend })),
                 ]),
                 m('.w-section.section.bg-gray', [
                     m('.w-container', [
@@ -73,15 +73,14 @@ const userFriends = {
                             m('.w-col.w-col-5', [
                                 m('.u-marginright-20')
                             ]),
-                            m.component(loadMoreBtn, { collection: listVM }),
+                            m(loadMoreBtn, { collection: listVM }),
                             m('.w-col.w-col-5')
                         ])
                     ])
                 ])
 
             ])
-        ])
-      ;
+        ]);
     }
 };
 

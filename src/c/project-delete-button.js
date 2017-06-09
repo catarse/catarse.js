@@ -8,22 +8,22 @@ import modalBox from '../c/modal-box';
 import deleteProjectModalContent from '../c/delete-project-modal-content';
 
 const projectDeleteButton = {
-    controller(args) {
+    oninit(vnode) {
         const displayDeleteModal = h.toggleProp(false, true);
         return {
             displayDeleteModal
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('div', [
-            (ctrl.displayDeleteModal() ? m.component(modalBox, {
-                displayModal: ctrl.displayDeleteModal,
+            (vnode.state.displayDeleteModal() ? m(modalBox, {
+                displayModal: vnode.state.displayDeleteModal,
                 hideCloseButton: true,
-                content: [deleteProjectModalContent, { displayDeleteModal: ctrl.displayDeleteModal, project: args.project }]
+                content: [deleteProjectModalContent, { displayDeleteModal: vnode.state.displayDeleteModal, project: vnode.attrs.project }]
             }) : ''),
             m('.before-footer',
               m('.w-container',
-                m('a.btn.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button[href=\'javascript:void(0);\']', { onclick: ctrl.displayDeleteModal.toggle, style: { transition: 'all 0.5s ease 0s' } },
+                m('a.btn.btn-inline.btn-no-border.btn-small.btn-terciary.u-marginbottom-20.u-right.w-button[href=\'javascript:void(0);\']', { onclick: vnode.state.displayDeleteModal.toggle, style: { transition: 'all 0.5s ease 0s' } },
                     [
                         m.trust('&nbsp;'),
                         'Deletar projeto ',

@@ -9,20 +9,20 @@ import rewardVM from '../vms/reward-vm';
 import popNotification from '../c/pop-notification';
 
 const posts = {
-    controller(args) {
+    oninit(vnode) {
         let deleteFormSubmit;
-        const showPreview = m.prop(false),
-            showSuccess = m.prop(false),
-            showError = m.prop(false),
-            titleHasError = m.prop(false),
-            commentHasError = m.prop(false),
-            projectPosts = m.prop(),
+        const showPreview = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            showSuccess = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            showError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            titleHasError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            commentHasError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            projectPosts = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
             loader = postgrest.loaderWithToken,
-            errors = m.prop(''),
+            errors = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
             fields = {
-                title: m.prop(''),
-                comment_html: m.prop(''),
-                reward_id: m.prop('-1')
+                title: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+                comment_html: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+                reward_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop('-1')
             },
             filterVM = postgrest.filtersVM({
                 project_id: 'eq'
@@ -56,8 +56,8 @@ const posts = {
                 }
                 return false;
             },
-            project_id = args.project_id,
-            projectDetails = m.prop([]),
+            project_id = vnode.attrs.project_id,
+            projectDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             rewardText = (rewardId) => {
                 const reward = _.find(rewardVM.rewards(), r => String(r.id) === String(rewardId));
                 return `Apoiadores da recompensa R$${reward.minimum_value} - ${reward.title ? reward.title : `${reward.description.substring(0, 70)}...`}`;
@@ -74,10 +74,10 @@ const posts = {
                 }
                 return '...';
             },
-            toDeletePost = m.prop(-1),
+            toDeletePost = console.warn("m.prop has been removed from mithril 1.0") || m.prop(-1),
             deletePost = post => () => {
                 toDeletePost(post.id);
-                m.redraw(true);
+                console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
                 deleteFormSubmit();
                 return false;
             },
@@ -122,31 +122,31 @@ const posts = {
             openedPercentage
         };
     },
-    view(ctrl) {
-        const project = _.first(ctrl.projectDetails()),
+    view(vnode) {
+        const project = _.first(vnode.state.projectDetails()),
             paidRewards = _.filter(rewardVM.rewards(), reward => reward.paid_count > 0);
 
-        return (project ? m('.project-posts',
-            (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
-                project: m.prop(project)
+        return project ? m('.project-posts',
+            (project.is_owner_or_admin ? m(projectDashboardMenu, {
+                project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(project)
             }) : ''),
-            ctrl.showPreview() ? m.component(postsPreview, {
-                showError: ctrl.showError,
-                showSuccess: ctrl.showSuccess,
-                errors: ctrl.errors,
-                showPreview: ctrl.showPreview,
-                project_id: ctrl.project_id,
-                comment_html: ctrl.fields.comment_html,
-                title: ctrl.fields.title,
-                reward_id: ctrl.fields.reward_id(),
-                rewardText: ctrl.fields.reward_id() >= 1 ? ctrl.rewardText(ctrl.fields.reward_id()) : null
+            vnode.state.showPreview() ? m(postsPreview, {
+                showError: vnode.state.showError,
+                showSuccess: vnode.state.showSuccess,
+                errors: vnode.state.errors,
+                showPreview: vnode.state.showPreview,
+                project_id: vnode.state.project_id,
+                comment_html: vnode.state.fields.comment_html,
+                title: vnode.state.fields.title,
+                reward_id: vnode.state.fields.reward_id(),
+                rewardText: vnode.state.fields.reward_id() >= 1 ? vnode.state.rewardText(vnode.state.fields.reward_id()) : null
             }) : [
                 m(`.w-section.section-product.${project.mode}`),
-                (ctrl.showSuccess() ? m.component(popNotification, {
+                (vnode.state.showSuccess() ? m(popNotification, {
                     message: 'Mensagem enviada com sucesso'
                 }) : ''),
-                (ctrl.showError() ? m.component(popNotification, {
-                    message: ctrl.errors(),
+                (vnode.state.showError() ? m(popNotification, {
+                    message: vnode.state.errors(),
                     error: true
                 }) : ''),
                 m('.dashboard-header.u-text-center',
@@ -182,7 +182,7 @@ const posts = {
                                         'Destinatários'
                                     ),
                                     m('select.positive.text-field.w-select', {
-                                        onchange: m.withAttr('value', ctrl.fields.reward_id)
+                                        onchange: m.withAttr('value', vnode.state.fields.reward_id)
                                     }, [
                                         m('option[value=\'-1\']', {
                                             selected: true
@@ -193,7 +193,7 @@ const posts = {
                                             'Todos os apoiadores'
                                         ),
                                         (_.map(paidRewards, reward => m(`option[value='${reward.id}']`,
-                                              ctrl.rewardText(reward.id)
+                                              vnode.state.rewardText(reward.id)
                                             )))
                                     ]),
                                     m('label.field-label.fontweight-semibold',
@@ -201,23 +201,23 @@ const posts = {
                                     ),
                                     m('input.positive.text-field.w-input[id=\'post_title\'][maxlength=\'256\'][type=\'text\']', {
                                         name: 'posts[title]',
-                                        value: ctrl.fields.title(),
-                                        onfocus: () => ctrl.titleHasError(false),
-                                        class: ctrl.titleHasError() ? 'error' : '',
-                                        onchange: m.withAttr('value', ctrl.fields.title)
+                                        value: vnode.state.fields.title(),
+                                        onfocus: () => vnode.state.titleHasError(false),
+                                        class: vnode.state.titleHasError() ? 'error' : '',
+                                        onchange: m.withAttr('value', vnode.state.fields.title)
                                     }),
                                     m('label.field-label.fontweight-semibold',
                                         'Texto'
                                     ),
                                     m('.preview-container.u-marginbottom-40', {
-                                        class: ctrl.commentHasError() ? 'error' : '',
-                                        onclick: () => ctrl.commentHasError(false)
-                                    }, h.redactor('posts[comment_html]', ctrl.fields.comment_html)),
+                                        class: vnode.state.commentHasError() ? 'error' : '',
+                                        onclick: () => vnode.state.commentHasError(false)
+                                    }, h.redactor('posts[comment_html]', vnode.state.fields.comment_html)),
                                     m('.u-marginbottom-20.w-row', [
                                         m('.w-col.w-col-3'),
                                         m('._w-sub-col.w-col.w-col-6',
                                             m('button.btn.btn-large', {
-                                                onclick: ctrl.togglePreview
+                                                onclick: vnode.state.togglePreview
                                             },
                                                 'Pré-visualizar'
                                             )
@@ -248,8 +248,8 @@ const posts = {
                                     ),
                                     m('.table-col.w-col.w-col-1')
                                 ]),
-                                (ctrl.projectPosts() ? m('.fontsize-small.table-inner', [
-                                    (_.map(ctrl.projectPosts(), post => m('.table-row.w-row', [
+                                (vnode.state.projectPosts() ? m('.fontsize-small.table-inner', [
+                                    (_.map(vnode.state.projectPosts(), post => m('.table-row.w-row', [
                                         m('.table-col.w-col.w-col-5', [
                                             m(`a.alt-link.fontsize-base[href='/projects/${project.project_id}/posts/${post.id}#posts'][target='_blank']`,
                                                     post.title
@@ -264,7 +264,7 @@ const posts = {
                                                 m('span.fontweight-semibold',
                                                         'Destinatários: '
                                                     ),
-                                                ctrl.showRecipientes(post)
+                                                vnode.state.showRecipientes(post)
                                             ])
                                         ]),
                                         m('.table-col.u-text-center.w-col.w-col-3',
@@ -275,19 +275,19 @@ const posts = {
                                         m('.table-col.u-text-center.w-col.w-col-3',
                                                 m('.fontsize-base', [
                                                     post.open_count,
-                                                    m('span.fontcolor-secondary', ` (${ctrl.openedPercentage(post)}%)`)
+                                                    m('span.fontcolor-secondary', ` (${vnode.state.openedPercentage(post)}%)`)
                                                 ])
                                             ),
                                         m('.table-col.w-col.w-col-1',
                                                 m('button.btn.btn-no-border.btn-small.btn-terciary.fa.fa-lg.fa-trash', {
-                                                    onclick: ctrl.deletePost(post)
+                                                    onclick: vnode.state.deletePost(post)
                                                 })
                                             )
                                     ]))),
                                     m('form.w-hidden', {
-                                        action: `/pt/projects/${project.project_id}/posts/${ctrl.toDeletePost()}`,
+                                        action: `/pt/projects/${project.project_id}/posts/${vnode.state.toDeletePost()}`,
                                         method: 'POST',
-                                        config: ctrl.setPostDeletionForm
+                                        config: vnode.state.setPostDeletionForm
                                     }, [
                                         m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'),
                                         m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'),
@@ -300,7 +300,7 @@ const posts = {
                         m('.w-col.w-col-1')
                     ])
                 ))
-            ]) : h.loader());
+            ]) : h.loader();
     }
 };
 

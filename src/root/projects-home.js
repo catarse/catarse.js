@@ -14,7 +14,7 @@ import UnsignedFriendFacebookConnect from '../c/unsigned-friend-facebook-connect
 const I18nScope = _.partial(h.i18nScope, 'projects.home');
 
 const projectsHome = {
-    controller(args) {
+    oninit(vnode) {
         const sample6 = _.partial(_.sample, _, 6),
             loader = postgrest.loaderWithToken,
             project = models.project,
@@ -38,7 +38,7 @@ const projectsHome = {
         const collections = _.map(['score', 'contributed_by_friends'], (name) => {
             const f = filters[name],
                 cLoader = loader(project.getPageOptions(_.extend({}, { order: 'score.desc' }, f.filter.parameters()))),
-                collection = m.prop([]);
+                collection = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]);
 
             cLoader.load().then(_.compose(collection, sample6));
 
@@ -57,8 +57,8 @@ const projectsHome = {
             hasFBAuth
         };
     },
-    view(ctrl) {
-        const slides = () => _.map(ctrl.slidesContent, (slide) => {
+    view(vnode) {
+        const slides = () => _.map(vnode.state.slidesContent, (slide) => {
             const customStyle = `background-image: url(${slide.image});`;
             const content = m('.w-container.u-text-center', [
                 m('.w-row.u-marginbottom-40', [
@@ -75,25 +75,22 @@ const projectsHome = {
         });
 
         return m('#projects-home-component', { config: h.setPageTitle(I18n.t('header_html', I18nScope())) }, [
-            // m.component(menu, {transparent: true}),
-            m.component(slider, {
+            m(slider, {
                 slides: slides(),
                 effect: 'fade',
                 slideClass: 'hero-slide start',
                 wrapperClass: 'hero-full hero-full-slide',
                 sliderTime: 10000
             }),
-            _.map(ctrl.collections, collection => m.component(projectRow, {
+            _.map(vnode.state.collections, collection => m(projectRow, {
                 collection,
                 title: collection.title,
                 ref: `home_${(collection.hash === 'all' ? 'score' : collection.hash)}`,
                 showFriends: collection.showFriends
             })),
             // m.component(contributionActivities),
-            (!ctrl.hasFBAuth ? m.component(UnsignedFriendFacebookConnect, { largeBg: true }) : ''),
-            m.component(blogBanner)
-            // m.component(footer, {expanded: true}),
-            // m.component(contributionActivities)
+            (!vnode.state.hasFBAuth ? m(UnsignedFriendFacebookConnect, { largeBg: true }) : ''),
+            m(blogBanner)
         ]);
     }
 };

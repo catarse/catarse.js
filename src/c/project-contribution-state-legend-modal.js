@@ -6,7 +6,7 @@ import h from '../h';
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions_report.legend_labels');
 
 const ProjectContributionStateLegendModal = {
-    controller(args) {
+    oninit(vnode) {
         const translate = path => I18n.t(path, I18nScope());
 
         return {
@@ -59,8 +59,8 @@ const ProjectContributionStateLegendModal = {
             }
         };
     },
-    view(ctrl, args) {
-        const project = _.first(args.project()),
+    view(vnode) {
+        const project = _.first(vnode.attrs.project()),
             project_stage = (project.state == 'waiting_funds' ? 'online' : project.state);
 
         return m('div', [
@@ -68,7 +68,7 @@ const ProjectContributionStateLegendModal = {
                 m('.fontsize-large.u-text-center',
                   'Status do apoio')
             ]),
-            m('.modal-dialog-content', _.map(ctrl.stages[project_stage], (item, i) => m('.u-marginbottom-20', [
+            m('.modal-dialog-content', _.map(vnode.state.stages[project_stage], (item, i) => m('.u-marginbottom-20', [
                 m('.fontsize-small.fontweight-semibold', [
                     m(`span${item.i_class}`),
                     `  ${item.label}`

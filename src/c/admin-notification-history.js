@@ -13,8 +13,8 @@ import h from '../h';
 import models from '../models';
 
 const adminNotificationHistory = {
-    controller(args) {
-        const notifications = m.prop([]),
+    oninit(vnode) {
+        const notifications = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             getNotifications = (user) => {
                 const notification = models.notification;
                 notification.getPageWithToken(postgrest.filtersVM({
@@ -30,16 +30,16 @@ const adminNotificationHistory = {
                 .then(notifications);
             };
 
-        getNotifications(args.user);
+        getNotifications(vnode.attrs.user);
 
         return {
             notifications
         };
     },
-    view(ctrl) {
+    view(vnode) {
         return m('.w-col.w-col-4', [
             m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Histórico de notificações'),
-            ctrl.notifications().map(cEvent => m('.w-row.fontsize-smallest.lineheight-looser.date-event', [
+            vnode.state.notifications().map(cEvent => m('.w-row.fontsize-smallest.lineheight-looser.date-event', [
                 m('.w-col.w-col-24', [
                     m('.fontcolor-secondary', h.momentify(cEvent.sent_at, 'DD/MM/YYYY, HH:mm'),
                           ' - ', m(`a[target="blank"][href="/notifications/${cEvent.relation}/${cEvent.id}"]`, cEvent.template_name), cEvent.origin ? ` - ${cEvent.origin}` : '')

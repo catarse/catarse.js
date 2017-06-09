@@ -6,7 +6,7 @@ import adminContributionUser from './admin-contribution-user';
 import paymentStatus from './payment-status';
 
 const adminContributionItem = {
-    controller() {
+    oninit() {
         return {
             itemBuilder: [{
                 component: adminContributionUser,
@@ -23,13 +23,13 @@ const adminContributionItem = {
             }]
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m(
             '.w-row',
-            _.map(ctrl.itemBuilder, panel => m(panel.wrapperClass, [
-                m.component(panel.component, {
-                    item: args.item,
-                    key: args.key
+            _.map(vnode.state.itemBuilder, panel => m(panel.wrapperClass, [
+                m(panel.component, {
+                    item: vnode.attrs.item,
+                    key: vnode.attrs.key
                 })
             ]))
         );

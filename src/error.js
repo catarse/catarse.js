@@ -4,9 +4,9 @@ import inlineError from './c/inline-error';
 // TODO: Define error pattern that comes from server-side and allow the lib
 // to define what fields are coming with errors from the back-end
 const generateErrorInstance = () => {
-    const fields = m.prop([]);
-    const submissionError = m.prop(false);
-    const submissionErrorMsg = m.prop('');
+    const fields = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]);
+    const submissionError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
+    const submissionErrorMsg = console.warn("m.prop has been removed from mithril 1.0") || m.prop('');
     const fieldIdxValue = (fieldName, idx, initialValue) => _.reduce(fields(), (memo, field) => field[0] === fieldName ? field[idx] : memo, initialValue);
 
     const setError = (fieldName, flag) => {

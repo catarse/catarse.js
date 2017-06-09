@@ -3,11 +3,11 @@ import h from '../h';
 import adminUser from './admin-user';
 
 const adminUserItem = {
-    view(ctrl, args) {
+    view(vnode) {
         return m(
             '.w-row', [
                 m('.w-col.w-col-4', [
-                    m.component(adminUser, args)
+                    m(adminUser, vnode.attrs)
                 ])
             ]
         );

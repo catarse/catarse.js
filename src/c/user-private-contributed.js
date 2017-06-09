@@ -8,13 +8,13 @@ import inlineError from './inline-error';
 import userContributedBox from './user-contributed-box';
 
 const userPrivateContributed = {
-    controller(args) {
-        const user_id = args.userId,
+    oninit(vnode) {
+        const user_id = vnode.attrs.userId,
             onlinePages = postgrest.paginationVM(models.userContribution),
             successfulPages = postgrest.paginationVM(models.userContribution),
             failedPages = postgrest.paginationVM(models.userContribution),
-            error = m.prop(false),
-            loader = m.prop(true),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            loader = console.warn("m.prop has been removed from mithril 1.0") || m.prop(true),
             handleError = () => {
                 error(true);
                 loader(false);
@@ -54,14 +54,14 @@ const userPrivateContributed = {
             loader
         };
     },
-    view(ctrl, args) {
-        const onlineCollection = ctrl.onlinePages.collection(),
-            successfulCollection = ctrl.successfulPages.collection(),
-            failedCollection = ctrl.failedPages.collection();
+    view(vnode) {
+        const onlineCollection = vnode.state.onlinePages.collection(),
+            successfulCollection = vnode.state.successfulPages.collection(),
+            failedCollection = vnode.state.failedPages.collection();
 
-        return m('.content[id=\'private-contributed-tab\']', ctrl.error() ? m.component(inlineError, {
+        return m('.content[id=\'private-contributed-tab\']', vnode.state.error() ? m(inlineError, {
             message: 'Erro ao carregar os projetos.'
-        }) : ctrl.loader() ? h.loader() :
+        }) : vnode.state.loader() ? h.loader() :
             (_.isEmpty(onlineCollection) && _.isEmpty(successfulCollection) && _.isEmpty(failedCollection)) ?
             m('.w-container',
                 m('.w-row.u-margintop-30.u-text-center', [
@@ -76,9 +76,9 @@ const userPrivateContributed = {
                             m('.w-col.w-col-3'),
                             m('.w-col.w-col-6',
                                 m('a.btn.btn-large[href=\'/pt/explore\']', {
-                                    config: m.route,
+                                    oncreate: m.route.link,
                                     onclick: () => {
-                                        m.route('/explore');
+                                        m.route.set('/explore');
                                     }
                                 },
                                     'Apoie agora!'
@@ -91,20 +91,20 @@ const userPrivateContributed = {
                 ])
             ) :
             [
-                m.component(userContributedBox, {
+                m(userContributedBox, {
                     title: 'Projetos em andamento',
                     collection: onlineCollection,
-                    pagination: ctrl.onlinePages
+                    pagination: vnode.state.onlinePages
                 }),
-                m.component(userContributedBox, {
+                m(userContributedBox, {
                     title: 'Projetos bem-sucedidos',
                     collection: successfulCollection,
-                    pagination: ctrl.successfulPages
+                    pagination: vnode.state.successfulPages
                 }),
-                m.component(userContributedBox, {
+                m(userContributedBox, {
                     title: 'Projetos não-financiados',
                     collection: failedCollection,
-                    pagination: ctrl.failedPages
+                    pagination: vnode.state.failedPages
                 }),
 
             ]);

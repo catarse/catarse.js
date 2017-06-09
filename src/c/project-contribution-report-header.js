@@ -7,8 +7,8 @@ import FilterMain from '../c/filter-main';
 const I18nScope = _.partial(h.i18nScope, 'projects.dashboard_contribution_reports');
 
 const projectContributionReportHeader = {
-    view(ctrl, args) {
-        const filterBuilder = args.filterBuilder,
+    view(vnode) {
+        const filterBuilder = vnode.attrs.filterBuilder,
             paymentStateFilter = _.findWhere(filterBuilder, {
                 label: 'payment_state'
             }),
@@ -21,9 +21,9 @@ const projectContributionReportHeader = {
             mainFilter = _.findWhere(filterBuilder, {
                 component: FilterMain
             }),
-            project_id = args.filterVM.project_id();
+            project_id = vnode.attrs.filterVM.project_id();
 
-        rewardFilter.data.options = args.mapRewardsToOptions();
+        rewardFilter.data.options = vnode.attrs.mapRewardsToOptions();
 
         return m('.w-section.dashboard-header',
             m('.w-container', [
@@ -41,20 +41,20 @@ const projectContributionReportHeader = {
                 ),
                 m('.w-form', [
                     m('form', {
-                        onsubmit: args.submit
+                        onsubmit: vnode.attrs.submit
                     },
                         m('.w-row', [
                             m('.w-col.w-col-8',
                                 m('.w-row', [
-                                    m.component(paymentStateFilter.component, paymentStateFilter.data),
-                                    m.component(rewardFilter.component, rewardFilter.data),
-                                    m.component(deliveryFilter.component, deliveryFilter.data)
+                                    m(paymentStateFilter.component, paymentStateFilter.data),
+                                    m(rewardFilter.component, rewardFilter.data),
+                                    m(deliveryFilter.component, deliveryFilter.data)
                                 ])
                             ),
 
                             m('.w-col.w-col-4',
                                 m('.u-margintop-20.w-row', [
-                                    m.component(mainFilter.component, mainFilter.data)
+                                    m(mainFilter.component, mainFilter.data)
                                 ])
                             )
                         ])

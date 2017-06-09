@@ -4,17 +4,17 @@ import m from 'mithril';
 import models from '../models';
 import h from '../h';
 
-const error = m.prop(''),
-    rewards = m.prop([]),
-    states = m.prop([]),
-    fees = m.prop([]),
+const error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    rewards = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+    states = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+    fees = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
     noReward = {
         id: -1,
         description: 'Obrigado. Eu só quero ajudar o projeto.',
         minimum_value: 10
     },
-    contributionValue = m.prop(`${noReward.minimum_value},00`),
-    selectedReward = m.prop(noReward),
+    contributionValue = console.warn("m.prop has been removed from mithril 1.0") || m.prop(`${noReward.minimum_value},00`),
+    selectedReward = console.warn("m.prop has been removed from mithril 1.0") || m.prop(noReward),
     vm = postgrest.filtersVM({
         project_id: 'eq'
     });
@@ -45,7 +45,7 @@ const getSelectedReward = () => {
         const contribution = JSON.parse(data);
 
         selectedReward(contribution.reward);
-        m.redraw(true);
+        console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
 
         return selectedReward;
     }
@@ -74,7 +74,7 @@ const getStates = () => {
 };
 
 const locationOptions = (reward, destination) => {
-    const options = m.prop([]),
+    const options = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
         mapStates = _.map(states(), (state) => {
             let fee;
             const feeState = _.findWhere(fees(), {

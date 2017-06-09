@@ -8,15 +8,15 @@ import userContributed from '../c/user-contributed';
 import userAbout from '../c/user-about';
 
 const usersShow = {
-    controller(args) {
-        const userDetails = m.prop({}),
-            user_id = args.user_id.split('-')[0],
-            hash = m.prop(window.location.hash),
+    oninit(vnode) {
+        const userDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
+            user_id = vnode.attrs.user_id.split('-')[0],
+            hash = console.warn("m.prop has been removed from mithril 1.0") || m.prop(window.location.hash),
             displayTabContent = (user) => {
                 const tabs = {
-                    '#created': m.component(userCreated, { userId: user.id }),
-                    '#contributed': m.component(userContributed, { userId: user.id }),
-                    '#about': m.component(userAbout, { userId: user.id })
+                    '#created': m(userCreated, { userId: user.id }),
+                    '#contributed': m(userContributed, { userId: user.id }),
+                    '#about': m(userAbout, { userId: user.id })
                 };
 
                 hash(window.location.hash);
@@ -47,18 +47,18 @@ const usersShow = {
             userDetails
         };
     },
-    view(ctrl, args) {
-        const user = ctrl.userDetails();
+    view(vnode) {
+        const user = vnode.state.userDetails();
 
         return m('div', [
-            m.component(userHeader, { user }),
+            m(userHeader, { user }),
 
             m('nav.project-nav.u-text-center.u-marginbottom-30.profile', { style: { 'z-index': '10', position: 'relative' } },
               m('.w-container[data-anchor=\'created\']',
                   [
                     (!_.isEmpty(user) ?
                      (user.is_owner_or_admin ?
-                      m(`a.dashboard-nav-link.dashboard[href=\'/pt/users/${user.id}/edit\']`, { config: m.route,
+                      m(`a.dashboard-nav-link.dashboard[href=\'/pt/users/${user.id}/edit\']`, { oncreate: m.route.link,
                           onclick: () => {
                               m.route(`/users/edit/${user.id}`, { user_id: user.id });
                           } },
@@ -68,7 +68,7 @@ const usersShow = {
                               ' Editar perfil'
                           ]
                       ) : '') : h.loader()),
-                      m(`a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#contributed' ? 'selected' : '')}\']`,
+                      m(`a[data-target=\'#contributed-tab\'][href=\'#contributed\'][id=\'contributed_link\'][class=\'dashboard-nav-link ${(vnode.state.hash() === '#contributed' ? 'selected' : '')}\']`,
                           [
                               'Apoiados ',
                               m.trust('&nbsp;'),
@@ -77,7 +77,7 @@ const usersShow = {
                               )
                           ]
                       ),
-                      m(`a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#created' ? 'selected' : '')}\']`,
+                      m(`a[data-target=\'#created-tab\'][href=\'#created\'][id=\'created_link\'][class=\'dashboard-nav-link ${(vnode.state.hash() === '#created' ? 'selected' : '')}\']`,
                           [
                               'Criados ',
                               m.trust('&nbsp;'),
@@ -86,7 +86,7 @@ const usersShow = {
                               )
                           ]
                       ),
-                      m(`a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ${(ctrl.hash() === '#about' ? 'selected' : '')}\']`,
+                      m(`a[data-target=\'#about-tab\'][href=\'#about\'][id=\'about_link\'][class=\'dashboard-nav-link ${(vnode.state.hash() === '#about' ? 'selected' : '')}\']`,
                           'Sobre'
                       )
                   ]
@@ -95,7 +95,7 @@ const usersShow = {
 
             m('section.section',
               m('.w-container',
-                  m('.w-row', user.id ? ctrl.displayTabContent(user) : h.loader())
+                  m('.w-row', user.id ? vnode.state.displayTabContent(user) : h.loader())
               )
           )
         ]);

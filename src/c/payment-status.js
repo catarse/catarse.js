@@ -6,8 +6,8 @@ import h from '../h';
 const I18nScope = _.partial(h.i18nScope, 'projects.payment');
 
 const paymentStatus = {
-    controller(args) {
-        const payment = args.item;
+    oninit(vnode) {
+        const payment = vnode.attrs.item;
         let card = null,
             displayPaymentMethod,
             paymentMethodClass,
@@ -80,18 +80,18 @@ const paymentStatus = {
             stateClass
         };
     },
-    view(ctrl, args) {
-        const payment = args.item;
+    view(vnode) {
+        const payment = vnode.attrs.item;
 
         return m('.w-row.payment-status', [
             m('.fontsize-smallest.lineheight-looser.fontweight-semibold', [
-                m(`span.fa.fa-circle${ctrl.stateClass()}`), ` ${I18n.t(payment.state, I18nScope())}`
+                m(`span.fa.fa-circle${vnode.state.stateClass()}`), ` ${I18n.t(payment.state, I18nScope())}`
             ]),
             m('.fontsize-smallest.fontweight-semibold', [
-                m(`span.fa${ctrl.paymentMethodClass()}`), ' ', m('a.link-hidden[href="#"]', payment.payment_method)
+                m(`span.fa${vnode.state.paymentMethodClass()}`), ' ', m('a.link-hidden[href="#"]', payment.payment_method)
             ]),
             m('.fontsize-smallest.fontcolor-secondary.lineheight-tight', [
-                ctrl.displayPaymentMethod()
+                vnode.state.displayPaymentMethod()
             ])
         ]);
     }

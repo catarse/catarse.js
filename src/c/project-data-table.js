@@ -27,9 +27,9 @@ import models from '../models';
 import h from '../h';
 
 const projectDataTable = {
-    controller(args) {
-        const table = m.prop(args.table),
-            sortIndex = m.prop(-1);
+    oninit(vnode) {
+        const table = console.warn("m.prop has been removed from mithril 1.0") || m.prop(vnode.attrs.table),
+            sortIndex = console.warn("m.prop has been removed from mithril 1.0") || m.prop(-1);
 
         const comparator = (a, b) => {
             let idx = sortIndex(),
@@ -59,10 +59,10 @@ const projectDataTable = {
             table(_.union([header], body));
         };
 
-        sortTable(Math.abs(args.defaultSortIndex) || 0);
+        sortTable(Math.abs(vnode.attrs.defaultSortIndex) || 0);
 
-        if (args.defaultSortIndex < 0) {
-            sortTable(Math.abs(args.defaultSortIndex) || 0);
+        if (vnode.attrs.defaultSortIndex < 0) {
+            sortTable(Math.abs(vnode.attrs.defaultSortIndex) || 0);
         }
 
         return {
@@ -70,13 +70,13 @@ const projectDataTable = {
             sortTable
         };
     },
-    view(ctrl, args) {
-        const header = _.first(ctrl.table()),
-            body = _.rest(ctrl.table());
+    view(vnode) {
+        const header = _.first(vnode.state.table()),
+            body = _.rest(vnode.state.table());
         return m('.table-outer.u-marginbottom-60', [
             m('.w-row.table-row.fontweight-semibold.fontsize-smaller.header',
                 _.map(header, (heading, idx) => {
-                    const sort = () => ctrl.sortTable(idx);
+                    const sort = () => vnode.state.sortTable(idx);
                     return m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.table-col', [
                         m('a.link-hidden[href="javascript:void(0);"]', {
                             onclick: sort

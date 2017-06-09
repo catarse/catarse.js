@@ -7,22 +7,22 @@ import models from '../models';
 import adminUserBalanceTransactionsList from './admin-user-balance-transactions-list';
 
 const adminBalanceTransferItemDetail = {
-    controller(args) {
-        const userBankAccount = m.prop(null),
-              metadata = args.item.last_transition_metadata || {transfer_data: {}},
+    oninit(vnode) {
+        const userBankAccount = console.warn("m.prop has been removed from mithril 1.0") || m.prop(null),
+              metadata = vnode.attrs.item.last_transition_metadata || {transfer_data: {}},
               transferData = metadata.transfer_data || {},
               metaBank = transferData.bank_account,
-              userBalance = m.prop({}),
-              transitionBankAccount = m.prop({}),
+              userBalance = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
+              transitionBankAccount = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
               fields = {
-                  admin_notes: m.prop(args.item.admin_notes)
+                  admin_notes: console.warn("m.prop has been removed from mithril 1.0") || m.prop(vnode.attrs.item.admin_notes)
               },
-              loadingNotes = m.prop(false),
+              loadingNotes = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
               submitNotes = () => {
                   loadingNotes(true);
                   m.request({
                       method: 'PUT',
-                      url: `/admin/balance_transfers/${args.item.id}`,
+                      url: `/admin/balance_transfers/${vnode.attrs.item.id}`,
                       data: {
                           balance_transfer: {
                               admin_notes: fields.admin_notes()
@@ -52,7 +52,7 @@ const adminBalanceTransferItemDetail = {
             }
         }
 
-        userVM.getUserBankAccount(args.item.user_id).then(_.compose(userBankAccount, _.first));
+        userVM.getUserBankAccount(vnode.attrs.item.user_id).then(_.compose(userBankAccount, _.first));
 
         return {
             metaBank,
@@ -65,8 +65,8 @@ const adminBalanceTransferItemDetail = {
         };
     },
 
-    view(ctrl, args) {
-        let bankAccount = (_.isUndefined(ctrl.metaBank) ? ctrl.userBankAccount() : ctrl.transitionBankAccount());
+    view(vnode) {
+        let bankAccount = (_.isUndefined(vnode.state.metaBank) ? vnode.state.userBankAccount() : vnode.state.transitionBankAccount());
 
         return m('#admin-balance-transfer-item-detail-box', [
             m('.divider.u-margintop-20.u-marginbottom-20'),
@@ -87,19 +87,19 @@ const adminBalanceTransferItemDetail = {
                         bankAccount.owner_document
                     ])
                     ] : h.loader()),
-                    (ctrl.loadingNotes() ? h.loader() : m('', [
+                    (vnode.state.loadingNotes() ? h.loader() : m('', [
                         m('textarea.text-field.height-mini.w-input', {
-                            value: ctrl.fields.admin_notes(),
-                            onkeydown: m.withAttr('value', ctrl.fields.admin_notes)
+                            value: vnode.state.fields.admin_notes(),
+                            onkeydown: m.withAttr('value', vnode.state.fields.admin_notes)
                         }),
                         m('.u-text-center',
                           m('button.btn.btn-terciary', {
-                              onclick: ctrl.submitNotes
+                              onclick: vnode.state.submitNotes
                           }, I18n.t('shared.save_text'))
                          )
                     ]))
                 ]),
-                m(adminUserBalanceTransactionsList, {user_id: args.item.user_id})
+                m(adminUserBalanceTransactionsList, {user_id: vnode.attrs.item.user_id})
             ])
         ]);
     }

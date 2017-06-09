@@ -18,10 +18,10 @@ const I18nScope = _.partial(h.i18nScope, 'projects.dashboard_nav');
 const linksScope = _.partial(h.i18nScope, 'projects.dashboard_nav_links');
 
 const projectDashboardMenu = {
-    controller(args) {
+    oninit(vnode) {
         const body = document.getElementsByTagName('body')[0],
             editLinksToggle = h.toggleProp(true, false),
-            validating = m.prop(false),
+            validating = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             showPublish = h.toggleProp(true, false),
             bodyToggleForNav = h.toggleProp('body-project open', 'body-project closed'),
             validatePublish = () => {
@@ -29,11 +29,11 @@ const projectDashboardMenu = {
                 m.redraw();
                 m.request({
                     method: 'GET',
-                    url: `/projects/${args.project().project_id}/validate_publish`,
+                    url: `/projects/${vnode.attrs.project().project_id}/validate_publish`,
                     config: h.setCsrfToken
                 }).then(() => {
                     validating(false);
-                    window.location.href = (`/projects/${args.project().project_id}/publish`);
+                    window.location.href = (`/projects/${vnode.attrs.project().project_id}/publish`);
                     m.redraw();
                 }).catch((err) => {
                     validating(false);
@@ -51,11 +51,11 @@ const projectDashboardMenu = {
                 return project.large_image;
             };
 
-        if (args.project().is_published) {
+        if (vnode.attrs.project().is_published) {
             editLinksToggle.toggle(false);
         }
 
-        if (args.hidePublish) {
+        if (vnode.attrs.hidePublish) {
             showPublish.toggle(false);
         }
 
@@ -69,20 +69,20 @@ const projectDashboardMenu = {
             projectThumb
         };
     },
-    view(ctrl, args) {
-        const project = args.project(),
+    view(vnode) {
+        const project = vnode.attrs.project(),
             projectRoute = `/projects/${project.project_id}`,
             editRoute = `${projectRoute}/edit`,
             editLinkClass = hash => `dashboard-nav-link-left ${project.is_published ? 'indent' : ''} ${h.hashMatch(hash) ? 'selected' : ''}`;
         const optionalOpt = m('span.fontsize-smallest.fontcolor-secondary', ' (opcional)');
 
-        ctrl.body.className = ctrl.bodyToggleForNav();
+        vnode.state.body.className = vnode.state.bodyToggleForNav();
 
         return m('#project-nav', [
             m('.project-nav-wrapper', [
                 m('nav.w-section.dashboard-nav.side', [
                     m(`a#dashboard_preview_link.w-inline-block.dashboard-project-name[href="${project.is_published ? `/${project.permalink}` : `${editRoute}#preview`}"]`, [
-                        m(`img.thumb-project-dashboard[src="${project ? ctrl.projectThumb(project) : '/assets/thumb-project.png'}"][width="114"]`),
+                        m(`img.thumb-project-dashboard[src="${project ? vnode.state.projectThumb(project) : '/assets/thumb-project.png'}"][width="114"]`),
                         m('.fontcolor-negative.lineheight-tight.fontsize-small', project.name),
                         m(`img.u-margintop-10[src="/assets/catarse_bootstrap/badge-${project.mode}-h.png"][width=80]`)
 
@@ -105,10 +105,10 @@ const projectDashboardMenu = {
                     ]),
                     m('.edit-project-div', [
                         (!project.is_published ? '' : m('button#toggle-edit-menu.dashboard-nav-link-left', {
-                            onclick: ctrl.editLinksToggle.toggle
+                            onclick: vnode.state.editLinksToggle.toggle
                         }, [
                             m('span.fa.fa-pencil.fa-fw.fa-lg'), I18n.t('edit_project', I18nScope())
-                        ])), (ctrl.editLinksToggle() ? m('#edit-menu-items', [
+                        ])), (vnode.state.editLinksToggle() ? m('#edit-menu-items', [
                             m('#dashboard-links', [
                                 ((!project.is_published || project.is_admin_role) ? [
                                     m(`a#basics_link[class="${editLinkClass('#basics')}"][href="${editRoute}#basics"]`, railsErrorsVM.errorsFor('basics'), I18n.t('basics_tab', linksScope())),
@@ -133,18 +133,18 @@ const projectDashboardMenu = {
                                 ] : '')
                             ])
                         ]) : ''),
-                        ((!project.is_published && ctrl.showPublish()) ? [
-                            (ctrl.validating() ? h.loader() :
+                        ((!project.is_published && vnode.state.showPublish()) ? [
+                            (vnode.state.validating() ? h.loader() :
                                 m('.btn-send-draft-fixed',
                                     (project.mode === 'aon' ? [
                                         (project.state === 'draft' ? m('button.btn.btn-medium', {
-                                            onclick: ctrl.validatePublish
+                                            onclick: vnode.state.validatePublish
                                         }, [
                                             I18n.t('publish', I18nScope()), m.trust('&nbsp;&nbsp;'), m('span.fa.fa-chevron-right')
                                         ]) : '')
                                     ] : [
                                         (project.state === 'draft' ? m('button.btn.btn-medium', {
-                                            onclick: ctrl.validatePublish
+                                            onclick: vnode.state.validatePublish
                                         }, [
                                             I18n.t('publish', I18nScope()), m.trust('&nbsp;&nbsp;'), m('span.fa.fa-chevron-right')
                                         ]) : '')
@@ -160,7 +160,7 @@ const projectDashboardMenu = {
                 ]),
             ]),
             m('a.btn-dashboard href="javascript:void(0);"', {
-                onclick: ctrl.bodyToggleForNav.toggle
+                onclick: vnode.state.bodyToggleForNav.toggle
             }, [
                 m('span.fa.fa-bars.fa-lg')
             ])

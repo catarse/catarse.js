@@ -12,15 +12,15 @@ import h from '../h';
 import models from '../models';
 
 const UserFollowBtn = {
-    controller(args) {
-        const following = m.prop((args.following || false)),
+    oninit(vnode) {
+        const following = console.warn("m.prop has been removed from mithril 1.0") || m.prop((vnode.attrs.following || false)),
             followVM = postgrest.filtersVM({ follow_id: 'eq' }),
-            loading = m.prop(false),
-            hover = m.prop(false),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            hover = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             userFollowInsert = models.userFollow.postOptions({
-                follow_id: args.follow_id }),
+                follow_id: vnode.attrs.follow_id }),
             userFollowDelete = (() => {
-                followVM.follow_id(args.follow_id);
+                followVM.follow_id(vnode.attrs.follow_id);
 
                 return models.userFollow.deleteOptions(
                       followVM.parameters());
@@ -52,22 +52,22 @@ const UserFollowBtn = {
             hover
         };
     },
-    view(ctrl, args) {
-        if (h.userSignedIn() && h.getUserID() != args.follow_id) {
-            let disableClass = args.disabledClass || '.w-button.btn.btn-medium.btn-terciary.u-margintop-20',
-                enabledClass = args.enabledClass || '.w-button.btn.btn-medium.u-margintop-20';
-            if (ctrl.loading()) { return h.loader(); }
-            if (ctrl.following()) {
+    view(vnode) {
+        if (h.userSignedIn() && h.getUserID() != vnode.attrs.follow_id) {
+            let disableClass = vnode.attrs.disabledClass || '.w-button.btn.btn-medium.btn-terciary.u-margintop-20',
+                enabledClass = vnode.attrs.enabledClass || '.w-button.btn.btn-medium.u-margintop-20';
+            if (vnode.state.loading()) { return h.loader(); }
+            if (vnode.state.following()) {
                 return m(`a${enabledClass}`,
                     {
-                        onclick: ctrl.unfollow,
-                        onmouseover: () => ctrl.hover(true),
-                        onmouseout: () => ctrl.hover(false)
+                        onclick: vnode.state.unfollow,
+                        onmouseover: () => vnode.state.hover(true),
+                        onmouseout: () => vnode.state.hover(false)
                     },
-                         (ctrl.hover() ? 'Deixar de seguir' : 'Seguindo'));
+                         (vnode.state.hover() ? 'Deixar de seguir' : 'Seguindo'));
             }
             return m(`a${disableClass}`,
-                         { onclick: ctrl.follow },
+                         { onclick: vnode.state.follow },
                          'Seguir');
         }
         return m('');

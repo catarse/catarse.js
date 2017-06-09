@@ -4,12 +4,12 @@ import projectVM from './project-vm';
 import generateErrorInstance from '../error';
 
 const e = generateErrorInstance();
-const currentProject = m.prop({});
+const currentProject = console.warn("m.prop has been removed from mithril 1.0") || m.prop({});
 
 const fields = {
-    headline: m.prop(''),
-    uploaded_image: m.prop(''),
-    upload_files: m.prop(undefined)
+    headline: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    uploaded_image: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    upload_files: console.warn("m.prop has been removed from mithril 1.0") || m.prop(undefined)
 };
 
 const fillFields = (data) => {
@@ -36,7 +36,7 @@ const prepareForUpload = (event) => {
 
 const uploadImage = (project_id) => {
     if (_.isUndefined(fields.upload_files())) {
-        const deferred = m.deferred();
+        const deferred = console.warn("m.deferred has been removed from mithril 1.0") || m.deferred();
         deferred.resolve({});
         return deferred.promise;
     }

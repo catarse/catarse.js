@@ -9,8 +9,8 @@ import projectMain from '../c/project-main';
 import projectDashboardMenu from '../c/project-dashboard-menu';
 
 const projectsShow = {
-    controller(args) {
-        const { project_id, project_user_id } = args;
+    oninit(vnode) {
+        const { project_id, project_user_id } = vnode.attrs;
 
         if (project_id && !_.isNaN(Number(project_id))) {
             projectVM.init(project_id, project_user_id);
@@ -24,30 +24,30 @@ const projectsShow = {
     
         return projectVM;
     },
-    view(ctrl, args) {
-        const project = ctrl.currentProject;
+    view(vnode) {
+        const project = vnode.state.currentProject;
 
         return m('.project-show', {
-            config: ctrl.setProjectPageTitle()
+            config: vnode.state.setProjectPageTitle()
         }, project() ? [
-            m.component(projectHeader, {
+            m(projectHeader, {
                 project,
-                rewardDetails: ctrl.rewardDetails,
-                userDetails: ctrl.userDetails,
-                projectContributions: ctrl.projectContributions
+                rewardDetails: vnode.state.rewardDetails,
+                userDetails: vnode.state.userDetails,
+                projectContributions: vnode.state.projectContributions
             }),
-            m.component(projectTabs, {
+            m(projectTabs, {
                 project,
-                rewardDetails: ctrl.rewardDetails
+                rewardDetails: vnode.state.rewardDetails
             }),
-            m.component(projectMain, {
+            m(projectMain, {
                 project,
-                post_id: args.post_id,
-                rewardDetails: ctrl.rewardDetails,
-                userDetails: ctrl.userDetails,
-                projectContributions: ctrl.projectContributions
+                post_id: vnode.attrs.post_id,
+                rewardDetails: vnode.state.rewardDetails,
+                userDetails: vnode.state.userDetails,
+                projectContributions: vnode.state.projectContributions
             }),
-                (project() && project().is_owner_or_admin ? m.component(projectDashboardMenu, {
+                (project() && project().is_owner_or_admin ? m(projectDashboardMenu, {
                     project
                 }) : '')
         ] : h.loader());

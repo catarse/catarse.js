@@ -2,9 +2,9 @@ import m from 'mithril';
 import _ from 'underscore';
 
 const downloadReports = {
-    view(ctrl, args) {
-        const project = args.project(),
-            paidRewards = _.filter(args.rewards, reward => reward.paid_count > 0);
+    view(vnode) {
+        const project = vnode.attrs.project(),
+            paidRewards = _.filter(vnode.attrs.rewards, reward => reward.paid_count > 0);
 
         return m('section.min-height-70',
             m('.w-section',

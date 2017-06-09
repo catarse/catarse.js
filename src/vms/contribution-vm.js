@@ -3,7 +3,7 @@ import m from 'mithril';
 import _ from 'underscore';
 import models from '../models';
 
-const currentContribution = m.prop({});
+const currentContribution = console.warn("m.prop has been removed from mithril 1.0") || m.prop({});
 
 const getUserProjectContributions = (userId, projectId, states) => {
     const vm = postgrest.filtersVM({
@@ -28,7 +28,7 @@ const getCurrentContribution = () => {
     if (data) {
         currentContribution(JSON.parse(data));
 
-        m.redraw(true);
+        console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
 
         return currentContribution;
     }

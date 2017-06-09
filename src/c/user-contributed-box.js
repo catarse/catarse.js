@@ -10,7 +10,7 @@ import rewardReceiver from './reward-receiver';
 const I18nScope = _.partial(h.i18nScope, 'payment.state');
 
 const userContributedBox = {
-    controller() {
+    oninit() {
         const toggleDelivery = (projectId, contribution) => {
             userVM.toggleDelivery(projectId, contribution).then(() => {
                 const lastStatus = contribution.reward_sent_at ? 'delivered' : 'undelivered';
@@ -23,12 +23,12 @@ const userContributedBox = {
             toggleDelivery
         };
     },
-    view(ctrl, args) {
-        const collection = args.collection,
-            pagination = args.pagination,
-            title = args.title;
+    view(vnode) {
+        const collection = vnode.attrs.collection,
+            pagination = vnode.attrs.pagination,
+            title = vnode.attrs.title;
 
-        return (!_.isEmpty(collection) ? m('.section-one-column.u-marginbottom-30', [
+        return !_.isEmpty(collection) ? m('.section-one-column.u-marginbottom-30', [
             m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center',
                 title
             ),
@@ -116,7 +116,7 @@ const userContributedBox = {
 
                     m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [
                         m(`input.w-checkbox-input[id='anonymous'][name='anonymous'][type='checkbox']${contribution.anonymous ? '[checked=\'checked\']' : ''}[value='1']`, {
-                            onclick: () => ctrl.toggleAnonymous(contribution.project_id, contribution)
+                            onclick: () => vnode.state.toggleAnonymous(contribution.project_id, contribution)
                         }),
                         m('label.w-form-label',
                             'Quero que meu apoio não seja público'
@@ -157,7 +157,7 @@ const userContributedBox = {
                     cssClass: '.w-col-push-5'
                 })
             ])
-        ]) : m('div', ''));
+        ]) : m('div', '');
     }
 };
 

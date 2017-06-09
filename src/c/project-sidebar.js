@@ -13,8 +13,8 @@ import categoryTag from './category-tag';
 const I18nScope = _.partial(h.i18nScope, 'projects.project_sidebar');
 
 const projectSidebar = {
-    controller(args) {
-        const project = args.project,
+    oninit(vnode) {
+        const project = vnode.attrs.project,
             animateProgress = (el, isInitialized) => {
                 if (!isInitialized) {
                     let animation,
@@ -55,8 +55,8 @@ const projectSidebar = {
             displayShareBox: h.toggleProp(false, true)
         };
     },
-    view(ctrl, args) {
-        const project = args.project,
+    view(vnode) {
+        const project = vnode.attrs.project,
             elapsed = project().elapsed_time,
             remaining = project().remaining_time,
             displayCardClass = () => {
@@ -117,7 +117,7 @@ const projectSidebar = {
                         ])
                     ]),
                     m('.w-row', [
-                        m.component(projectMode, {
+                        m(projectMode, {
                             project
                         })
                     ])
@@ -133,29 +133,29 @@ const projectSidebar = {
 
                         }, I18n.t('submit', I18nScope()))
                     ]),
-                    m('.back-project-btn-row-right', m.component(projectReminder, {
+                    m('.back-project-btn-row-right', m(projectReminder, {
                         project,
                         type: 'link'
                     }))
                 ]) : ''),
                 m('.friend-backed-card.project-page', [
-                    (!_.isUndefined(project()) && project().contributed_by_friends ? m.component(projectFriends, { project: project(), wrapper: 'div' }) : '')
+                    (!_.isUndefined(project()) && project().contributed_by_friends ? m(projectFriends, { project: project(), wrapper: 'div' }) : '')
                 ]),
                 m(`div[class="fontsize-smaller u-marginbottom-30 ${displayCardClass()}"]`, displayStatusText())
             ]),
             m('.project-share.w-hidden-main.w-hidden-medium', [
-                m.component(addressTag, { project }),
-                m.component(categoryTag, { project }),
+                m(addressTag, { project }),
+                m(categoryTag, { project }),
                 m('.u-marginbottom-30.u-text-center-small-only', m('button.btn.btn-inline.btn-medium.btn-terciary', {
-                    onclick: ctrl.displayShareBox.toggle
+                    onclick: vnode.state.displayShareBox.toggle
                 }, 'Compartilhar este projeto')),
-                ctrl.displayShareBox() ? m(projectShareBox, {
+                vnode.state.displayShareBox() ? m(projectShareBox, {
                     project,
-                    displayShareBox: ctrl.displayShareBox
+                    displayShareBox: vnode.state.displayShareBox
                 }) : ''
             ]),
-            m('.user-c', m.component(projectUserCard, {
-                userDetails: args.userDetails,
+            m('.user-c', m(projectUserCard, {
+                userDetails: vnode.attrs.userDetails,
                 project
             }))
         ]);

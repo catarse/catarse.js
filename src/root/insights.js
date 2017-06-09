@@ -21,15 +21,15 @@ import projectInviteCard from '../c/project-invite-card';
 const I18nScope = _.partial(h.i18nScope, 'projects.insights');
 
 const insights = {
-    controller(args) {
+    oninit(vnode) {
         const filtersVM = postgrest.filtersVM({
                 project_id: 'eq'
             }),
             displayModal = h.toggleProp(false, true),
-            projectDetails = m.prop([]),
-            contributionsPerDay = m.prop([]),
-            visitorsTotal = m.prop(0),
-            visitorsPerDay = m.prop([]),
+            projectDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            contributionsPerDay = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            visitorsTotal = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            visitorsPerDay = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             loader = postgrest.loaderWithToken,
             setProjectId = () => {
                 try {
@@ -37,7 +37,7 @@ const insights = {
 
                     filtersVM.project_id(project_id);
                 } catch (e) {
-                    filtersVM.project_id(args.root.getAttribute('data-id'));
+                    filtersVM.project_id(vnode.attrs.root.getAttribute('data-id'));
                 }
             };
 
@@ -129,14 +129,14 @@ const insights = {
             visitorsTotal
         };
     },
-    view(ctrl) {
-        const project = _.first(ctrl.projectDetails()) || {
+    view(vnode) {
+        const project = _.first(vnode.state.projectDetails()) || {
                 user: {
                     name: 'Realizador'
                 }
             },
 
-            buildTooltip = el => m.component(tooltip, {
+            buildTooltip = el => m(tooltip, {
                 el,
                 text: [
                     'Informa de onde vieram os apoios de seu projeto. Saiba como usar essa tabela e planejar melhor suas ações de comunicação ',
@@ -145,26 +145,26 @@ const insights = {
                 width: 380
             });
 
-        if (!ctrl.l()) {
+        if (!vnode.state.l()) {
             project.user.name = project.user.name || 'Realizador';
         }
 
-        return m('.project-insights', !ctrl.l() ? [
+        return m('.project-insights', !vnode.state.l() ? [
             m(`.w-section.section-product.${project.mode}`),
-            (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
-                project: m.prop(project)
+            (project.is_owner_or_admin ? m(projectDashboardMenu, {
+                project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(project)
             }) : ''),
-            (ctrl.displayModal() ? m.component(modalBox, {
-                displayModal: ctrl.displayModal,
+            (vnode.state.displayModal() ? m(modalBox, {
+                displayModal: vnode.state.displayModal,
                 content: [onlineSuccessModalContent]
             }) : ''),
 
-            m('.w-container', (project.state === 'successful') ? m.component(projectSuccessfulOnboard, { project: m.prop(project) }) : [
+            m('.w-container', (project.state === 'successful') ? m(projectSuccessfulOnboard, { project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(project) }) : [
                 m('.w-row.u-marginbottom-40', [
                     m('.w-col.w-col-8.w-col-push-2', [
                         m('.fontweight-semibold.fontsize-larger.lineheight-looser.u-marginbottom-10.u-text-center.dashboard-header', I18n.t('campaign_title', I18nScope())),
-                        (project.state === 'online' ? m.component(projectInviteCard, { project }) : ''),
-                        (project.state === 'draft' ? m.component(adminProjectDetailsCard, {
+                        (project.state === 'online' ? m(projectInviteCard, { project }) : ''),
+                        (project.state === 'draft' ? m(adminProjectDetailsCard, {
                             resource: project
                         }) : ''),
                         m(`p.${project.state}-project-text.u-text-center.fontsize-small.lineheight-loose`, [
@@ -177,13 +177,16 @@ const insights = {
                 ]),
             ]),
             (project.state === 'draft' ?
-               m.component(projectDeleteButton, { project })
+               m(projectDeleteButton, { project })
             : ''),
             (project.is_published) ? [
                 m('.divider'),
                 m('.w-section.section-one-column.section.bg-gray.before-footer', [
                     m('.w-container', [
-                        m.component(projectDataStats, { project: m.prop(project), visitorsTotal: ctrl.visitorsTotal }),
+                        m(
+                            projectDataStats,
+                            { project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(project), visitorsTotal: vnode.state.visitorsTotal }
+                        ),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', {
                                 style: {
@@ -194,8 +197,8 @@ const insights = {
                                     I18n.t('visitors_per_day_label', I18nScope()),
                                     h.newFeatureBadge()
                                 ]),
-                                !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
-                                    collection: ctrl.visitorsPerDay,
+                                !vnode.state.lVisitorsPerDay() ? m(projectDataChart, {
+                                    collection: vnode.state.visitorsPerDay,
                                     dataKey: 'visitors',
                                     xAxis: item => h.momentify(item.day),
                                     emptyState: I18n.t('visitors_per_day_empty', I18nScope())
@@ -208,8 +211,8 @@ const insights = {
                                     'min-height': '300px'
                                 }
                             }, [
-                                !ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
-                                    collection: ctrl.contributionsPerDay,
+                                !vnode.state.lContributionsPerDay() ? m(projectDataChart, {
+                                    collection: vnode.state.contributionsPerDay,
                                     label: I18n.t('amount_per_day_label', I18nScope()),
                                     dataKey: 'total_amount',
                                     xAxis: item => h.momentify(item.paid_at),
@@ -223,8 +226,8 @@ const insights = {
                                     'min-height': '300px'
                                 }
                             }, [
-                                !ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
-                                    collection: ctrl.contributionsPerDay,
+                                !vnode.state.lContributionsPerDay() ? m(projectDataChart, {
+                                    collection: vnode.state.contributionsPerDay,
                                     label: I18n.t('contributions_per_day_label', I18nScope()),
                                     dataKey: 'total',
                                     xAxis: item => h.momentify(item.paid_at),
@@ -240,8 +243,8 @@ const insights = {
                                         ' ',
                                         buildTooltip('span.fontsize-smallest.tooltip-wrapper.fa.fa-question-circle.fontcolor-secondary')
                                     ]),
-                                    !ctrl.lContributionsPerRef() ? !_.isEmpty(_.rest(ctrl.contributionsPerRefTable)) ? m.component(projectDataTable, {
-                                        table: ctrl.contributionsPerRefTable,
+                                    !vnode.state.lContributionsPerRef() ? !_.isEmpty(_.rest(vnode.state.contributionsPerRefTable)) ? m(projectDataTable, {
+                                        table: vnode.state.contributionsPerRefTable,
                                         defaultSortIndex: -2
                                     }) : m('.card.u-radius.medium.u-marginbottom-60',
                                             m('.w-row.u-text-center.u-margintop-40.u-marginbottom-40',
@@ -257,8 +260,8 @@ const insights = {
                             m('.w-col.w-col-12.u-text-center', [
                                 m('.project-contributions-per-ref', [
                                     m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', I18n.t('location_origin_title', I18nScope())),
-                                    !ctrl.lContributionsPerLocation() ? !_.isEmpty(_.rest(ctrl.contributionsPerLocationTable)) ? m.component(projectDataTable, {
-                                        table: ctrl.contributionsPerLocationTable,
+                                    !vnode.state.lContributionsPerLocation() ? !_.isEmpty(_.rest(vnode.state.contributionsPerLocationTable)) ? m(projectDataTable, {
+                                        table: vnode.state.contributionsPerLocationTable,
                                         defaultSortIndex: -2
                                     }) : m('.card.u-radius.medium.u-marginbottom-60',
                                             m('.w-row.u-text-center.u-margintop-40.u-marginbottom-40',
@@ -272,7 +275,7 @@ const insights = {
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', [
-                                m.component(projectReminderCount, {
+                                m(projectReminderCount, {
                                     resource: project
                                 })
                             ]),
@@ -280,7 +283,7 @@ const insights = {
                     ])
                 ]),
             (project.state === 'online' && (project.is_admin_role || project.pledged == 0) ?
-                m.component(projectCancelButton, { project })
+                m(projectCancelButton, { project })
             : '')
 
             ] : ''

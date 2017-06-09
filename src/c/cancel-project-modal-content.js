@@ -6,12 +6,12 @@
 import m from 'mithril';
 
 const cancelProjectModalContent = {
-    controller(args) {
-        const checkError = m.prop(false),
-            check = m.prop(''),
+    oninit(vnode) {
+        const checkError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            check = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
             showNextModal = () => {
                 if (check() === 'cancelar-projeto') {
-                    args.displayModal.toggle();
+                    vnode.attrs.displayModal.toggle();
                     document.getElementById('send-message').style.display = 'block';
                 } else {
                     checkError(true);
@@ -26,8 +26,8 @@ const cancelProjectModalContent = {
         };
     },
 
-    view(ctrl, args) {
-        return m('form.cancel-project-modal.modal-dialog-content', { onsubmit: ctrl.showNextModal },
+    view(vnode) {
+        return m('form.cancel-project-modal.modal-dialog-content', { onsubmit: vnode.state.showNextModal },
             [
                 m('.fontsize-small.u-marginbottom-20',
                     [
@@ -51,7 +51,7 @@ const cancelProjectModalContent = {
                     ),
                 m('.w-form',
                     [
-                        m('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: !ctrl.checkError() ? false : 'error', placeholder: 'cancelar-projeto', onchange: m.withAttr('value', ctrl.check) })
+                        m('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: !vnode.state.checkError() ? false : 'error', placeholder: 'cancelar-projeto', onchange: m.withAttr('value', vnode.state.check) })
                     ]
                     ),
                 m('div',
@@ -61,7 +61,7 @@ const cancelProjectModalContent = {
                                 m('.u-text-center.w-col.w-col-6',
                                     [
                                         m('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Próximo passo >\']'),
-                                        m('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayModal.toggle },
+                                        m('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: vnode.attrs.displayModal.toggle },
                                             'Cancelar'
                                         )
                                     ]

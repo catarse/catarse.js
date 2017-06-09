@@ -2,8 +2,8 @@ import m from 'mithril';
 import h from '../h';
 
 const adminContribution = {
-    view(ctrl, args) {
-        const contribution = args.item;
+    view(vnode) {
+        const contribution = vnode.attrs.item;
         return m('.w-row.admin-contribution', [
             m('.fontweight-semibold.lineheight-tighter.u-marginbottom-10.fontsize-small', `R$${contribution.value}`),
             m('.fontsize-smallest.fontcolor-secondary', h.momentify(contribution.created_at, 'DD/MM/YYYY HH:mm[h]')),

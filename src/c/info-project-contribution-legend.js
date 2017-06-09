@@ -3,21 +3,21 @@ import h from '../h';
 import modalBox from './modal-box';
 
 const InfoProjectContributionLegend = {
-    controller(args) {
+    oninit(vnode) {
         return {
             modalToggle: h.toggleProp(false, true)
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('span', [
-            args.text,
+            vnode.attrs.text,
             m.trust('&nbsp;'),
             m('a.fa.fa-question-circle.fontcolor-secondary[href="#"]', {
-                onclick: ctrl.modalToggle.toggle
+                onclick: vnode.state.modalToggle.toggle
             }, ''),
-            (ctrl.modalToggle() ? m.component(modalBox, {
-                displayModal: ctrl.modalToggle,
-                content: args.content
+            (vnode.state.modalToggle() ? m(modalBox, {
+                displayModal: vnode.state.modalToggle,
+                content: vnode.attrs.content
             }) : '')
         ]);
     }

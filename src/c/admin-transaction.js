@@ -2,8 +2,8 @@ import m from 'mithril';
 import h from '../h';
 
 const adminTransaction = {
-    view(ctrl, args) {
-        const contribution = args.contribution;
+    view(vnode) {
+        const contribution = vnode.attrs.contribution;
         return m('.w-col.w-col-4', [
             m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Detalhes do apoio'),
             m('.fontsize-smallest.lineheight-looser', [

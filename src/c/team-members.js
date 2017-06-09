@@ -3,9 +3,9 @@ import _ from 'underscore';
 import models from '../models';
 
 const teamMembers = {
-    controller() {
+    oninit() {
         const vm = {
-                collection: m.prop([])
+                collection: console.warn("m.prop has been removed from mithril 1.0") || m.prop([])
             },
 
             groupCollection = (collection, groupTotal) => _.map(_.range(Math.ceil(collection.length / groupTotal)), i => collection.slice(i * groupTotal, (i + 1) * groupTotal));
@@ -18,10 +18,10 @@ const teamMembers = {
             vm
         };
     },
-    view(ctrl) {
+    view(vnode) {
         return m('#team-members-static.w-section.section', [
             m('.w-container', [
-                _.map(ctrl.vm.collection(), group => m('.w-row.u-text-center', [
+                _.map(vnode.state.vm.collection(), group => m('.w-row.u-text-center', [
                     _.map(group, member => m('.team-member.w-col.w-col-3.w-col-small-3.w-col-tiny-6.u-marginbottom-40', [
                         m(`a.alt-link[href="/users/${member.id}"]`, [
                             m(`img.thumb.big.u-round.u-marginbottom-10[src="${member.img}"]`),

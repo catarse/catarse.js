@@ -2,38 +2,38 @@ import m from 'mithril';
 import h from '../h';
 
 const postsPreview = {
-    controller(args) {
+    oninit(vnode) {
         const togglePreview = () => {
                 h.scrollTop();
-                args.showPreview(false);
+                vnode.attrs.showPreview(false);
             },
             sendNotification = (e) => {
                 e.preventDefault();
 
                 const notificationData = {
-                    title: args.title(),
-                    comment_html: args.comment_html(),
-                    reward_id: args.reward_id >= 1 ? args.reward_id : null,
-                    recipients: args.reward_id >= 1 ? 'reward' : args.reward_id == '-1' ? 'public' : 'backers'
+                    title: vnode.attrs.title(),
+                    comment_html: vnode.attrs.comment_html(),
+                    reward_id: vnode.attrs.reward_id >= 1 ? vnode.attrs.reward_id : null,
+                    recipients: vnode.attrs.reward_id >= 1 ? 'reward' : vnode.attrs.reward_id == '-1' ? 'public' : 'backers'
                 };
 
                 return m.request({
                     method: 'POST',
-                    url: `/projects/${args.project_id}/posts.json`,
+                    url: `/projects/${vnode.attrs.project_id}/posts.json`,
                     data: {
                         project_post: notificationData,
-                        project: args.project_id
+                        project: vnode.attrs.project_id
                     },
                     config: h.setCsrfToken
                 }).then(() => {
-                    args.showSuccess(true);
-                    args.comment_html('');
-                    args.title('');
+                    vnode.attrs.showSuccess(true);
+                    vnode.attrs.comment_html('');
+                    vnode.attrs.title('');
                     togglePreview();
                     m.redraw();
                 }).catch((err) => {
-                    args.errors('Erro ao enviar mensagem.'),
-                    args.showError(true);
+                    vnode.attrs.errors('Erro ao enviar mensagem.'),
+                    vnode.attrs.showError(true);
                     m.redraw();
                 });
             };
@@ -42,21 +42,21 @@ const postsPreview = {
             togglePreview
         };
     },
-    view(ctrl, args) {
-        const comment_html = args.comment_html(),
-            title = args.title(),
-            recipientsText = args.reward_id > 1 ?
+    view(vnode) {
+        const comment_html = vnode.attrs.comment_html(),
+            title = vnode.attrs.title(),
+            recipientsText = vnode.attrs.reward_id > 1 ?
             m('.fontsize-small.u-marginbottom-30', [
                 'A novidade acima será enviada por email para os ',
                 m('span.fontweight-semibold',
-                    args.rewardText
+                    vnode.attrs.rewardText
                 ),
                 ' e ficará ',
                 m('span.fontweight-semibold',
                 'visível na plataforma somente para esses apoiadores.'
                 )
             ]) :
-            args.reward_id === '-1' ?
+            vnode.attrs.reward_id === '-1' ?
             m('.fontsize-small.u-marginbottom-30', [
                 'A novidade acima será  ',
                 m('span.fontweight-semibold',
@@ -117,7 +117,7 @@ const postsPreview = {
                     m('.w-col.w-col-3'),
                     m('._w-sub-col.w-col.w-col-4',
                         m('button.btn.btn-large', {
-                            onclick: ctrl.sendNotification
+                            onclick: vnode.state.sendNotification
                         }, [
                             m('span.fa.fa-paper-plane',
                                 ''
@@ -129,7 +129,7 @@ const postsPreview = {
                     ),
                     m('.w-col.w-col-2',
                         m('button.btn.btn-large.btn-terciary', {
-                            onclick: ctrl.togglePreview
+                            onclick: vnode.state.togglePreview
                         },
                             'Editar'
                         )

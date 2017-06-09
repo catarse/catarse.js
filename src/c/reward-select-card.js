@@ -8,10 +8,10 @@ import projectVM from '../vms/project-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions');
 
 const rewardSelectCard = {
-    controller(args) {
+    oninit(vnode) {
         const setInput = (el, isInitialized) => !isInitialized ? el.focus() : null;
         const isSelected = currentReward => currentReward.id === rewardVM.selectedReward().id;
-        const selectedDestination = m.prop('');
+        const selectedDestination = console.warn("m.prop has been removed from mithril 1.0") || m.prop('');
         const queryRewardId = h.getParams('reward_id');
 
         const submitContribution = (event) => {
@@ -59,8 +59,8 @@ const rewardSelectCard = {
         };
 
 
-        if (args.reward.id === Number(queryRewardId)) {
-            rewardVM.selectReward(args.reward).call();
+        if (vnode.attrs.reward.id === Number(queryRewardId)) {
+            rewardVM.selectReward(vnode.attrs.reward).call();
         }
 
         rewardVM.getStates();
@@ -80,30 +80,30 @@ const rewardSelectCard = {
             contributionValue: rewardVM.contributionValue
         };
     },
-    view(ctrl, args) {
-        const reward = ctrl.normalReward(args.reward);
+    view(vnode) {
+        const reward = vnode.state.normalReward(vnode.attrs.reward);
 
-        return (h.rewardSouldOut(reward) ? m('') : m('span.radio.w-radio.w-clearfix.back-reward-radio-reward', {
-            class: ctrl.isSelected(reward) ? 'selected' : '',
-            onclick: ctrl.selectReward(reward)
+        return h.rewardSouldOut(reward) ? m('') : m('span.radio.w-radio.w-clearfix.back-reward-radio-reward', {
+            class: vnode.state.isSelected(reward) ? 'selected' : '',
+            onclick: vnode.state.selectReward(reward)
         },
             m(`label[for="contribution_reward_id_${reward.id}"]`, [
                 m(`input.radio_buttons.optional.w-input.text-field.w-radio-input.back-reward-radio-button[id="contribution_reward_id_${reward.id}"][type="radio"][value="${reward.id}"]`, {
-                    checked: ctrl.isSelected(reward),
+                    checked: vnode.state.isSelected(reward),
                     name: 'contribution[reward_id]'
                 }),
                 m(`label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for="contribution_reward_${reward.id}"]`,
                     `R$ ${h.formatNumber(reward.minimum_value)} ou mais`
-                ), !ctrl.isSelected(reward) ? '' : m('.w-row.back-reward-money', [
+                ), !vnode.state.isSelected(reward) ? '' : m('.w-row.back-reward-money', [
                     rewardVM.hasShippingOptions(reward) ?
                     m('.w-sub-col.w-col.w-col-4', [
                         m('.fontcolor-secondary.u-marginbottom-10',
                             'Local de entrega'
                         ),
                         m('select.positive.text-field.w-select', {
-                            onchange: m.withAttr('value', ctrl.selectDestination)
+                            onchange: m.withAttr('value', vnode.state.selectDestination)
                         },
-                            _.map(ctrl.locationOptions(reward, ctrl.selectedDestination),
+                            _.map(vnode.state.locationOptions(reward, vnode.state.selectedDestination),
                                 option => m(`option[value="${option.value}"]`, [
                                     `${option.name} `,
                                     option.value != '' ? `+R$${option.fee}` : null
@@ -128,9 +128,9 @@ const rewardSelectCard = {
                                     min: reward.minimum_value,
                                     placeholder: reward.minimum_value,
                                     type: 'tel',
-                                    config: ctrl.setInput,
-                                    onkeyup: m.withAttr('value', ctrl.applyMask),
-                                    value: ctrl.contributionValue()
+                                    config: vnode.state.setInput,
+                                    onkeyup: m.withAttr('value', vnode.state.applyMask),
+                                    value: vnode.state.contributionValue()
                                 })
                             )
                         ]),
@@ -141,17 +141,17 @@ const rewardSelectCard = {
                     ]),
                     m('.submit-form.w-col.w-col-4',
                         m('button.btn.btn-medium.u-margintop-30', {
-                            onclick: ctrl.submitContribution
+                            onclick: vnode.state.submitContribution
                         }, [
                             'Continuar  ',
                             m('span.fa.fa-chevron-right')
                         ])
                     )
                 ]),
-                ctrl.error().length > 0 && ctrl.isSelected(reward) ? m('.text-error', [
+                vnode.state.error().length > 0 && vnode.state.isSelected(reward) ? m('.text-error', [
                     m('br'),
                     m('span.fa.fa-exclamation-triangle'),
-                    ` ${ctrl.error()}`
+                    ` ${vnode.state.error()}`
                 ]) : '',
                 m('.fontsize-smaller.fontweight-semibold',
                     reward.title
@@ -169,7 +169,7 @@ const rewardSelectCard = {
                     ])
                 ])
             ])
-                                                  ));
+                                                  );
     }
 };
 

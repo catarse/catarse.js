@@ -13,7 +13,7 @@ import projectEditSaveBtn from './project-edit-save-btn';
 const I18nScope = _.partial(h.i18nScope, 'projects.dashboard_basics');
 
 const projectBasicsEdit = {
-    controller(args) {
+    oninit(vnode) {
         const vm = projectBasicsVM,
             mapErrors = [
                   ['name', ['name']],
@@ -22,15 +22,15 @@ const projectBasicsEdit = {
                   ['category_id', ['category']],
                   ['city_id', ['city']]
             ],
-            loading = m.prop(false),
-            cities = m.prop(),
-            categories = m.prop([]),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            cities = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            categories = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),
-            selectedTags = m.prop([]),
-            tagOptions = m.prop([]),
-            isEditingTags = m.prop(false),
-            tagEditingLoading = m.prop(false),
+            selectedTags = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            tagOptions = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            isEditingTags = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            tagEditingLoading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             onSubmit = () => {
                 if (isEditingTags()) {
                     return false;
@@ -40,7 +40,7 @@ const projectBasicsEdit = {
                 m.redraw();
                 const tagString = _.pluck(selectedTags(), 'name').join(',');
                 vm.fields.public_tags(tagString);
-                vm.updateProject(args.projectId).then(() => {
+                vm.updateProject(vnode.attrs.projectId).then(() => {
                     loading(false);
                     vm.e.resetFieldErrors();
                     showSuccess(true);
@@ -59,7 +59,7 @@ const projectBasicsEdit = {
         if (railsErrorsVM.railsErrors()) {
             railsErrorsVM.mapRailsErrors(railsErrorsVM.railsErrors(), mapErrors, vm.e);
         }
-        vm.fillFields(args.project);
+        vm.fillFields(vnode.attrs.project);
 
         if (vm.fields.public_tags()) {
             selectedTags(_.map(vm.fields.public_tags().split(','), name => ({ name })));
@@ -91,8 +91,8 @@ const projectBasicsEdit = {
 
             return false;
         };
-        const tagString = m.prop('');
-        const transport = m.prop({ abort: Function.prototype });
+        const tagString = console.warn("m.prop has been removed from mithril 1.0") || m.prop('');
+        const transport = console.warn("m.prop has been removed from mithril 1.0") || m.prop({ abort: Function.prototype });
         const searchTagsUrl = `${h.getApiHost()}/rpc/tag_search`;
         const searchTags = () => m.request({ method: 'POST', background: true, config: transport, data: { query: tagString(), count: 3 }, url: searchTagsUrl });
         const triggerTagSearch = (e) => {
@@ -118,7 +118,7 @@ const projectBasicsEdit = {
             searchTags().then((data) => {
                 tagOptions(data);
                 tagEditingLoading(false);
-                m.redraw(true);
+                console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
             });
 
             return false;
@@ -148,25 +148,25 @@ const projectBasicsEdit = {
             tagEditingLoading
         };
     },
-    view(ctrl, args) {
-        const vm = ctrl.vm;
+    view(vnode) {
+        const vm = vnode.state.vm;
 
         return m('#basics-tab', [
-            (ctrl.showSuccess() ? m.component(popNotification, {
+            (vnode.state.showSuccess() ? m(popNotification, {
                 message: I18n.t('shared.successful_update'),
-                toggleOpt: ctrl.showSuccess
+                toggleOpt: vnode.state.showSuccess
             }) : ''),
-            (ctrl.showError() ? m.component(popNotification, {
+            (vnode.state.showError() ? m(popNotification, {
                 message: I18n.t('shared.failed_update'),
-                toggleOpt: ctrl.showError,
+                toggleOpt: vnode.state.showError,
                 error: true
             }) : ''),
 
             // add pop notifications here
-            m('form.w-form', { onsubmit: ctrl.onSubmit }, [
+            m('form.w-form', { onsubmit: vnode.state.onSubmit }, [
                 m('.w-container', [
                     // admin fields
-                    (args.user.is_admin ?
+                    (vnode.attrs.user.is_admin ?
                       m('.w-row', [
                           m('.w-col.w-col-10.w-col-push-1', [
                               m(inputCard, {
@@ -226,28 +226,28 @@ const projectBasicsEdit = {
                             m(inputCard, {
                                 label: I18n.t('tags', I18nScope()),
                                 label_hint: I18n.t('tags_hint', I18nScope()),
-                                onclick: () => ctrl.isEditingTags(false),
+                                onclick: () => vnode.state.isEditingTags(false),
                                 children: [
                                     m('input.string.optional.w-input.text-field.positive.medium[type="text"]', {
-                                        config: ctrl.editTag,
+                                        config: vnode.state.editTag,
                                         class: vm.e.hasError('public_tags') ? 'error' : '',
                                         onfocus: () => vm.e.inlineError('public_tags', false)
                                     }),
-                                    ctrl.isEditingTags() ? m('.options-list.table-outer',
-                                         ctrl.tagEditingLoading()
+                                    vnode.state.isEditingTags() ? m('.options-list.table-outer',
+                                         vnode.state.tagEditingLoading()
                                             ? m('.dropdown-link', m('.fontsize-smallest', 'Carregando...'))
-                                            : ctrl.tagOptions().length
-                                                ? _.map(ctrl.tagOptions(), tag => m('.dropdown-link',
-                                                    { onclick: ctrl.addTag(tag) },
+                                            : vnode.state.tagOptions().length
+                                                ? _.map(vnode.state.tagOptions(), tag => m('.dropdown-link',
+                                                    { onclick: vnode.state.addTag(tag) },
                                                     m('.fontsize-smaller', tag.name)
                                                 ))
                                                 : m('.dropdown-link', m('.fontsize-smallest', 'Nenhuma tag relacionada...'))
                                     ) : '',
                                     vm.e.inlineError('public_tags'),
                                     m('div.tag-choices',
-                                        _.map(ctrl.selectedTags(), choice => m('.tag-div',
+                                        _.map(vnode.state.selectedTags(), choice => m('.tag-div',
                                             m('div', [
-                                                m('a.tag-close-btn.fa.fa-times-circle', { onclick: ctrl.removeTag(choice) }),
+                                                m('a.tag-close-btn.fa.fa-times-circle', { onclick: vnode.state.removeTag(choice) }),
                                                 ` ${choice.name}`
                                             ]))
                                         )
@@ -282,7 +282,7 @@ const projectBasicsEdit = {
                                         value: vm.fields.category_id(),
                                         class: vm.e.hasError('category_id') ? 'error' : '',
                                         onchange: m.withAttr('value', vm.fields.category_id)
-                                    }, ctrl.categories()),
+                                    }, vnode.state.categories()),
                                     vm.e.inlineError('category_id')
                                 ]
                             }),
@@ -293,16 +293,16 @@ const projectBasicsEdit = {
                                     m('input.string.required.w-input.text-field.positive.medium[type="text"]', {
                                         value: vm.fields.city_name(),
                                         class: vm.e.hasError('city_id') ? 'error' : '',
-                                        onkeyup: vm.generateSearchCity(ctrl.cities)
+                                        onkeyup: vm.generateSearchCity(vnode.state.cities)
                                     }),
                                     vm.e.inlineError('city_id'),
-                                    ctrl.cities()
+                                    vnode.state.cities()
                                 ]
                             })
                         ])
                     ])
                 ]),
-                m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })
+                m(projectEditSaveBtn, { loading: vnode.state.loading, onSubmit: vnode.state.onSubmit })
             ])
         ]);
     }

@@ -4,17 +4,17 @@ import $ from 'jquery';
 import h from '../h';
 
 const projectContributionReportContentCard = {
-    controller(args) {
-        const project = args.project(),
-            checked = contribution => _.contains(args.selectedContributions(), contribution.id),
+    oninit(vnode) {
+        const project = vnode.attrs.project(),
+            checked = contribution => _.contains(vnode.attrs.selectedContributions(), contribution.id),
             selectContribution = (contribution) => {
                 const anyChecked = $('input:checkbox').is(':checked');
 
-                args.selectedAny(anyChecked);
+                vnode.attrs.selectedAny(anyChecked);
                 if (!checked(contribution)) {
-                    args.selectedContributions().push(contribution.id);
+                    vnode.attrs.selectedContributions().push(contribution.id);
                 } else {
-                    args.selectedContributions(_.without(args.selectedContributions(), contribution.id));
+                    vnode.attrs.selectedContributions(_.without(vnode.attrs.selectedContributions(), contribution.id));
                 }
                 return true;
             },
@@ -59,25 +59,25 @@ const projectContributionReportContentCard = {
             selectContribution
         };
     },
-    view(ctrl, args) {
-        const contribution = args.contribution(),
-            project = args.project(),
+    view(vnode) {
+        const contribution = vnode.attrs.contribution(),
+            project = vnode.attrs.project(),
             profileImg = (_.isEmpty(contribution.profile_img_thumbnail) ? '/assets/catarse_bootstrap/user.jpg' : contribution.profile_img_thumbnail),
             reward = contribution.reward || {
                 minimum_value: 0,
                 description: 'Nenhuma recompensa selecionada'
             };
 
-        return m(`.w-clearfix.card${ctrl.checked(contribution) ? '.card-alert' : ''}`, [
+        return m(`.w-clearfix.card${vnode.state.checked(contribution) ? '.card-alert' : ''}`, [
             m('.w-row', [
                 m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1',
                     m('.w-inline-block',
                         m('.w-checkbox.w-clearfix',
                             (contribution.delivery_status !== 'received' && project.state !== 'failed' ?
                                 m('input.w-checkbox-input[type=\'checkbox\']', {
-                                    checked: ctrl.checked(contribution),
+                                    checked: vnode.state.checked(contribution),
                                     value: contribution.id,
-                                    onclick: () => ctrl.selectContribution(contribution)
+                                    onclick: () => vnode.state.selectContribution(contribution)
                                 }) : '')
                         )
                     )
@@ -102,7 +102,7 @@ const projectContributionReportContentCard = {
                                 ]),
                                 m('.w-col.w-col-3', [
                                     m('.lineheight-tighter', [
-                                        m(`span.fa.fontsize-smallest.${ctrl.stateClass(contribution.state)}`),
+                                        m(`span.fa.fontsize-smallest.${vnode.state.stateClass(contribution.state)}`),
                                         '   ',
                                         m('span.fontsize-large', `R$ ${h.formatNumber(contribution.value, 2, 3)}`)
                                     ])

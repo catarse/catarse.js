@@ -9,12 +9,12 @@ import inlineError from './inline-error';
 import loadMoreBtn from './load-more-btn';
 
 const userContributed = {
-    controller(args) {
-        const contributedProjects = m.prop(),
-            user_id = args.userId,
+    oninit(vnode) {
+        const contributedProjects = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            user_id = vnode.attrs.userId,
             pages = postgrest.paginationVM(models.project),
-            error = m.prop(false),
-            loader = m.prop(true),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            loader = console.warn("m.prop has been removed from mithril 1.0") || m.prop(true),
             contextVM = postgrest.filtersVM({
                 project_id: 'in'
             });
@@ -45,11 +45,11 @@ const userContributed = {
             loader
         };
     },
-    view(ctrl, args) {
-        const projects_collection = ctrl.projects.collection();
-        return (ctrl.error() ? m.component(inlineError, { message: 'Erro ao carregar os projetos.' }) : ctrl.loader() ? h.loader() : m('.content[id=\'contributed-tab\']',
+    view(vnode) {
+        const projects_collection = vnode.state.projects.collection();
+        return vnode.state.error() ? m(inlineError, { message: 'Erro ao carregar os projetos.' }) : vnode.state.loader() ? h.loader() : m('.content[id=\'contributed-tab\']',
             [
-                  (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m.component(projectCard, {
+                  (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m(projectCard, {
                       project,
                       ref: 'user_contributed',
                       showFriends: false
@@ -83,11 +83,10 @@ const userContributed = {
 
                   (!_.isEmpty(projects_collection) ?
                   m('.w-row.u-marginbottom-40.u-margintop-30', [
-                      m(loadMoreBtn, { collection: ctrl.projects, cssClass: '.w-col-push-5' })
+                      m(loadMoreBtn, { collection: vnode.state.projects, cssClass: '.w-col-push-5' })
                   ]) : '')
             ]
-              ))
-              ;
+              );
     }
 };
 

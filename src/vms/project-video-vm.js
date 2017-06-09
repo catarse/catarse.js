@@ -5,7 +5,7 @@ import generateErrorInstance from '../error';
 const e = generateErrorInstance();
 
 const fields = {
-    video_url: m.prop('')
+    video_url: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
 };
 
 const fillFields = (data) => {

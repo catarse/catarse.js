@@ -4,15 +4,15 @@ import h from '../h';
 import filterMain from './filter-main';
 
 const adminFilter = {
-    controller() {
+    oninit() {
         return {
             toggler: h.toggleProp(false, true)
         };
     },
-    view(ctrl, args) {
-        const filterBuilder = args.filterBuilder,
-            data = args.data,
-            label = args.label || '',
+    view(vnode) {
+        const filterBuilder = vnode.attrs.filterBuilder,
+            data = vnode.attrs.data,
+            label = vnode.attrs.label || '',
             main = _.findWhere(filterBuilder, {
                 component: filterMain
             });
@@ -22,15 +22,15 @@ const adminFilter = {
                 m('.fontsize-larger.u-text-center.u-marginbottom-30', label),
                 m('.w-form', [
                     m('form', {
-                        onsubmit: args.submit
+                        onsubmit: vnode.attrs.submit
                     }, [
-                        main ? m.component(main.component, main.data) : '',
+                        main ? m(main.component, main.data) : '',
                         m('.u-marginbottom-20.w-row',
                             m('button.w-col.w-col-12.fontsize-smallest.link-hidden-light[style="background: none; border: none; outline: none; text-align: left;"][type="button"]', {
-                                onclick: ctrl.toggler.toggle
-                            }, 'Filtros avançados  >')), (ctrl.toggler() ?
+                                onclick: vnode.state.toggler.toggle
+                            }, 'Filtros avançados  >')), (vnode.state.toggler() ?
                             m('#advanced-search.w-row.admin-filters', [
-                                _.map(filterBuilder, f => (f.component !== filterMain) ? m.component(f.component, f.data) : '')
+                                _.map(filterBuilder, f => (f.component !== filterMain) ? m(f.component, f.data) : '')
                             ]) : ''
                         )
                     ])

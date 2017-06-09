@@ -8,11 +8,11 @@ import userVM from '../vms/user-vm';
 const I18nScope = _.partial(h.i18nScope, 'users.edit.email_confirmation');
 
 const CheckEmail = {
-    controller(args) {
+    oninit(vnode) {
         const userID = h.getUserID(),
             user = userVM.fetchUser(userID),
-            confirmedEmail = m.prop(false),
-            hideAlert = m.prop(false);
+            confirmedEmail = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            hideAlert = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
 
         return {
             confirmedEmail,
@@ -31,19 +31,19 @@ const CheckEmail = {
                 confirmedEmail(true);
                 window.setTimeout(() => {
                     hideAlert(true);
-                    m.redraw(true);
+                    console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
                 }, 4000);
             })
         };
     },
 
-    view(ctrl, args) {
-        const user = ctrl.user();
+    view(vnode) {
+        const user = vnode.state.user();
         if (user) {
             const userCreatedRecently = moment().isBefore(moment(user.created_at).add(2, 'days'));
 
-            return ((user && !userCreatedRecently && !user.email_active && !ctrl.hideAlert()) ? m('.card-alert.section.u-text-center', { style: (args.menuTransparency ? { 'padding-top': '100px' } : {}) }, [
-                m('.w-container', (ctrl.confirmedEmail() ? [
+            return (user && !userCreatedRecently && !user.email_active && !vnode.state.hideAlert()) ? m('.card-alert.section.u-text-center', { style: (vnode.attrs.menuTransparency ? { 'padding-top': '100px' } : {}) }, [
+                m('.w-container', (vnode.state.confirmedEmail() ? [
                     m('.fontsize-large.fontweight-semibold', I18n.t('confirmed_title', I18nScope())),
                     m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('confirmed_sub', I18nScope())),
                 ] : [
@@ -54,7 +54,7 @@ const CheckEmail = {
                         m('.w-col.w-col-3'),
                         m('.w-col.w-col-3', [
                             m('button.btn.btn-medium.btn-terciary.w-button', {
-                                onclick: ctrl.checkEmail
+                                onclick: vnode.state.checkEmail
                             }, 'Sim!')
                         ]),
                         m('.w-col.w-col-3', [
@@ -63,7 +63,7 @@ const CheckEmail = {
                         m('.w-col.w-col-3')
                     ])
                 ]))
-            ]) : m('div'));
+            ]) : m('div');
         }
 
         return m('div');

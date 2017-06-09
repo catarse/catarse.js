@@ -9,8 +9,8 @@ import UserFollowBtn from './user-follow-btn';
 import userVM from '../vms/user-vm';
 
 const projectContributions = {
-    controller(args) {
-        const contributionsPerDay = m.prop([]),
+    oninit(vnode) {
+        const contributionsPerDay = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             listVM = postgrest.paginationVM(models.contributor),
             filterStats = postgrest.filtersVM({
                 project_id: 'eq'
@@ -35,10 +35,10 @@ const projectContributions = {
 
                 return grouped;
             },
-            contributionsStats = m.prop({});
+            contributionsStats = console.warn("m.prop has been removed from mithril 1.0") || m.prop({});
 
-        filterVM.project_id(args.project().project_id);
-        filterStats.project_id(args.project().project_id);
+        filterVM.project_id(vnode.attrs.project().project_id);
+        filterStats.project_id(vnode.attrs.project().project_id);
 
         if (!listVM.collection().length) {
             listVM.firstPage(filterVM.parameters());
@@ -82,15 +82,15 @@ const projectContributions = {
             contributionsStats
         };
     },
-    view(ctrl, args) {
-        const list = ctrl.listVM,
-            stats = ctrl.contributionsStats(),
-            groupedCollection = ctrl.groupedCollection(list.collection());
+    view(vnode) {
+        const list = vnode.state.listVM,
+            stats = vnode.state.contributionsStats(),
+            groupedCollection = vnode.state.groupedCollection(list.collection());
 
         return m('#project_contributions', m('#contributions_top', [
             m('.section.w-section',
               m('.w-container',
-                m('.w-row', ctrl.lContributionsStats() ? h.loader() : !_.isEmpty(stats) ? [
+                m('.w-row', vnode.state.lContributionsStats() ? h.loader() : !_.isEmpty(stats) ? [
                     m('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [
                         m('.fontsize-megajumbo',
                           stats.total
@@ -142,7 +142,7 @@ const projectContributions = {
                                 cat: 'project_view',
                                 act: 'project_backer_link',
                                 lbl: contribution.user_id,
-                                project: args.project()
+                                project: vnode.attrs.project()
                             })
                         }, [
                             m(`img.thumb.u-marginbottom-10.u-round[src="${!_.isEmpty(contribution.data.profile_img_thumbnail) ? contribution.data.profile_img_thumbnail : '/assets/catarse_bootstrap/user.jpg'}"]`)
@@ -152,7 +152,7 @@ const projectContributions = {
                                 cat: 'project_view',
                                 act: 'project_backer_link',
                                 lbl: contribution.user_id,
-                                project: args.project()
+                                project: vnode.attrs.project()
                             })
                         }, userVM.displayName(contribution.data)),
                         m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', `${h.selfOrEmpty(contribution.data.city)}, ${h.selfOrEmpty(contribution.data.state)}`),
@@ -185,8 +185,8 @@ const projectContributions = {
                              style: {
                                  'min-height': '300px'
                              }
-                         }, [!ctrl.lContributionsPerDay() ? m.component(projectDataChart, {
-                             collection: ctrl.contributionsPerDay,
+                         }, [!vnode.state.lContributionsPerDay() ? m(projectDataChart, {
+                             collection: vnode.state.contributionsPerDay,
                              label: 'R$ arrecadados por dia',
                              dataKey: 'total_amount',
                              xAxis: item => h.momentify(item.paid_at),
@@ -196,8 +196,8 @@ const projectContributions = {
                      m('.w-row',
                        m('.w-col.w-col-12.u-text-center', [
                            m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', 'De onde vem os apoios'),
-                           (!ctrl.lContributionsPerLocation() ? !_.isEmpty(_.rest(ctrl.contributionsPerLocationTable)) ? m.component(projectDataTable, {
-                               table: ctrl.contributionsPerLocationTable,
+                           (!vnode.state.lContributionsPerLocation() ? !_.isEmpty(_.rest(vnode.state.contributionsPerLocationTable)) ? m(projectDataTable, {
+                               table: vnode.state.contributionsPerLocationTable,
                                defaultSortIndex: -2
                            }) : '' : h.loader())
                        ])

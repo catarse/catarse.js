@@ -5,9 +5,9 @@ import generateErrorInstance from '../error';
 const e = generateErrorInstance();
 
 const fields = {
-    mode: m.prop(''),
-    online_days: m.prop(''),
-    goal: m.prop('')
+    mode: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    online_days: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    goal: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
 };
 
 const fillFields = (data) => {

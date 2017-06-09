@@ -10,7 +10,7 @@ import faqBox from '../c/faq-box';
 
 
 const projectsContribution = {
-    controller(args) {
+    oninit(vnode) {
         const rewards = () => _.union(
             [{
                 id: null,
@@ -44,8 +44,8 @@ const projectsContribution = {
             sortedRewards: () => _.sortBy(rewards(), reward => Number(reward.row_order))
         };
     },
-    view(ctrl, args) {
-        const project = ctrl.project;
+    view(vnode) {
+        const project = vnode.state.project;
 
         return m('#contribution-new',
                  !_.isEmpty(project()) ? [
@@ -64,18 +64,18 @@ const projectsContribution = {
                     m('.w-col.w-col-8',
                         m('.w-form.back-reward-form',
                             m(`form.simple_form.new_contribution[accept-charset="UTF-8"][action="/pt/projects/${project().id}/contributions/fallback_create"][id="contribution_form"][method="get"][novalidate="novalidate"]`,
-                                { onsubmit: ctrl.submitContribution }
+                                { onsubmit: vnode.state.submitContribution }
                             , [
                                 m('input[name="utf8"][type="hidden"][value="✓"]'),
-                                _.map(ctrl.sortedRewards(), reward => m(rewardSelectCard, { reward }))
+                                _.map(vnode.state.sortedRewards(), reward => m(rewardSelectCard, { reward }))
                             ])
                         )
                     ),
-                    m('.w-col.w-col-4', m.component(faqBox, {
+                    m('.w-col.w-col-4', m(faqBox, {
                         mode: project().mode,
-                        vm: ctrl.paymentVM,
-                        faq: ctrl.paymentVM.faq(project().mode),
-                        projectUserId: args.project_user_id
+                        vm: vnode.state.paymentVM,
+                        faq: vnode.state.paymentVM.faq(project().mode),
+                        projectUserId: vnode.attrs.project_user_id
                     }))
                 ])))
             ] : h.loader());

@@ -14,13 +14,13 @@ import _ from 'underscore';
 import h from '../h';
 
 const adminExternalAction = {
-    controller(args) {
-        let builder = args.data,
-            complete = m.prop(false),
-            error = m.prop(false),
-            fail = m.prop(false),
+    oninit(vnode) {
+        let builder = vnode.attrs.data,
+            complete = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            fail = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             data = {},
-            item = args.item;
+            item = vnode.attrs.item;
 
         builder.requestOptions.config = (xhr) => {
             if (h.authenticityToken()) {
@@ -29,7 +29,7 @@ const adminExternalAction = {
         };
 
         const reload = _.compose(builder.model.getRowWithToken, h.idVM.id(item[builder.updateKey]).parameters),
-            l = m.prop(false);
+            l = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
 
         const reloadItem = () => reload().then(updateItem);
 
@@ -51,12 +51,7 @@ const adminExternalAction = {
             return false;
         };
 
-        const unload = (el, isinit, context) => {
-            context.onunload = function () {
-                complete(false);
-                error(false);
-            };
-        };
+        const unload = (el, isinit, context) => {};
 
         return {
             l,
@@ -67,23 +62,24 @@ const adminExternalAction = {
             unload
         };
     },
-    view(ctrl, args) {
-        const data = args.data,
-            btnValue = (ctrl.l()) ? 'por favor, aguarde...' : data.callToAction;
+
+    view(vnode) {
+        const data = vnode.attrs.data,
+            btnValue = (vnode.state.l()) ? 'por favor, aguarde...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
-                onclick: ctrl.toggler.toggle
-            }, data.outerLabel), (ctrl.toggler()) ?
+                onclick: vnode.state.toggler.toggle
+            }, data.outerLabel), (vnode.state.toggler()) ?
             m('.dropdown-list.card.u-radius.dropdown-list-medium.zindex-10', {
-                config: ctrl.unload
+                config: vnode.state.unload
             }, [
                 m('form.w-form', {
-                    onsubmit: ctrl.submit
-                }, (!ctrl.complete()) ? [
+                    onsubmit: vnode.state.submit
+                }, (!vnode.state.complete()) ? [
                     m('label', data.innerLabel),
                     m(`input.w-button.btn.btn-small[type="submit"][value="${btnValue}"]`)
-                ] : (!ctrl.error()) ? [
+                ] : (!vnode.state.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
                         m('p', 'Requisição feita com sucesso.')
                     ])
@@ -94,6 +90,11 @@ const adminExternalAction = {
                 ])
             ]) : ''
         ]);
+    },
+
+    onremove: function () {
+        complete(false);
+        error(false);
     }
 };
 

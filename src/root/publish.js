@@ -10,14 +10,14 @@ import projectDashboardMenu from '../c/project-dashboard-menu';
 const I18nScope = _.partial(h.i18nScope, 'projects.publish');
 
 const publish = {
-    controller(args) {
+    oninit(vnode) {
         const filtersVM = postgrest.filtersVM({
                 project_id: 'eq'
             }),
-            projectAccount = m.prop([]),
-            projectDetails = m.prop([]),
-            acceptTerm = m.prop([true, true, true, true, true, true, true, true, true]),
-            flexAcceptTerm = m.prop([true, true, true, true, true, true, true, true, true]),
+            projectAccount = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            projectDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            acceptTerm = console.warn("m.prop has been removed from mithril 1.0") || m.prop([true, true, true, true, true, true, true, true, true]),
+            flexAcceptTerm = console.warn("m.prop has been removed from mithril 1.0") || m.prop([true, true, true, true, true, true, true, true, true]),
             showNextTerm = (index, acceptTerms) => {
                 const terms = acceptTerms();
                 if (terms[index]) {
@@ -35,7 +35,7 @@ const publish = {
             },
             loader = postgrest.loaderWithToken;
 
-        filtersVM.project_id(args.root.getAttribute('data-id'));
+        filtersVM.project_id(vnode.attrs.root.getAttribute('data-id'));
 
         const l = loader(models.projectDetail.getRowOptions(filtersVM.parameters())),
             accountL = loader(models.projectAccount.getRowOptions(filtersVM.parameters()));
@@ -59,9 +59,9 @@ const publish = {
             projectDetails
         };
     },
-    view(ctrl, args) {
-        const project = _.first(ctrl.projectDetails()),
-            account = _.first(ctrl.projectAccount()),
+    view(vnode) {
+        const project = _.first(vnode.state.projectDetails()),
+            account = _.first(vnode.state.projectAccount()),
             flexTerms = project => [
                 m('.w-col.w-col-11', [
                     m('div', [
@@ -202,7 +202,7 @@ const publish = {
                         ' ',
                         m('span', { style: { 'font-weight': ' 600' } }, 'Prazo da campanha')
                     ]),
-                    m('div', `Seu projeto estará em arrecadação no Catarse até o dia ${h.momentify(ctrl.expiresAt())} às 23h59min59s. Este prazo não poderá ser alterado após a publicação do projeto.`)
+                    m('div', `Seu projeto estará em arrecadação no Catarse até o dia ${h.momentify(vnode.state.expiresAt())} às 23h59min59s. Este prazo não poderá ser alterado após a publicação do projeto.`)
                 ]),
 
                 m('.w-col.w-col-11', [
@@ -246,9 +246,9 @@ const publish = {
 
             ];
 
-        return [!ctrl.l() && !ctrl.accountL() ? [
-            (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
-                project: m.prop(project),
+        return [!vnode.state.l() && !vnode.state.accountL() ? [
+            (project.is_owner_or_admin ? m(projectDashboardMenu, {
+                project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(project),
                 hidePublish: true
             }) : ''),
             m(`.w-section.section-product.${project.mode}`),
@@ -314,7 +314,7 @@ const publish = {
                             m(`.w-row[id='rule-${index}']`, [
                                 m('.w-col.w-col-1.u-text-center', [
                                     m('div', [
-                                        m((project.mode === 'flex' ? ctrl.flexAcceptTerm() : ctrl.acceptTerm())[index] ? `a.w-inline-block.checkbox-big[href='#rule-${index + 1}']` : `a.w-inline-block.checkbox-big.checkbox--selected.fa.fa-check.fa-lg[href='#rule-${index + 1}']`, { onclick: () => ctrl.showNextTerm(index, (project.mode === 'flex' ? ctrl.flexAcceptTerm : ctrl.acceptTerm)) })
+                                        m((project.mode === 'flex' ? vnode.state.flexAcceptTerm() : vnode.state.acceptTerm())[index] ? `a.w-inline-block.checkbox-big[href='#rule-${index + 1}']` : `a.w-inline-block.checkbox-big.checkbox--selected.fa.fa-check.fa-lg[href='#rule-${index + 1}']`, { onclick: () => vnode.state.showNextTerm(index, (project.mode === 'flex' ? vnode.state.flexAcceptTerm : vnode.state.acceptTerm)) })
                                     ])
                                 ]),
                                 term

@@ -7,8 +7,8 @@ import projectReport from './project-report';
 import projectSuggestedContributions from './project-suggested-contributions';
 
 const projectAbout = {
-    view(ctrl, args) {
-        const project = args.project() || {},
+    view(vnode) {
+        const project = vnode.attrs.project() || {},
             onlineDays = () => {
                 const diff = moment(project.zone_online_date).diff(moment(project.zone_expires_at)),
                     duration = moment.duration(diff);
@@ -32,17 +32,17 @@ const projectAbout = {
                     m('p.fontsize-base.fontweight-semibold', 'Orçamento'),
                     m('p.fontsize-base', m.trust(project.budget))
                 ] : '',
-                m.component(projectReport)
+                m(projectReport)
             ]),
-            m('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', !_.isEmpty(args.rewardDetails()) ? [
+            m('.w-col.w-col-4.w-hidden-small.w-hidden-tiny', !_.isEmpty(vnode.attrs.rewardDetails()) ? [
                 m('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Recompensas'),
-                m.component(projectRewardList, {
-                    project: args.project,
-                    rewardDetails: args.rewardDetails
+                m(projectRewardList, {
+                    project: vnode.attrs.project,
+                    rewardDetails: vnode.attrs.rewardDetails
                 }), fundingPeriod()
             ] : [
                 m('.fontsize-base.fontweight-semibold.u-marginbottom-30', 'Sugestões de apoio'),
-                m.component(projectSuggestedContributions, { project: args.project }),
+                m(projectSuggestedContributions, { project: vnode.attrs.project }),
                 fundingPeriod()
             ])
         ]);

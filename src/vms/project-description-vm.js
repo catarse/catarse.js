@@ -6,7 +6,7 @@ import generateErrorInstance from '../error';
 const e = generateErrorInstance();
 
 const fields = {
-    about_html: m.prop('')
+    about_html: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
 };
 
 const fillFields = (data) => {

@@ -4,7 +4,7 @@ import m from 'mithril';
 
 const blogVM : { getBlogPosts : Function } = {
     getBlogPosts () : Promise<any> {
-        const deferred = m.deferred();
+        const deferred = console.warn("m.deferred has been removed from mithril 1.0") || m.deferred();
         const posts = _.first(document.getElementsByTagName('body')).getAttribute('data-blog');
 
         if (posts) {

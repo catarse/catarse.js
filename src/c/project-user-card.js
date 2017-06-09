@@ -7,8 +7,8 @@ import UserFollowBtn from './user-follow-btn';
 import userVM from '../vms/user-vm';
 
 const projectUserCard = {
-    controller(args) {
-        const project = args.project || m.prop({}),
+    oninit(vnode) {
+        const project = vnode.attrs.project || (console.warn("m.prop has been removed from mithril 1.0") || m.prop({})),
             displayModal = h.toggleProp(false, true),
             storeId = 'message',
             sendMessage = () => {
@@ -29,14 +29,14 @@ const projectUserCard = {
             sendMessage
         };
     },
-    view(ctrl, args) {
-        const project = args.project;
-        const contactModalC = [ownerMessageContent, args.userDetails];
-        const userDetail = args.userDetails();
+    view(vnode) {
+        const project = vnode.attrs.project;
+        const contactModalC = [ownerMessageContent, vnode.attrs.userDetails];
+        const userDetail = vnode.attrs.userDetails();
 
         return m('#user-card', _.isEmpty(userDetail) ? 'carregando...' : m('.u-marginbottom-30.u-text-center-small-only', [
-                (ctrl.displayModal() ? m.component(modalBox, {
-                    displayModal: ctrl.displayModal,
+                (vnode.state.displayModal() ? m(modalBox, {
+                    displayModal: vnode.state.displayModal,
                     content: contactModalC
                 }) : ''),
             m('.w-row', [
@@ -45,7 +45,7 @@ const projectUserCard = {
                 ]),
                 m('.w-col.w-col-8', [
                     m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [
-                        m(`a.link-hidden[href="/users/${userDetail.id}"]`, { config: m.route,
+                        m(`a.link-hidden[href="/users/${userDetail.id}"]`, { oncreate: m.route.link,
                             onclick: () => {
                                 m.route(`/users/${userDetail.id}`, { user_id: userDetail.id });
                                 h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
@@ -76,9 +76,9 @@ const projectUserCard = {
                                 disabledClass: 'a.w-button.btn.btn-terciary.btn-small.u-marginbottom-10',
                                 follow_id: userDetail.id,
                                 following: userDetail.following_this_user }),
-                            m('a.w-button.btn.btn-terciary.btn-small[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, ctrl.sendMessage) }, 'Contato')
+                            m('a.w-button.btn.btn-terciary.btn-small[href=\'javascript:void(0);\']', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_sendmsg', lbl: userDetail.id, project: project() }, vnode.state.sendMessage) }, 'Contato')
                         ] : ''),
-                    args.project().is_admin_role ?
+                    vnode.attrs.project().is_admin_role ?
                         m('p', userDetail.email) : ''
                 ]),
             ]),

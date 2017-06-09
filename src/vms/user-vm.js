@@ -6,7 +6,7 @@ import models from '../models';
 import projectFilters from './project-filters-vm';
 
 const idVM = h.idVM,
-    currentUser = m.prop({}),
+    currentUser = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
     createdVM = postgrest.filtersVM({ project_user_id: 'eq' });
 
 const getUserCreatedProjects = (user_id, pageSize = 3) => {
@@ -156,8 +156,8 @@ const displayCover = (user) => {
 
 const getUserRecommendedProjects = (contribution) => {
     const sample3 = _.partial(_.sample, _, 3),
-        loaders = m.prop([]),
-        collection = m.prop([]),
+        loaders = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+        collection = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
         { user_id } = h.getUser();
 
     const loader = () => _.reduce(loaders(), (memo, curr) => {

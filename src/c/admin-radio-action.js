@@ -3,26 +3,26 @@ import _ from 'underscore';
 import h from '../h';
 
 const adminRadioAction = {
-    controller(args) {
-        const builder = args.data,
-            complete = m.prop(false),
+    oninit(vnode) {
+        const builder = vnode.attrs.data,
+            complete = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             data = {},
-            error = m.prop(false),
-            fail = m.prop(false),
-            item = args.item(),
-            description = m.prop(item.description || ''),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            fail = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            item = vnode.attrs.item(),
+            description = console.warn("m.prop has been removed from mithril 1.0") || m.prop(item.description || ''),
             key = builder.getKey,
-            newID = m.prop(''),
+            newID = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
             getFilter = {},
             setFilter = {},
-            radios = m.prop([]),
+            radios = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             getAttr = builder.radios,
             getKey = builder.getKey,
-            getKeyValue = args.getKeyValue,
+            getKeyValue = vnode.attrs.getKeyValue,
             updateKey = builder.updateKey,
-            updateKeyValue = args.updateKeyValue,
+            updateKeyValue = vnode.attrs.updateKeyValue,
             validate = builder.validate,
-            selectedItem = builder.selectedItem || m.prop();
+            selectedItem = builder.selectedItem || (console.warn("m.prop has been removed from mithril 1.0") || m.prop());
 
         setFilter[updateKey] = 'eq';
         const setVM = postgrest.filtersVM(setFilter);
@@ -80,13 +80,7 @@ const adminRadioAction = {
             return false;
         };
 
-        const unload = (el, isinit, context) => {
-            context.onunload = () => {
-                complete(false);
-                error(false);
-                newID('');
-            };
-        };
+        const unload = (el, isinit, context) => {};
 
         const setDescription = (text) => {
             description(text);
@@ -109,46 +103,53 @@ const adminRadioAction = {
             radios
         };
     },
-    view(ctrl, args) {
-        const data = args.data,
-            item = args.item(),
-            btnValue = (ctrl.setLoader() || ctrl.getLoader()) ? 'por favor, aguarde...' : data.callToAction;
+
+    view(vnode) {
+        const data = vnode.attrs.data,
+            item = vnode.attrs.item(),
+            btnValue = (vnode.state.setLoader() || vnode.state.getLoader()) ? 'por favor, aguarde...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
-                onclick: ctrl.toggler.toggle
-            }, data.outerLabel), (ctrl.toggler()) ?
+                onclick: vnode.state.toggler.toggle
+            }, data.outerLabel), (vnode.state.toggler()) ?
             m('.dropdown-list.card.u-radius.dropdown-list-medium.zindex-10', {
-                config: ctrl.unload
+                config: vnode.state.unload
             }, [
                 m('form.w-form', {
-                    onsubmit: ctrl.submit
-                }, (!ctrl.complete()) ? [
-                    (ctrl.radios()) ?
-                    _.map(ctrl.radios(), (radio, index) => m('.w-radio', [
+                    onsubmit: vnode.state.submit
+                }, (!vnode.state.complete()) ? [
+                    (vnode.state.radios()) ?
+                    _.map(vnode.state.radios(), (radio, index) => m('.w-radio', [
                         m(`input#r-${index}.w-radio-input[type=radio][name="admin-radio"][value="${radio.id}"]`, {
                             checked: radio.id === (item[data.selectKey] || item.id),
                             onclick: () => {
-                                ctrl.newID(radio.id);
-                                ctrl.setDescription(radio.description);
+                                vnode.state.newID(radio.id);
+                                vnode.state.setDescription(radio.description);
                             }
                         }),
                         m(`label.w-form-label[for="r-${index}"]`, `R$${radio.minimum_value}`)
                     ])) : h.loader(),
                     m('strong', 'Descrição'),
-                    m('p', ctrl.description()),
+                    m('p', vnode.state.description()),
                     m(`input.w-button.btn.btn-small[type="submit"][value="${btnValue}"]`)
-                ] : (!ctrl.error()) ? [
+                ] : (!vnode.state.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
                         m('p', 'Recompensa alterada com sucesso!')
                     ])
                 ] : [
                     m('.w-form-error[style="display:block;"]', [
-                        m('p', ctrl.error().message)
+                        m('p', vnode.state.error().message)
                     ])
                 ])
             ]) : ''
         ]);
+    },
+
+    onremove: () => {
+        complete(false);
+        error(false);
+        newID('');
     }
 };
 

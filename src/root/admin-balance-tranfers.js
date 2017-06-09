@@ -13,7 +13,7 @@ import adminBalanceTransferItem from '../c/admin-balance-transfer-item';
 import adminBalanceTransferItemDetail from '../c/admin-balance-transfer-item-detail';
 
 const adminBalanceTranfers = {
-    controller(args) {
+    oninit(vnode) {
         const listVM = balanceTransferListVM,
               filterVM = balanceTransferFilterVM,
               error = m.prop(''),
@@ -121,10 +121,10 @@ const adminBalanceTranfers = {
               },
               generateWrapperModal = (customAttrs) => {
                   const wrapper = {
-                      view(ctrl, args) {
+                      view(ctrl, vnode.attrs) {
                           return m('', [
                               m('.modal-dialog-header', [
-                                  m('.fontsize-large.u-text-center', args.modalTitle)
+                                  m('.fontsize-large.u-text-center', vnode.attrs.modalTitle)
                               ]),
                               m('.modal-dialog-content', [
                                   _.map(selectedItemsIDs(), (item, index) => {
@@ -149,12 +149,12 @@ const adminBalanceTranfers = {
                                       m('.w-col.w-col-1'),
                                       m('.w-col.w-col-5',
                                         m('a.btn.btn-medium.w-button', {
-                                            onclick: args.onClickCallback
-                                        }, args.ctaText)
+                                            onclick: vnode.attrs.onClickCallback
+                                        }, vnode.attrs.ctaText)
                                        ),
                                       m('.w-col.w-col-5',
                                         m('a.btn.btn-medium.btn-terciary.w-button', {
-                                            onclick: args.displayModal.toggle
+                                            onclick: vnode.attrs.displayModal.toggle
                                         }, 'Voltar')
                                        ),
                                       m('.w-col.w-col-1')

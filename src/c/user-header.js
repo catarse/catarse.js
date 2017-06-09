@@ -4,9 +4,9 @@ import h from '../h';
 import userVM from '../vms/user-vm';
 
 const userHeader = {
-    view(ctrl, args) {
-        const user = args.user,
-            hideDetails = args.hideDetails,
+    view(vnode) {
+        const user = vnode.attrs.user,
+            hideDetails = vnode.attrs.hideDetails,
             profileImage = userVM.displayImage(user),
             coverImage = userVM.displayCover(user);
 

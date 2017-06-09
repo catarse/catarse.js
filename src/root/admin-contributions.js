@@ -12,10 +12,10 @@ import filterNumberRange from '../c/filter-number-range';
 import filterDateRange from '../c/filter-date-range';
 
 const adminContributions = {
-    controller() {
+    oninit() {
         let listVM = contributionListVM,
             filterVM = contributionFilterVM,
-            error = m.prop(''),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
             filterBuilder = [{ // full_text_index
                 component: filterMain,
                 data: {
@@ -137,15 +137,15 @@ const adminContributions = {
         };
     },
 
-    view(ctrl) {
+    view(vnode) {
         return m('#admin-root-contributions', [
-            m.component(adminFilter, {
-                form: ctrl.filterVM.formDescriber,
-                filterBuilder: ctrl.filterBuilder,
-                submit: ctrl.submit
+            m(adminFilter, {
+                form: vnode.state.filterVM.formDescriber,
+                filterBuilder: vnode.state.filterBuilder,
+                submit: vnode.state.submit
             }),
-            m.component(adminList, {
-                vm: ctrl.listVM,
+            m(adminList, {
+                vm: vnode.state.listVM,
                 listItem: adminContributionItem,
                 listDetail: adminContributionDetail
             })

@@ -13,12 +13,12 @@ import popNotification from '../c/pop-notification';
 const I18nScope = _.partial(h.i18nScope, 'projects.reward_fields');
 
 const projectEditReward = {
-    controller(args) {
-        const rewards = m.prop([]),
-            loading = m.prop(false),
-            error = m.prop(false),
-            errors = m.prop([]),
-            showSuccess = m.prop(false),
+    oninit(vnode) {
+        const rewards = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            errors = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            showSuccess = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             availableCount = reward => reward.maximum_contributions - reward.paid_count,
             updateRewardData = () => {
                 const data = $('#reward_form').serialize();
@@ -26,7 +26,7 @@ const projectEditReward = {
                 // m.request won't serialize params properly here
                 return $.ajax({
                     type: 'PATCH',
-                    url: `/pt/projects/${args.project_id}'`,
+                    url: `/pt/projects/${vnode.attrs.project_id}'`,
                     data,
                     dataType: 'JSON'
                 }).done(() => {
@@ -65,7 +65,7 @@ const projectEditReward = {
                 deliver_at: moment().date(1).format(),
                 description: null,
                 paid_count: 0,
-                edit: m.prop(true),
+                edit: console.warn("m.prop has been removed from mithril 1.0") || m.prop(true),
                 limited: h.toggleProp(false, true),
                 maximum_contributions: null,
                 newReward: true,
@@ -74,11 +74,11 @@ const projectEditReward = {
 
         const updateRewardSortPosition = (rewardId, position) => m.request({
             method: 'POST',
-            url: `/pt/projects/${args.project_id}/rewards/${rewardId}/sort?reward[row_order_position]=${position}`,
-            config: (xhr) => {
+            url: `/pt/projects/${vnode.attrs.project_id}/rewards/${rewardId}/sort?reward[row_order_position]=${position}`,
+            onupdate: (vnode) => {
                 if (h.authenticityToken()) {
-                    xhr.setRequestHeader('X-CSRF-Token', h.authenticityToken());
-                    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    vnode.dom.setRequestHeader('X-CSRF-Token', h.authenticityToken());
+                    vnode.dom.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                 }
             }
         });
@@ -94,7 +94,7 @@ const projectEditReward = {
             }
         };
 
-        const loadRewards = () => rewardVM.fetchRewards(args.project_id).then(() => {
+        const loadRewards = () => rewardVM.fetchRewards(vnode.attrs.project_id).then(() => {
             rewards([]);
             _.map(rewardVM.rewards(), (reward) => {
                 const limited = reward.maximum_contributions !== null;
@@ -102,11 +102,11 @@ const projectEditReward = {
                     edit: h.toggleProp(false, true),
                     limited: h.toggleProp(limited, !limited)
                 });
-                rewards().push(m.prop(reward));
+                rewards().push(console.warn("m.prop has been removed from mithril 1.0") || m.prop(reward));
             });
 
             if (rewardVM.rewards().length === 0) {
-                rewards().push(m.prop(newReward()));
+                rewards().push(console.warn("m.prop has been removed from mithril 1.0") || m.prop(newReward()));
             }
         });
 
@@ -121,7 +121,7 @@ const projectEditReward = {
             showSuccess,
             rewards,
             onSubmit,
-            user: userVM.fetchUser(args.user_id),
+            user: userVM.fetchUser(vnode.attrs.user_id),
             availableCount,
             newReward,
             setSorting,
@@ -129,19 +129,19 @@ const projectEditReward = {
         };
     },
 
-    view(ctrl, args) {
-        const error = ctrl.error,
-              project = args.project;
+    view(vnode) {
+        const error = vnode.state.error,
+              project = vnode.attrs.project;
 
         return m("[id='dashboard-rewards-tab']",
                  (project() ? [
             m('.w-section.section',
                 m('.w-container', [
-                    (ctrl.showSuccess() ? m.component(popNotification, {
+                    (vnode.state.showSuccess() ? m(popNotification, {
                         message: 'Recompensas salvas com sucesso'
                     }) : ''),
-                    (ctrl.error() ? m.component(popNotification, {
-                        message: ctrl.errors(),
+                    (vnode.state.error() ? m(popNotification, {
+                        message: vnode.state.errors(),
                         error: true
                     }) : ''),
                     m('.w-row',
@@ -160,29 +160,29 @@ const projectEditReward = {
                         [
                             m('.w-col.w-col-9',
                                 m('form.simple_form.project-form.w-form[id=\'reward_form\']', {
-                                    onsubmit: ctrl.onSubmit
+                                    onsubmit: vnode.state.onSubmit
                                 }, [
                                     m("input[name='utf8'][type='hidden'][value='✓']"),
                                     m("input[name='_method'][type='hidden'][value='patch']"),
                                     m(`input[name="authenticity_token"][type="hidden"][value=${h.authenticityToken()}]`),
-                                    m(`input[id='project_id'][name='project_id'][type='hidden'][value='${args.project_id}']`),
+                                    m(`input[id='project_id'][name='project_id'][type='hidden'][value='${vnode.attrs.project_id}']`),
                                     m("input[id='anchor'][name='anchor'][type='hidden'][value='reward']"),
                                     m("[id='dashboard-rewards']", [
 
-                                        ctrl.rewards().length === 0 ? '' : m(".ui-sortable[id='rewards']", {
-                                            config: ctrl.setSorting
+                                        vnode.state.rewards().length === 0 ? '' : m(".ui-sortable[id='rewards']", {
+                                            config: vnode.state.setSorting
                                         }, [
-                                            _.map(_.sortBy(ctrl.rewards(), reward => Number(reward().row_order)), (reward, index) => m(`div[id=${reward().id}]`, [m('.nested-fields',
+                                            _.map(_.sortBy(vnode.state.rewards(), reward => Number(reward().row_order)), (reward, index) => m(`div[id=${reward().id}]`, [m('.nested-fields',
                                                     m('.reward-card', [
                                                         (!reward().edit() ?
                                                             m(dashboardRewardCard, {
                                                                 reward: reward(),
-                                                                user: ctrl.user(),
-                                                                project_id: args.project_id,
+                                                                user: vnode.state.user(),
+                                                                project_id: vnode.attrs.project_id,
                                                                 project_state: project().state
                                                             }) :
                                                             m(editRewardCard, {
-                                                                project_id: args.project_id,
+                                                                project_id: vnode.attrs.project_id,
                                                                 error,
                                                                 reward,
                                                                 index
@@ -200,7 +200,7 @@ const projectEditReward = {
                                 ]),
                               rewardVM.canAdd(project().state) ? [
                                     m('button.btn.btn-large.btn-message.show_reward_form.new_reward_button.add_fields', {
-                                        onclick: () => ctrl.rewards().push(m.prop(ctrl.newReward()))
+                                        onclick: () => vnode.state.rewards().push(console.warn("m.prop has been removed from mithril 1.0") || m.prop(vnode.state.newReward()))
                                     },
                                         I18n.t('add_reward', I18nScope())
                                     )
@@ -214,7 +214,7 @@ const projectEditReward = {
                                 I18n.t('reward_faq_sub_intro', I18nScope()),
                                 m('br'),
                                 m('br'),
-                                _.map(ctrl.tips, tip => [
+                                _.map(vnode.state.tips, tip => [
                                     m('.fontweight-semibold', tip.title),
                                     m.trust(tip.description),
                                     m('br'),
@@ -226,8 +226,8 @@ const projectEditReward = {
                 ]),
                 rewardVM.canAdd(project().state) ? [
                     m(projectEditSaveBtn, {
-                        loading: ctrl.loading,
-                        onSubmit: ctrl.onSubmit
+                        loading: vnode.state.loading,
+                        onSubmit: vnode.state.onSubmit
                     })
                 ] : ''
             )] : h.loader())

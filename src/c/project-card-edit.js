@@ -12,7 +12,7 @@ import projectCard from './project-card';
 const I18nScope = _.partial(h.i18nScope, 'projects.dashboard_card');
 
 const projectCardEdit = {
-    controller(args) {
+    oninit(vnode) {
         const vm = projectCardVM,
             mapErrors = [
                   ['uploaded_image', ['uploaded_image']],
@@ -20,12 +20,12 @@ const projectCardEdit = {
             ],
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),
-            loading = m.prop(false),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             onSubmit = (event) => {
                 loading(true);
                 m.redraw();
-                vm.uploadImage(args.projectId).then((uploaded) => {
-                    vm.updateProject(args.projectId).then((data) => {
+                vm.uploadImage(vnode.attrs.projectId).then((uploaded) => {
+                    vm.updateProject(vnode.attrs.projectId).then((data) => {
                         loading(false);
                         vm.e.resetFieldErrors();
                         if (!showSuccess()) { showSuccess.toggle(); }
@@ -55,7 +55,7 @@ const projectCardEdit = {
         if (railsErrorsVM.railsErrors()) {
             railsErrorsVM.mapRailsErrors(railsErrorsVM.railsErrors(), mapErrors, vm.e);
         }
-        vm.fillFields(args.project);
+        vm.fillFields(vnode.attrs.project);
 
         return {
             onSubmit,
@@ -65,20 +65,20 @@ const projectCardEdit = {
             loading
         };
     },
-    view(ctrl, args) {
-        const vm = ctrl.vm;
+    view(vnode) {
+        const vm = vnode.state.vm;
         return m('#card-tab', [
-            (ctrl.showSuccess() ? m.component(popNotification, {
+            (vnode.state.showSuccess() ? m(popNotification, {
                 message: I18n.t('shared.successful_update'),
-                toggleOpt: ctrl.showSuccess
+                toggleOpt: vnode.state.showSuccess
             }) : ''),
-            (ctrl.showError() ? m.component(popNotification, {
+            (vnode.state.showError() ? m(popNotification, {
                 message: I18n.t('shared.failed_update'),
-                toggleOpt: ctrl.showError,
+                toggleOpt: vnode.state.showError,
                 error: true
             }) : ''),
 
-            m('form.w-form', { onsubmit: ctrl.onSubmit }, [
+            m('form.w-form', { onsubmit: vnode.state.onSubmit }, [
                 m('.w-section.section', [
                     m('.w-container', [
                         m('.w-row', [
@@ -110,7 +110,7 @@ const projectCardEdit = {
                         ])
                     ])
                 ]),
-                m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })
+                m(projectEditSaveBtn, { loading: vnode.state.loading, onSubmit: vnode.state.onSubmit })
             ])
 
         ]);

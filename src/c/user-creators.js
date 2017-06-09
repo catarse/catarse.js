@@ -18,14 +18,14 @@ import UserFollowCard from '../c/user-follow-card';
 import loadMoreBtn from '../c/load-more-btn';
 
 const userCreators = {
-    controller() {
+    oninit() {
         models.creatorSuggestion.pageSize(9);
         const creatorsListVM = postgrest.paginationVM(
             models.creatorSuggestion,
             'following.asc, total_published_projects.desc, total_contributed_projects.desc', {
                 Prefer: 'count=exact'
             });
-        const allLoading = m.prop(false);
+        const allLoading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
         const followAll = () => {
             allLoading(true);
             const l = postgrest.loaderWithToken(models.followAllCreators.postOptions({}));
@@ -46,8 +46,8 @@ const userCreators = {
             followAll
         };
     },
-    view(ctrl) {
-        const creatorsVM = ctrl.creatorsListVM;
+    view(vnode) {
+        const creatorsVM = vnode.state.creatorsListVM;
 
         return m('.w-section.bg-gray.before-footer.section', [
             m('.w-container', [
@@ -56,35 +56,32 @@ const userCreators = {
                         m('.fontsize-small', 'Siga os realizadores que você já apoiou e saiba em primeira mão sempre que eles apoiarem projetos ou lançarem novas campanhas!')
                     ]),
                     m('.w-col.w-col-5.w-col-small-6.w-col-tiny-6', [
-                        (ctrl.allLoading() ? h.loader()
+                        (vnode.state.allLoading() ? h.loader()
                          : m('a.w-button.btn.btn-medium', {
-                             onclick: ctrl.followAll
+                             onclick: vnode.state.followAll
                          }, `Siga todos os ${creatorsVM.total() ? creatorsVM.total() : ''} realizadores`))
                     ])
                 ]),
                 m('.w-row', [
-                    _.map(creatorsVM.collection(), friend => m.component(
-                            UserFollowCard,
-                        {
-                            friend: _.extend({}, {
-                                friend_id: friend.user_id
-                            }, friend)
-                        })),
+                    _.map(creatorsVM.collection(), friend => m(UserFollowCard, {
+                        friend: _.extend({}, {
+                            friend_id: friend.user_id
+                        }, friend)
+                    })),
                 ]),
                 m('.w-section.section.bg-gray', [
                     m('.w-container', [
                         m('.w-row.u-marginbottom-60', [
                             m('.w-col.w-col-5', [
                                 m('.u-marginright-20')
-                            ]), m.component(loadMoreBtn, { collection: creatorsVM }),
+                            ]), m(loadMoreBtn, { collection: creatorsVM }),
                             m('.w-col.w-col-5')
                         ])
                     ])
                 ])
 
             ])
-        ])
-        ;
+        ]);
     }
 };
 

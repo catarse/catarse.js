@@ -11,9 +11,9 @@ const I18nScope = _.partial(h.i18nScope, 'projects.contributions.edit.errors');
 const I18nIntScope = _.partial(h.i18nScope, 'projects.contributions.edit_international.errors');
 
 const paymentVM = () => {
-    const pagarme = m.prop({}),
-        submissionError = m.prop(false),
-        isLoading = m.prop(false);
+    const pagarme = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
+        submissionError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+        isLoading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
 
     const setCsrfToken = (xhr) => {
         if (h.authenticityToken()) {
@@ -22,32 +22,32 @@ const paymentVM = () => {
     };
 
     const fields = {
-        completeName: m.prop(''),
-        anonymous: m.prop(),
-        countries: m.prop(),
-        userCountryId: m.prop(),
-        zipCode: m.prop(''),
-        street: m.prop(''),
-        number: m.prop(''),
-        addressComplement: m.prop(''),
-        neighbourhood: m.prop(''),
-        city: m.prop(''),
-        states: m.prop([]),
-        userState: m.prop(),
-        ownerDocument: m.prop(''),
-        phone: m.prop(''),
-        errors: m.prop([])
+        completeName: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        anonymous: console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+        countries: console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+        userCountryId: console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+        zipCode: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        street: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        number: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        addressComplement: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        neighbourhood: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        city: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        states: console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+        userState: console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+        ownerDocument: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        phone: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        errors: console.warn("m.prop has been removed from mithril 1.0") || m.prop([])
     };
 
     const creditCardFields = {
-        name: m.prop(''),
-        number: m.prop(''),
-        expMonth: m.prop(''),
-        expYear: m.prop(''),
-        save: m.prop(false),
-        cvv: m.prop(''),
-        errors: m.prop([]),
-        cardOwnerDocument: m.prop('')
+        name: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        number: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        expMonth: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        expYear: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        save: console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+        cvv: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+        errors: console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+        cardOwnerDocument: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
     };
 
     const populateForm = (fetchedData) => {
@@ -180,7 +180,7 @@ const paymentVM = () => {
     };
 
     const getSlipPaymentDate = (contribution_id) => {
-        const paymentDate = m.prop();
+        const paymentDate = console.warn("m.prop has been removed from mithril 1.0") || m.prop();
 
         m.request({
             method: 'GET',
@@ -233,7 +233,7 @@ const paymentVM = () => {
         }
     };
 
-    const savedCreditCards = m.prop([]);
+    const savedCreditCards = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]);
 
     const getSavedCreditCards = (user_id) => {
         const otherSample = {
@@ -297,7 +297,7 @@ const paymentVM = () => {
     };
 
     const payWithNewCard = (contribution_id, installment) => {
-        const deferred = m.deferred();
+        const deferred = console.warn("m.deferred has been removed from mithril 1.0") || m.deferred();
         m.request({
             method: 'GET',
             url: `/payment/pagarme/${contribution_id}/get_encryption_key`,
@@ -390,7 +390,7 @@ const paymentVM = () => {
     };
 
     const sendPayment = (selectedCreditCard, selectedInstallment, contribution_id, project_id) => {
-        const deferred = m.deferred();
+        const deferred = console.warn("m.deferred has been removed from mithril 1.0") || m.deferred();
         if (validate()) {
             isLoading(true);
             submissionError(false);
@@ -424,7 +424,7 @@ const paymentVM = () => {
         return newErrors(creditCardFields.errors(), errorField);
     };
 
-    const installments = m.prop([{ value: 10, number: 1 }]);
+    const installments = console.warn("m.prop has been removed from mithril 1.0") || m.prop([{ value: 10, number: 1 }]);
 
     const getInstallments = contribution_id => m.request({
         method: 'GET',

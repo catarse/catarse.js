@@ -8,15 +8,15 @@ import rewardVM from '../vms/reward-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.reward_fields');
 
 const dashboardRewardCard = {
-    controller() {
+    oninit() {
         const availableCount = reward => reward.maximum_contributions - reward.paid_count;
 
         return {
             availableCount
         };
     },
-    view(ctrl, args) {
-        const reward = args.reward;
+    view(vnode) {
+        const reward = vnode.attrs.reward;
         return m('.w-row.card-persisted.card.card-terciary.u-marginbottom-20.medium.sortable', [
             m('.card', [
                 m('.w-row', [
@@ -25,7 +25,7 @@ const dashboardRewardCard = {
                             I18n.t('minimum_value_title', I18nScope({minimum_value: reward.minimum_value}))
                         )
                     ),
-                    (rewardVM.canEdit(reward, args.project_state, args.user) ?
+                    (rewardVM.canEdit(reward, vnode.attrs.project_state, vnode.attrs.user) ?
                         m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1',
                             m("a.show_reward_form[href='javascript:void(0);']", {
                                     onclick: () => {
@@ -45,7 +45,7 @@ const dashboardRewardCard = {
                 m('.fontsize-small.fontcolor-secondary',
                     m.trust(h.simpleFormat(h.strip(reward.description))),
                 ),
-                (reward.limited() ? (ctrl.availableCount(reward) <= 0) ?
+                (reward.limited() ? (vnode.state.availableCount(reward) <= 0) ?
                     m('.u-margintop-10',
                         m('span.badge.badge-gone.fontsize-smaller',
                             I18n.t('reward_gone', I18nScope())
@@ -56,7 +56,7 @@ const dashboardRewardCard = {
                             m('span.fontweight-bold',
                                 I18n.t('reward_limited', I18nScope())
                             ),
-                            I18n.t('reward_available', I18nScope({available: ctrl.availableCount(reward), maximum: reward.maximum_contributions}))
+                            I18n.t('reward_available', I18nScope({available: vnode.state.availableCount(reward), maximum: reward.maximum_contributions}))
                         ])
                     ) : ''),
 
@@ -74,8 +74,8 @@ const dashboardRewardCard = {
                 ),
                 m('.w-form',
                     m('.w-col.w-col-6',
-                        m.component(copyTextInput, {
-                            value: `https://www.catarse.me/pt/projects/${args.project_id}/contributions/new?reward_id=${reward.id}`
+                        m(copyTextInput, {
+                            value: `https://www.catarse.me/pt/projects/${vnode.attrs.project_id}/contributions/new?reward_id=${reward.id}`
                         }),
                     )
                 ),

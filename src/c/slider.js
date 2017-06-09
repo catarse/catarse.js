@@ -17,20 +17,20 @@ import m from 'mithril';
 import _ from 'underscore';
 
 const slider = {
-    controller(args) {
+    oninit(vnode) {
         let interval;
-        const selectedSlideIdx = m.prop(0),
-            translationSize = m.prop(1600),
-            sliderTime = args.sliderTime || 6500,
+        const selectedSlideIdx = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            translationSize = console.warn("m.prop has been removed from mithril 1.0") || m.prop(1600),
+            sliderTime = vnode.attrs.sliderTime || 6500,
             decrementSlide = () => {
                 if (selectedSlideIdx() > 0) {
                     selectedSlideIdx(selectedSlideIdx() - 1);
                 } else {
-                    selectedSlideIdx(args.slides.length - 1);
+                    selectedSlideIdx(vnode.attrs.slides.length - 1);
                 }
             },
             incrementSlide = () => {
-                if (selectedSlideIdx() < (args.slides.length - 1)) {
+                if (selectedSlideIdx() < (vnode.attrs.slides.length - 1)) {
                     selectedSlideIdx(selectedSlideIdx() + 1);
                 } else {
                     selectedSlideIdx(0);
@@ -51,8 +51,6 @@ const slider = {
                     translationSize(Math.max(document.documentElement.clientWidth, window.innerWidth || 0));
                     m.redraw();
                 }
-
-                context.onunload = () => clearInterval(interval);
             };
 
         startSliderTimer();
@@ -66,29 +64,30 @@ const slider = {
             resetSliderTimer
         };
     },
-    view(ctrl, args) {
-        const slideClass = args.slideClass || '',
-            wrapperClass = args.wrapperClass || '',
-            effect = args.effect || 'slide',
+
+    view(vnode) {
+        const slideClass = vnode.attrs.slideClass || '',
+            wrapperClass = vnode.attrs.wrapperClass || '',
+            effect = vnode.attrs.effect || 'slide',
             sliderClick = (fn, param) => {
                 fn(param);
-                ctrl.resetSliderTimer();
-                args.onchange && args.onchange();
+                vnode.state.resetSliderTimer();
+                vnode.attrs.onchange && vnode.attrs.onchange();
             },
             effectStyle = (idx, translateStr) => {
                 const slideFx = `transform: ${translateStr}; -webkit-transform: ${translateStr}; -ms-transform:${translateStr}`,
-                    fadeFx = idx === ctrl.selectedSlideIdx() ? 'opacity: 1; visibility: visible;' : 'opacity: 0; visibility: hidden;';
+                    fadeFx = idx === vnode.state.selectedSlideIdx() ? 'opacity: 1; visibility: visible;' : 'opacity: 0; visibility: hidden;';
 
                 return effect === 'fade' ? fadeFx : slideFx;
             };
 
         return m(`.w-slider.${wrapperClass}`, {
-            config: ctrl.config
+            config: vnode.state.config
         }, [
-            m('.fontsize-larger', args.title),
+            m('.fontsize-larger', vnode.attrs.title),
             m('.w-slider-mask', [
-                _.map(args.slides, (slide, idx) => {
-                    let translateValue = (idx - ctrl.selectedSlideIdx()) * ctrl.translationSize(),
+                _.map(vnode.attrs.slides, (slide, idx) => {
+                    let translateValue = (idx - vnode.state.selectedSlideIdx()) * vnode.state.translationSize(),
                         translateStr = `translate3d(${translateValue}px, 0, 0)`;
 
                     return m(`.slide.w-slide.${slideClass}`, {
@@ -102,21 +101,23 @@ const slider = {
                     ]);
                 }),
                 m('#slide-prev.w-slider-arrow-left.w-hidden-small.w-hidden-tiny', {
-                    onclick: () => sliderClick(ctrl.decrementSlide)
+                    onclick: () => sliderClick(vnode.state.decrementSlide)
                 }, [
                     m('.w-icon-slider-left.fa.fa-lg.fa-angle-left.fontcolor-terciary')
                 ]),
                 m('#slide-next.w-slider-arrow-right.w-hidden-small.w-hidden-tiny', {
-                    onclick: () => sliderClick(ctrl.incrementSlide)
+                    onclick: () => sliderClick(vnode.state.incrementSlide)
                 }, [
                     m('.w-icon-slider-right.fa.fa-lg.fa-angle-right.fontcolor-terciary')
                 ]),
-                m('.w-slider-nav.w-slider-nav-invert.w-round.slide-nav', _(args.slides.length).times(idx => m(`.slide-bullet.w-slider-dot${ctrl.selectedSlideIdx() === idx ? '.w-active' : ''}`, {
-                    onclick: () => sliderClick(ctrl.selectedSlideIdx, idx)
+                m('.w-slider-nav.w-slider-nav-invert.w-round.slide-nav', _(vnode.attrs.slides.length).times(idx => m(`.slide-bullet.w-slider-dot${vnode.state.selectedSlideIdx() === idx ? '.w-active' : ''}`, {
+                    onclick: () => sliderClick(vnode.state.selectedSlideIdx, idx)
                 })))
             ])
         ]);
-    }
+    },
+
+    onremove: () => clearInterval(interval)
 };
 
 export default slider;

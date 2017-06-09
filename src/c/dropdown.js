@@ -2,14 +2,14 @@ import m from 'mithril';
 import _ from 'underscore';
 
 const dropdown = {
-    view(ctrl, args) {
-        const opts = (_.isFunction(args.options) ? args.options() : args.options);
+    view(vnode) {
+        const opts = (_.isFunction(vnode.attrs.options) ? vnode.attrs.options() : vnode.attrs.options);
 
         return m(
-            `select${args.classes}[id="${args.id}"]`,
+            `select${vnode.attrs.classes}[id="${vnode.attrs.id}"]`,
             {
-                onchange: (e) => { args.valueProp(e.target.value); args.onchange(); },
-                value: args.valueProp()
+                onchange: (e) => { vnode.attrs.valueProp(e.target.value); vnode.attrs.onchange(); },
+                value: vnode.attrs.valueProp()
             },
             _.map(opts, data => m(`option[value="${data.value}"]`, data.option))
         );

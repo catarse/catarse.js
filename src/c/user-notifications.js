@@ -5,12 +5,12 @@ import userVM from '../vms/user-vm';
 import inlineError from './inline-error';
 
 const userNotifications = {
-    controller(args) {
-        const contributedProjects = m.prop(),
-            projectReminders = m.prop(),
-            user_id = args.userId,
+    oninit(vnode) {
+        const contributedProjects = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            projectReminders = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            user_id = vnode.attrs.userId,
             showNotifications = h.toggleProp(false, true),
-            error = m.prop(false);
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
 
         userVM.getUserProjectReminders(user_id).then(
             projectReminders
@@ -33,12 +33,12 @@ const userNotifications = {
             error
         };
     },
-    view(ctrl, args) {
-        const user = args.user,
-            reminders = ctrl.projectReminders();
-        const projects_collection = ctrl.projects();
+    view(vnode) {
+        const user = vnode.attrs.user,
+            reminders = vnode.state.projectReminders();
+        const projects_collection = vnode.state.projects();
 
-        return m('[id=\'notifications-tab\']', ctrl.error() ? m.component(inlineError, {
+        return m('[id=\'notifications-tab\']', vnode.state.error() ? m(inlineError, {
             message: 'Erro ao carregar a página.'
         }) :
             m(`form.simple_form.edit_user[accept-charset='UTF-8'][action='/pt/users/${user.id}'][method='post'][novalidate='novalidate']`, [
@@ -85,12 +85,12 @@ const userNotifications = {
                                             ),
                                             m('.u-marginbottom-20',
                                                 m('a.alt-link[href=\'javascript:void(0);\']', {
-                                                    onclick: ctrl.showNotifications.toggle
+                                                    onclick: vnode.state.showNotifications.toggle
                                                 },
                                                     ` Gerenciar as notificações de ${user.total_contributed_projects} projetos`
                                                 )
                                             ),
-                                            (ctrl.showNotifications() ?
+                                            (vnode.state.showNotifications() ?
                                                 m('ul.w-list-unstyled.u-radius.card.card-secondary[id=\'notifications-box\']', [
                                                     (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m('li',
                                                             m('.w-checkbox.w-clearfix', [

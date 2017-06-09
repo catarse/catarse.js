@@ -13,8 +13,8 @@ import _ from 'underscore';
 import Chart from 'chartjs';
 
 const projectDataChart = {
-    controller(args) {
-        const resource = _.first(args.collection()),
+    oninit(vnode) {
+        const resource = _.first(vnode.attrs.collection()),
             source = (!_.isUndefined(resource) ? resource.source : []),
 
             mountDataset = () => [{
@@ -24,14 +24,14 @@ const projectDataChart = {
                 pointStrokeColor: '#fff',
                 pointHighlightFill: '#fff',
                 pointHighlightStroke: 'rgba(220,220,220,1)',
-                data: _.map(source, item => item[args.dataKey])
+                data: _.map(source, item => item[vnode.attrs.dataKey])
             }],
             renderChart = (element, isInitialized) => {
                 if (!isInitialized) {
                     const ctx = element.getContext('2d');
 
                     new Chart(ctx).Line({
-                        labels: args.xAxis ? _.map(source, item => args.xAxis(item)) : [],
+                        labels: vnode.attrs.xAxis ? _.map(source, item => vnode.attrs.xAxis(item)) : [],
                         datasets: mountDataset()
                     });
                 }
@@ -42,14 +42,14 @@ const projectDataChart = {
             source
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('.card.u-radius.medium.u-marginbottom-30', [
-            m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', args.label),
+            m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', vnode.attrs.label),
             m('.w-row', [
                 m('.w-col.w-col-12.overflow-auto', [
-                    !_.isEmpty(ctrl.source) ? m('canvas[id="chart"][width="860"][height="300"]', {
-                        config: ctrl.renderChart
-                    }) : m('.w-col.w-col-8.w-col-push-2', m('p.fontsize-base', args.emptyState))
+                    !_.isEmpty(vnode.state.source) ? m('canvas[id="chart"][width="860"][height="300"]', {
+                        config: vnode.state.renderChart
+                    }) : m('.w-col.w-col-8.w-col-push-2', m('p.fontsize-base', vnode.attrs.emptyState))
                 ]),
             ])
         ]);

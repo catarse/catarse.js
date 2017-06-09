@@ -1,15 +1,15 @@
 import m from 'mithril';
 
 const bigInputCard = {
-    view(ctrl, args) {
-        const cardClass = args.cardClass || '.w-row.u-marginbottom-30.card.card-terciary.padding-redactor-description.text.optional.project_about_html.field_with_hint';
+    view(vnode) {
+        const cardClass = vnode.attrs.cardClass || '.w-row.u-marginbottom-30.card.card-terciary.padding-redactor-description.text.optional.project_about_html.field_with_hint';
 
-        return m(cardClass, {style: (args.cardStyle||{})}, [
+        return m(cardClass, {style: (vnode.attrs.cardStyle||{})}, [
             m('div', [
-                m('label.field-label.fontweight-semibold.fontsize-base', args.label),
-                (args.label_hint ? m('label.hint.fontsize-smallest.fontcolor-secondary', args.label_hint) : '')
+                m('label.field-label.fontweight-semibold.fontsize-base', vnode.attrs.label),
+                (vnode.attrs.label_hint ? m('label.hint.fontsize-smallest.fontcolor-secondary', vnode.attrs.label_hint) : '')
             ]),
-            m('div', args.children)
+            m('div', vnode.attrs.children)
         ]);
     }
 };

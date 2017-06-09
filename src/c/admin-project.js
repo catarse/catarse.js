@@ -2,8 +2,8 @@ import m from 'mithril';
 import h from '../h';
 
 const adminProject = {
-    view(ctrl, args) {
-        const project = args.item;
+    view(vnode) {
+        const project = vnode.attrs.item;
         return m('.w-row.admin-project', [
             m('.w-col.w-col-3.w-col-small-3.u-marginbottom-10', [
                 m(`img.thumb-project.u-radius[src=${project.project_img}][width=50]`)

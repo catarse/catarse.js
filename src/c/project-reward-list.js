@@ -8,11 +8,11 @@ import projectVM from '../vms/project-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions');
 
 const projectRewardList = {
-    controller() {
+    oninit() {
         const storeKey = 'selectedReward',
             vm = rewardVM,
-            descriptionExtended = m.prop(0),
-            selectedDestination = m.prop(''),
+            descriptionExtended = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            selectedDestination = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
             toggleDescriptionExtended = (rewardId) => {
                 if (descriptionExtended() === rewardId) {
                     descriptionExtended(0);
@@ -85,14 +85,14 @@ const projectRewardList = {
             contributionValue: vm.contributionValue
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         // FIXME: MISSING ADJUSTS
         // - add draft admin modifications
         // - move the cards to it's own component
-        const project = args.project() || {
+        const project = vnode.attrs.project() || {
             open_for_contributions: false
         };
-        return m('#rewards.reward.u-marginbottom-30', _.map(_.sortBy(args.rewardDetails(), reward => Number(reward.row_order)), reward => m(`div[class="${h.rewardSouldOut(reward) ? 'card-gone' : `card-reward ${project.open_for_contributions ? 'clickable' : ''}`} card card-secondary u-marginbottom-10"]`, {
+        return m('#rewards.reward.u-marginbottom-30', _.map(_.sortBy(vnode.attrs.rewardDetails(), reward => Number(reward.row_order)), reward => m(`div[class="${h.rewardSouldOut(reward) ? 'card-gone' : `card-reward ${project.open_for_contributions ? 'clickable' : ''}`} card card-secondary u-marginbottom-10"]`, {
             onclick: h.analytics.event({
                 cat: 'contribution_create',
                 act: 'contribution_reward_click',
@@ -102,8 +102,8 @@ const projectRewardList = {
                     reward_id: reward.id,
                     reward_value: reward.minimum_value
                 }
-            }, ctrl.selectReward(reward)),
-            config: ctrl.isRewardOpened(reward) ? h.scrollTo() : Function.prototype
+            }, vnode.state.selectReward(reward)),
+            config: vnode.state.isRewardOpened(reward) ? h.scrollTo() : Function.prototype
         }, [
             reward.minimum_value >= 100 ? m('.tag-circle-installment', [
                 m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'),
@@ -117,18 +117,18 @@ const projectRewardList = {
                 ),
 
             m(`.fontsize-smaller.reward-description${h.rewardSouldOut(reward) ? '' : '.fontcolor-secondary'}`, {
-                class: ctrl.isLongDescription(reward)
-                         ? ctrl.isRewardOpened(reward)
-                            ? `opened ${ctrl.isRewardDescriptionExtended(reward) ? 'extended' : ''}`
+                class: vnode.state.isLongDescription(reward)
+                         ? vnode.state.isRewardOpened(reward)
+                            ? `opened ${vnode.state.isRewardDescriptionExtended(reward) ? 'extended' : ''}`
                             : ''
                          : 'opened extended'
             }, m.trust(h.simpleFormat(h.strip(reward.description)))),
-            ctrl.isLongDescription(reward) && ctrl.isRewardOpened(reward) ? m('a[href="javascript:void(0);"].alt-link.fontsize-smallest.gray.link-more.u-marginbottom-20', {
-                onclick: () => ctrl.toggleDescriptionExtended(reward.id)
+            vnode.state.isLongDescription(reward) && vnode.state.isRewardOpened(reward) ? m('a[href="javascript:void(0);"].alt-link.fontsize-smallest.gray.link-more.u-marginbottom-20', {
+                onclick: () => vnode.state.toggleDescriptionExtended(reward.id)
             }, [
-                ctrl.isRewardDescriptionExtended(reward) ? 'menos ' : 'mais ',
+                vnode.state.isRewardDescriptionExtended(reward) ? 'menos ' : 'mais ',
                 m('span.fa.fa-angle-down', {
-                    class: ctrl.isRewardDescriptionExtended(reward) ? 'reversed' : ''
+                    class: vnode.state.isRewardDescriptionExtended(reward) ? 'reversed' : ''
                 })
             ]) : '',
             m('.u-marginbottom-20.w-row', [
@@ -166,9 +166,9 @@ const projectRewardList = {
                 m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' apoio em prazo de confirmação', ' apoios em prazo de confirmação.'))
             ]) : '',
             project.open_for_contributions && !h.rewardSouldOut(reward) ? [
-                ctrl.isRewardOpened(reward) ? m('.w-form', [
+                vnode.state.isRewardOpened(reward) ? m('.w-form', [
                     m('form.u-margintop-30', {
-                        onsubmit: ctrl.submitContribution
+                        onsubmit: vnode.state.submitContribution
                     }, [
                         m('.divider.u-marginbottom-20'),
                         rewardVM.hasShippingOptions(reward) ? m('div', [
@@ -176,13 +176,13 @@ const projectRewardList = {
                                 'Local de entrega'
                             ),
                             m('select.positive.text-field.w-select', {
-                                onchange: m.withAttr('value', ctrl.selectDestination),
-                                value: ctrl.selectedDestination()
+                                onchange: m.withAttr('value', vnode.state.selectDestination),
+                                value: vnode.state.selectedDestination()
                             },
                                 _.map(
-                                    ctrl.locationOptions(reward, ctrl.selectedDestination),
+                                    vnode.state.locationOptions(reward, vnode.state.selectedDestination),
                                     option => m(`option[value="${option.value}"]`,
-                                        { selected: option.value === ctrl.selectedDestination() },
+                                        { selected: option.value === vnode.state.selectedDestination() },
                                         [
                                             `${option.name} `,
                                             option.value != '' ? `+R$${option.fee}` : null
@@ -200,17 +200,17 @@ const projectRewardList = {
                             ),
                             m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
                                 m('input.w-input.back-reward-input-reward[type="tel"]', {
-                                    config: ctrl.setInput,
-                                    onkeyup: m.withAttr('value', ctrl.applyMask),
-                                    value: ctrl.contributionValue()
+                                    config: vnode.state.setInput,
+                                    onkeyup: m.withAttr('value', vnode.state.applyMask),
+                                    value: vnode.state.contributionValue()
                                 })
                             )
                         ]),
                         m('input.w-button.btn.btn-medium[type="submit"][value="Continuar >"]'),
-                        ctrl.error().length > 0 ? m('.text-error', [
+                        vnode.state.error().length > 0 ? m('.text-error', [
                             m('br'),
                             m('span.fa.fa-exclamation-triangle'),
-                            ` ${ctrl.error()}`
+                            ` ${vnode.state.error()}`
                         ]) : ''
                     ])
                 ]) : ''

@@ -5,15 +5,15 @@ import h from '../h';
 import blogVM from '../vms/blog-vm';
 
 const blogBanner : Component = {
-    controller(args) {
-        const posts = m.prop([]),
-            error = m.prop(false);
+    oninit(vnode) {
+        const posts = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false);
 
         blogVM.getBlogPosts().then(posts).catch(error);
 
         return {posts, error};
     },
-    view(ctrl, args) {
+    view(vnode) {
 
         return m('section.section-large.bg-gray.before-footer[id=\'blog\']',
             m('.w-container',
@@ -30,7 +30,7 @@ const blogBanner : Component = {
                             )
                         ]
                     ),
-                    m('.w-row', _.map(ctrl.posts(), (post) => {
+                    m('.w-row', _.map(vnode.state.posts(), (post) => {
                         return m('.w-col.w-col-4.col-blog-post',
                             [
                                 m(`a.link-hidden.fontweight-semibold.fontsize-base.u-marginbottom-10[href="${post[1][1]}"][target=\'__blank\']`, post[0][1]),
@@ -38,7 +38,7 @@ const blogBanner : Component = {
                             ]
                         );
                     })),
-                    ctrl.error() ? m('.w-row', m('.w-col.w-col-12.u-text-center', 'Erro ao carregar posts...')) : ''
+                    vnode.state.error() ? m('.w-row', m('.w-col.w-col-12.u-text-center', 'Erro ao carregar posts...')) : ''
                 ]
             )
         );

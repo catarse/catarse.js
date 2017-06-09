@@ -16,8 +16,8 @@ import m from 'mithril';
 import _ from 'underscore';
 
 const dashboardInfo = {
-    controller(args) {
-        const toRedraw = args.dataToRedraw || {},
+    oninit(vnode) {
+        const toRedraw = vnode.attrs.dataToRedraw || {},
             listenToReplace = (element, isInitialized, context) => {
                 if (isInitialized) return;
 
@@ -34,8 +34,8 @@ const dashboardInfo = {
             listenToReplace
         };
     },
-    view(ctrl, args) {
-        const content = args.content;
+    view(vnode) {
+        const content = vnode.attrs.content;
 
         return m('.w-container', [
             m('.w-row.u-marginbottom-40', [
@@ -43,8 +43,8 @@ const dashboardInfo = {
                     m('.u-text-center', [
                         m('img.u-marginbottom-20', { src: content.icon, width: 94 }),
                         m('.fontsize-large.fontweight-semibold.u-marginbottom-20', content.title),
-                        m('.fontsize-base.u-marginbottom-30', { config: ctrl.listenToReplace }, m.trust(content.text)),
-                        content.cta ? m('a.btn.btn-large.btn-inline', { href: content.href, onclick: args.nextStage }, content.cta) : ''
+                        m('.fontsize-base.u-marginbottom-30', { config: vnode.state.listenToReplace }, m.trust(content.text)),
+                        content.cta ? m('a.btn.btn-large.btn-inline', { href: content.href, onclick: vnode.attrs.nextStage }, content.cta) : ''
                     ])
                 ])
             ])

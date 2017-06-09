@@ -2,7 +2,7 @@ import _ from 'underscore';
 import m from 'mithril';
 import h from '../h';
 
-const railsErrors = m.prop('');
+const railsErrors = console.warn("m.prop has been removed from mithril 1.0") || m.prop('');
 const setRailsErrors = errors => railsErrors(errors);
 const errorGroups = {
     basics: ['public_name', 'permalink', 'category_id', 'city', 'public_tags', 'name'],

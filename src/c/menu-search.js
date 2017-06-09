@@ -1,7 +1,7 @@
 import m from 'mithril';
 
 const menuSearch = {
-    view(ctrl, args) {
+    view(vnode) {
         return m('span#menu-search', [
             m('.w-form.w-hidden-small.w-hidden-tiny.header-search[id=\'discover-form-wrapper\']',
                 [

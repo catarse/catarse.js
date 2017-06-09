@@ -2,16 +2,16 @@ import m from 'mithril';
 import h from '../h';
 
 const adminInputAction = {
-    controller(args) {
-        const builder = args.data,
-            complete = m.prop(false),
-            error = m.prop(false),
-            fail = m.prop(false),
+    oninit(vnode) {
+        const builder = vnode.attrs.data,
+            complete = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            fail = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             data = {},
-            item = args.item,
+            item = vnode.attrs.item,
             key = builder.property,
             forceValue = builder.forceValue || null,
-            newValue = m.prop(forceValue);
+            newValue = console.warn("m.prop has been removed from mithril 1.0") || m.prop(forceValue);
 
         h.idVM.id(item[builder.updateKey]);
 
@@ -32,13 +32,7 @@ const adminInputAction = {
             return false;
         };
 
-        const unload = function (el, isinit, context) {
-            context.onunload = function () {
-                complete(false);
-                error(false);
-                newValue(forceValue);
-            };
-        };
+        const unload = function (el, isinit, context) {};
 
         return {
             complete,
@@ -50,27 +44,28 @@ const adminInputAction = {
             unload
         };
     },
-    view(ctrl, args) {
-        const data = args.data,
-            btnValue = (ctrl.l()) ? 'por favor, aguarde...' : data.callToAction;
+
+    view(vnode) {
+        const data = vnode.attrs.data,
+            btnValue = (vnode.state.l()) ? 'por favor, aguarde...' : data.callToAction;
 
         return m('.w-col.w-col-2', [
             m('button.btn.btn-small.btn-terciary', {
-                onclick: ctrl.toggler.toggle
-            }, data.outerLabel), (ctrl.toggler()) ?
+                onclick: vnode.state.toggler.toggle
+            }, data.outerLabel), (vnode.state.toggler()) ?
             m('.dropdown-list.card.u-radius.dropdown-list-medium.zindex-10', {
-                config: ctrl.unload
+                config: vnode.state.unload
             }, [
                 m('form.w-form', {
-                    onsubmit: ctrl.submit
-                }, (!ctrl.complete()) ? [
+                    onsubmit: vnode.state.submit
+                }, (!vnode.state.complete()) ? [
                     m('label', data.innerLabel), (data.forceValue === undefined) ?
                     m(`input.w-input.text-field[type="text"][placeholder="${data.placeholder}"]`, {
-                        onchange: m.withAttr('value', ctrl.newValue),
-                        value: ctrl.newValue()
+                        onchange: m.withAttr('value', vnode.state.newValue),
+                        value: vnode.state.newValue()
                     }) : '',
                     m(`input.w-button.btn.btn-small[type="submit"][value="${btnValue}"]`)
-                ] : (!ctrl.error()) ? [
+                ] : (!vnode.state.error()) ? [
                     m('.w-form-done[style="display:block;"]', [
                         m('p', data.successMessage)
                     ])
@@ -81,6 +76,12 @@ const adminInputAction = {
                 ])
             ]) : ''
         ]);
+    },
+
+    onremove: function () {
+        complete(false);
+        error(false);
+        newValue(forceValue);
     }
 };
 

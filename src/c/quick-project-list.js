@@ -2,8 +2,8 @@ import m from 'mithril';
 import projectVM from '../vms/project-vm';
 
 const quickProjectList = {
-    view(ctrl, args) {
-        return m('.quickProjectList', _.map(args.projects(), (project, idx) => m('li.u-marginbottom-10', {
+    view(vnode) {
+        return m('.quickProjectList', _.map(vnode.attrs.projects(), (project, idx) => m('li.u-marginbottom-10', {
             key: idx
         }, m('.w-row',
             [
@@ -12,7 +12,7 @@ const quickProjectList = {
                             ),
                 m('.w-col.w-col-9',
                                 m(`a.alt-link.fontsize-smaller[href='/${project.permalink}?ref=ctrse_search_quick']`, {
-                                    onclick: projectVM.routeToProject(project, args.ref)
+                                    onclick: projectVM.routeToProject(project, vnode.attrs.ref)
                                 },
                                     `${project.name}`
                                 )
@@ -23,7 +23,7 @@ const quickProjectList = {
                   m('.w-row',
                       [
                           m('.w-col.w-col-6',
-                              m(`a.btn.btn-terciary[href=${args.loadMoreHref}?ref=ctrse_search_quick]`,
+                              m(`a.btn.btn-terciary[href=${vnode.attrs.loadMoreHref}?ref=ctrse_search_quick]`,
                                   'Ver todos'
                               )
                           ),

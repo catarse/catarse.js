@@ -5,12 +5,12 @@ import h from '../h';
 import models from '../models';
 
 const menuProfile = {
-    controller(args) {
-        const contributedProjects = m.prop(),
-              latestProjects = m.prop([]),
-              userDetails = m.prop({}),
-              user_id = args.user.user_id,
-              userBalance = m.prop(0),
+    oninit(vnode) {
+        const contributedProjects = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+              latestProjects = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+              userDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
+              user_id = vnode.attrs.user.user_id,
+              userBalance = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
               userIdVM = postgrest.filtersVM({ user_id: 'eq' });
 
         const userName = () => {
@@ -39,25 +39,25 @@ const menuProfile = {
             userBalance
         };
     },
-    view(ctrl, args) {
-        const user = ctrl.userDetails();
+    view(vnode) {
+        const user = vnode.state.userDetails();
 
         return m('.w-dropdown.user-profile',
             [
                 m('.w-dropdown-toggle.dropdown-toggle.w-clearfix[id=\'user-menu\']',
                     {
-                        onclick: ctrl.toggleMenu.toggle
+                        onclick: vnode.state.toggleMenu.toggle
                     },
                     [
                         m('.user-name-menu', [
-                            m('.fontsize-smaller.lineheight-tightest.text-align-right', ctrl.userName()),
-                            (ctrl.userBalance() > 0 ? m('.fontsize-smallest.fontweight-semibold.text-success', `R$ ${h.formatNumber(ctrl.userBalance(), 2, 3)}`) : '' )
+                            m('.fontsize-smaller.lineheight-tightest.text-align-right', vnode.state.userName()),
+                            (vnode.state.userBalance() > 0 ? m('.fontsize-smallest.fontweight-semibold.text-success', `R$ ${h.formatNumber(vnode.state.userBalance(), 2, 3)}`) : '' )
 
                         ]),
                         m(`img.user-avatar[alt='Thumbnail - ${user.name}'][height='40'][src='${h.useAvatarOrDefault(user.profile_img_thumbnail)}'][width='40']`)
                     ]
                 ),
-                ctrl.toggleMenu() ? m('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' },
+                vnode.state.toggleMenu() ? m('nav.w-dropdown-list.dropdown-list.user-menu.w--open[id=\'user-menu-dropdown\']', { style: 'display:block;' },
                     [
                         m('.w-row',
                             [
@@ -73,7 +73,7 @@ const menuProfile = {
                                                     m('span', [
                                                         'Saldo ',
                                                         m('span.fontcolor-secondary',
-                                                          `R$ ${h.formatNumber(ctrl.userBalance(), 2, 3)}`)
+                                                          `R$ ${h.formatNumber(vnode.state.userBalance(), 2, 3)}`)
                                                     ])
                                                    )
                                                  ),
@@ -122,10 +122,10 @@ const menuProfile = {
                                             ]
                                         ),
                                         m('.divider.u-marginbottom-20'),
-                                        args.user.is_admin_role ? m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10',
+                                        vnode.attrs.user.is_admin_role ? m('.fontweight-semibold.fontsize-smaller.u-marginbottom-10',
                                             'Admin'
                                         ) : '',
-                                        args.user.is_admin_role ? m('ul.w-list-unstyled.u-marginbottom-20',
+                                        vnode.attrs.user.is_admin_role ? m('ul.w-list-unstyled.u-marginbottom-20',
                                             [
                                                 m('li.lineheight-looser',
                                                     m('a.alt-link.fontsize-smaller[href=\'/pt/new-admin#/users\']',

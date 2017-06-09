@@ -3,9 +3,9 @@ import h from '../h';
 import models from '../models';
 
 const teamTotal = {
-    controller() {
+    oninit() {
         const vm = {
-            collection: m.prop([])
+            collection: console.warn("m.prop has been removed from mithril 1.0") || m.prop([])
         };
 
         models.teamTotal.getRow().then((data) => {
@@ -16,9 +16,9 @@ const teamTotal = {
             vm
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('#team-total-static.w-section.section-one-column.section.u-margintop-40.u-text-center.u-marginbottom-20', [
-            ctrl.vm.collection().map(teamTotal => m('.w-container', [
+            vnode.state.vm.collection().map(teamTotal => m('.w-container', [
                 m('.w-row', [
                     m('.w-col.w-col-2'),
                     m('.w-col.w-col-8', [

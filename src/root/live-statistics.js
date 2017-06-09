@@ -4,9 +4,9 @@ import models from '../models';
 import h from '../h';
 
 const liveStatistics = {
-    controller(args = {}) {
-        const pageStatistics = m.prop([]),
-            notificationData = m.prop({});
+    oninit(vnode) {
+        const pageStatistics = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            notificationData = console.warn("m.prop has been removed from mithril 1.0") || m.prop({});
 
         models.statistic.getRow().then(pageStatistics);
         // args.socket is a socket provided by socket.io
@@ -24,11 +24,11 @@ const liveStatistics = {
             notificationData
         };
     },
-    view(ctrl) {
-        const data = ctrl.notificationData();
+    view(vnode) {
+        const data = vnode.state.notificationData();
 
         return m('.w-section.bg-stats.section.min-height-100', [
-            m('.w-container.u-text-center', _.map(ctrl.pageStatistics(), stat => [m('img.u-marginbottom-60[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/55ada5dd11b36a52616d97df_symbol-catarse.png"]'),
+            m('.w-container.u-text-center', _.map(vnode.state.pageStatistics(), stat => [m('img.u-marginbottom-60[src="https://daks2k3a4ib2z.cloudfront.net/54b440b85608e3f4389db387/55ada5dd11b36a52616d97df_symbol-catarse.png"]'),
                 m('.fontcolor-negative.u-marginbottom-40', [
                     m('.fontsize-megajumbo.fontweight-semibold', `R$ ${h.formatNumber(stat.total_contributed, 2, 3)}`),
                     m('.fontsize-large', 'Doados para projetos publicados por aqui')

@@ -9,30 +9,30 @@ import projectComments from './project-comments';
 import projectPosts from './project-posts';
 
 const projectMain = {
-    controller(args) {
-        const hash = m.prop(window.location.hash),
+    oninit(vnode) {
+        const hash = console.warn("m.prop has been removed from mithril 1.0") || m.prop(window.location.hash),
             displayTabContent = (project) => {
                 const c_opts = {
                         project,
-                        post_id: args.post_id
+                        post_id: vnode.attrs.post_id
                     },
                     tabs = {
-                        '#rewards': m('.w-col.w-col-12', m.component(projectRewardList, _.extend({}, {
-                            rewardDetails: args.rewardDetails
+                        '#rewards': m('.w-col.w-col-12', m(projectRewardList, _.extend({}, {
+                            rewardDetails: vnode.attrs.rewardDetails
                         }, c_opts))),
-                        '#contribution_suggestions': m.component(projectSuggestedContributions, c_opts),
-                        '#contributions': m.component(projectContributions, c_opts),
-                        '#about': m.component(projectAbout, _.extend({}, {
-                            rewardDetails: args.rewardDetails
+                        '#contribution_suggestions': m(projectSuggestedContributions, c_opts),
+                        '#contributions': m(projectContributions, c_opts),
+                        '#about': m(projectAbout, _.extend({}, {
+                            rewardDetails: vnode.attrs.rewardDetails
                         }, c_opts)),
-                        '#comments': m.component(projectComments, c_opts),
-                        '#posts': m.component(projectPosts, _.extend({}, {
-                            projectContributions: args.projectContributions,
-                            userDetails: args.userDetails,
+                        '#comments': m(projectComments, c_opts),
+                        '#posts': m(projectPosts, _.extend({}, {
+                            projectContributions: vnode.attrs.projectContributions,
+                            userDetails: vnode.attrs.userDetails,
                         }, c_opts))
                     };
 
-                if (_.isNumber(args.post_id) && !window.location.hash) {
+                if (_.isNumber(vnode.attrs.post_id) && !window.location.hash) {
                     window.location.hash = 'posts';
                 }
 
@@ -52,10 +52,10 @@ const projectMain = {
             hash
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('section.section[itemtype="http://schema.org/CreativeWork"]', [
-            m(`${ctrl.hash() !== '#contributions' ? '.w-container' : '.about-tab-content'}`, [
-                m('.w-row', args.project() ? ctrl.displayTabContent(args.project) : h.loader())
+            m(`${vnode.state.hash() !== '#contributions' ? '.w-container' : '.about-tab-content'}`, [
+                m('.w-row', vnode.attrs.project() ? vnode.state.displayTabContent(vnode.attrs.project) : h.loader())
             ])
         ]);
     }

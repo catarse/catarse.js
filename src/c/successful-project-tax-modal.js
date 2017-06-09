@@ -6,8 +6,8 @@ import m from 'mithril';
 import h from '../h';
 
 const successfulProjectTaxModal = {
-    view(ctrl, args) {
-        const pt = args.projectTransfer;
+    view(vnode) {
+        const pt = vnode.attrs.projectTransfer;
 
         return m('div', [
             m('.modal-dialog-header', [

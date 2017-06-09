@@ -12,8 +12,8 @@ import h from '../h';
 import moment from 'moment';
 
 const adminProjectDetailsCard = {
-    controller(args) {
-        let project = args.resource,
+    oninit(vnode) {
+        let project = vnode.attrs.resource,
             isFinalLap = () =>
                 // @TODO: use 8 days because timezone on js
                  !_.isNull(project.expires_at) && moment().add(8, 'days') >= moment(project.zone_expires_at);
@@ -24,12 +24,12 @@ const adminProjectDetailsCard = {
             isFinalLap
         };
     },
-    view(ctrl) {
-        let project = ctrl.project,
+    view(vnode) {
+        let project = vnode.state.project,
             progress = project.progress.toFixed(2),
             statusTextObj = h.projectStateTextClass(project.state),
-            remainingTextObj = ctrl.remainingTextObj,
-            elapsedTextObj = ctrl.elapsedTextObj;
+            remainingTextObj = vnode.state.remainingTextObj,
+            elapsedTextObj = vnode.state.elapsedTextObj;
 
         return m('.project-details-card.card.u-radius.card-terciary.u-marginbottom-20', [
             m('div', [
@@ -37,7 +37,7 @@ const adminProjectDetailsCard = {
                     m('span.fontcolor-secondary', 'Status:'), ' ',
                     m('span', {
                         class: statusTextObj.cssClass
-                    }, (ctrl.isFinalLap() && project.open_for_contributions ? 'RETA FINAL' : statusTextObj.text)), ' '
+                    }, (vnode.state.isFinalLap() && project.open_for_contributions ? 'RETA FINAL' : statusTextObj.text)), ' '
                 ]), project.is_published ? [
                     m('.meter.u-margintop-20.u-marginbottom-10', [
                         m('.meter-fill', {

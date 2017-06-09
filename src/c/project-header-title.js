@@ -4,8 +4,8 @@ import userVM from '../vms/user-vm';
 import h from '../h';
 
 const projectHeaderTitle = {
-    view(ctrl, args) {
-        const project = args.project;
+    view(vnode) {
+        const project = vnode.attrs.project;
 
         return !_.isUndefined(project()) ? m('.w-section.page-header.u-text-center', [
             m('.w-container', [
@@ -14,7 +14,7 @@ const projectHeaderTitle = {
                     'por ',
                     project().user ? userVM.displayName(project().user) : (project().owner_public_name ? project().owner_public_name : project().owner_name)
                 ]),
-                args.children
+                vnode.attrs.children
             ])
         ]) : m('div', '');
     }

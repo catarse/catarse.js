@@ -19,10 +19,10 @@ import insightVM from '../vms/insight-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.successful_onboard');
 
 const projectSuccessfulOnboard = {
-    controller(args) {
+    oninit(vnode) {
         const projectIdVM = postgrest.filtersVM({ project_id: 'eq' }),
-              projectAccounts = m.prop([]),
-              projectTransfers = m.prop([]),
+              projectAccounts = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+              projectTransfers = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
               showTaxModal = h.toggleProp(false, true),
               loader = postgrest.loaderWithToken,
               listenToReplace = (element, isInitialized, context) => {
@@ -48,7 +48,7 @@ const projectSuccessfulOnboard = {
               };
 
 
-        projectIdVM.project_id(args.project().project_id);
+        projectIdVM.project_id(vnode.attrs.project().project_id);
 
         const lProjectAccount = loader(models.projectAccount.getRowOptions(projectIdVM.parameters()));
         lProjectAccount.load().then((data) => {
@@ -68,15 +68,15 @@ const projectSuccessfulOnboard = {
             listenToReplace
         };
     },
-    view(ctrl, args) {
-        const projectAccount = _.first(ctrl.projectAccounts()),
-              projectTransfer = _.first(ctrl.projectTransfers()),
-              lpa = ctrl.lProjectAccount,
-              lpt = ctrl.lProjectTransfer;
+    view(vnode) {
+        const projectAccount = _.first(vnode.state.projectAccounts()),
+              projectTransfer = _.first(vnode.state.projectTransfers()),
+              lpa = vnode.state.lProjectAccount,
+              lpt = vnode.state.lProjectTransfer;
 
         return m('.w-section.section', [
-            (ctrl.showTaxModal() ? m.component(modalBox, {
-                displayModal: ctrl.showTaxModal,
+            (vnode.state.showTaxModal() ? m(modalBox, {
+                displayModal: vnode.state.showTaxModal,
                 content: [successfulProjectTaxModal, {
                     projectTransfer
                 }]
@@ -89,10 +89,10 @@ const projectSuccessfulOnboard = {
                              m('img.u-marginbottom-20', { src: I18n.t('start.icon', I18nScope()), width: 94 }),
                              m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('start.title', I18nScope())),
                              m('.fontsize-base.u-marginbottom-30', {
-                                 config: ctrl.listenToReplace
+                                 config: vnode.state.listenToReplace
                              }, m.trust(
                                  I18n.t('start.text', I18nScope({ total_amount: h.formatNumber(projectTransfer.total_amount, 2) })))),
-                             m('a.btn.btn-large.btn-inline', { href: `/users/${args.project().user_id}/edit#balance` }, I18n.t('start.cta', I18nScope()))
+                             m('a.btn.btn-large.btn-inline', { href: `/users/${vnode.attrs.project().user_id}/edit#balance` }, I18n.t('start.cta', I18nScope()))
                          ])
                      ])
                  ])

@@ -7,9 +7,9 @@ import modalBox from './modal-box';
 import UserFollowBtn from './user-follow-btn';
 
 const userCard = {
-    controller(args) {
-        const userDetails = m.prop({}),
-            user_id = args.userId;
+    oninit(vnode) {
+        const userDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop({}),
+            user_id = vnode.attrs.userId;
 
         userVM.fetchUser(user_id, true, userDetails);
 
@@ -18,9 +18,9 @@ const userCard = {
             displayModal: h.toggleProp(false, true)
         };
     },
-    view(ctrl) {
-        const user = ctrl.userDetails(),
-            contactModalC = [ownerMessageContent, ctrl.userDetails],
+    view(vnode) {
+        const user = vnode.state.userDetails(),
+            contactModalC = [ownerMessageContent, vnode.state.userDetails],
             profileImage = userVM.displayImage(user);
 
         return m('#user-card', m('.card.card-user.u-radius.u-marginbottom-30[itemprop=\'author\']', [
@@ -55,12 +55,12 @@ const userCard = {
                     ]))
                 ]),
             ]),
-            (ctrl.displayModal() ? m.component(modalBox, {
-                displayModal: ctrl.displayModal,
+            (vnode.state.displayModal() ? m(modalBox, {
+                displayModal: vnode.state.displayModal,
                 content: contactModalC
             }) : ''),
             m(UserFollowBtn, { follow_id: user.id, following: user.follwing_this_user, enabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10', disabledClass: '.btn.btn-medium.btn-message.u-marginbottom-10' }),
-            (!_.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', { onclick: ctrl.displayModal.toggle }, 'Enviar mensagem') : '')
+            (!_.isEmpty(user.email) ? m('a.btn.btn-medium.btn-message[href=\'javascript:void(0);\']', { onclick: vnode.state.displayModal.toggle }, 'Enviar mensagem') : '')
         ]));
     }
 };

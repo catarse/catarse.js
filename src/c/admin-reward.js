@@ -4,15 +4,15 @@ import postgrest from 'mithril-postgrest';
 import models from '../models';
 
 const adminReward = {
-    controller(args) {
+    oninit(vnode) {
         let l;
         const loadShippingFee = () => {
-            const shippingFee = m.prop({});
+            const shippingFee = console.warn("m.prop has been removed from mithril 1.0") || m.prop({});
 
-            if (args.contribution.shipping_fee_id) {
+            if (vnode.attrs.contribution.shipping_fee_id) {
                 const options = models.shippingFee.getRowOptions(
                     h.idVM.id(
-                        args.contribution.shipping_fee_id
+                        vnode.attrs.contribution.shipping_fee_id
                     ).parameters());
 
                 l = postgrest.loaderWithToken(options);
@@ -27,11 +27,11 @@ const adminReward = {
         };
     },
 
-    view(ctrl, args) {
-        const reward = args.reward(),
-            contribution = args.contribution,
+    view(vnode) {
+        const reward = vnode.attrs.reward(),
+            contribution = vnode.attrs.contribution,
             available = parseInt(reward.paid_count) + parseInt(reward.waiting_payment_count),
-            shippingFee = ctrl.shippingFee();
+            shippingFee = vnode.state.shippingFee();
 
         return m('.w-col.w-col-4', [
             m('.fontweight-semibold.fontsize-smaller.lineheight-tighter.u-marginbottom-20', 'Recompensa'),

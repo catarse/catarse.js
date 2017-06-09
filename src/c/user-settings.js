@@ -14,32 +14,32 @@ import railsErrorsVM from '../vms/rails-errors-vm';
 const I18nScope = _.partial(h.i18nScope, 'users.edit.settings_tab');
 
 const userSettings = {
-    controller(args) {
+    oninit(vnode) {
         let parsedErrors = userSettingsVM.mapRailsErrors(railsErrorsVM.railsErrors());
         let deleteFormSubmit;
-        const user = args.user,
+        const user = vnode.attrs.user,
             fields = {
-                owner_document: m.prop(user.owner_document || ''),
-                country_id: m.prop(user.address.country_id || 36),
-                street: m.prop(user.address.street || ''),
-                number: m.prop(user.address.number || ''),
-                city: m.prop(user.address.city || ''),
-                zipcode: m.prop(user.address.zipcode || ''),
-                complement: m.prop(user.address.complement || ''),
-                neighbourhood: m.prop(user.address.neighbourhood || ''),
-                state: m.prop(user.address.state || ''),
-                phonenumber: m.prop(user.address.phonenumber || ''),
-                name: m.prop(user.name || ''),
-                state_inscription: m.prop(''),
-                birth_date: m.prop((user.birth_date ? h.momentify(user.birth_date) : '')),
-                account_type: m.prop(user.account_type || '')
+                owner_document: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.owner_document || ''),
+                country_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.country_id || 36),
+                street: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.street || ''),
+                number: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.number || ''),
+                city: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.city || ''),
+                zipcode: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.zipcode || ''),
+                complement: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.complement || ''),
+                neighbourhood: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.neighbourhood || ''),
+                state: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.state || ''),
+                phonenumber: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.address.phonenumber || ''),
+                name: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.name || ''),
+                state_inscription: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+                birth_date: console.warn("m.prop has been removed from mithril 1.0") || m.prop((user.birth_date ? h.momentify(user.birth_date) : '')),
+                account_type: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.account_type || '')
             },
-            loading = m.prop(false),
-            user_id = args.userId,
-            error = m.prop(''),
-            countries = m.prop(),
-            states = m.prop(),
-            loader = m.prop(true),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            user_id = vnode.attrs.userId,
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+            countries = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            states = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            loader = console.warn("m.prop has been removed from mithril 1.0") || m.prop(true),
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),
             countriesLoader = postgrest.loader(models.country.getPageOptions()),
@@ -49,12 +49,12 @@ const userSettings = {
             documentCompanyMask = _.partial(h.mask, '99.999.999/9999-99'),
             zipcodeMask = _.partial(h.mask, '99999-999'),
             birthDayMask = _.partial(h.mask, '99/99/9999'),
-            creditCards = m.prop(),
-            toDeleteCard = m.prop(-1),
+            creditCards = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            toDeleteCard = console.warn("m.prop has been removed from mithril 1.0") || m.prop(-1),
             deleteCard = id => () => {
                 toDeleteCard(id);
                 // We must redraw here to update the action output of the hidden form on the DOM.
-                m.redraw(true);
+                console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
                 deleteFormSubmit();
                 return false;
             },
@@ -80,7 +80,7 @@ const userSettings = {
                     birth_date: fields.birth_date()
                 };
 
-                if (args.publishingUserSettings) {
+                if (vnode.attrs.publishingUserSettings) {
                     userData.publishing_user_settings = true;
                 }
 
@@ -137,7 +137,7 @@ const userSettings = {
                 m.redraw();
             };
 
-        userVM.getUserCreditCards(args.userId).then(creditCards).catch(handleError);
+        userVM.getUserCreditCards(vnode.attrs.userId).then(creditCards).catch(handleError);
         countriesLoader.load().then(data => countries(_.sortBy(data, 'name_en')));
         statesLoader.load().then(states);
 
@@ -168,24 +168,24 @@ const userSettings = {
             parsedErrors
         };
     },
-    view(ctrl, args) {
-        let user = ctrl.user,
-            fields = ctrl.fields,
+    view(vnode) {
+        let user = vnode.state.user,
+            fields = vnode.state.fields,
             hasContributedOrPublished = (user.total_contributed_projects >= 1 || user.total_published_projects >= 1),
             disableFields = (user.is_admin_role ? false : (hasContributedOrPublished && !_.isEmpty(user.name) && !_.isEmpty(user.owner_document)));
 
         return m('[id=\'settings-tab\']', [
-            (ctrl.showSuccess() ? m.component(popNotification, {
+            (vnode.state.showSuccess() ? m(popNotification, {
                 message: I18n.t('update_success_msg', I18nScope()),
-                toggleOpt: ctrl.showSuccess
+                toggleOpt: vnode.state.showSuccess
             }) : ''),
-            (ctrl.showError() ? m.component(popNotification, {
-                message: m.trust(ctrl.error()),
-                toggleOpt: ctrl.showError,
+            (vnode.state.showError() ? m(popNotification, {
+                message: m.trust(vnode.state.error()),
+                toggleOpt: vnode.state.showError,
                 error: true
             }) : ''),
             m('form.w-form', {
-                onsubmit: ctrl.onSubmit
+                onsubmit: vnode.state.onSubmit
             }, [
                 m('div', [
                     m('.w-container',
@@ -231,11 +231,11 @@ const userSettings = {
                                         m(`input.string.required.w-input.text-field.positive${(disableFields ? '.text-field-disabled' : '')}[id='user_bank_account_attributes_owner_name'][type='text']`, {
                                             value: fields.name(),
                                             name: 'user[name]',
-                                            class: ctrl.parsedErrors.hasError('name') ? 'error' : false,
+                                            class: vnode.state.parsedErrors.hasError('name') ? 'error' : false,
                                             onchange: m.withAttr('value', fields.name),
                                             disabled: disableFields
                                         }),
-                                        ctrl.parsedErrors.inlineError('name')
+                                        vnode.state.parsedErrors.inlineError('name')
                                     ]),
                                     m('.w-col.w-col-6', [
                                         m('.w-row', [
@@ -245,13 +245,13 @@ const userSettings = {
                                                 ),
                                                 m(`input.string.tel.required.w-input.text-field.positive${(disableFields ? '.text-field-disabled' : '')}[data-validate-cpf-cnpj='true'][id='user_bank_account_attributes_owner_document'][type='tel'][validation_text='true']`, {
                                                     value: fields.owner_document(),
-                                                    class: ctrl.parsedErrors.hasError('owner_document') ? 'error' : false,
+                                                    class: vnode.state.parsedErrors.hasError('owner_document') ? 'error' : false,
                                                     disabled: disableFields,
                                                     name: 'user[cpf]',
-                                                    onchange: m.withAttr('value', ctrl.applyDocumentMask),
-                                                    onkeyup: m.withAttr('value', ctrl.applyDocumentMask)
+                                                    onchange: m.withAttr('value', vnode.state.applyDocumentMask),
+                                                    onkeyup: m.withAttr('value', vnode.state.applyDocumentMask)
                                                 }),
-                                                ctrl.parsedErrors.inlineError('owner_document')
+                                                vnode.state.parsedErrors.inlineError('owner_document')
                                             ]),
                                             m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', (fields.account_type() == 'pf' ? [
                                                 m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']',
@@ -260,23 +260,23 @@ const userSettings = {
                                                 m(`input.string.tel.required.w-input.text-field.positive${((disableFields && !_.isEmpty(user.birth_date)) ? '.text-field-disabled' : '')}[data-validate-cpf-cnpj='true'][id='user_bank_account_attributes_owner_document'][type='tel'][validation_text='true']`, {
                                                     value: fields.birth_date(),
                                                     name: 'user[birth_date]',
-                                                    class: ctrl.parsedErrors.hasError('birth_date') ? 'error' : false,
+                                                    class: vnode.state.parsedErrors.hasError('birth_date') ? 'error' : false,
                                                     disabled: (disableFields && !_.isEmpty(user.birth_date)),
-                                                    onchange: m.withAttr('value', ctrl.applyBirthDateMask),
-                                                    onkeyup: m.withAttr('value', ctrl.applyBirthDateMask)
+                                                    onchange: m.withAttr('value', vnode.state.applyBirthDateMask),
+                                                    onkeyup: m.withAttr('value', vnode.state.applyBirthDateMask)
                                                 }),
-                                                ctrl.parsedErrors.inlineError('birth_date')
+                                                vnode.state.parsedErrors.inlineError('birth_date')
                                             ] : [
                                                 m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']',
                                                   I18n.t('label_state_inscription', I18nScope())
                                                 ),
                                                 m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
                                                     value: fields.state_inscription(),
-                                                    class: ctrl.parsedErrors.hasError('state_inscription') ? 'error' : false,
+                                                    class: vnode.state.parsedErrors.hasError('state_inscription') ? 'error' : false,
                                                     name: 'user[state_inscription]',
                                                     onchange: m.withAttr('value', fields.state_inscription)
                                                 }),
-                                                ctrl.parsedErrors.inlineError('state_inscription')
+                                                vnode.state.parsedErrors.inlineError('state_inscription')
                                             ]))
                                         ])
                                     ])
@@ -297,18 +297,18 @@ const userSettings = {
                                         ),
                                         m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
                                             onchange: m.withAttr('value', fields.country_id),
-                                            class: ctrl.parsedErrors.hasError('country_id') ? 'error' : false
+                                            class: vnode.state.parsedErrors.hasError('country_id') ? 'error' : false
                                         }, [
                                             m('option[value=\'\']'),
-                                            (!_.isEmpty(ctrl.countries()) ?
-                                                _.map(ctrl.countries(), country => m(`option${country.id == fields.country_id() ? '[selected="selected"]' : ''}`, {
+                                            (!_.isEmpty(vnode.state.countries()) ?
+                                                _.map(vnode.state.countries(), country => m(`option${country.id == fields.country_id() ? '[selected="selected"]' : ''}`, {
                                                     value: country.id
                                                 },
                                                     country.name_en
                                                 )) :
                                                 '')
                                         ]),
-                                        ctrl.parsedErrors.inlineError('country_id')
+                                        vnode.state.parsedErrors.inlineError('country_id')
                                     ]),
                                     m('.w-col.w-col-6')
                                 ]),
@@ -319,10 +319,10 @@ const userSettings = {
                                         ),
                                         m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
                                             value: fields.street(),
-                                            class: ctrl.parsedErrors.hasError('street') ? 'error' : false,
+                                            class: vnode.state.parsedErrors.hasError('street') ? 'error' : false,
                                             onchange: m.withAttr('value', fields.street)
                                         }),
-                                        ctrl.parsedErrors.inlineError('street')
+                                        vnode.state.parsedErrors.inlineError('street')
                                     ]),
                                     m('.w-col.w-col-6',
                                         m('.w-row', [
@@ -332,10 +332,10 @@ const userSettings = {
                                                 ),
                                                 m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
                                                     value: fields.number(),
-                                                    class: ctrl.parsedErrors.hasError('number') ? 'error' : false,
+                                                    class: vnode.state.parsedErrors.hasError('number') ? 'error' : false,
                                                     onchange: m.withAttr('value', fields.number)
                                                 }),
-                                                ctrl.parsedErrors.inlineError('number')
+                                                vnode.state.parsedErrors.inlineError('number')
                                             ]),
                                             m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                                 m('label.field-label',
@@ -343,10 +343,10 @@ const userSettings = {
                                                 ),
                                                 m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
                                                     value: fields.complement(),
-                                                    class: ctrl.parsedErrors.hasError('complement') ? 'error' : false,
+                                                    class: vnode.state.parsedErrors.hasError('complement') ? 'error' : false,
                                                     onchange: m.withAttr('value', fields.complement)
                                                 }),
-                                                ctrl.parsedErrors.inlineError('complement')
+                                                vnode.state.parsedErrors.inlineError('complement')
                                             ])
                                         ])
                                     )
@@ -358,10 +358,10 @@ const userSettings = {
                                         ),
                                         m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
                                             value: fields.neighbourhood(),
-                                            class: ctrl.parsedErrors.hasError('neighbourhood') ? 'error' : false,
+                                            class: vnode.state.parsedErrors.hasError('neighbourhood') ? 'error' : false,
                                             onchange: m.withAttr('value', fields.neighbourhood)
                                         }),
-                                        ctrl.parsedErrors.inlineError('neighbourhood')
+                                        vnode.state.parsedErrors.inlineError('neighbourhood')
                                     ]),
                                     m('.input.string.optional.user_address_city.w-col.w-col-6', [
                                         m('label.field-label',
@@ -369,10 +369,10 @@ const userSettings = {
                                         ),
                                         m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
                                             value: fields.city(),
-                                            class: ctrl.parsedErrors.hasError('city') ? 'error' : false,
+                                            class: vnode.state.parsedErrors.hasError('city') ? 'error' : false,
                                             onchange: m.withAttr('value', fields.city)
                                         }),
-                                        ctrl.parsedErrors.inlineError('city')
+                                        vnode.state.parsedErrors.inlineError('city')
                                     ])
                                 ]),
                                 m('.w-row', [
@@ -381,12 +381,12 @@ const userSettings = {
                                           I18n.t('label_address_state', I18nScope())
                                         ),
                                         m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
-                                            class: ctrl.parsedErrors.hasError('state') ? 'error' : false,
+                                            class: vnode.state.parsedErrors.hasError('state') ? 'error' : false,
                                             onchange: m.withAttr('value', fields.state)
                                         }, [
                                             m('option[value=\'\']'),
-                                            (!_.isEmpty(ctrl.states()) ?
-                                                _.map(ctrl.states(), state => m(`option[value='${state.acronym}']${state.acronym == fields.state() ? '[selected="selected"]' : ''}`, {
+                                            (!_.isEmpty(vnode.state.states()) ?
+                                                _.map(vnode.state.states(), state => m(`option[value='${state.acronym}']${state.acronym == fields.state() ? '[selected="selected"]' : ''}`, {
                                                     value: state.acronym
                                                 },
                                                     state.name
@@ -398,7 +398,7 @@ const userSettings = {
                                               I18n.t('label_other_option', I18nScope())
                                             )
                                         ]),
-                                        ctrl.parsedErrors.inlineError('state')
+                                        vnode.state.parsedErrors.inlineError('state')
                                     ]),
                                     m('.w-col.w-col-6',
                                         m('.w-row', [
@@ -408,10 +408,10 @@ const userSettings = {
                                                 ),
                                                 m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
                                                     value: fields.zipcode(),
-                                                    class: ctrl.parsedErrors.hasError('zipcode') ? 'error' : false,
+                                                    class: vnode.state.parsedErrors.hasError('zipcode') ? 'error' : false,
                                                     onchange: m.withAttr('value', fields.zipcode)
                                                 }),
-                                                ctrl.parsedErrors.inlineError('zipcode')
+                                                vnode.state.parsedErrors.inlineError('zipcode')
                                             ]),
                                             m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [
                                                 m('label.field-label',
@@ -420,16 +420,16 @@ const userSettings = {
                                                 m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
                                                     value: fields.phonenumber(),
                                                     onchange: m.withAttr('value', fields.phonenumber),
-                                                    class: ctrl.parsedErrors.hasError('phonenumber') ? 'error' : false,
-                                                    onkeyup: m.withAttr('value', value => ctrl.applyPhoneMask(value))
+                                                    class: vnode.state.parsedErrors.hasError('phonenumber') ? 'error' : false,
+                                                    onkeyup: m.withAttr('value', value => vnode.state.applyPhoneMask(value))
                                                 }),
-                                                ctrl.parsedErrors.inlineError('phonenumber')
+                                                vnode.state.parsedErrors.inlineError('phonenumber')
                                             ])
                                         ])
                                     )
                                 ]),
                             ]),
-                            (args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [
+                            (vnode.attrs.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [
                                 m('.fontsize-base.fontweight-semibold',
                                   I18n.t('credit_cards.title', I18nScope())
                                 ),
@@ -453,7 +453,7 @@ const userSettings = {
                                     m('.w-col.w-col-2.w-col-small-2')
                                 ]),
 
-                                (_.map(ctrl.creditCards(), card => m('.w-row.card', [
+                                (_.map(vnode.state.creditCards(), card => m('.w-row.card', [
                                     m('.w-col.w-col-5.w-col-small-5',
                                         m('.fontsize-small.fontweight-semibold', [
                                             'XXXX XXXX XXXX',
@@ -468,16 +468,16 @@ const userSettings = {
                                     ),
                                     m('.w-col.w-col-2.w-col-small-2',
                                         m('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', {
-                                            onclick: ctrl.deleteCard(card.id)
+                                            onclick: vnode.state.deleteCard(card.id)
                                         },
                                           I18n.t('credit_cards.remove_label', I18nScope())
                                         )
                                     )
                                 ]))),
                                 m('form.w-hidden', {
-                                    action: `/pt/users/${user.id}/credit_cards/${ctrl.toDeleteCard()}`,
+                                    action: `/pt/users/${user.id}/credit_cards/${vnode.state.toDeleteCard()}`,
                                     method: 'POST',
-                                    config: ctrl.setCardDeletionForm
+                                    config: vnode.state.setCardDeletionForm
                                 }, [
                                     m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'),
                                     m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'),
@@ -489,8 +489,8 @@ const userSettings = {
 
 
                     m(projectEditSaveBtn, {
-                        loading: ctrl.loading,
-                        onSubmit: ctrl.onSubmit
+                        loading: vnode.state.loading,
+                        onSubmit: vnode.state.onSubmit
                     })
 
                 ])

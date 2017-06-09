@@ -7,18 +7,18 @@ import generateErrorInstance from '../error';
 const e = generateErrorInstance();
 
 const fields = {
-    password: m.prop(''),
-    current_password: m.prop(''),
-    uploaded_image: m.prop(''),
-    cover_image: m.prop(''),
-    email: m.prop(''),
-    permalink: m.prop(''),
-    public_name: m.prop(''),
-    facebook_link: m.prop(''),
-    twitter: m.prop(''),
-    links: m.prop([]),
-    about_html: m.prop(''),
-    email_confirmation: m.prop('')
+    password: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    current_password: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    uploaded_image: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    cover_image: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    email: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    permalink: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    public_name: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    facebook_link: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    twitter: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    links: console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+    about_html: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    email_confirmation: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
 };
 
 const mapRailsErrors = (rails_errors) => {

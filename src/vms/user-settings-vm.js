@@ -7,27 +7,27 @@ import generateErrorInstance from '../error';
 const e = generateErrorInstance();
 
 const fields = {
-    owner_document: m.prop(''),
-    country_id: m.prop(''),
-    street: m.prop(''),
-    number: m.prop(''),
-    city: m.prop(''),
-    zipcode: m.prop(''),
-    complement: m.prop(''),
-    neighbourhood: m.prop(''),
-    state: m.prop(''),
-    phonenumber: m.prop(''),
-    name: m.prop(''),
-    agency: m.prop(''),
-    bank_id: m.prop(''),
-    agency_digit: m.prop(''),
-    account: m.prop(''),
-    account_digit: m.prop(''),
-    bank_account_id: m.prop(''),
-    state_inscription: m.prop(''),
-    birth_date: m.prop(''),
-    account_type: m.prop(''),
-    bank_account_type: m.prop('')
+    owner_document: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    country_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    street: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    number: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    city: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    zipcode: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    complement: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    neighbourhood: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    state: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    phonenumber: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    name: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    agency: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    bank_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    agency_digit: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    account: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    account_digit: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    bank_account_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    state_inscription: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    birth_date: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    account_type: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    bank_account_type: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
 };
 
 const mapRailsErrors = (rails_errors) => {

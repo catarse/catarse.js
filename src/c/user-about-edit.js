@@ -9,38 +9,38 @@ import inlineError from './inline-error';
 import projectEditSaveBtn from './project-edit-save-btn';
 
 const userAboutEdit = {
-    controller(args) {
+    oninit(vnode) {
         let parsedErrors = userAboutVM.mapRailsErrors(railsErrorsVM.railsErrors());
         let deleteUser;
-        const user = args.user || {},
+        const user = vnode.attrs.user || {},
             fields = {
-                password: m.prop(''),
-                current_password: m.prop(''),
-                uploaded_image: m.prop(userVM.displayImage(user)),
-                cover_image: m.prop(user.profile_cover_image || ''),
-                email: m.prop(''),
-                permalink: m.prop(user.permalink || ''),
-                public_name: m.prop(user.public_name || ''),
-                facebook_link: m.prop(user.facebook_link || ''),
-                twitter: m.prop(user.twitter_username || ''),
-                links: m.prop(user.links || []),
-                about_html: m.prop(user.about_html || ''),
-                email_confirmation: m.prop('')
+                password: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+                current_password: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+                uploaded_image: console.warn("m.prop has been removed from mithril 1.0") || m.prop(userVM.displayImage(user)),
+                cover_image: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.profile_cover_image || ''),
+                email: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+                permalink: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.permalink || ''),
+                public_name: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.public_name || ''),
+                facebook_link: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.facebook_link || ''),
+                twitter: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.twitter_username || ''),
+                links: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.links || []),
+                about_html: console.warn("m.prop has been removed from mithril 1.0") || m.prop(user.about_html || ''),
+                email_confirmation: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
             },
-            passwordHasError = m.prop(false),
-            emailHasError = m.prop(false),
+            passwordHasError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            emailHasError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             showEmailForm = h.toggleProp(false, true),
-            showSuccess = m.prop(false),
-            showError = m.prop(false),
-            errors = m.prop(),
-            loading = m.prop(false),
-            uploading = m.prop(false),
-            errorsArray = m.prop([]),
+            showSuccess = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            showError = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            errors = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            uploading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            errorsArray = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             pushErrosMessage = () => {
                 errors(errorsArray().join('<br/>'));
             },
             updateFieldsFromUser = () => {
-                userVM.fetchUser(args.userId, false).then((dataResponse) => {
+                userVM.fetchUser(vnode.attrs.userId, false).then((dataResponse) => {
                     const data = _.first(dataResponse);
                     fields.uploaded_image(userVM.displayImage(data));
                     fields.cover_image(data.profile_cover_image);
@@ -57,9 +57,9 @@ const userAboutEdit = {
                     userCoverImageEl = window.document.getElementById('user_cover_image'),
                     formData = new FormData();
 
-                if (userUploadedImageEl.files[0] || (!args.hideCoverImg && userCoverImageEl.files[0])) {
+                if (userUploadedImageEl.files[0] || (!vnode.attrs.hideCoverImg && userCoverImageEl.files[0])) {
                     formData.append('uploaded_image', userUploadedImageEl.files[0]);
-                    if (!args.hideCoverImg) {
+                    if (!vnode.attrs.hideCoverImg) {
                         formData.append('cover_image', userCoverImageEl.files[0]);
                     }
 
@@ -106,7 +106,7 @@ const userAboutEdit = {
                     links_attributes: linkAttributes()
                 };
 
-                if (args.publishingUserAbout) {
+                if (vnode.attrs.publishingUserAbout) {
                     userData.publishing_user_about = true;
                 }
 
@@ -216,20 +216,20 @@ const userAboutEdit = {
             parsedErrors
         };
     },
-    view(ctrl, args) {
-        const user = args.user || {},
-            fields = ctrl.fields;
+    view(vnode) {
+        const user = vnode.attrs.user || {},
+            fields = vnode.state.fields;
 
         return m('#about-tab.content', [
-            (ctrl.showSuccess() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
+            (vnode.state.showSuccess() && !vnode.state.loading() && !vnode.state.uploading() ? m(popNotification, {
                 message: 'As suas informações foram atualizadas'
             }) : ''),
-            (ctrl.showError() && !ctrl.loading() && !ctrl.uploading() ? m.component(popNotification, {
-                message: m.trust(ctrl.errors()),
+            (vnode.state.showError() && !vnode.state.loading() && !vnode.state.uploading() ? m(popNotification, {
+                message: m.trust(vnode.state.errors()),
                 error: true
             }) : ''),
             m('form.simple_form.w-form', {
-                onsubmit: ctrl.onSubmit
+                onsubmit: vnode.state.onSubmit
             }, [
                 m('input[name="utf8"][type="hidden"][value="✓"]'),
                 m('input[name="_method"][type="hidden"][value="patch"]'),
@@ -274,21 +274,21 @@ const userAboutEdit = {
                                         ),
                                         m('a.alt-link.fontsize-small.u-marginleft-10[href=\'javascript:void(0);\'][id=\'update_email\']', {
                                             onclick: () => {
-                                                ctrl.showEmailForm.toggle();
+                                                vnode.state.showEmailForm.toggle();
                                             }
                                         },
                                             'Alterar email'
                                         )
                                     ]),
-                                    m(`${ctrl.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
+                                    m(`${vnode.state.showEmailForm() ? '' : '.w-hidden'}.u-marginbottom-20.w-row[id=\'email_update_form\']`, [
                                         m('.w-col.w-col-6.w-sub-col', [
                                             m('label.field-label.fontweight-semibold',
                                                 'Novo email'
                                             ),
                                             m('input.w-input.text-field.positive[id=\'new_email\'][name=\'new_email\'][type=\'email\']', {
-                                                class: ctrl.emailHasError() ? 'error' : '',
+                                                class: vnode.state.emailHasError() ? 'error' : '',
                                                 value: fields.email(),
-                                                onfocus: () => ctrl.emailHasError(false),
+                                                onfocus: () => vnode.state.emailHasError(false),
                                                 onchange: m.withAttr('value', fields.email)
                                             })
                                         ]),
@@ -297,14 +297,14 @@ const userAboutEdit = {
                                                 'Confirmar novo email'
                                             ),
                                             m('input.string.required.w-input.text-field.w-input.text-field.positive[id=\'new_email_confirmation\'][name=\'user[email]\'][type=\'text\']', {
-                                                class: ctrl.emailHasError() ? 'error' : '',
+                                                class: vnode.state.emailHasError() ? 'error' : '',
                                                 value: fields.email_confirmation(),
-                                                onfocus: () => ctrl.emailHasError(false),
-                                                onblur: ctrl.validateEmailConfirmation,
+                                                onfocus: () => vnode.state.emailHasError(false),
+                                                onblur: vnode.state.validateEmailConfirmation,
                                                 onchange: m.withAttr('value', fields.email_confirmation)
                                             })
                                         ]),
-                                        ctrl.emailHasError() ? m(inlineError, {
+                                        vnode.state.emailHasError() ? m(inlineError, {
                                             message: 'Confirmação de email está incorreta.'
                                         }) : ''
                                     ])
@@ -321,11 +321,11 @@ const userAboutEdit = {
                                     m('.w-col.w-col-7',
                                         m('input.string.optional.w-input.text-field.positive[id="user_public_name"][type="text"]', {
                                             name: 'user[public_name]',
-                                            class: ctrl.parsedErrors.hasError('public_name') ? 'error' : false,
+                                            class: vnode.state.parsedErrors.hasError('public_name') ? 'error' : false,
                                             value: fields.public_name(),
                                             onchange: m.withAttr('value', fields.public_name)
                                         }),
-                                        ctrl.parsedErrors.inlineError('public_name')
+                                        vnode.state.parsedErrors.inlineError('public_name')
                                     )
                                 ]),
                                 m('.w-form', [
@@ -346,13 +346,13 @@ const userAboutEdit = {
                                                 ),
                                                 m('input.file.optional.w-input.text-field[id="user_uploaded_image"][type="file"]', {
                                                     name: 'user[uploaded_image]',
-                                                    class: ctrl.parsedErrors.hasError('uploaded_image') ? 'error' : false
+                                                    class: vnode.state.parsedErrors.hasError('uploaded_image') ? 'error' : false
                                                 }),
-                                                ctrl.parsedErrors.inlineError('uploaded_image')
+                                                vnode.state.parsedErrors.inlineError('uploaded_image')
                                             ])
                                         )
                                     ]),
-                                    (args.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [
+                                    (vnode.attrs.hideCoverImg ? '' : m('.w-row.u-marginbottom-30.card.card-terciary', [
                                         m('.w-col.w-col-5.w-sub-col', [
                                             m('label.field-label.fontweight-semibold',
                                                 '  Imagem de capa do perfil'
@@ -387,9 +387,9 @@ const userAboutEdit = {
                                             ),
                                             m('.w-form',
                                                 m('.preview-container.u-marginbottom-40', {
-                                                    class: ctrl.parsedErrors.hasError('about_html') ? 'error' : false
+                                                    class: vnode.state.parsedErrors.hasError('about_html') ? 'error' : false
                                                 }, h.redactor('user[about_html]', fields.about_html)),
-                                                ctrl.parsedErrors.inlineError('about_html')
+                                                vnode.state.parsedErrors.inlineError('about_html')
                                             )
                                         ])
                                     )
@@ -456,7 +456,7 @@ const userAboutEdit = {
                                                         ),
                                                         m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2', [
                                                             m('a.btn.btn-small.btn-terciary.fa.fa-lg.fa-trash.btn-no-border', {
-                                                                onclick: ctrl.removeLink(link.id, idx)
+                                                                onclick: vnode.state.removeLink(link.id, idx)
                                                             })
                                                         ])
                                                     ]);
@@ -465,7 +465,7 @@ const userAboutEdit = {
                                             m('.w-row', [
                                                 m('.w-col.w-col-6.w-col-push-6',
                                                     m('a.btn.btn-small.btn-terciary', {
-                                                        onclick: ctrl.addLink
+                                                        onclick: vnode.state.addLink
                                                     },
                                                         m('span.translation_missing', 'Add Link')
                                                     )
@@ -474,7 +474,7 @@ const userAboutEdit = {
                                         ])
                                     ])
                                 ),
-                                (args.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
+                                (vnode.attrs.hidePasswordChange ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
                                     m('.w-row.u-marginbottom-10', [
                                         m('.fontsize-base.fontweight-semibold',
                                             'Alterar minha senha'
@@ -497,12 +497,12 @@ const userAboutEdit = {
                                                     ' Nova senha'
                                                 ),
                                                 m('input.password.optional.w-input.text-field.w-input.text-field.positive[id=\'user_password\'][name=\'user[password]\'][type=\'password\']', {
-                                                    class: ctrl.passwordHasError() ? 'error' : '',
+                                                    class: vnode.state.passwordHasError() ? 'error' : '',
                                                     value: fields.password(),
-                                                    onfocus: () => ctrl.passwordHasError(false),
-                                                    onblur: ctrl.validatePassword,
+                                                    onfocus: () => vnode.state.passwordHasError(false),
+                                                    onblur: vnode.state.validatePassword,
                                                     onchange: m.withAttr('value', fields.password)
-                                                }), !ctrl.passwordHasError() ? '' : m(inlineError, {
+                                                }), !vnode.state.passwordHasError() ? '' : m(inlineError, {
                                                     message: 'A sua nova senha deve ter no mínimo 6 caracteres.'
                                                 })
                                             ])
@@ -510,7 +510,7 @@ const userAboutEdit = {
 
                                     ])
                                 )),
-                                (args.hideDisableAcc || user.total_published_projects > 0 ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
+                                (vnode.attrs.hideDisableAcc || user.total_published_projects > 0 ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
                                     m('.w-row.u-marginbottom-10', [
                                         m('.fontweight-semibold.fontsize-smaller',
                                             'Desativar minha conta'
@@ -519,14 +519,14 @@ const userAboutEdit = {
                                             'Todos os seus apoios serão convertidos em apoios anônimos, seus dados não serão mais visíveis, você sairá automaticamente do sistema e sua conta será desativada permanentemente.'
                                         ),
                                         m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}'][rel='nofollow']`, {
-                                            onclick: ctrl.deleteAccount
+                                            onclick: vnode.state.deleteAccount
                                         },
                                             'Desativar minha conta no Catarse'
                                         ),
                                         m('form.w-hidden', {
                                             action: `/pt/users/${user.id}`,
                                             method: 'post',
-                                            config: ctrl.setDeleteForm
+                                            config: vnode.state.setDeleteForm
                                         }, [
                                             m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
                                             m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']')
@@ -541,8 +541,8 @@ const userAboutEdit = {
 
 
                     m(projectEditSaveBtn, {
-                        loading: ctrl.loading,
-                        onSubmit: ctrl.onSubmit
+                        loading: vnode.state.loading,
+                        onSubmit: vnode.state.onSubmit
                     })
 
 

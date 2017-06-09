@@ -17,12 +17,12 @@ import h from '../h';
 import models from '../models';
 
 const contributionActivities = {
-    controller(args) {
+    oninit(vnode) {
         let interval;
-        const collection = m.prop([]),
-            resource = m.prop(),
-            collectionIndex = m.prop(0),
-            collectionSize = m.prop(),
+        const collection = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            resource = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+            collectionIndex = console.warn("m.prop has been removed from mithril 1.0") || m.prop(0),
+            collectionSize = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
             collectionL = postgrest.loader(
                   models.contributionActivity.getPageOptions()),
             nextResource = () => {
@@ -34,9 +34,7 @@ const contributionActivities = {
                 resource(collection()[collectionIndex()]);
                 m.redraw();
             },
-            startConfig = (el, isinitialized, context) => {
-                context.onunload = () => clearInterval(interval);
-            },
+            startConfig = (el, isinitialized, context) => {},
             startTimer = () => {
                 interval = setInterval(nextResource, 15000);
             };
@@ -57,13 +55,14 @@ const contributionActivities = {
             collectionSize
         };
     },
-    view(ctrl, args) {
-        if (!ctrl.collectionL() && !_.isUndefined(ctrl.resource()) && (ctrl.collectionSize() || 0) > 0) {
-            const resource = ctrl.resource(),
+
+    view(vnode) {
+        if (!vnode.state.collectionL() && !_.isUndefined(vnode.state.resource()) && (vnode.state.collectionSize() || 0) > 0) {
+            const resource = vnode.state.resource(),
                 elapsed = h.translatedTime(resource.elapsed_time),
                 projectLink = `https://catarse.me/${resource.permalink}?ref=ctrse_home_activities`;
 
-            return m('.w-section.section.bg-backs-carrosel', { config: ctrl.startConfig }, [
+            return m('.w-section.section.bg-backs-carrosel', { config: vnode.state.startConfig }, [
                 m('.w-container.u-text-center.fontcolor-negative', [
                     m('.fontsize-large.u-marginbottom-30', `há ${parseInt(elapsed.total)} ${elapsed.unit}...`),
                     m('.w-clearfix.w-inline-block.u-marginbottom-10', [
@@ -83,7 +82,9 @@ const contributionActivities = {
             ]);
         }
         return m('div');
-    }
+    },
+
+    onremove: () => clearInterval(interval)
 };
 
 export default contributionActivities;

@@ -15,7 +15,7 @@ import models from '../models';
 import h from '../h';
 
 const youtubeLightbox = {
-    controller(args) {
+    oninit(vnode) {
         let player;
         const showLightbox = h.toggleProp(false, true),
             setYoutube = (el, isInitialized) => {
@@ -40,7 +40,7 @@ const youtubeLightbox = {
                 player = new YT.Player('ytvideo', {
                     height: '528',
                     width: '940',
-                    videoId: args.src,
+                    videoId: vnode.attrs.src,
                     playerVars: {
                         showInfo: 0,
                         modestBranding: 0
@@ -57,29 +57,29 @@ const youtubeLightbox = {
             closeVideo
         };
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m('#youtube-lightbox', [
             m('a#youtube-play.w-lightbox.w-inline-block.fa.fa-play-circle.fontcolor-negative.fa-5x[href=\'javascript:void(0);\']', {
                 onclick: () => {
-                    ctrl.showLightbox.toggle();
-                    args.onclick && args.onclick();
+                    vnode.state.showLightbox.toggle();
+                    vnode.attrs.onclick && vnode.attrs.onclick();
                 }
             }),
-            m(`#lightbox.w-lightbox-backdrop[style="display:${ctrl.showLightbox() ? 'block' : 'none'}"]`, [
+            m(`#lightbox.w-lightbox-backdrop[style="display:${vnode.state.showLightbox() ? 'block' : 'none'}"]`, [
                 m('.w-lightbox-container', [
                     m('.w-lightbox-content', [
                         m('.w-lightbox-view', [
                             m('.w-lightbox-frame', [
                                 m('figure.w-lightbox-figure', [
                                     m('img.w-lightbox-img.w-lightbox-image[src=\'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22940%22%20height=%22528%22/%3E\']'),
-                                    m('#ytvideo.embedly-embed.w-lightbox-embed', { config: ctrl.setYoutube })
+                                    m('#ytvideo.embedly-embed.w-lightbox-embed', { config: vnode.state.setYoutube })
                                 ])
                             ])
                         ]),
                         m('.w-lightbox-spinner.w-lightbox-hide'),
                         m('.w-lightbox-control.w-lightbox-left.w-lightbox-inactive'),
                         m('.w-lightbox-control.w-lightbox-right.w-lightbox-inactive'),
-                        m('#youtube-close.w-lightbox-control.w-lightbox-close', { onclick: ctrl.closeVideo })
+                        m('#youtube-close.w-lightbox-control.w-lightbox-close', { onclick: vnode.state.closeVideo })
                     ]),
                     m('.w-lightbox-strip')
                 ])

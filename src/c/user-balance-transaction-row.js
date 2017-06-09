@@ -4,10 +4,10 @@ import h from '../h';
 const I18nScope = _.partial(h.i18nScope, 'users.balance');
 
 const userBalanceTrasactionRow = {
-    controller(args) {
+    oninit(vnode) {
         const expanded = h.toggleProp(false, true);
 
-        if (args.index == 0) {
+        if (vnode.attrs.index == 0) {
             expanded.toggle();
         }
 
@@ -15,11 +15,11 @@ const userBalanceTrasactionRow = {
             expanded
         };
     },
-    view(ctrl, args) {
-        const item = args.item,
+    view(vnode) {
+        const item = vnode.attrs.item,
             createdAt = h.momentFromString(item.created_at, 'YYYY-MM-DD');
 
-        return m(`div[class='balance-card ${(ctrl.expanded() ? 'card-detailed-open' : '')}']`,
+        return m(`div[class='balance-card ${(vnode.state.expanded() ? 'card-detailed-open' : '')}']`,
                  m('.w-clearfix.card.card-clickable', [
                      m('.w-row', [
                          m('.w-col.w-col-2.w-col-tiny-2', [
@@ -52,9 +52,9 @@ const userBalanceTrasactionRow = {
                              ])
                          ])
                      ]),
-                     m(`a.w-inline-block.arrow-admin.${(ctrl.expanded() ? 'arrow-admin-opened' : '')}.fa.fa-chevron-down.fontcolor-secondary[href="js:(void(0));"]`, { onclick: ctrl.expanded.toggle })
+                     m(`a.w-inline-block.arrow-admin.${(vnode.state.expanded() ? 'arrow-admin-opened' : '')}.fa.fa-chevron-down.fontcolor-secondary[href="js:(void(0));"]`, { onclick: vnode.state.expanded.toggle })
                  ]),
-                 (ctrl.expanded() ? m('.card', _.map(item.source, (transaction) => {
+                 (vnode.state.expanded() ? m('.card', _.map(item.source, (transaction) => {
                      const pos = transaction.amount >= 0;
 
                      return m('div', [

@@ -10,16 +10,16 @@ import replaceDiacritics from 'replaceDiacritics';
 const e = generateErrorInstance();
 
 const fields = {
-    tracker_snippet_html: m.prop(''),
-    user_id: m.prop(''),
-    public_tags: m.prop(''),
-    admin_tags: m.prop(''),
-    service_fee: m.prop(''),
-    name: m.prop(''),
-    permalink: m.prop(''),
-    category_id: m.prop(''),
-    city_id: m.prop(''),
-    city_name: m.prop('')
+    tracker_snippet_html: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    user_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    public_tags: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    admin_tags: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    service_fee: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    name: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    permalink: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    category_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    city_id: console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+    city_name: console.warn("m.prop has been removed from mithril 1.0") || m.prop('')
 };
 
 const fillFields = (data) => {

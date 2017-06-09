@@ -14,14 +14,14 @@ import userBalance from './user-balance';
 import userBalanceTransactions from './user-balance-transactions';
 
 const userBalanceMain = {
-    controller(args) {
+    oninit(vnode) {
         const userIdVM = postgrest.filtersVM({ user_id: 'eq' });
 
-        userIdVM.user_id(args.user_id);
+        userIdVM.user_id(vnode.attrs.user_id);
 
         // Handles with user balance request data
         const balanceManager = (() => {
-                const collection = m.prop([{ amount: 0, user_id: args.user_id }]),
+                const collection = console.warn("m.prop has been removed from mithril 1.0") || m.prop([{ amount: 0, user_id: vnode.attrs.user_id }]),
                     load = () => {
                         models.balance.getRowWithToken(userIdVM.parameters()).then(collection);
                     };
@@ -48,7 +48,7 @@ const userBalanceMain = {
 
               // Handles with bank account to check
             bankAccountManager = (() => {
-                const collection = m.prop([]),
+                const collection = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
                     loader = (() => postgrest.loaderWithToken(
                                 models.bankAccount.getRowOptions(
                                     userIdVM.parameters())))(),
@@ -69,12 +69,12 @@ const userBalanceMain = {
             balanceTransactionManager
         };
     },
-    view(ctrl, args) {
-        const opts = _.extend({}, args, ctrl);
+    view(vnode) {
+        const opts = _.extend({}, vnode.attrs, vnode.state);
         return m('#balance-area', [
-            m.component(userBalance, opts),
+            m(userBalance, opts),
             m('.divider'),
-            m.component(userBalanceTransactions, opts),
+            m(userBalanceTransactions, opts),
             m('.u-marginbottom-40'),
             m('.w-section.section.card-terciary.before-footer')
         ]);

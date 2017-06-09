@@ -3,18 +3,18 @@ import _ from 'underscore';
 import h from '../h';
 
 const UnsignedFriendFacebookConnect = {
-    controller(args) {
+    oninit(vnode) {
         return {
             largeBg: (() => {
-                if (_.isUndefined(args)) {
+                if (_.isUndefined(vnode.attrs)) {
                     return false;
                 }
-                return (_.isUndefined(args.largeBg) ? false : args.largeBg);
+                return _.isUndefined(vnode.attrs.largeBg) ? false : vnode.attrs.largeBg;
             })()
         };
     },
-    view(ctrl, args) {
-        return m(`.w-section.section${(ctrl.largeBg ? '.bg-backs-carrosel.section-large' : '')}`, [
+    view(vnode) {
+        return m(`.w-section.section${(vnode.state.largeBg ? '.bg-backs-carrosel.section-large' : '')}`, [
             m('.w-container', [
                 m('.card.card-big', [
                     m('.w-row', [

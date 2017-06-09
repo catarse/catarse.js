@@ -9,12 +9,12 @@ import loadMoreBtn from './load-more-btn';
 import projectCard from './project-card';
 
 const userCreated = {
-    controller(args) {
-        const user_id = args.userId,
-            showDraft = args.showDraft || false,
-            error = m.prop(false),
+    oninit(vnode) {
+        const user_id = vnode.attrs.userId,
+            showDraft = vnode.attrs.showDraft || false,
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             pages = postgrest.paginationVM(models.project),
-            loader = m.prop(true),
+            loader = console.warn("m.prop has been removed from mithril 1.0") || m.prop(true),
             contextVM = postgrest.filtersVM({
                 project_user_id: 'eq',
                 state: 'in'
@@ -43,14 +43,14 @@ const userCreated = {
             error
         };
     },
-    view(ctrl, args) {
-        const projects_collection = ctrl.projects.collection();
+    view(vnode) {
+        const projects_collection = vnode.state.projects.collection();
 
         return m('.content[id=\'created-tab\']',
-            (ctrl.error() ? m.component(inlineError, {
+            (vnode.state.error() ? m(inlineError, {
                 message: 'Erro ao carregar os projetos.'
-            }) : !ctrl.loader() ? [
-                (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m.component(projectCard, {
+            }) : !vnode.state.loader() ? [
+                (!_.isEmpty(projects_collection) ? _.map(projects_collection, project => m(projectCard, {
                     project,
                     ref: 'user_contributed',
                     showFriends: false
@@ -79,7 +79,7 @@ const userCreated = {
                 (!_.isEmpty(projects_collection) ?
                     m('.w-row.u-marginbottom-40.u-margintop-30', [
                         m(loadMoreBtn, {
-                            collection: ctrl.projects,
+                            collection: vnode.state.projects,
                             cssClass: '.w-col-push-5'
                         })
                     ]) : '')

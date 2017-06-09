@@ -6,9 +6,9 @@ import rewardReceiver from './reward-receiver';
 import contributionVM from '../vms/contribution-vm';
 
 const userContributionDetail = {
-    controller(args) {
-        const contribution = args.contribution,
-            rewardDetails = args.rewardDetails,
+    oninit(vnode) {
+        const contribution = vnode.attrs.contribution,
+            rewardDetails = vnode.attrs.rewardDetails,
             chosenReward = _.findWhere(rewardDetails(), {
                 id: contribution.reward_id
             });
@@ -18,8 +18,8 @@ const userContributionDetail = {
             chosenReward
         };
     },
-    view(ctrl, args) {
-        const contribution = args.contribution;
+    view(vnode) {
+        const contribution = vnode.attrs.contribution;
 
         return m('.user-contribution-detail', [
             m('.w-col.w-col-3', [
@@ -31,7 +31,7 @@ const userContributionDetail = {
                 )
             ]),
             m('.w-col.w-col-3',
-                m.component(paymentStatus, {
+                m(paymentStatus, {
                     item: contribution
                 })
             ),
@@ -40,18 +40,18 @@ const userContributionDetail = {
                     'Recompensa:'
                 ),
                 m('.fontsize-smallest.lineheight-tight.u-marginbottom-20',
-                    (!_.isUndefined(ctrl.chosenReward) ? [m('.fontsize-smallest.fontweight-semibold',
-                        ctrl.chosenReward.title
+                    (!_.isUndefined(vnode.state.chosenReward) ? [m('.fontsize-smallest.fontweight-semibold',
+                        vnode.state.chosenReward.title
                     ), m('.fontsize-smallest.fontcolor-secondary',
-                        ctrl.chosenReward.description
+                        vnode.state.chosenReward.description
                     )] : 'Nenhuma recompensa selecionada.')
                 ),
                 m('.fontsize-smallest.lineheight-looser',
-                    (!_.isUndefined(ctrl.chosenReward) ? [
+                    (!_.isUndefined(vnode.state.chosenReward) ? [
                         m('span.fontweight-semibold',
                             'Estimativa de entrega: '
                         ),
-                        h.momentify(ctrl.chosenReward.deliver_at, 'MMM/YYYY')
+                        h.momentify(vnode.state.chosenReward.deliver_at, 'MMM/YYYY')
                     ] : '')
                 ),
                 contributionVM.canBeDelivered(contribution) ? m('.fontsize-smallest.lineheight-looser', [

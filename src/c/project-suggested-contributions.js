@@ -13,8 +13,8 @@ import m from 'mithril';
 import _ from 'underscore';
 
 const projectSuggestedContributions = {
-    view(ctrl, args) {
-        const project = args.project();
+    view(vnode) {
+        const project = vnode.attrs.project();
 
         const suggestionUrl = amount => `/projects/${project.project_id}/contributions/new?amount=${amount}`,
             suggestedValues = [10, 25, 50, 100];

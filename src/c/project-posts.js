@@ -8,7 +8,7 @@ import h from '../h';
 const I18nScope = _.partial(h.i18nScope, 'projects.posts');
 
 const projectPosts = {
-    controller(args) {
+    oninit(vnode) {
         const listVM = postgrest.paginationVM(models.projectPostDetail),
             filterVM = postgrest.filtersVM({
                 project_id: 'eq',
@@ -20,10 +20,10 @@ const projectPosts = {
             }
         };
 
-        filterVM.project_id(args.project().project_id);
+        filterVM.project_id(vnode.attrs.project().project_id);
 
-        if (_.isNumber(args.post_id)) {
-            filterVM.id(args.post_id);
+        if (_.isNumber(vnode.attrs.post_id)) {
+            filterVM.id(vnode.attrs.post_id);
         }
 
         if (!listVM.collection().length) {
@@ -36,11 +36,11 @@ const projectPosts = {
             scrollTo
         };
     },
-    view(ctrl, args) {
-        const list = ctrl.listVM,
-            project = args.project() || {};
+    view(vnode) {
+        const list = vnode.state.listVM,
+            project = vnode.attrs.project() || {};
 
-        return m('#posts.project-posts.w-section', { config: ctrl.scrollTo }, [
+        return m('#posts.project-posts.w-section', { config: vnode.state.scrollTo }, [
             m('.w-container.u-margintop-20', [
                 (project.is_owner_or_admin ? [
                     (!list.isLoading()) ?
@@ -69,15 +69,15 @@ const projectPosts = {
                     m('.w-col.w-col-1')
                 ]))),
                 m('.w-row', [
-                    (!_.isUndefined(args.post_id) ? '' :
+                    (!_.isUndefined(vnode.attrs.post_id) ? '' :
                         (!list.isLoading() ?
-                            (list.collection().length === 0 && args.projectContributions().length === 0) ?
+                            (list.collection().length === 0 && vnode.attrs.projectContributions().length === 0) ?
                                 !project.is_owner_or_admin ? m('.w-col.w-col-10.w-col-push-1',
                                     m('p.fontsize-base',
                                         m.trust(
                                             I18n.t('empty',
                                                 I18nScope({
-                                                    project_user_name: args.userDetails().name,
+                                                    project_user_name: vnode.attrs.userDetails().name,
                                                     project_id: project.project_id
                                                 })
                                             )

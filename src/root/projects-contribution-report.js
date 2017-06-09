@@ -15,15 +15,15 @@ import ProjectContributionStateLegendModal from '../c/project-contribution-state
 import ProjectContributionDeliveryLegendModal from '../c/project-contribution-delivery-legend-modal';
 
 const projectContributionReport = {
-    controller(args) {
+    oninit(vnode) {
         const listVM = postgrest.paginationVM(models.projectContribution, 'id.desc', {
                 Prefer: 'count=exact'
             }),
             filterVM = projectsContributionReportVM,
-            project = m.prop([{}]),
-            rewards = m.prop([]),
-            showDownloads = m.prop(false),
-            contributionStateOptions = m.prop([]),
+            project = console.warn("m.prop has been removed from mithril 1.0") || m.prop([{}]),
+            rewards = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            showDownloads = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            contributionStateOptions = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
             reloadSelectOptions = (projectState) => {
                 let opts = [{
                     value: '',
@@ -169,7 +169,7 @@ const projectContributionReport = {
             }
             ];
 
-        filterVM.project_id(args.project_id);
+        filterVM.project_id(vnode.attrs.project_id);
 
         const lReward = postgrest.loaderWithToken(models.rewardDetail.getPageOptions({
             project_id: `eq.${filterVM.project_id()}`
@@ -222,33 +222,33 @@ const projectContributionReport = {
             mapRewardsToOptions
         };
     },
-    view(ctrl) {
-        const list = ctrl.listVM;
+    view(vnode) {
+        const list = vnode.state.listVM;
 
-        if (!ctrl.lProject()) {
+        if (!vnode.state.lProject()) {
             return m('', [
-                m.component(projectDashboardMenu, {
-                    project: m.prop(_.first(ctrl.project()))
+                m(projectDashboardMenu, {
+                    project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(_.first(vnode.state.project()))
                 }),
-                ctrl.showDownloads() ? m(downloadReports, {
-                    project: m.prop(_.first(ctrl.project())),
-                    rewards: ctrl.rewards()
+                vnode.state.showDownloads() ? m(downloadReports, {
+                    project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(_.first(vnode.state.project())),
+                    rewards: vnode.state.rewards()
                 }) : [
-                    m(`.w-section.section-product.${_.first(ctrl.project()).mode}`),
-                    m.component(projectContributionReportHeader, {
-                        submit: ctrl.submit,
-                        filterBuilder: ctrl.filterBuilder,
-                        form: ctrl.filterVM.formDescriber,
-                        mapRewardsToOptions: ctrl.mapRewardsToOptions,
-                        filterVM: ctrl.filterVM
+                    m(`.w-section.section-product.${_.first(vnode.state.project()).mode}`),
+                    m(projectContributionReportHeader, {
+                        submit: vnode.state.submit,
+                        filterBuilder: vnode.state.filterBuilder,
+                        form: vnode.state.filterVM.formDescriber,
+                        mapRewardsToOptions: vnode.state.mapRewardsToOptions,
+                        filterVM: vnode.state.filterVM
                     }),
                     m('.divider.u-margintop-30'),
-                    m.component(projectContributionReportContent, {
-                        submit: ctrl.submit,
+                    m(projectContributionReportContent, {
+                        submit: vnode.state.submit,
                         list,
-                        showDownloads: ctrl.showDownloads,
-                        filterVM: ctrl.filterVM,
-                        project: m.prop(_.first(ctrl.project()))
+                        showDownloads: vnode.state.showDownloads,
+                        filterVM: vnode.state.filterVM,
+                        project: console.warn("m.prop has been removed from mithril 1.0") || m.prop(_.first(vnode.state.project()))
                     })]
             ]);
         }

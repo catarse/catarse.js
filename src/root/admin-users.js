@@ -11,10 +11,10 @@ import filterMain from '../c/filter-main';
 import filterDropdown from '../c/filter-dropdown';
 
 const adminUsers = {
-    controller() {
+    oninit() {
         const listVM = userListVM,
             filterVM = userFilterVM,
-            error = m.prop(''),
+            error = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
             itemBuilder = [{
                 component: adminUser,
                 wrapperClass: '.w-col.w-col-4'
@@ -61,18 +61,18 @@ const adminUsers = {
             submit
         };
     },
-    view(ctrl) {
+    view(vnode) {
         const label = 'Usuários';
 
         return m('', [
-            m.component(adminFilter, {
-                form: ctrl.filterVM.formDescriber,
-                filterBuilder: ctrl.filterBuilder,
+            m(adminFilter, {
+                form: vnode.state.filterVM.formDescriber,
+                filterBuilder: vnode.state.filterBuilder,
                 label,
-                submit: ctrl.submit
+                submit: vnode.state.submit
             }),
-            m.component(adminList, {
-                vm: ctrl.listVM,
+            m(adminList, {
+                vm: vnode.state.listVM,
                 label,
                 listItem: adminUserItem,
                 listDetail: adminUserDetail

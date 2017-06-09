@@ -8,12 +8,12 @@ import modalBox from './modal-box';
 import inviteEmailsFromImport from './invite-emails-from-import';
 
 const projectGoogleContactImport = {
-    controller(args) {
+    oninit(vnode) {
         const clientId = document.getElementById('google_oauth_client'),
             modalToggle = h.toggleProp(false, true),
             feedPageUrl = 'https://www.google.com/m8/feeds/contacts/default/full?alt=json&max-results=1000',
-            dataEmails = m.prop([]),
-            loadingContacts = m.prop(false),
+            dataEmails = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
+            loadingContacts = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
             fetch = (token, pageUrl) => {
                 if (!modalToggle()) {
                     modalToggle.toggle();
@@ -71,22 +71,22 @@ const projectGoogleContactImport = {
             dataEmails
         };
     },
-    view(ctrl, args) {
-        const project = args.project;
+    view(vnode) {
+        const project = vnode.attrs.project;
 
         return m('#google_contact_wrapper', [
-            (ctrl.modalToggle() ? m.component(modalBox, {
-                displayModal: ctrl.modalToggle,
+            (vnode.state.modalToggle() ? m(modalBox, {
+                displayModal: vnode.state.modalToggle,
                 content: [inviteEmailsFromImport, {
-                    project: args.project,
-                    dataEmails: ctrl.dataEmails,
-                    loadingContacts: ctrl.loadingContacts,
-                    modalToggle: ctrl.modalToggle,
-                    showSuccess: args.showSuccess
+                    project: vnode.attrs.project,
+                    dataEmails: vnode.state.dataEmails,
+                    loadingContacts: vnode.state.loadingContacts,
+                    modalToggle: vnode.state.modalToggle,
+                    showSuccess: vnode.attrs.showSuccess
                 }]
             }) : ''),
             m('a.btn.btn-inline.btn-no-border.btn-terciary.w-inline-block[href=\'javascript:void(0);\']', {
-                onclick: ctrl.auth
+                onclick: vnode.state.auth
             }, [
                 m('img[src=\'http://uploads.webflow.com/57ba58b4846cc19e60acdd5b/57bc339f77f314e23b94d44d_gmail-icon.png\'][width=\'25\']'),
                 m('._w-inline-block.fontsize-smallest', 'Contatos do gmail')

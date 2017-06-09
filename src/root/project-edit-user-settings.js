@@ -5,20 +5,20 @@ import userAboutEdit from '../c/user-about-edit';
 import userSettings from '../c/user-settings';
 
 const projectEditUserSettings = {
-    controller(args) {
+    oninit(vnode) {
         return {
-            user: userVM.fetchUser(args.user_id)
+            user: userVM.fetchUser(vnode.attrs.user_id)
         };
     },
 
-    view(ctrl, args) {
-        return (ctrl.user() ? m(userSettings, {
-            user: ctrl.user(),
-            userId: args.user_id,
+    view(vnode) {
+        return vnode.state.user() ? m(userSettings, {
+            user: vnode.state.user(),
+            userId: vnode.attrs.user_id,
             hideCreditCards: true,
             useFloatBtn: true,
             publishingUserSettings: true
-        }) : m('div', h.loader()));
+        }) : m('div', h.loader());
     }
 };
 

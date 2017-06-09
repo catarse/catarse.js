@@ -7,11 +7,11 @@ import popNotification from './pop-notification';
 import projectGoogleContactImport from './project-google-contact-import';
 
 const projectEmailInvite = {
-    controller(args) {
-        const emailText = m.prop(''),
-            loading = m.prop(false),
-            project = args.project,
-            showSuccess = m.prop(false),
+    oninit(vnode) {
+        const emailText = console.warn("m.prop has been removed from mithril 1.0") || m.prop(''),
+            loading = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            project = vnode.attrs.project,
+            showSuccess = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
 
             submitInvite = () => {
                 if (_.isEmpty(emailText()) || loading() === true) {
@@ -50,33 +50,30 @@ const projectEmailInvite = {
             showSuccess
         };
     },
-    view(ctrl, args) {
-        const project = args.project;
+    view(vnode) {
+        const project = vnode.attrs.project;
 
         return m('.email-invite-box', [
-            (ctrl.showSuccess() ? m.component(popNotification, { message: 'Convites enviados.' }) : ''),
-            (ctrl.loading() ? h.loader()
+            (vnode.state.showSuccess() ? m(popNotification, { message: 'Convites enviados.' }) : ''),
+            (vnode.state.loading() ? h.loader()
              : [
                  m('.w-form', [
                      m('form', [
                          m('.u-marginbottom-10', [
-                             m.component(projectGoogleContactImport, {
+                             m(projectGoogleContactImport, {
                                  project,
-                                 showSuccess: ctrl.showSuccess
+                                 showSuccess: vnode.state.showSuccess
                              })
-                         //    m("a.btn.btn-inline.btn-no-border.btn-terciary.w-inline-block[href='#']", [
-                         //        m("._w-inline-block.fontsize-smallest", "Upload CSV")
-                         //    ])
                          ]),
                          m('textarea.positive.text-field.w-input[maxlength="5000"][placeholder="Adicione um ou mais emails, separados por linha."]', {
-                             onchange: m.withAttr('value', ctrl.emailText),
-                             value: ctrl.emailText()
+                             onchange: m.withAttr('value', vnode.state.emailText),
+                             value: vnode.state.emailText()
                          })
                      ])
                  ]),
                  m('.u-text-center', [
                      m('a.btn.btn-inline.btn-medium.w-button[href="javascript:void(0)"]', {
-                         onclick: ctrl.submitInvite
+                         onclick: vnode.state.submitInvite
                      }, 'Enviar convites')
                  ])
              ])

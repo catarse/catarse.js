@@ -14,11 +14,11 @@ import projectSuccessfulOnboardConfirmAccountAccept from './project-successful-o
 const I18nScope = _.partial(h.i18nScope, 'projects.successful_onboard.confirm_account');
 
 const projectSuccessfulOnboardConfirmAccount = {
-    controller(args) {
+    oninit(vnode) {
         const actionStages = {
                 accept: projectSuccessfulOnboardConfirmAccountAccept
             },
-            currentStage = m.prop('start'),
+            currentStage = console.warn("m.prop has been removed from mithril 1.0") || m.prop('start'),
             actionStage = () => actionStages[currentStage()],
             changeToAction = stage => () => {
                 currentStage(stage);
@@ -32,10 +32,10 @@ const projectSuccessfulOnboardConfirmAccount = {
             currentStage
         };
     },
-    view(ctrl, args) {
-        const projectAccount = args.projectAccount,
-            actionStage = ctrl.actionStage,
-            currentStage = ctrl.currentStage,
+    view(vnode) {
+        const projectAccount = vnode.attrs.projectAccount,
+            actionStage = vnode.state.actionStage,
+            currentStage = vnode.state.currentStage,
             juridicalPerson = projectAccount.user_type != 'pf';
 
         return m('.w-container.u-marginbottom-40', [
@@ -103,17 +103,17 @@ const projectSuccessfulOnboardConfirmAccount = {
             (currentStage() === 'start') ? m('#confirmation-dialog.w-row.bank-transfer-answer', [
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny'),
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
-                    m('a#confirm-account.btn.btn-large', { href: '#confirm_account', onclick: ctrl.changeToAction('accept') }, 'Sim')
+                    m('a#confirm-account.btn.btn-large', { href: '#confirm_account', onclick: vnode.state.changeToAction('accept') }, 'Sim')
                 ]),
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6', [
                     m('a#refuse-account.btn.btn-large.btn-terciary', { href: `/projects/${projectAccount.project_id}/edit#user_settings` }, 'Não')
                 ]),
                 m('.w-col.w-col-3.w-col-small-6.w-col-tiny-6.w-hidden-small.w-hidden-tiny')
-            ]) : m.component(actionStage(), {
+            ]) : m(actionStage(), {
                 projectAccount,
-                changeToAction: ctrl.changeToAction,
-                acceptAccount: args.acceptAccount,
-                acceptAccountLoader: args.acceptAccountLoader
+                changeToAction: vnode.state.changeToAction,
+                acceptAccount: vnode.attrs.acceptAccount,
+                acceptAccountLoader: vnode.attrs.acceptAccountLoader
             })
         ]);
     }

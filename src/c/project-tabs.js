@@ -4,9 +4,9 @@ import h from '../h';
 import projectReminder from './project-reminder';
 
 const projectTabs = {
-    controller(args) {
-        const isFixed = m.prop(false),
-            originalPosition = m.prop(-1);
+    oninit(vnode) {
+        const isFixed = console.warn("m.prop has been removed from mithril 1.0") || m.prop(false),
+            originalPosition = console.warn("m.prop has been removed from mithril 1.0") || m.prop(-1);
 
         const fixOnScroll = el => () => {
             const viewportOffset = el.getBoundingClientRect();
@@ -38,15 +38,15 @@ const projectTabs = {
             isFixed
         };
     },
-    view(ctrl, args) {
-        const project = args.project,
-            rewards = args.rewardDetails;
+    view(vnode) {
+        const project = vnode.attrs.project,
+            rewards = vnode.attrs.rewardDetails;
 
-        const mainClass = (!ctrl.isFixed() || project().is_owner_or_admin) ? '.w-section.project-nav' : '.w-section.project-nav.project-nav-fixed';
+        const mainClass = (!vnode.state.isFixed() || project().is_owner_or_admin) ? '.w-section.project-nav' : '.w-section.project-nav.project-nav-fixed';
 
         return m('nav-wrapper', project() ? [
             m(mainClass, {
-                config: ctrl.navDisplay
+                config: vnode.state.navDisplay
             }, [
                 m('.w-container', [
                     m('.w-row', [
@@ -100,14 +100,14 @@ const projectTabs = {
                                 m('.w-col.w-col-6.w-col-medium-4', {
                                     onclick: h.analytics.event({ cat: 'project_view', act: 'project_floatingreminder_click', project: project() })
                                 }, [
-                                    m.component(projectReminder, { project, type: 'button', hideTextOnMobile: true })
+                                    m(projectReminder, { project, type: 'button', hideTextOnMobile: true })
                                 ])
                             ])
                         ] : '') : ''
                     ])
                 ])
             ]),
-            (ctrl.isFixed() && !project().is_owner_or_admin) ? m('.w-section.project-nav') : ''
+            (vnode.state.isFixed() && !project().is_owner_or_admin) ? m('.w-section.project-nav') : ''
         ] : '');
     }
 };

@@ -7,12 +7,12 @@ import projectFriends from './project-friends';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.card');
 const projectCard = {
-    controller(args) {
-        const project = args.project,
+    oninit(vnode) {
+        const project = vnode.attrs.project,
             progress = project.progress.toFixed(2),
             remainingTextObj = h.translatedTime(project.remaining_time),
             elapsedTextObj = h.translatedTime(project.elapsed_time),
-            type = args.type || 'small';
+            type = vnode.attrs.type || 'small';
 
         const css = () => {
             const cssClasses = {
@@ -89,8 +89,8 @@ const projectCard = {
             cardMeter
         };
     },
-    view(ctrl, args) {
-        const project = args.project,
+    view(vnode) {
+        const project = vnode.attrs.project,
               projectOwnerName = (project.user ? (
                   project.user.public_name||project.user.name
               ) : (project.owner_public_name || project.owner_name)),
@@ -98,45 +98,45 @@ const projectCard = {
                   `${project.address.city} - ${project.address.state_acronym}`
               ) : (`${project.city_name} - ${project.state_acronym}`));
 
-        return m(ctrl.css().wrapper, [
-            m(ctrl.css().innerWrapper, [
-                m(`a${ctrl.css().thumb}[href="/${project.permalink}?ref=${args.ref}"]`, {
-                    onclick: projectVM.routeToProject(project, args.ref),
+        return m(vnode.state.css().wrapper, [
+            m(vnode.state.css().innerWrapper, [
+                m(`a${vnode.state.css().thumb}[href="/${project.permalink}?ref=${vnode.attrs.ref}"]`, {
+                    onclick: projectVM.routeToProject(project, vnode.attrs.ref),
                     style: {
                         'background-image': `url(${project.project_img||project.large_image})`,
                         display: 'block'
                     }
                 }),
-                m(ctrl.css().descriptionWrapper, [
-                    m(ctrl.css().description, [
-                        m(ctrl.css().title, [
-                            m(`a.link-hidden[href="/${project.permalink}?ref=${args.ref}"]`, {
-                                onclick: projectVM.routeToProject(project, args.ref)
+                m(vnode.state.css().descriptionWrapper, [
+                    m(vnode.state.css().description, [
+                        m(vnode.state.css().title, [
+                            m(`a.link-hidden[href="/${project.permalink}?ref=${vnode.attrs.ref}"]`, {
+                                onclick: projectVM.routeToProject(project, vnode.attrs.ref)
                             },
                             project.project_name||project.name)
                         ]),
-                        m(ctrl.css().author, `${I18n.t('by', I18nScope())} ${projectOwnerName}`),
-                        m(ctrl.css().headline, [
-                            m(`a.link-hidden[href="/${project.permalink}?ref=${args.ref}"]`, {
-                                onclick: projectVM.routeToProject(project, args.ref)
+                        m(vnode.state.css().author, `${I18n.t('by', I18nScope())} ${projectOwnerName}`),
+                        m(vnode.state.css().headline, [
+                            m(`a.link-hidden[href="/${project.permalink}?ref=${vnode.attrs.ref}"]`, {
+                                onclick: projectVM.routeToProject(project, vnode.attrs.ref)
                             }, project.headline)
                         ])
                     ]),
-                    m(ctrl.css().city, [
+                    m(vnode.state.css().city, [
                         m('.fontsize-smallest.fontcolor-secondary', [
                             m('span.fa.fa-map-marker.fa-1', ' '),
                             projectAddress
                         ])
                     ]),
-                    m(ctrl.cardMeter(), [
-                        (ctrl.isFinished(project)) ?
+                    m(vnode.state.cardMeter(), [
+                        (vnode.state.isFinished(project)) ?
                             m('div',
-                                project.state === 'successful' && ctrl.progress < 100 ? I18n.t('display_status.flex_successful', I18nScope()) : I18n.t(`display_status.${project.state}`, I18nScope())
+                                project.state === 'successful' && vnode.state.progress < 100 ? I18n.t('display_status.flex_successful', I18nScope()) : I18n.t(`display_status.${project.state}`, I18nScope())
                             ) :
                         m('.meter', [
                             m('.meter-fill', {
                                 style: {
-                                    width: `${(ctrl.progress > 100 ? 100 : ctrl.progress)}%`
+                                    width: `${(vnode.state.progress > 100 ? 100 : vnode.state.progress)}%`
                                 }
                             })
                         ])
@@ -150,15 +150,15 @@ const projectCard = {
                                 m('.fontsize-smaller.fontweight-semibold', `R$ ${h.formatNumber(project.pledged)}`),
                                 m('.fontsize-smallest.lineheight-tightest', 'Levantados')
                             ]),
-                            m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', ctrl.cardCopy(project)),
+                            m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', vnode.state.cardCopy(project)),
                         ])
                     ]),
                 ]),
-                (args.showFriends && ctrl.type === 'big' ?
-                 m('.w-col.w-col-4.w-col-medium-6', [m.component(projectFriends, { project })]) : '')
+                (vnode.attrs.showFriends && vnode.state.type === 'big' ?
+                 m('.w-col.w-col-4.w-col-medium-6', [m(projectFriends, { project })]) : '')
             ]),
-            (args.showFriends && ctrl.type !== 'big' ?
-              m.component(projectFriends, { project }) : '')
+            (vnode.attrs.showFriends && vnode.state.type !== 'big' ?
+              m(projectFriends, { project }) : '')
         ]);
     }
 };

@@ -4,15 +4,15 @@ import h from '../h';
 import inlineError from '../c/inline-error';
 
 const shippingFeeInput = {
-    controller(args) {
-        const states = args.states;
-        const fee = args.fee,
-            fees = args.fees,
-            feeIndex = args.feeIndex,
+    oninit(vnode) {
+        const states = vnode.attrs.states;
+        const fee = vnode.attrs.fee,
+            fees = vnode.attrs.fees,
+            feeIndex = vnode.attrs.feeIndex,
             deleted = h.toggleProp(false, true),
-            feeValue = m.prop(fee.value || 0),
-            feeDestination = m.prop(fee.destination),
-            index = args.index,
+            feeValue = console.warn("m.prop has been removed from mithril 1.0") || m.prop(fee.value || 0),
+            feeDestination = console.warn("m.prop has been removed from mithril 1.0") || m.prop(fee.destination),
+            index = vnode.attrs.index,
             stateInUse = state => state.acronym !== feeDestination() && _.contains(_.pluck(fees(), 'destination'), state.acronym),
             updateFees = () => {
                 const feeToUpdateIndex = _.indexOf(fees(), fee);
@@ -33,19 +33,19 @@ const shippingFeeInput = {
             states
         };
     },
-    view(ctrl, args) {
-        const feeIndex = ctrl.feeIndex,
-            index = ctrl.index,
-            deleted = ctrl.deleted,
-            othersCount = _.filter(ctrl.fees(), fee => fee.destination !== 'others' && fee.destination !== 'international').length,
-            states = ctrl.states;
+    view(vnode) {
+        const feeIndex = vnode.state.feeIndex,
+            index = vnode.state.index,
+            deleted = vnode.state.deleted,
+            othersCount = _.filter(vnode.state.fees(), fee => fee.destination !== 'others' && fee.destination !== 'international').length,
+            states = vnode.state.states;
 
         return m(`div${deleted() ? '.w-hidden' : ''}`, [
             m('.u-marginbottom-10.w-row', [
                 m('.w-col.w-col-6',
 
                     (
-                        ctrl.feeDestination() === 'others' ? [
+                        vnode.state.feeDestination() === 'others' ? [
 
                             m('input[type=\'hidden\']', {
                                 name: `project[rewards_attributes][${index}][shipping_fees_attributes][${feeIndex}][destination]`,
@@ -56,7 +56,7 @@ const shippingFeeInput = {
                             )
                         ] :
 
-                        ctrl.feeDestination() === 'international' ?
+                        vnode.state.feeDestination() === 'international' ?
 
                         [
                             m('input[type=\'hidden\']', {
@@ -69,17 +69,17 @@ const shippingFeeInput = {
                         ] :
 
                         m(`select.fontsize-smallest.text-field.text-field-light.w-select[id='project_rewards_shipping_fees_attributes_${index}_destination']`, {
-                            class: ctrl.fee.error ? 'error' : false,
+                            class: vnode.state.fee.error ? 'error' : false,
                             name: `project[rewards_attributes][${index}][shipping_fees_attributes][${feeIndex}][destination]`,
-                            value: ctrl.feeDestination(),
+                            value: vnode.state.feeDestination(),
                             onchange: (e) => {
-                                ctrl.feeDestination(e.target.value);
-                                ctrl.updateFees();
+                                vnode.state.feeDestination(e.target.value);
+                                vnode.state.updateFees();
                             }
                         }, [
                             (_.map(states(), state =>
                                 m(`option[value='${state.acronym}']`, {
-                                    disabled: ctrl.stateInUse(state)
+                                    disabled: vnode.state.stateInUse(state)
                                 },
                                     state.name
                                 )))
@@ -95,32 +95,32 @@ const shippingFeeInput = {
                         ),
                         m('.w-col.w-col-9',
                             m("input.positive.postfix.text-field.w-input[type='text']", {
-                                value: ctrl.feeValue(),
+                                value: vnode.state.feeValue(),
                                 name: `project[rewards_attributes][${index}][shipping_fees_attributes][${feeIndex}][value]`,
-                                oninput: m.withAttr('value', ctrl.feeValue)
+                                oninput: m.withAttr('value', vnode.state.feeValue)
                             })
                         )
                     ])
                 ),
                 m('.w-col.w-col-1', [
                     m(`input[id='project_rewards_shipping_fees_attributes_${index}__destroy'][type='hidden']`, {
-                        value: ctrl.deleted(),
+                        value: vnode.state.deleted(),
                         name: `project[rewards_attributes][${index}][shipping_fees_attributes][${feeIndex}][_destroy]`
                     }),
 
-                    (ctrl.feeDestination() === 'others' || ctrl.feeDestination() === 'international' ? '' :
+                    (vnode.state.feeDestination() === 'others' || vnode.state.feeDestination() === 'international' ? '' :
                         m('a.btn.btn-no-border.btn-small.btn-terciary.fa.fa-1.fa-trash', {
-                            onclick: () => ctrl.deleted.toggle()
+                            onclick: () => vnode.state.deleted.toggle()
                         }))
                 ]),
 
                 m(`input[type='hidden'][id='project_rewards_shipping_fees_attributes_${feeIndex}_id']`, {
                     name: `project[rewards_attributes][${index}][shipping_fees_attributes][${feeIndex}][id]`,
-                    value: ctrl.fee.id || null
+                    value: vnode.state.fee.id || null
                 })
 
             ],
-            ctrl.fee.error ? m(inlineError, { message: 'Estado não pode ficar em branco.' }) : ''
+            vnode.state.fee.error ? m(inlineError, { message: 'Estado não pode ficar em branco.' }) : ''
             ), m('.divider.u-marginbottom-10')
         ]);
     }

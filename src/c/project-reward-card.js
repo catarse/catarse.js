@@ -2,10 +2,10 @@ import m from 'mithril';
 import rewardVM from '../vms/reward-vm';
 
 const projectRewardCard = {
-    controller() {
+    oninit() {
 
     },
-    view(ctrl, args) {
+    view(vnode) {
         return m(`div[class="${h.rewardSouldOut(reward) ? 'card-gone' : `card-reward ${project.open_for_contributions ? 'clickable' : ''}`} card card-secondary u-marginbottom-10"]`, {
             onclick: h.analytics.event({
                 cat: 'contribution_create',
@@ -16,7 +16,7 @@ const projectRewardCard = {
                     reward_id: reward.id,
                     reward_value: reward.minimum_value
                 }
-            }, ctrl.selectReward(reward))
+            }, vnode.state.selectReward(reward))
         }, [
             reward.minimum_value >= 100 ? m('.tag-circle-installment', [
                 m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'),
@@ -27,10 +27,10 @@ const projectRewardCard = {
             ]),
 
             m('.fontsize-smaller.u-margintop-20.reward-description', {
-                class: ctrl.isRewardOpened(reward) ? `opened ${ctrl.isRewardDescriptionExtended(reward) ? 'extended' : ''}` : ''
+                class: vnode.state.isRewardOpened(reward) ? `opened ${vnode.state.isRewardDescriptionExtended(reward) ? 'extended' : ''}` : ''
             }, m.trust(h.simpleFormat(h.strip(reward.description)))),
-            ctrl.isRewardOpened(reward) ? m('a[href="javascript:void(0);"].alt-link.fontsize-smallest.gray.link-more.u-marginbottom-20', {
-                onclick: () => ctrl.descriptionExtended(reward.id)
+            vnode.state.isRewardOpened(reward) ? m('a[href="javascript:void(0);"].alt-link.fontsize-smallest.gray.link-more.u-marginbottom-20', {
+                onclick: () => vnode.state.descriptionExtended(reward.id)
             }, [
                 'mais',
                 m('span.fa.fa-angle-down')
@@ -72,9 +72,9 @@ const projectRewardCard = {
                 m('.pending.fontsize-smallest.fontcolor-secondary', h.pluralize(reward.waiting_payment_count, ' apoio em prazo de confirmação', ' apoios em prazo de confirmação.'))
             ]) : '',
             project.open_for_contributions && !h.rewardSouldOut(reward) ? [
-                ctrl.isRewardOpened(reward) ? m('.w-form', [
+                vnode.state.isRewardOpened(reward) ? m('.w-form', [
                     m('form.u-margintop-30', {
-                        onsubmit: ctrl.submitContribution
+                        onsubmit: vnode.state.submitContribution
                     }, [
                         m('.divider.u-marginbottom-20'),
                         (rewardVM.hasShippingOptions(reward) ? m('div', [
@@ -82,9 +82,9 @@ const projectRewardCard = {
                               'Local de entrega'
                              ),
                             m('select.positive.text-field.w-select', {
-                                onchange: m.withAttr('value', ctrl.selectedDestination)
+                                onchange: m.withAttr('value', vnode.state.selectedDestination)
                             },
-                              _.map(ctrl.locationOptions(reward), option => m(`option[value="${option.value}"]`, option.name))
+                              _.map(vnode.state.locationOptions(reward), option => m(`option[value="${option.value}"]`, option.name))
                              )
                         ]) : ''),
                         m('.fontcolor-secondary.u-marginbottom-10',
@@ -98,17 +98,17 @@ const projectRewardCard = {
                             ),
                             m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
                                 m('input.w-input.back-reward-input-reward[type="tel"]', {
-                                    config: ctrl.setInput,
-                                    onkeyup: m.withAttr('value', ctrl.applyMask),
-                                    value: ctrl.contributionValue()
+                                    config: vnode.state.setInput,
+                                    onkeyup: m.withAttr('value', vnode.state.applyMask),
+                                    value: vnode.state.contributionValue()
                                 })
                             )
                         ]),
                         m('input.w-button.btn.btn-medium[type="submit"][value="Continuar >"]'),
-                        ctrl.error().length > 0 ? m('.text-error', [
+                        vnode.state.error().length > 0 ? m('.text-error', [
                             m('br'),
                             m('span.fa.fa-exclamation-triangle'),
-                            ` ${ctrl.error()}`
+                            ` ${vnode.state.error()}`
                         ]) : ''
                     ])
                 ]) : '',

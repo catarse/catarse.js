@@ -6,9 +6,9 @@ import models from '../models';
 import rewardVM from './reward-vm';
 import userVM from './user-vm';
 
-const currentProject = m.prop(),
-    userDetails = m.prop(),
-    projectContributions = m.prop([]),
+const currentProject = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+    userDetails = console.warn("m.prop has been removed from mithril 1.0") || m.prop(),
+    projectContributions = console.warn("m.prop has been removed from mithril 1.0") || m.prop([]),
     vm = postgrest.filtersVM({ project_id: 'eq' }),
     idVM = h.idVM;
 
@@ -62,7 +62,7 @@ const getCurrentProject = () => {
             currentProject(jsonData);
         }
 
-        m.redraw(true);
+        console.warn("m.redraw ignores arguments in mithril 1.0") || m.redraw(true);
 
         init((project_id || projectId), (project_user_id || projectUserId));
 
