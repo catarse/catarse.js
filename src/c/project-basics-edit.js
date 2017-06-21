@@ -1,9 +1,9 @@
 import m from 'mithril';
+import _ from 'underscore';
+import I18n from 'i18n-js';
 import postgrest from 'mithril-postgrest';
 import models from '../models';
-import _ from 'underscore';
 import h from '../h';
-import I18n from 'i18n-js';
 import railsErrorsVM from '../vms/rails-errors-vm';
 import projectBasicsVM from '../vms/project-basics-vm';
 import popNotification from './pop-notification';
@@ -28,15 +28,18 @@ const projectBasicsEdit = {
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),
             selectedTags = m.prop([]),
-            editTag = m.prop(''),
-            lastTime = m.prop(0),
             tagOptions = m.prop([]),
             isEditingTags = m.prop(false),
             tagEditingLoading = m.prop(false),
             onSubmit = () => {
+                if (isEditingTags()) {
+                    return false;
+                }
+
                 loading(true);
                 m.redraw();
-                vm.fields.public_tags(_.pluck(selectedTags(), 'name').join(','));
+                const tagString = _.pluck(selectedTags(), 'name').join(',');
+                vm.fields.public_tags(tagString);
                 vm.updateProject(args.projectId).then(() => {
                     loading(false);
                     vm.e.resetFieldErrors();
@@ -57,36 +60,27 @@ const projectBasicsEdit = {
             railsErrorsVM.mapRailsErrors(railsErrorsVM.railsErrors(), mapErrors, vm.e);
         }
         vm.fillFields(args.project);
-        selectedTags(_.map(vm.fields.public_tags().split(','), name => ({name})));
+
+        if (vm.fields.public_tags()) {
+            selectedTags(_.map(vm.fields.public_tags().split(','), name => ({ name })));
+        }
+
         vm.loadCategoriesOptionsTo(categories, vm.fields.category_id());
-        const tagFilter = postgrest.filtersVM({
-            slug: '@@'
-        });
-
-        const triggerTagSearch = (tagString) => {
-            editTag(tagString);
-            m.redraw();
-
-            const elapsedTime = new Date() - lastTime();
-            if (tagString.length >= 3 && (elapsedTime > 350)) {
-                tagEditingLoading(true);
-                m.redraw();
-                models
-                    .publicTags
-                    .getPage(tagFilter.slug(tagString).parameters())
-                    .then((data) => {
-                        tagOptions(data);
-                        tagEditingLoading(false);
-                        lastTime(new Date());
-                        m.redraw();
-                    });
-            }
-        };
-
         const addTag = tag => () => {
+            tagOptions([]);
+
+            if (selectedTags().length >= 5) {
+                vm.e('public_tags', I18n.t('tags_max_error', I18nScope()));
+                vm.e.inlineError('public_tags', true);
+                m.redraw();
+
+                return false;
+            }
             selectedTags().push(tag);
             isEditingTags(false);
-            editTag('');
+
+            m.redraw();
+
             return false;
         };
 
@@ -96,6 +90,44 @@ const projectBasicsEdit = {
             selectedTags(updatedTags);
 
             return false;
+        };
+        const tagString = m.prop('');
+        const transport = m.prop({ abort: Function.prototype });
+        const searchTagsUrl = `${h.getApiHost()}/rpc/tag_search`;
+        const searchTags = () => m.request({ method: 'POST', background: true, config: transport, data: { query: tagString(), count: 3 }, url: searchTagsUrl });
+        const triggerTagSearch = (e) => {
+            tagString(e.target.value);
+
+            isEditingTags(true);
+            tagOptions([]);
+
+            const keyCode = e.keyCode;
+
+            if (keyCode === 188 || keyCode === 13) {
+                const tag = tagString().charAt(tagString().length - 1) === ','
+                    ? tagString().substr(0, tagString().length - 1)
+                    : tagString();
+
+                addTag({ name: tag.toLowerCase() }).call();
+                e.target.value = '';
+                return false;
+            }
+
+            tagEditingLoading(true);
+            transport().abort();
+            searchTags().then((data) => {
+                tagOptions(data);
+                tagEditingLoading(false);
+                m.redraw(true);
+            });
+
+            return false;
+        };
+
+        const editTag = (el, isinit) => {
+            if (!isinit) {
+                el.onkeyup = triggerTagSearch;
+            }
         };
 
         return {
@@ -118,6 +150,7 @@ const projectBasicsEdit = {
     },
     view(ctrl, args) {
         const vm = ctrl.vm;
+
         return m('#basics-tab', [
             (ctrl.showSuccess() ? m.component(popNotification, {
                 message: I18n.t('shared.successful_update'),
@@ -193,23 +226,22 @@ const projectBasicsEdit = {
                             m(inputCard, {
                                 label: I18n.t('tags', I18nScope()),
                                 label_hint: I18n.t('tags_hint', I18nScope()),
+                                onclick: () => ctrl.isEditingTags(false),
                                 children: [
                                     m('input.string.optional.w-input.text-field.positive.medium[type="text"]', {
-                                        // value: vm.fields.public_tags(),
-                                        value: ctrl.editTag(),
-                                        onfocus: () => ctrl.isEditingTags(true),
+                                        config: ctrl.editTag,
                                         class: vm.e.hasError('public_tags') ? 'error' : '',
-                                        onkeyup: m.withAttr('value', ctrl.triggerTagSearch)
+                                        onfocus: () => vm.e.inlineError('public_tags', false)
                                     }),
                                     ctrl.isEditingTags() ? m('.options-list.table-outer',
-                                        ctrl.tagEditingLoading()
-                                            ? m('.fontsize-smaller.fontcolor-secondary', 'carregando...')
-                                            : _.map(ctrl.tagOptions(), tag => m('.dropdown-link',
-                                                { onclick: ctrl.addTag(tag) },
-                                                m('.fontsize-smaller',
-                                                    tag.name
-                                                )
-                                            ))
+                                         ctrl.tagEditingLoading()
+                                            ? m('.dropdown-link', m('.fontsize-smallest', 'Carregando...'))
+                                            : ctrl.tagOptions().length
+                                                ? _.map(ctrl.tagOptions(), tag => m('.dropdown-link',
+                                                    { onclick: ctrl.addTag(tag) },
+                                                    m('.fontsize-smaller', tag.name)
+                                                ))
+                                                : m('.dropdown-link', m('.fontsize-smallest', 'Nenhuma tag relacionada...'))
                                     ) : '',
                                     vm.e.inlineError('public_tags'),
                                     m('div.tag-choices',
@@ -270,7 +302,7 @@ const projectBasicsEdit = {
                         ])
                     ])
                 ]),
-                m(projectEditSaveBtn, {loading: ctrl.loading, onSubmit: ctrl.onSubmit})
+                m(projectEditSaveBtn, { loading: ctrl.loading, onSubmit: ctrl.onSubmit })
             ])
         ]);
     }

@@ -22,7 +22,6 @@ const projectRewardList = {
 
                 return false;
             };
-
         const setInput = (el, isInitialized) => (!isInitialized ? el.focus() : false);
 
         const selectDestination = (destination) => {
@@ -42,8 +41,8 @@ const projectRewardList = {
 
             if (!selectedDestination() && rewardVM.hasShippingOptions(vm.selectedReward())) {
                 vm.error('Please select a valid freight option.');
-            } else if (valueFloat < vm.selectedReward().minimum_value + shippingFee.value) {
-                vm.error(`The support amount for this reward must be at least Rs${vm.selectedReward().minimum_value} + freight Rs${h.formatNumber(shippingFee.value)}`);
+            } else if (valueFloat < vm.selectedReward().minimum_value) {
+                vm.error(`The support amount for this reward must be at least Rs${vm.selectedReward().minimum_value}`);
             } else {
                 vm.error('');
                 const valueUrl = window.encodeURIComponent(String(valueFloat).replace('.', ','));

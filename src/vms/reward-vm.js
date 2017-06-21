@@ -59,14 +59,16 @@ const selectReward = reward => () => {
     if (selectedReward() !== reward) {
         error('');
         selectedReward(reward);
-        contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
+        // contributionValue(h.applyMonetaryMask(`${reward.minimum_value},00`));
+        contributionValue(h.numbersOnlyMask(`${reward.minimum_value}`));
         if (reward.id) {
             getFees(reward).then(fees);
         }
     }
 };
 
-const applyMask = _.compose(contributionValue, h.applyMonetaryMask);
+// const applyMask = _.compose(contributionValue, h.applyMonetaryMask);
+const applyMask = _.compose(contributionValue, h.numbersOnlyMask);
 
 const statesLoader = postgrest.loader(models.state.getPageOptions());
 const getStates = () => {
@@ -157,7 +159,7 @@ const shippingFeeForCurrentReward = (selectedDestination) => {
     return currentFee;
 };
 
-const canEdit = (reward, projectState, user) => user.is_admin || (projectState === 'draft' || (projectState === 'online' && reward.paid_count <= 0 && reward.waiting_payment_count <= 0));
+const canEdit = (reward, projectState, user) => (user||{}).is_admin || (projectState === 'draft' || (projectState === 'online' && reward.paid_count <= 0 && reward.waiting_payment_count <= 0));
 
 const canAdd = projectState => projectState === 'draft' || projectState === 'online';
 

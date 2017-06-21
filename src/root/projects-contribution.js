@@ -10,12 +10,12 @@ import faqBox from '../c/faq-box';
 
 
 const projectsContribution = {
-    controller() {
+    controller(args) {
         const rewards = () => _.union(
             [{
                 id: null,
-                description: 'Obrigado. Eu só quero ajudar o projeto.',
-                minimum_value: 10,
+                description: 'Thank you. I just want to help the project.',
+                minimum_value: 100,
                 shipping_options: null,
                 row_order: -9999999
             }],
@@ -26,7 +26,7 @@ const projectsContribution = {
             const valueFloat = h.monetaryToFloat(rewardVM.contributionValue);
 
             if (valueFloat < rewardVM.selectedReward().minimum_value) {
-                rewardVM.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${rewardVM.selectedReward().minimum_value}`);
+                rewardVM.error(`The support amount for this reward must be at least Rs${rewardVM.selectedReward().minimum_value}`);
             } else {
                 rewardVM.error('');
                 h.navigateTo(`/projects/${projectVM.currentProject().project_id}/contributions/fallback_create?contribution%5Breward_id%5D=${rewardVM.selectedReward().id}&contribution%5Bvalue%5D=${valueFloat}`);
@@ -38,17 +38,17 @@ const projectsContribution = {
         projectVM.getCurrentProject();
 
         return {
-            paymentVM: paymentVM(projectVM.currentProject().mode),
             project: projectVM.currentProject,
+            paymentVM: paymentVM(),
             submitContribution,
             sortedRewards: () => _.sortBy(rewards(), reward => Number(reward.row_order))
         };
     },
-    view(ctrl) {
+    view(ctrl, args) {
         const project = ctrl.project;
 
         return m('#contribution-new',
-            project && !_.isUndefined(project()) ? [
+                 !_.isEmpty(project()) ? [
                 m(`.w-section.section-product.${project().mode}`),
                 m(projectHeaderTitle, {
                     project
@@ -74,11 +74,11 @@ const projectsContribution = {
                     m('.w-col.w-col-4', m.component(faqBox, {
                         mode: project().mode,
                         vm: ctrl.paymentVM,
-                        faq: ctrl.paymentVM.faq(),
-                        projectUserId: project().user.id
+                        faq: ctrl.paymentVM.faq(project().mode),
+                        projectUserId: args.project_user_id
                     }))
                 ])))
-            ] : '');
+            ] : h.loader());
     }
 };
 
