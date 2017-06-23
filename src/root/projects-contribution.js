@@ -45,7 +45,6 @@ const projectsContribution = {
         };
     },
     view(ctrl, args) {
-        debugger
         const project = ctrl.project;
         return m('#contribution-new',
                  !_.isEmpty(project()) ? [

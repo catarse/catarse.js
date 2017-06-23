@@ -133,10 +133,10 @@ const projectsPayment = {
                         [
                             m('.fontsize-larger.text-success.u-left',
                                 `Rs ${formatedValue}`
-                            ),
-                            m(`a.alt-link.fontsize-smaller.u-right[href="/projects/${projectVM.currentProject().project_id}/contributions/new${ctrl.reward().id ? `?reward_id=${ctrl.reward().id}` : ''}"]`,
-                                'Edit'
                             )
+                            // m(`a.alt-link.fontsize-smaller.u-right[href="/projects/${projectVM.currentProject().project_id}/contributions/new${ctrl.reward().id ? `?reward_id=${ctrl.reward().id}` : ''}"]`,
+                            //     'Edit'
+                            // )
                         ]
                     ),
                     m('.divider.u-marginbottom-10.u-margintop-10'),
@@ -153,13 +153,7 @@ const projectsPayment = {
                                        : 'extended'
                         }, ctrl.reward().description
                                 ? ctrl.reward().description
-                                : m.trust(
-                                    I18n.t('selected_reward.review_without_reward_html',
-                                        ctrl.scope(
-                                            _.extend({ value: formatedValue })
-                                        )
-                                    )
-                                )
+                                : ''
                         ),
                         ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
                             onclick: ctrl.toggleDescription.toggle
@@ -206,8 +200,7 @@ const projectsPayment = {
                                 m('.w-row.u-marginbottom-30', [
                                     m('.w-col.w-col-7.w-sub-col', [
                                         m('label.field-label.fontweight-semibold[for=\'country\']', [
-                                            'Parents / ',
-                                            m('em', 'Country'),
+                                            'Country ',
                                             ' *'
                                         ]),
                                         m('select.w-select.text-field[id=\'country\']', {
@@ -449,13 +442,7 @@ const projectsPayment = {
                                                    : 'extended'
                                     }, ctrl.reward().description
                                             ? ctrl.reward().description
-                                            : m.trust(
-                                                I18n.t('selected_reward.review_without_reward_html',
-                                                    ctrl.scope(
-                                                        _.extend({ value: Number(ctrl.value).toFixed() })
-                                                    )
-                                                )
-                                            )
+                                            : ''
                                     ),
                                     ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
                                         onclick: ctrl.toggleDescription.toggle
