@@ -19,7 +19,7 @@ const projectRewardCard = {
             }, ctrl.selectReward(reward))
         }, [
             reward.minimum_value >= 100 ? m('.tag-circle-installment', [
-                m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x'),
+                m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '33x'),
                 m('.fontsize-mini.lineheight-tightest', 's/ juros')
             ]) : '',
             m('.u-marginbottom-20', [

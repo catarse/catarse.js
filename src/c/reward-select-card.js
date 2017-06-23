@@ -48,7 +48,7 @@ const rewardSelectCard = {
             if (_.isEmpty(reward)) {
                 return {
                     id: null,
-                    description: 'Thank you. I just want to help the project.',
+                    description: 'I just want to help the campaign.',
                     minimum_value: 10,
                     shipping_options: null,
                     row_order: -999999
