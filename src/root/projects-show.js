@@ -26,7 +26,6 @@ const projectsShow = {
     },
     view(ctrl, args) {
         const project = ctrl.currentProject;
-
         return m('.project-show', {
             config: ctrl.setProjectPageTitle()
         }, project() ? [

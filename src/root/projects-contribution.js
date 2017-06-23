@@ -21,13 +21,7 @@ const projectsContribution = {
         //     }],
         //     projectVM.rewardDetails()
         // );
-        const rewards = () => [{
-            id: null,
-            description: 'Thank you. I just want to help the project.',
-            minimum_value: 10,
-            shipping_options: null,
-            row_order: -9999999
-        }];
+        const rewards = () => [{}];
         const submitContribution = () => {
             const valueFloat = h.monetaryToFloat(rewardVM.contributionValue);
 

@@ -105,12 +105,12 @@ const projectRewardList = {
             }, ctrl.selectReward(reward)),
             config: ctrl.isRewardOpened(reward) ? h.scrollTo() : Function.prototype
         }, [
-            reward.minimum_value >= 1000 ? m('.tag-circle-installment', [
-                m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', '3x')
-                // m('.fontsize-mini.lineheight-tightest', 's/ interest')
-            ]) : '',
+            // reward.minimum_value >= 1000 ? m('.tag-circle-installment', [
+            //     m('.fontsize-smallest.fontweight-semibold.lineheight-tightest', 'x')
+            //     // m('.fontsize-mini.lineheight-tightest', 's/ interest')
+            // ]) : '',
             m('.u-marginbottom-20', [
-                m('.fontsize-base.fontweight-semibold', `For Rs ${h.formatNumber(reward.minimum_value)} or more`)
+                m('.fontsize-base.fontweight-semibold', `For Rs ${h.formatNumber(reward.minimum_value)} `)
             ]),
             m('.fontsize-smaller.fontweight-semibold',
                     reward.title
@@ -170,7 +170,7 @@ const projectRewardList = {
                     m('form.u-margintop-30', {
                         onsubmit: ctrl.submitContribution
                     }, [
-                        m('.divider.u-marginbottom-20'),
+                        // m('.divider.u-marginbottom-20'),
                         rewardVM.hasShippingOptions(reward) ? m('div', [
                             m('.fontcolor-secondary.u-marginbottom-10',
                                 'Delivery place'
@@ -191,21 +191,21 @@ const projectRewardList = {
                                 )
                             )
                         ]) : '',
-                        m('.fontcolor-secondary.u-marginbottom-10',
-                            'Value of support'
-                        ),
-                        m('.w-row.u-marginbottom-20', [
-                            m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
-                                m('.back-reward-input-reward.placeholder', 'Rs')
-                            ),
-                            m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
-                                m('input.w-input.back-reward-input-reward[type="tel"]', {
-                                    config: ctrl.setInput,
-                                    onkeyup: m.withAttr('value', ctrl.applyMask),
-                                    value: ctrl.contributionValue()
-                                })
-                            )
-                        ]),
+                        // m('.fontcolor-secondary.u-marginbottom-10',
+                        //     'Value of support'
+                        // ),
+                        // m('.w-row.u-marginbottom-20', [
+                        //     m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3',
+                        //         m('.back-reward-input-reward.placeholder', 'Rs')
+                        //     ),
+                        //     m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9',
+                        //         m('input.w-input.back-reward-input-reward[type="tel"]', {
+                        //             config: ctrl.setInput,
+                        //             onkeyup: m.withAttr('value', ctrl.applyMask),
+                        //             value: ctrl.contributionValue()
+                        //         })
+                        //     )
+                        // ]),
                         m('input.w-button.btn.btn-medium[type="submit"][value="Continue >"]'),
                         ctrl.error().length > 0 ? m('.text-error', [
                             m('br'),
