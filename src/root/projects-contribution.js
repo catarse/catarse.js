@@ -11,17 +11,23 @@ import faqBox from '../c/faq-box';
 
 const projectsContribution = {
     controller(args) {
-        const rewards = () => _.union(
-            [{
-                id: null,
-                description: 'Thank you. I just want to help the project.',
-                minimum_value: 100,
-                shipping_options: null,
-                row_order: -9999999
-            }],
-            projectVM.rewardDetails()
-        );
-
+        // const rewards = () => _.union(
+        //     [{
+        //         id: null,
+        //         description: 'Thank you. I just want to help the project.',
+        //         minimum_value: 10,
+        //         shipping_options: null,
+        //         row_order: -9999999
+        //     }],
+        //     projectVM.rewardDetails()
+        // );
+        const rewards = () => [{
+            id: null,
+            description: 'Thank you. I just want to help the project.',
+            minimum_value: 10,
+            shipping_options: null,
+            row_order: -9999999
+        }];
         const submitContribution = () => {
             const valueFloat = h.monetaryToFloat(rewardVM.contributionValue);
 
@@ -36,17 +42,17 @@ const projectsContribution = {
         };
 
         projectVM.getCurrentProject();
-
         return {
             project: projectVM.currentProject,
             paymentVM: paymentVM(),
             submitContribution,
-            sortedRewards: () => _.sortBy(rewards(), reward => Number(reward.row_order))
+            // sortedRewards: () => _.sortBy(rewards(), reward => Number(reward.row_order))
+            sortedRewards: () => rewards()
         };
     },
     view(ctrl, args) {
+        debugger
         const project = ctrl.project;
-
         return m('#contribution-new',
                  !_.isEmpty(project()) ? [
                 m(`.w-section.section-product.${project().mode}`),
@@ -56,7 +62,7 @@ const projectsContribution = {
                 m('.w-section.header-cont-new',
                     m('.w-container',
                         m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only',
-                            'Choose the reward and then the value of the support'
+                            'Value of your support'
                         )
                     )
                 ),
