@@ -96,7 +96,7 @@ const footer = {
                                                 m('a.link-footer[href=\'/en/explore?ref=ctrse_footer\']',
                                                     I18n.t('links.discover', I18nScope())
                                                 ),
-                                                m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'http://blog.catarse.me?ref=ctrse_footer\']',
+                                                m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'https://medium.com/grasruts?ref=ctrse_footer\']',
                                                     ' Blog'
                                                 ),
                                                 m('a.w-hidden-main.w-hidden-medium.w-hidden-small.link-footer[href=\'#\']',

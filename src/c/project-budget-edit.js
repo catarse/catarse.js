@@ -69,11 +69,11 @@ const projectBudgetEdit = {
                 m('.w-container', [
                     m('.w-row', [
                         m('.w-col.w-col-10.w-col-push-1', [
-                            m('.u-marginbottom-60.u-text-center', [
-		                            m('.w-inline-block.card.fontsize-small.u-radius', [
-                                m.trust(I18n.t('budget_alert', I18nScope()))
-		                            ])
-	                          ]),
+                            // m('.u-marginbottom-60.u-text-center', [
+		                     //        m('.w-inline-block.card.fontsize-small.u-radius', [
+                            //     m.trust(I18n.t('budget_alert', I18nScope()))
+		                     //        ])
+	                         //  ]),
                             m(bigInputCard, {
                                 cardStyle: { display: 'block' },
                                 label: I18n.t('budget_label', I18nScope()),

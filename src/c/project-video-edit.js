@@ -69,11 +69,11 @@ const projectBudgetEdit = {
                 m('.w-container', [
                     m('.w-row', [
                         m('.w-col.w-col-10.w-col-push-1', [
-                            m('.u-marginbottom-60.u-text-center', [
-		                            m('.w-inline-block.card.fontsize-small.u-radius', [
-                                m.trust(I18n.t('video_alert', I18nScope()))
-		                            ])
-	                          ]),
+                            // m('.u-marginbottom-60.u-text-center', [
+		                     //        m('.w-inline-block.card.fontsize-small.u-radius', [
+                            //     m.trust(I18n.t('video_alert', I18nScope()))
+		                     //        ])
+	                         //  ]),
                             m(inputCard, {
                                 label: I18n.t('video_label', I18nScope()),
                                 label_hint: I18n.t('video_hint', I18nScope()),

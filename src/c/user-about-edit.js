@@ -311,7 +311,7 @@ const userAboutEdit = {
                                 m('.w-row.u-marginbottom-30.card.card-terciary', [
                                     m('.w-col.w-col-5.w-sub-col', [
                                         m('label.field-label.fontweight-semibold',
-                                            '  Name in public profile'
+                                            '  Name'
                                         ),
                                         m('label.field-label.fontsize-smallest.fontcolor-secondary',
                                             'This is the name that users will see on your profile.'
@@ -433,7 +433,7 @@ const userAboutEdit = {
                                     m('.w-row.u-marginbottom-10', [
                                         m('.w-col.w-col-5.w-sub-col', [
                                             m('label.field-label.fontweight-semibold[for="name-8"]',
-                                                ' Presence on the internet'
+                                                ' Other links'
                                             ),
                                             m('label.field-label.fontsize-smallest.fontcolor-secondary[for="name-8"]', ' Include links to help other users get to know you better. ')
                                         ]),

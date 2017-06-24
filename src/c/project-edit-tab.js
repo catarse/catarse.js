@@ -21,5 +21,4 @@ const projectEditTab = {
         ]);
     }
 };
-
 export default projectEditTab;

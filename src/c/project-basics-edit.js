@@ -241,7 +241,7 @@ const projectBasicsEdit = {
                                                     { onclick: ctrl.addTag(tag) },
                                                     m('.fontsize-smaller', tag.name)
                                                 ))
-                                                : m('.dropdown-link', m('.fontsize-smallest', 'Nenhuma tag relacionada...'))
+                                                : m('.dropdown-link', m('.fontsize-smallest', 'No related tags...'))
                                     ) : '',
                                     vm.e.inlineError('public_tags'),
                                     m('div.tag-choices',

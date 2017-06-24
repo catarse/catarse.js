@@ -123,7 +123,10 @@ const projectDashboardMenu = {
                                 m(`a#dashboard_reward_link[class="${editLinkClass('#reward')}"][href="${editRoute}#reward"]`, [railsErrorsVM.errorsFor('reward'),
                                     'Rewards', optionalOpt
                                 ]),
-                                m(`a#dashboard_user_about_link[class="${editLinkClass('#user_about')}"][href="${editRoute}#user_about"]`, railsErrorsVM.errorsFor('user_about'), I18n.t('about_you_tab', linksScope())), (!project.is_published ? [
+                                m(`a#dashboard_user_about_link[class="${editLinkClass('#user_about')}"][href="${editRoute}#user_about"]`, railsErrorsVM.errorsFor('user_about'), I18n.t('about_you_tab', linksScope())),
+                                ((project.is_published || project.state === 'draft') || project.is_admin_role ? [
+                                    m(`a#dashboard_user_settings_link[class="${editLinkClass('#user_settings')}"][href="${editRoute}#user_settings"]`, railsErrorsVM.errorsFor('user_settings'), I18n.t('account_tab', linksScope())),
+                                ] : ''), (!project.is_published ? [
                                     m(`a#dashboard_preview_link[class="${editLinkClass('#preview')}"][href="${editRoute}#preview"]`, [
                                         m('span.fa.fa-fw.fa-eye.fa-lg'), I18n.t('preview_tab', linksScope())
                                     ]),

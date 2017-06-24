@@ -79,7 +79,7 @@ const projectGoalEdit = {
                         m('.w-col.w-col-10.w-col-push-1', [
                             m(bigCard, {
                                 label: I18n.t('mode_label', I18nScope()),
-                                label_hint: I18n.t('mode_hint', I18nScope()),
+                                // label_hint: I18n.t('mode_hint', I18nScope()),
                                 children: [
                                     m('.flex-row.u-marginbottom-30', [
                                         m('a.choose-mode.choose-aon.w-inline-block.btn-select.flex-column.u-text-center[data-mode="aon"][href="javascript:void(0);"]', {
@@ -105,12 +105,12 @@ const projectGoalEdit = {
                                         m('.flex-row', [
                                             m('.w-hidden-small.w-hidden-tiny.fontsize-smaller.flex-column', m.trust(I18n.t('aon_diff_html', I18nScope()))),
                                             m('.w-hidden-small.w-hidden-tiny.fontsize-smaller.flex-column', m.trust(I18n.t('flex_diff_html', I18nScope())))
-                                        ]),
-                                        m('.u-text-center.u-margintop-30', [
-                                            m('.divider.u-marginbottom-20'),
-                                            m('.fontsize-base', I18n.t('want_more', I18nScope())),
-                                            m.trust(I18n.t('mode_diff_ebook', I18nScope()))
                                         ])
+                                        // m('.u-text-center.u-margintop-30', [
+                                        //     m('.divider.u-marginbottom-20'),
+                                        //     m('.fontsize-base', I18n.t('want_more', I18nScope())),
+                                        //     m.trust(I18n.t('mode_diff_ebook', I18nScope()))
+                                        // ])
                                     ]) : '')
                                 ]
                             }),
@@ -154,12 +154,12 @@ const projectGoalEdit = {
                                         m('.u-marginbottom-30', [
                                             m('.fontsize-small.fontweight-semibold', I18n.t('goal_taxes_label', I18nScope())),
                                             m('.fontsize-smaller', I18n.t(`goal_${vm.fields.mode()}_taxes_hint`, I18nScope()))
-                                        ]),
-                                        m('.u-text-center.u-margintop-30', [
-                                            m('.divider.u-marginbottom-20'),
-                                            m('.fontsize-base', I18n.t('want_more', I18nScope())),
-                                            m.trust(I18n.t('goal_taxes_watch_video_html', I18nScope()))
                                         ])
+                                        // m('.u-text-center.u-margintop-30', [
+                                        //     m('.divider.u-marginbottom-20'),
+                                        //     m('.fontsize-base', I18n.t('want_more', I18nScope())),
+                                        //     m.trust(I18n.t('goal_taxes_watch_video_html', I18nScope()))
+                                        // ])
                                     ]) : ''),
                                 ]
                             }),
