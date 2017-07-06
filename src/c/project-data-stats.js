@@ -72,7 +72,7 @@ const projectDataStats = {
                 ]),
                 m('.fontcolor-secondary.fontsize-smallest.u-margintop-20', [
                     'Data may take up to 12 hours to update.',
-                    m('a.alt-link', {href:"http://suporte.catarse.me/hc/pt-br/articles/214764343#visitante", target:"_blank"}, 'know more'),
+                    // m('a.alt-link', {href:"http://suporte.catarse.me/hc/pt-br/articles/214764343#visitante", target:"_blank"}, 'know more'),
                     '.'
                 ])
             ])
