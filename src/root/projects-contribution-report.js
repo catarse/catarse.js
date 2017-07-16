@@ -107,11 +107,11 @@ const projectContributionReport = {
                 label: 'reward_filter',
                 component: FilterDropdown,
                 data: {
-                    label: 'Recompensa selecionada',
+                    label: 'Recompensa',
                     onchange: submit,
                     name: 'reward_id',
                     vm: filterVM.reward_id,
-                    wrapper_class: '.w-sub-col.w-col.w-col-4',
+                    wrapper_class: '.w-sub-col.w-col.w-col-3',
                     options: []
                 }
             },
@@ -126,18 +126,18 @@ const projectContributionReport = {
                     onchange: submit,
                     name: 'delivery_status',
                     vm: filterVM.delivery_status,
-                    wrapper_class: '.w-col.w-col-4',
+                    wrapper_class: '.w-sub-col.w-col.w-col-3',
                     options: [{
                         value: '',
                         option: 'Todos'
                     },
                     {
                         value: 'undelivered',
-                        option: 'Não enviada'
+                        option: 'Não entregue'
                     },
                     {
                         value: 'delivered',
-                        option: 'Enviada'
+                        option: 'Entregue'
                     },
                     {
                         value: 'error',
@@ -146,6 +146,38 @@ const projectContributionReport = {
                     {
                         value: 'received',
                         option: 'Recebida'
+                    }
+                    ]
+                }
+            },
+            {
+                label: 'survey_filter',
+                component: FilterDropdown,
+                data: {
+                    label: 'Status do questionário',
+                    onchange: submit,
+                    name: 'survey_status',
+                    vm: filterVM.survey_status,
+                    wrapper_class: '.w-col.w-col-3',
+                    options: [{
+                        value: '',
+                        option: 'Todos'
+                    },
+                    {
+                        value: 'not_sent',
+                        option: 'Não enviado'
+                    },
+                    {
+                        value: 'sent,answered',
+                        option: 'Enviado'
+                    },
+                    {
+                        value: 'sent',
+                        option: 'Não Respondido'
+                    },
+                    {
+                        value: 'answered',
+                        option: 'Respondido'
                     }
                     ]
                 }
@@ -163,7 +195,7 @@ const projectContributionReport = {
                     name: 'state',
                     onchange: submit,
                     vm: filterVM.state,
-                    wrapper_class: '.w-sub-col.w-col.w-col-4',
+                    wrapper_class: '.w-sub-col.w-col.w-col-3',
                     options: contributionStateOptions
                 }
             }
@@ -207,6 +239,9 @@ const projectContributionReport = {
         };
 
         if (!listVM.collection().length) {
+            if (m.route.param('rewardId')) {
+                filterVM.reward_id(m.route.param('rewardId'));
+            }
             listVM.firstPage(filterVM.parameters());
         }
 
