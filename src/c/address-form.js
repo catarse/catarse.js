@@ -10,13 +10,14 @@ const I18nScope = _.partial(h.i18nScope, 'activerecord.attributes.address');
 
 const addressForm = {
     controller(args) {
+        const parsedErrors = args.parsedErrors;
         const countriesLoader = postgrest.loader(models.country.getPageOptions()),
             statesLoader = postgrest.loader(models.state.getPageOptions()),
             countries = m.prop(),
-            defaultCountryID = 36,
+            defaultCountryID = 36, // @TODO get id from endpoint
             states = m.prop(),
             zipCodeErrorMessage = m.prop(''),
-            data = args.fields().addresses_attributes,
+            data = args.fields().address(),
             fields = {
                 id: m.prop(data.id || ''),
                 countryID: m.prop(data.country_id || defaultCountryID),
@@ -31,17 +32,21 @@ const addressForm = {
                 phoneNumber: m.prop(data.phone_number || '')
             },
             errors = {
-                countryID: m.prop(false),
-                stateID: m.prop(false),
-                addressStreet: m.prop(false),
-                addressNumber: m.prop(false),
+                countryID: m.prop(parsedErrors ? parsedErrors.hasError('country_id') : false),
+                stateID: m.prop(parsedErrors ? parsedErrors.hasError('state') : false),
+                addressStreet: m.prop(parsedErrors ? parsedErrors.hasError('street') : false),
+                addressNumber: m.prop(parsedErrors ? parsedErrors.hasError('number') : false),
                 addressComplement: m.prop(false),
-                addressNeighbourhood: m.prop(false),
-                addressCity: m.prop(false),
-                addressState: m.prop(false),
-                addressZipCode: m.prop(false),
-                phoneNumber: m.prop(false)
+                addressNeighbourhood: m.prop(parsedErrors ? parsedErrors.hasError('neighbourhood') : false),
+                addressCity: m.prop(parsedErrors ? parsedErrors.hasError('city') : false),
+                addressState: m.prop(parsedErrors ? parsedErrors.hasError('state') : false),
+                addressZipCode: m.prop(parsedErrors ? parsedErrors.hasError('zipcode') : false),
+                phoneNumber: m.prop(parsedErrors ? parsedErrors.hasError('phonenumber') : false)
             },
+            phoneMask = _.partial(h.mask, '(99) 9999-99999'),
+            zipcodeMask = _.partial(h.mask, '99999-999'),
+            applyZipcodeMask = _.compose(fields.addressZipCode, zipcodeMask),
+            applyPhoneMask = _.compose(fields.phoneNumber, phoneMask),
             international = m.prop(fields.countryID() !== '' && fields.countryID() !== defaultCountryID);
 
         _.extend(args.fields(), {
@@ -62,8 +67,8 @@ const addressForm = {
         });
 
         const lookupZipCode = (zipCode) => {
-            fields.addressZipCode(h.numbersOnlyMask(zipCode));
-            if (zipCode.length === 8) {
+            fields.addressZipCode(zipCode);
+            if (zipCode.length === 9) {
                 m.request({
                     method: 'GET',
                     url: `https://api.pagar.me/1/zipcodes/${zipCode}`
@@ -90,6 +95,8 @@ const addressForm = {
             lookupZipCode,
             zipCodeErrorMessage,
             errors,
+            applyPhoneMask,
+            applyZipcodeMask,
             defaultCountryID,
             fields,
             international,
@@ -101,6 +108,7 @@ const addressForm = {
         const fields = ctrl.fields,
             international = ctrl.international,
             errors = ctrl.errors,
+            // hash to send to rails
             address = {
                 id: fields.id(),
                 country_id: fields.countryID(),
@@ -115,14 +123,17 @@ const addressForm = {
                 phone_number: fields.phoneNumber()
             };
 
-        args.fields().addresses_attributes = address;
-        args.countryName(ctrl.countries() && fields.countryID() ? _.find(ctrl.countries(), country => country.id === parseInt(fields.countryID())).name_en : '');
-        args.stateName(ctrl.states() && fields.stateID() ? _.find(ctrl.states(), state => state.id === parseInt(fields.stateID())).name : '');
+        args.fields().address(address);
+        if (args.countryName && args.stateName) {
+            args.countryName(ctrl.countries() && fields.countryID() ? _.find(ctrl.countries(), country => country.id === parseInt(fields.countryID())).name_en : '');
+            args.stateName(ctrl.states() && fields.stateID() ? _.find(ctrl.states(), state => state.id === parseInt(fields.stateID())).name : '');
+        }
 
         return m('#address-form.u-marginbottom-30.w-form', [
             m('.fontsize-smaller.u-marginbottom-20',
                 '* Preenchimento obrigatório'
             ),
+            m('.divider.u-marginbottom-20'),
             m('.u-marginbottom-30', [
                 m('div',
                     m('.w-row', [
@@ -154,7 +165,7 @@ const addressForm = {
                                     }
                                 }),
                                 m('label.w-form-label',
-                                    'International backer'
+                                    'International'
                                 )
                             ])
                         )
@@ -189,17 +200,20 @@ const addressForm = {
                         m('.w-col.w-col-6')
                     ]),
                     m('div', [
-                        m('.field-label.fontweight-semibold',
-                            'Address *'
-                        ),
-                        m("input.positive.text-field.w-input[required='required'][type='text']", {
-                            class: errors.addressStreet() ? 'error' : '',
-                            value: ctrl.fields.addressStreet(),
-                            onchange: m.withAttr('value', ctrl.fields.addressStreet)
-                        }),
-                        errors.addressStreet() ? m(inlineError, {
-                            message: 'Please fill in an address.'
-                        }) : '',
+                        m('.w-row',
+                                m('.w-col.w-col-12', [
+                                    m('.field-label.fontweight-semibold',
+                                      'Address *'
+                                    ),
+                                    m("input.positive.text-field.w-input[required='required'][type='text']", {
+                                        class: errors.addressStreet() ? 'error' : '',
+                                        value: ctrl.fields.addressStreet(),
+                                        onchange: m.withAttr('value', ctrl.fields.addressStreet)
+                                    }),
+                                    errors.addressStreet() ? m(inlineError, {
+                                        message: 'Please fill in an address.'
+                                    }) : ''
+                                ])),
                         m('div',
                             m('.w-row', [
                                 m('.w-sub-col.w-col.w-col-4', [
@@ -282,9 +296,10 @@ const addressForm = {
                                             I18n.t('zipcode_unknown', I18nScope())
                                         )
                                     ]),
-                                    m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][maxlength='8'][type='text']", {
+                                    m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
                                         class: errors.addressZipCode() ? 'error' : '',
                                         value: ctrl.fields.addressZipCode(),
+                                        onkeyup: m.withAttr('value', value => ctrl.applyZipcodeMask(value)),
                                         oninput: (e) => {
                                             ctrl.lookupZipCode(e.target.value);
                                         }
@@ -295,7 +310,7 @@ const addressForm = {
                                 ]),
                                 m('.w-col.w-col-6')
                             ]),
-                            m('div', [
+                            m('.w-row', [
                                 m('.field-label.fontweight-semibold',
                                     `${I18n.t('address_street', I18nScope())} *`
                                 ),
@@ -324,7 +339,7 @@ const addressForm = {
                                 ]),
                                 m('.w-sub-col.w-col.w-col-4', [
                                     m('.field-label.fontweight-semibold',
-                                        `${I18n.t('address_complement', I18nScope())} *`
+                                        I18n.t('address_complement', I18nScope())
                                     ),
                                     m("input.positive.text-field.w-input[required='required'][type='text']", {
                                         value: ctrl.fields.addressComplement(),
@@ -359,7 +374,7 @@ const addressForm = {
                                         message: 'Informe uma cidade.'
                                     }) : ''
                                 ]),
-                                m('.w-col.w-col-6', [
+                                m('.w-sub-col.w-col.w-col-2', [
                                     m('.field-label.fontweight-semibold',
                                         `${I18n.t('address_state', I18nScope())} *`
                                     ),
@@ -373,30 +388,29 @@ const addressForm = {
                                                 value: state.id,
                                                 selected: state.id === ctrl.fields.stateID()
                                             },
-                                                state.name
+                                                state.acronym
                                             )) : ''),
                                     ]),
                                     errors.stateID() ? m(inlineError, {
                                         message: 'Informe um estado.'
                                     }) : ''
-                                ])
-                            ]),
-                            m('.w-row', [
-                                m('.w-col.w-col-6', [
+                                ]),
+                                m('.w-col.w-col-4', [
                                     m('.field-label.fontweight-semibold',
                                         `${I18n.t('phone_number', I18nScope())} *`
                                     ),
                                     m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
                                         class: errors.phoneNumber() ? 'error' : '',
                                         value: ctrl.fields.phoneNumber(),
+                                        onkeyup: m.withAttr('value', value => ctrl.applyPhoneMask(value)),
                                         onchange: m.withAttr('value', ctrl.fields.phoneNumber)
                                     }),
                                     errors.phoneNumber() ? m(inlineError, {
                                         message: 'Informe um telefone.'
                                     }) : ''
-                                ]),
-                                m('.w-col.w-col-6')
+                                ])
                             ])
+
                         ])
                     ])
                 ]))

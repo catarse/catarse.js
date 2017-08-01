@@ -39,31 +39,31 @@ const surveyPreview = {
                                         `${I18n.t('address_street', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.address_street,
+                                    ctrl.fields.address_street,
                                     m('br'),
                                     m('span.fontweight-semibold',
                                         `${I18n.t('address_number', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.address_number,
+                                    ctrl.fields.address_number,
                                     m('br'),
                                     m('span.fontweight-semibold',
                                         `${I18n.t('address_complement', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.address_complement,
+                                    ctrl.fields.address_complement,
                                     m('br'),
                                     m('span.fontweight-semibold',
                                         `${I18n.t('address_neighbourhood', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.address_neighbourhood,
+                                    ctrl.fields.address_neighbourhood,
                                     m('br'),
                                     m('span.fontweight-semibold',
                                         `${I18n.t('address_city', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.address_city,
+                                    ctrl.fields.address_city,
                                     m('br'),
                                     m('span.fontweight-semibold',
                                         `${I18n.t('address_state', I18nScope())}:`
@@ -75,21 +75,23 @@ const surveyPreview = {
                                         `${I18n.t('address_zip_code', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.address_zip_code,
+                                    ctrl.fields.address_zip_code,
                                     m('br'),
                                     m('span.fontweight-semibold',
                                         `${I18n.t('phone_number', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
-                                    ctrl.fields().addresses_attributes.phone_number
+                                    ctrl.fields.phone_number
                                 ])
                             ]) : ''),
-                            _.map(ctrl.multipleChoiceQuestions, item =>
-                                m('.u-marginbottom-30', [
+                            _.map(ctrl.multipleChoiceQuestions, (item) => {
+                                const answer = _.find(item.question.question_choices, choice => item.value() == choice.id);
+                                return m('.u-marginbottom-30', [
                                     m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20',
                                         item.question.question
-                                    ), m('.fontsize-base', _.find(item.question.question_choices, choice => item.value() == choice.id).option)
-                                ])),
+                                    ), m('.fontsize-base', answer ? answer.option : '')
+                                ]);
+                            }),
                             _.map(ctrl.openQuestions, item =>
                                 m('.u-marginbottom-30', [
                                     m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20',

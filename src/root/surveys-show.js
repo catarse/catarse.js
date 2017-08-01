@@ -22,6 +22,7 @@ const surveysShow = {
         } = args,
             contributionId = m.route.param('contribution_id'),
             survey = m.prop(),
+            idVM = h.idVM,
             displayModal = h.toggleProp(false, true),
             showPreview = h.toggleProp(false, true),
             showThanks = h.toggleProp(false, true),
@@ -32,7 +33,7 @@ const surveysShow = {
             fields = m.prop({}),
             openQuestions = m.prop([]),
             multipleChoiceQuestions = m.prop([]),
-            user = userVM.getCurrentUser(),
+            user = m.prop({}),
             reward = m.prop(),
             sendMessage = () => {
                 displayModal(true);
@@ -59,7 +60,7 @@ const surveysShow = {
             sendAnswer = () => {
                 const data = {};
                 _.extend(data, {
-                    survey_address_answers_attributes: fields()
+                    survey_address_answers_attributes: { addresses_attributes: fields().address() }
                 });
                 _.extend(data, {
                     survey_open_question_answers_attributes: _.map(openQuestions(), question => ({
@@ -88,16 +89,24 @@ const surveysShow = {
                 });
             };
         surveyLoader().load().then((data) => {
-            survey(data);
-            survey(_.first(survey()));
+            survey(_.first(data));
             finished(!_.isEmpty(survey().finished_at));
             answeredAt(survey().survey_answered_at);
             projectVM.fetchProject(survey().project_id);
             rewardVM.rewardLoader(survey().reward_id).load().then(reward);
             const surveyData = survey();
-            fields({
-                addresses_attributes: surveyData.address || {}
+
+            idVM.id(h.getUserID());
+
+            const lUser = postgrest.loaderWithToken(models.userDetail.getRowOptions(idVM.parameters()));
+
+            lUser.load().then((userData) => {
+                user(_.first(userData));
+                fields({
+                    address: m.prop(surveyData.address || _.omit(user().address, 'id') || {})
+                });
             });
+
             _.map(surveyData.open_questions, (question) => {
                 openQuestions().push({
                     question,
@@ -184,7 +193,7 @@ const surveysShow = {
                     confirmAddress: survey.confirm_address,
                     countryName: countryName(),
                     stateName: stateName(),
-                    fields: ctrl.fields,
+                    fields: ctrl.fields().address(),
                     openQuestions,
                     multipleChoiceQuestions
                 })
@@ -211,7 +220,7 @@ const surveysShow = {
                     confirmAddress: survey.confirm_address,
                     countryName: countryName(),
                     stateName: stateName(),
-                    fields: ctrl.fields,
+                    fields: ctrl.fields().address(),
                     openQuestions,
                     multipleChoiceQuestions
                 }),
@@ -303,7 +312,7 @@ const surveysShow = {
                                             confirmAddress: survey.confirm_address,
                                             countryName: countryName(),
                                             stateName: stateName(),
-                                            fields: ctrl.fields,
+                                            fields: ctrl.fields().address(),
                                             openQuestions,
                                             multipleChoiceQuestions
                                         }) : ''),

@@ -129,11 +129,11 @@ var canShowReceipt = function canShowReceipt(contribution) {
 };
 
 var canShowSlip = function canShowSlip(contribution) {
-    return contribution.payment_method === 'BoletoBancario' && contribution.waiting_payment;
+    return contribution.payment_method === 'BoletoBancario' && moment(contribution.gateway_data.boleto_expiration_date).isAfter(moment());
 };
 
 var canGenerateSlip = function canGenerateSlip(contribution) {
-    return contribution.payment_method === 'BoletoBancario' && contribution.state === 'pending' && contribution.project_state === 'online' && !contribution.reward_sold_out && !contribution.waiting_payment;
+    return contribution.payment_method === 'BoletoBancario' && contribution.state === 'pending' && contribution.project_state === 'online' && !contribution.reward_sold_out && !moment(contribution.gateway_data.boleto_expiration_date).isAfter(moment());
 };
 
 var canBeDelivered = function canBeDelivered(contribution) {
@@ -840,7 +840,7 @@ var scrollTo = function scrollTo() {
         }
     };
 };
-var projectStateTextClass = function projectStateTextClass(state) {
+var projectStateTextClass = function projectStateTextClass(state, has_cancelation_request) {
     var statusText = {
         online: {
             cssClass: 'text-success',
@@ -860,7 +860,7 @@ var projectStateTextClass = function projectStateTextClass(state) {
         },
         rejected: {
             cssClass: 'text-error',
-            text: 'RECUSADO'
+            text: 'CANCELADO'
         },
         draft: {
             cssClass: '',
@@ -876,7 +876,14 @@ var projectStateTextClass = function projectStateTextClass(state) {
         }
     };
 
-    return statusText[state];
+    if (has_cancelation_request) {
+        return {
+            cssClass: 'text-error',
+            text: 'AGUARDANDO CANCELAMENTO'
+        };
+    } else {
+        return statusText[state];
+    }
 };
 var RDTracker = function RDTracker(eventId) {
     return function (el, isInitialized) {
@@ -2906,7 +2913,7 @@ var adminContributions = {
     }
 };
 
-var balanceTransferListVM = postgrest.paginationVM(models.balanceTransfer, 'id.desc', { Prefer: 'count=exact' });
+var balanceTransferListVM = postgrest.paginationVM(models.balanceTransfer, 'created_at.asc', { Prefer: 'count=exact' });
 
 var vm$2 = postgrest$1.filtersVM({
     full_text_index: '@@',
@@ -3846,7 +3853,7 @@ var projectCard = {
 
         var cardCopy = function cardCopy(project) {
             if (project.expires_at) {
-                return isFinished(project) ? [m('.fontsize-smaller.fontweight-loose', 'Encerrado'), m('.fontsize-smallest.lineheight-tightest', h.momentify(project.zone_expires_at))] : [m('.fontsize-smaller.fontweight-semibold', remainingTextObj.total + ' ' + remainingTextObj.unit), m('.fontsize-smallest.lineheight-tightest', remainingTextObj.total > 1 ? 'Restantes' : 'Restante')];
+                return isFinished(project) ? [m('.fontsize-smaller.fontweight-loose', 'Encerrado'), m('.fontsize-smallest.lineheight-tightest', h.momentify(project.expires_at))] : [m('.fontsize-smaller.fontweight-semibold', remainingTextObj.total + ' ' + remainingTextObj.unit), m('.fontsize-smallest.lineheight-tightest', remainingTextObj.total > 1 ? 'Restantes' : 'Restante')];
             }
             return [m('.fontsize-smallest.lineheight-tight', ['Iniciado há', m('br'), elapsedTextObj.total + ' ' + elapsedTextObj.unit])];
         };
@@ -4294,7 +4301,7 @@ var adminProjectDetailsCard = {
     view: function view(ctrl) {
         var project = ctrl.project,
             progress = project.progress.toFixed(2),
-            statusTextObj = h.projectStateTextClass(project.state),
+            statusTextObj = h.projectStateTextClass(project.state, project.has_cancelation_request),
             remainingTextObj = ctrl.remainingTextObj,
             elapsedTextObj = ctrl.elapsedTextObj;
 
@@ -4331,7 +4338,7 @@ var projectDataStats = {
     view: function view(ctrl, args) {
         var project = args.project(),
             visitorsTotal = args.visitorsTotal(),
-            statusTextObj = h.projectStateTextClass(project.state),
+            statusTextObj = h.projectStateTextClass(project.state, project.has_cancelation_request),
             remainingTextObj = h.translatedTime(project.remaining_time),
             elapsedTextObj = h.translatedTime(project.elapsed_time);
 
@@ -4431,7 +4438,7 @@ var cancelProjectModalContent = {
         };
     },
     view: function view(ctrl, args) {
-        return m('form.cancel-project-modal.modal-dialog-content', { onsubmit: ctrl.showNextModal }, [m('.fontsize-small.u-marginbottom-20', ['Após o cancelamento, sua campanha constará na plataforma como "não financiada" e os seus apoiadores serão imediatamente reembolsados. ', m('span.fontweight-semibold', 'Essa ação não poderá ser desfeita!'), m('br'), m('span.fontweight-semibold')]), m('.fontsize-small.u-marginbottom-10', ['Se você tem certeza que deseja cancelar seu projeto, confirme escrevendo ', m('span.fontweight-semibold.text-error', 'cancelar-projeto '), 'no campo abaixo. Em seguida te pediremos para escrever uma mensagem aos seus apoiadores e seu projeto será então cancelado.', m('span.fontweight-semibold.text-error')]), m('.w-form', [m('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: !ctrl.checkError() ? false : 'error', placeholder: 'cancelar-projeto', onchange: m.withAttr('value', ctrl.check) })]), m('div', m('.w-row', [m('.w-col.w-col-3'), m('.u-text-center.w-col.w-col-6', [m('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Próximo passo >\']'), m('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayModal.toggle }, 'Cancelar')]), m('.w-col.w-col-3')]))]);
+        return m('form.cancel-project-modal.modal-dialog-content', { onsubmit: ctrl.showNextModal }, [m('.fontsize-small.u-marginbottom-20', ['Após o cancelamento, sua campanha será expirada e os seus apoiadores serão reembolsados dentro das próximas 24h horas.', m('span.fontweight-semibold', 'Essa ação não poderá ser desfeita!'), m('br'), m('span.fontweight-semibold')]), m('.fontsize-small.u-marginbottom-10', ['Se você tem certeza que deseja cancelar seu projeto, confirme escrevendo ', m('span.fontweight-semibold.text-error', 'cancelar-projeto '), 'no campo abaixo. Em seguida lhe pediremos para escrever uma mensagem aos apoiadores e seu projeto será então cancelado.', m('span.fontweight-semibold.text-error')]), m('.w-form', [m('input.positive.text-field.u-marginbottom-40.w-input[maxlength=\'256\'][type=\'text\']', { class: !ctrl.checkError() ? false : 'error', placeholder: 'cancelar-projeto', onchange: m.withAttr('value', ctrl.check) })]), m('div', m('.w-row', [m('.w-col.w-col-3'), m('.u-text-center.w-col.w-col-6', [m('input.btn.btn-inactive.btn-large.u-marginbottom-20[type=\'submit\'][value=\'Próximo passo >\']'), m('a.fontsize-small.link-hidden-light[href=\'#\']', { onclick: args.displayModal.toggle }, 'Cancelar')]), m('.w-col.w-col-3')]))]);
     }
 };
 
@@ -4961,9 +4968,9 @@ var insights = {
         }) : '', ctrl.displayModal() ? m.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: [onlineSuccessModalContent]
-        }) : '', m('.w-container', project.state === 'successful' ? m.component(projectSuccessfulOnboard, { project: m.prop(project) }) : [m('.w-row.u-marginbottom-40', [m('.w-col.w-col-8.w-col-push-2', [m('.fontweight-semibold.fontsize-larger.lineheight-looser.u-marginbottom-10.u-text-center.dashboard-header', I18n$1.t('campaign_title', I18nScope$4())), project.state === 'online' ? m.component(projectInviteCard, { project: project }) : '', project.state === 'draft' ? m.component(adminProjectDetailsCard, {
+        }) : '', m('.w-container', project.state === 'successful' && !project.has_cancelation_request ? m.component(projectSuccessfulOnboard, { project: m.prop(project) }) : [m('.w-row.u-marginbottom-40', [m('.w-col.w-col-8.w-col-push-2', [m('.fontweight-semibold.fontsize-larger.lineheight-looser.u-marginbottom-10.u-text-center.dashboard-header', I18n$1.t('campaign_title', I18nScope$4())), project.state === 'online' && !project.has_cancelation_request ? m.component(projectInviteCard, { project: project }) : '', project.state === 'draft' && !project.has_cancelation_request ? m.component(adminProjectDetailsCard, {
             resource: project
-        }) : '', m('p.' + project.state + '-project-text.u-text-center.fontsize-small.lineheight-loose', [project.mode === 'flex' && _$1.isNull(project.expires_at) && project.state !== 'draft' ? m('span', [m.trust(I18n$1.t('finish_explanation', I18nScope$4())), m('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/articles/213783503-tudo-sobre-Prazo-da-campanha"][target="_blank"]', I18n$1.t('know_more', I18nScope$4()))]) : m.trust(I18n$1.t('campaign.' + project.mode + '.' + project.state, I18nScope$4({ username: project.user.name, expires_at: h.momentify(project.zone_expires_at), sent_to_analysis_at: h.momentify(project.sent_to_analysis_at) })))])])])]), project.state === 'draft' ? m.component(projectDeleteButton, { project: project }) : '', project.is_published ? [m('.divider'), m('.w-section.section-one-column.section.bg-gray.before-footer', [m('.w-container', [m.component(projectDataStats, { project: m.prop(project), visitorsTotal: ctrl.visitorsTotal }), m('.w-row', [m('.w-col.w-col-12.u-text-center', {
+        }) : '', project.has_cancelation_request ? m('p', m.trust(I18n$1.t('has_cancelation_request_explanation', I18nScope$4()))) : m('p.' + project.state + '-project-text.u-text-center.fontsize-small.lineheight-loose', [project.mode === 'flex' && _$1.isNull(project.expires_at) && project.state !== 'draft' ? m('span', [m.trust(I18n$1.t('finish_explanation', I18nScope$4())), m('a.alt-link[href="http://suporte.catarse.me/hc/pt-br/articles/213783503-tudo-sobre-Prazo-da-campanha"][target="_blank"]', I18n$1.t('know_more', I18nScope$4()))]) : m.trust(I18n$1.t('campaign.' + project.mode + '.' + project.state, I18nScope$4({ username: project.user.name, expires_at: h.momentify(project.zone_expires_at), sent_to_analysis_at: h.momentify(project.sent_to_analysis_at) })))])])])]), project.state === 'draft' ? m.component(projectDeleteButton, { project: project }) : '', project.is_published ? [m('.divider'), m('.w-section.section-one-column.section.bg-gray.before-footer', [m('.w-container', [m.component(projectDataStats, { project: m.prop(project), visitorsTotal: ctrl.visitorsTotal }), m('.w-row', [m('.w-col.w-col-12.u-text-center', {
             style: {
                 'min-height': '300px'
             }
@@ -5006,7 +5013,7 @@ var insights = {
             defaultSortIndex: -2
         }) : m('.card.u-radius.medium.u-marginbottom-60', m('.w-row.u-text-center.u-margintop-40.u-marginbottom-40', m('.w-col.w-col-8.w-col-push-2', m('p.fontsize-base', I18n$1.t('contributions_per_location_empty', I18nScope$4()))))) : h.loader()])])]), m('.w-row', [m('.w-col.w-col-12.u-text-center', [m.component(projectReminderCount, {
             resource: project
-        })])])])]), project.state === 'online' && (project.is_admin_role || project.pledged == 0) ? m.component(projectCancelButton, { project: project }) : ''] : ''] : h.loader());
+        })])])])]), project.can_cancel ? m.component(projectCancelButton, { project: project }) : ''] : ''] : h.loader());
     }
 };
 
@@ -5411,8 +5418,11 @@ var isValid = function isValid() {
             return isValid;
         }
 
+        question.error = false;
+
         if (question.question.trim() === '') {
             questionWithEmptyFields().push(question);
+            question.error = true;
 
             return false;
         }
@@ -5473,6 +5483,12 @@ var surveyCreatePreview = {
     }
 };
 
+var inlineError = {
+    view: function view(ctrl, args) {
+        return m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle', m('span', ' ' + args.message));
+    }
+};
+
 var dashboardMultipleChoiceQuestion = {
     controller: function controller(args) {
         var question = args.question;
@@ -5519,12 +5535,16 @@ var dashboardMultipleChoiceQuestion = {
 
 
         return m('.card.u-marginbottom-30.u-radius.w-form', [m('.dashboard-question', [m('.w-row', [m('.w-col.w-col-4', m('label.fontsize-smaller', 'Pergunta')), m('.w-col.w-col-8', m('input.positive.text-field.w-input[type="text"]', {
+            class: question.error ? 'error' : null,
             name: 'reward[surveys_attributes][questions][' + index + '][question]',
             onchange: m.withAttr('value', function (newValue) {
                 return question.question = newValue;
             }),
+            onfocus: function onfocus() {
+                question.error = false;
+            },
             value: question.question
-        }))]), m('.w-row', [m('.w-col.w-col-4', m('label.fontsize-smaller[for="name-3"]', 'Descrição')), m('.w-col.w-col-8', m('input.positive.text-field.w-input[type="text"]', {
+        }), question.error ? m(inlineError, { message: 'O campo pergunta não pode ser vazio.' }) : null)]), m('.w-row', [m('.w-col.w-col-4', m('label.fontsize-smaller[for="name-3"]', 'Descrição')), m('.w-col.w-col-8', m('input.positive.text-field.w-input[type="text"]', {
             onchange: m.withAttr('value', function (newValue) {
                 return question.description = newValue;
             }),
@@ -5547,24 +5567,22 @@ var dashboardOpenQuestion = {
             index = args.index;
 
         return m('.card.u-marginbottom-30.u-radius.w-form', [m('div', [m('.w-row', [m('.w-col.w-col-4', m('label.fontsize-smaller[for="name-3"]', 'Pergunta')), m('.w-col.w-col-8', m('input.positive.text-field.w-input[name="question"][type="text"]', {
+            class: question.error ? 'error' : null,
             name: 'reward[surveys_attributes][questions][' + index + '][question]',
             onchange: m.withAttr('value', function (newValue) {
                 return question.question = newValue;
             }),
-            value: question.question
-        }))]), m('.w-row', [m('.w-col.w-col-4', m('label.fontsize-smaller[for="name-3"]', 'Descrição')), m('.w-col.w-col-8', m('input.positive.text-field.w-input[type="text"]', {
+            value: question.question,
+            onfocus: function onfocus() {
+                question.error = false;
+            }
+        }), question.error ? m(inlineError, { message: 'O campo pergunta não pode ser vazio.' }) : null)]), m('.w-row', [m('.w-col.w-col-4', m('label.fontsize-smaller[for="name-3"]', 'Descrição')), m('.w-col.w-col-8', m('input.positive.text-field.w-input[type="text"]', {
             name: 'reward[surveys_attributes][questions][' + index + '][description]',
             onchange: m.withAttr('value', function (newValue) {
                 return question.description = newValue;
             }),
             value: question.description
         }))])])]);
-    }
-};
-
-var inlineError = {
-    view: function view(ctrl, args) {
-        return m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle', m('span', ' ' + args.message));
     }
 };
 
@@ -5690,7 +5708,7 @@ var surveyCreate = {
             onclick: ctrl.addDashboardQuestion
         }, [m('span.fa.fa-plus-circle'), '  Adicionar pergunta'])])])), m('.section', m('.w-container', m('.w-row', [m('.w-col.w-col-4.w-col-push-4', m('a.btn.btn-large[href=\'javascript:void(0);\']', {
             onclick: ctrl.toggleShowPreview
-        }, 'Pré-visualizar'), ctrl.showError() ? m(inlineError, { message: 'O campo pergunta não pode ser vazio.' }) : null)])))]) : h.loader();
+        }, 'Pré-visualizar'), ctrl.showError() ? m('.u-text-center.u-margintop-10', m(inlineError, { message: 'Erro ao salvar formulário.' })) : null)])))]) : h.loader();
     }
 };
 
@@ -5859,7 +5877,7 @@ var projectContributionReportContentCard = {
             onclick: function onclick() {
                 return ctrl.selectContribution(contribution);
             }
-        }) : ''))), m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.w-row', [m('.w-col.w-col-1.w-col-tiny-1', [m('img.user-avatar.u-marginbottom-10[src=\'' + profileImg + '\']')]), m('.w-col.w-col-11.w-col-tiny-11', [m('.w-row', [m('.w-col.w-col-3', [m('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m('a.link-hidden-light.badge.badge-light', '+1 apoio ')] : '', !contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' ' + I18n$1.t('contribution.anonymous_contribution', contributionScope()))) : '']), m('.fontsize-smallest.lineheight-looser', contribution.email)]), m('.w-col.w-col-3', [m('.lineheight-tighter', [m('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m('span.fontsize-large', 'R$ ' + h.formatNumber(contribution.value, 2, 3))])]), m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m('div', deliveryBadge()), m('.fontsize-smallest.fontweight-semibold', I18n$1.t('reward', I18nScope$16()) + ': ' + (reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : '')), m('.fontsize-smallest.fontweight-semibold', reward.title), m('.fontsize-smallest.fontcolor-secondary', reward.description.substring(0, 80) + '...')]), survey ? survey.survey_answered_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-success', 'respondido')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.survey_answered_at, 'DD/MM/YYYY'))]) : survey.finished_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-fail', 'sem resposta')]), m('.fontcolor-terciary.fontsize-smallest', 'finalizado em ' + h.momentify(survey.finished_at, 'DD/MM/YYYY'))]) : m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-waiting', 'enviado')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.sent_at, 'DD/MM/YYYY'))]) : ''])])]))]), m('a.arrow-admin.fa.fa-chevron-down.fontcolor-secondary.w-inline-block', {
+        }) : ''))), m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.w-row', [m('.w-col.w-col-1.w-col-tiny-1', [m('img.user-avatar.u-marginbottom-10[src=\'' + profileImg + '\']')]), m('.w-col.w-col-11.w-col-tiny-11', [m('.w-row', [m('.w-col.w-col-3', [m('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m('a.link-hidden-light.badge.badge-light', '+1 apoio ')] : '', contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' ' + I18n$1.t('contribution.anonymous_contribution', contributionScope()))) : '']), m('.fontsize-smallest.lineheight-looser', contribution.email)]), m('.w-col.w-col-3', [m('.lineheight-tighter', [m('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m('span.fontsize-large', 'R$ ' + h.formatNumber(contribution.value, 2, 3))])]), m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m('div', deliveryBadge()), m('.fontsize-smallest.fontweight-semibold', I18n$1.t('reward', I18nScope$16()) + ': ' + (reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : '')), m('.fontsize-smallest.fontweight-semibold', reward.title), m('.fontsize-smallest.fontcolor-secondary', reward.description.substring(0, 80) + '...')]), survey ? survey.survey_answered_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-success', 'respondido')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.survey_answered_at, 'DD/MM/YYYY'))]) : survey.finished_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-fail', 'sem resposta')]), m('.fontcolor-terciary.fontsize-smallest', 'finalizado em ' + h.momentify(survey.finished_at, 'DD/MM/YYYY'))]) : m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-waiting', 'enviado')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.sent_at, 'DD/MM/YYYY'))]) : ''])])]))]), m('a.arrow-admin.fa.fa-chevron-down.fontcolor-secondary.w-inline-block', {
             onclick: ctrl.showDetail.toggle
         })]), ctrl.showDetail() ? m('.card.details-backed-project.w-tabs', [m('.w-tab-menu', [_$1.map(['info', 'profile'], function (tab) {
             return m('a.dashboard-nav-link.w-inline-block.w-tab-link' + (ctrl.currentTab() === tab ? '.w--current' : ''), { onclick: function onclick() {
@@ -7382,15 +7400,19 @@ var projectUserCard = {
         return m('#user-card', _$1.isEmpty(userDetail) ? 'carregando...' : m('.u-marginbottom-30.u-text-center-small-only', [ctrl.displayModal() ? m.component(modalBox, {
             displayModal: ctrl.displayModal,
             content: contactModalC
-        }) : '', m('.w-row', [m('.w-col.w-col-4', [m('img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="' + userVM.displayImage(userDetail) + '"]')]), m('.w-col.w-col-8', [m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [m('a.link-hidden[href="/users/' + userDetail.id + '"]', { config: m.route,
+        }) : '', m('.w-row', [m('.w-col.w-col-4', [m('img.thumb.u-marginbottom-30.u-round[width="100"][itemprop="image"][src="' + userVM.displayImage(userDetail) + '"]')]), m('.w-col.w-col-8', [m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [m('a.link-hidden[href="' + (_$1.isNull(userDetail.deactivated_at) ? '/users/' + userDetail.id : 'javascript:void(0);') + '"]', { config: m.route,
             onclick: function onclick() {
-                m.route('/users/' + userDetail.id, { user_id: userDetail.id });
-                h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
-            } }, userVM.displayName(userDetail))]), m('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' criado', ' criados'), m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' apoiado', ' apoiados')]), m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Perfil no Facebook')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Perfil no Twitter')]) : '', _$1.map(userDetail.links, function (link) {
+                if (!_$1.isNull(userDetail.deactivated_at)) {
+                    return false;
+                } else {
+                    m.route('/users/' + userDetail.id, { user_id: userDetail.id });
+                    h.analytics.event({ cat: 'project_view', act: 'project_creator_link', lbl: userDetail.id, project: project() });
+                }
+            } }, userVM.displayName(userDetail))]), !_$1.isNull(userDetail.deactivated_at) ? '' : m('.fontsize-smallest', [h.pluralize(userDetail.total_published_projects, ' criado', ' criados'), m.trust('&nbsp;&nbsp;|&nbsp;&nbsp;'), h.pluralize(userDetail.total_contributed_projects, ' apoiado', ' apoiados')]), !_$1.isNull(userDetail.deactivated_at) ? '' : m('ul.w-hidden-tiny.w-hidden-small.w-list-unstyled.fontsize-smaller.fontweight-semibold.u-margintop-20.u-marginbottom-20', [!_$1.isEmpty(userDetail.facebook_link) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + userDetail.facebook_link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_fb', lbl: userDetail.facebook_link, project: project() }) }, 'Perfil no Facebook')]) : '', !_$1.isEmpty(userDetail.twitter_username) ? m('li', [m('a.link-hidden[itemprop="url"][href="https://twitter.com/' + userDetail.twitter_username + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_twitter', lbl: userDetail.twitter_username, project: project() }) }, 'Perfil no Twitter')]) : '', _$1.map(userDetail.links, function (link) {
             var parsedLink = h.parseUrl(link.link);
 
             return !_$1.isEmpty(parsedLink.hostname) ? m('li', [m('a.link-hidden[itemprop="url"][href="' + link.link + '"][target="_blank"]', { onclick: h.analytics.event({ cat: 'project_view', act: 'project_creator_otherlinks', lbl: link.link, project: project() }) }, parsedLink.hostname)]) : '';
-        })]), !_$1.isEmpty(userDetail) ? [m(UserFollowBtn, {
+        })]), !_$1.isEmpty(userDetail) ? [!_$1.isNull(userDetail.deactivated_at) ? '' : m(UserFollowBtn, {
             enabledClass: 'a.w-button.btn.btn-terciary.btn-small..u-marginbottom-10',
             disabledClass: 'a.w-button.btn.btn-terciary.btn-small.u-marginbottom-10',
             follow_id: userDetail.id,
@@ -7577,7 +7599,7 @@ var userContributedBox = {
             }
         }, I18n$1.t('contact_author', contributionScope$1()))]), m('.u-marginbottom-20.w-col.w-col-3', [m('.fontsize-base.fontweight-semibold.lineheight-looser', 'R$ ' + contribution.value), m('.w-embed', m('div', [m('.w-hidden-main.w-hidden-medium.fontsize-smallest.fontweight-semibold', I18n$1.t('status', contributionScope$1())), m('.fontsize-smaller.fontweight-semibold', [m('.lineheight-tighter'), m('span.fa.fa-circle.fontsize-smallest.' + (contribution.state === 'paid' ? 'text-success' : contribution.state === 'pending' ? 'text-waiting' : 'text-error'), m.trust('&nbsp;')), I18n$1.t(contribution.state, I18nScope$21({
             date: h.momentify(contribution[contribution.state + '_at'])
-        }))]), m('.fontsize-smallest', contribution.installments > 1 ? contribution.installments + ' x R$ ' + contribution.installment_value + ' ' : '', contribution.payment_method === 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito'), contributionVM.canShowReceipt(contribution) ? m('a.alt-link.u-margintop-10[href=\'/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/receipt\'][target=\'__blank\']', I18n$1.t('show_receipt', contributionScope$1())) : '', contributionVM.canShowSlip(contribution) ? m('a.alt-link.u-margintop-10[href=\'' + contribution.gateway_data.boleto_url + '\'][target=\'__blank\']', I18n$1.t('print_slip', contributionScope$1())) : '', contributionVM.canGenerateSlip(contribution) ? m('a.alt-link.u-margintop-10[href=\'/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/second_slip\'][target=\'__blank\']', I18n$1.t('slip_copy', contributionScope$1())) : '', m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [m('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']' + (contribution.anonymous ? '[checked=\'checked\']' : '') + '[value=\'1\']', {
+        }))]), m('.fontsize-smallest', contribution.installments > 1 ? contribution.installments + ' x R$ ' + contribution.installment_value + ' ' : '', contribution.payment_method === 'BoletoBancario' ? 'Boleto Bancário' : 'Cartão de Crédito'), contributionVM.canShowReceipt(contribution) ? m('a.alt-link.u-margintop-10[href=\'/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/receipt\'][target=\'__blank\']', I18n$1.t('show_receipt', contributionScope$1())) : '', contributionVM.canShowSlip(contribution) && contribution.gateway_data ? m('a.alt-link.u-margintop-10[href=\'' + contribution.gateway_data.boleto_url + '\'][target=\'__blank\']', I18n$1.t('print_slip', contributionScope$1())) : '', contributionVM.canGenerateSlip(contribution) ? m('a.alt-link.u-margintop-10[href=\'/projects/' + contribution.project_id + '/contributions/' + contribution.contribution_id + '/second_slip\'][target=\'__blank\']', I18n$1.t('slip_copy', contributionScope$1())) : '', m('.w-checkbox.fontsize-smallest.fontcolor-secondary.u-margintop-10', [m('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']' + (contribution.anonymous ? '[checked=\'checked\']' : '') + '[value=\'1\']', {
             onclick: function onclick() {
                 return ctrl.toggleAnonymous(contribution.project_id, contribution);
             }
@@ -8307,14 +8329,14 @@ var paymentVM = function paymentVM() {
             countryId = data.address && data.address.country_id || defaultCountry;
 
         if (!_$1.isEmpty(data.address)) {
-            fields.city(data.address.city);
-            fields.zipCode(data.address.zipcode);
-            fields.street(data.address.street);
-            fields.number(data.address.number);
-            fields.addressComplement(data.address.complement);
-            fields.userState(data.address.state);
-            fields.neighbourhood(data.address.neighbourhood);
-            fields.phone(data.address.phonenumber);
+            fields.city(data.address.address_city);
+            fields.zipCode(data.address.address_zip_code);
+            fields.street(data.address.address_street);
+            fields.number(data.address.address_number);
+            fields.addressComplement(data.address.address_complement);
+            fields.userState(data.address.address_state);
+            fields.neighbourhood(data.address.address_neighbourhood);
+            fields.phone(data.address.phone_number);
         }
 
         fields.completeName(data.name);
@@ -8938,7 +8960,7 @@ var projectsContribution = {
             project: project
         }), m('.w-section.header-cont-new', m('.w-container', m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', 'Escolha a recompensa e em seguida o valor do apoio'))), m('.section', m('.w-container', m('.w-row', [m('.w-col.w-col-8', m('.w-form.back-reward-form', m('form.simple_form.new_contribution[accept-charset="UTF-8"][action="/pt/projects/' + project().id + '/contributions/fallback_create"][id="contribution_form"][method="get"][novalidate="novalidate"]', { onsubmit: ctrl.submitContribution }, [m('input[name="utf8"][type="hidden"][value="✓"]'), _$1.map(ctrl.sortedRewards(), function (reward) {
             return m(rewardSelectCard, { reward: reward });
-        })]))), m('.w-col.w-col-4', [m('.card.u-marginbottom-20.u-radius.w-hidden-small.w-hidden-tiny', [m('.fontsize-small.fontweight-semibold', I18n$1.t('contribution_warning.title', I18nScope$24())), m('.fontsize-smaller.u-marginbottom-10', I18n$1.t('contribution_warning.subtitle', I18nScope$24())), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', I18n$1.t('contribution_warning.info', I18nScope$24())), m('a.alt-link.fontsize-smallest[href="' + I18n$1.t('contribution_warning.link') + '"]', I18n$1.t('contribution_warning.link_label', I18nScope$24()))]), m.component(faqBox, {
+        })]))), m('.w-col.w-col-4', [m('.card.u-marginbottom-20.u-radius.w-hidden-small.w-hidden-tiny', [m('.fontsize-small.fontweight-semibold', I18n$1.t('contribution_warning.title', I18nScope$24())), m('.fontsize-smaller.u-marginbottom-10', I18n$1.t('contribution_warning.subtitle', I18nScope$24())), m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', I18n$1.t('contribution_warning.info', I18nScope$24())), m('a.alt-link.fontsize-smallest[target="__blank"][href="' + I18n$1.t('contribution_warning.link', I18nScope$24()) + '"]', I18n$1.t('contribution_warning.link_label', I18nScope$24()))]), m.component(faqBox, {
             mode: project().mode,
             vm: ctrl.paymentVM,
             faq: ctrl.paymentVM.faq(project().mode),
@@ -9200,10 +9222,11 @@ var surveyPreview = {
         };
     },
     view: function view(ctrl, args) {
-        return m('.section.u-marginbottom-40', m('.w-container', m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.card.card-terciary.medium.u-radius', [args.confirmAddress ? m('.u-marginbottom-30', [m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20', I18n$1.t('delivery_address', I18nScope$28())), m('.fontsize-base', [m('span.fontweight-semibold', I18n$1.t('country', I18nScope$28()) + ': '), args.countryName, m('br'), m('span.fontweight-semibold', I18n$1.t('address_street', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.address_street, m('br'), m('span.fontweight-semibold', I18n$1.t('address_number', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.address_number, m('br'), m('span.fontweight-semibold', I18n$1.t('address_complement', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.address_complement, m('br'), m('span.fontweight-semibold', I18n$1.t('address_neighbourhood', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.address_neighbourhood, m('br'), m('span.fontweight-semibold', I18n$1.t('address_city', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.address_city, m('br'), m('span.fontweight-semibold', I18n$1.t('address_state', I18nScope$28()) + ':'), m.trust('&nbsp;'), args.stateName, m('br'), m('span.fontweight-semibold', I18n$1.t('address_zip_code', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.address_zip_code, m('br'), m('span.fontweight-semibold', I18n$1.t('phone_number', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields().addresses_attributes.phone_number])]) : '', _$1.map(ctrl.multipleChoiceQuestions, function (item) {
-            return m('.u-marginbottom-30', [m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20', item.question.question), m('.fontsize-base', _$1.find(item.question.question_choices, function (choice) {
+        return m('.section.u-marginbottom-40', m('.w-container', m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.card.card-terciary.medium.u-radius', [args.confirmAddress ? m('.u-marginbottom-30', [m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20', I18n$1.t('delivery_address', I18nScope$28())), m('.fontsize-base', [m('span.fontweight-semibold', I18n$1.t('country', I18nScope$28()) + ': '), args.countryName, m('br'), m('span.fontweight-semibold', I18n$1.t('address_street', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.address_street, m('br'), m('span.fontweight-semibold', I18n$1.t('address_number', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.address_number, m('br'), m('span.fontweight-semibold', I18n$1.t('address_complement', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.address_complement, m('br'), m('span.fontweight-semibold', I18n$1.t('address_neighbourhood', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.address_neighbourhood, m('br'), m('span.fontweight-semibold', I18n$1.t('address_city', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.address_city, m('br'), m('span.fontweight-semibold', I18n$1.t('address_state', I18nScope$28()) + ':'), m.trust('&nbsp;'), args.stateName, m('br'), m('span.fontweight-semibold', I18n$1.t('address_zip_code', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.address_zip_code, m('br'), m('span.fontweight-semibold', I18n$1.t('phone_number', I18nScope$28()) + ':'), m.trust('&nbsp;'), ctrl.fields.phone_number])]) : '', _$1.map(ctrl.multipleChoiceQuestions, function (item) {
+            var answer = _$1.find(item.question.question_choices, function (choice) {
                 return item.value() == choice.id;
-            }).option)]);
+            });
+            return m('.u-marginbottom-30', [m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20', item.question.question), m('.fontsize-base', answer ? answer.option : '')]);
         }), _$1.map(ctrl.openQuestions, function (item) {
             return m('.u-marginbottom-30', [m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20', item.question.question), m('.fontsize-base', item.value())]);
         })])), m('.w-col.w-col-1')])));
@@ -9214,13 +9237,15 @@ var I18nScope$29 = _$1.partial(h.i18nScope, 'activerecord.attributes.address');
 
 var addressForm = {
     controller: function controller(args) {
+        var parsedErrors = args.parsedErrors;
         var countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
             statesLoader = postgrest$1.loader(models.state.getPageOptions()),
             countries = m.prop(),
             defaultCountryID = 36,
-            states = m.prop(),
+            // @TODO get id from endpoint
+        states = m.prop(),
             zipCodeErrorMessage = m.prop(''),
-            data = args.fields().addresses_attributes,
+            data = args.fields().address(),
             fields = {
             id: m.prop(data.id || ''),
             countryID: m.prop(data.country_id || defaultCountryID),
@@ -9235,17 +9260,21 @@ var addressForm = {
             phoneNumber: m.prop(data.phone_number || '')
         },
             errors = {
-            countryID: m.prop(false),
-            stateID: m.prop(false),
-            addressStreet: m.prop(false),
-            addressNumber: m.prop(false),
+            countryID: m.prop(parsedErrors ? parsedErrors.hasError('country_id') : false),
+            stateID: m.prop(parsedErrors ? parsedErrors.hasError('state') : false),
+            addressStreet: m.prop(parsedErrors ? parsedErrors.hasError('street') : false),
+            addressNumber: m.prop(parsedErrors ? parsedErrors.hasError('number') : false),
             addressComplement: m.prop(false),
-            addressNeighbourhood: m.prop(false),
-            addressCity: m.prop(false),
-            addressState: m.prop(false),
-            addressZipCode: m.prop(false),
-            phoneNumber: m.prop(false)
+            addressNeighbourhood: m.prop(parsedErrors ? parsedErrors.hasError('neighbourhood') : false),
+            addressCity: m.prop(parsedErrors ? parsedErrors.hasError('city') : false),
+            addressState: m.prop(parsedErrors ? parsedErrors.hasError('state') : false),
+            addressZipCode: m.prop(parsedErrors ? parsedErrors.hasError('zipcode') : false),
+            phoneNumber: m.prop(parsedErrors ? parsedErrors.hasError('phonenumber') : false)
         },
+            phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
+            zipcodeMask = _$1.partial(h.mask, '99999-999'),
+            applyZipcodeMask = _$1.compose(fields.addressZipCode, zipcodeMask),
+            applyPhoneMask = _$1.compose(fields.phoneNumber, phoneMask),
             international = m.prop(fields.countryID() !== '' && fields.countryID() !== defaultCountryID);
 
         _$1.extend(args.fields(), {
@@ -9266,8 +9295,8 @@ var addressForm = {
         });
 
         var lookupZipCode = function lookupZipCode(zipCode) {
-            fields.addressZipCode(h.numbersOnlyMask(zipCode));
-            if (zipCode.length === 8) {
+            fields.addressZipCode(zipCode);
+            if (zipCode.length === 9) {
                 m.request({
                     method: 'GET',
                     url: 'https://api.pagar.me/1/zipcodes/' + zipCode
@@ -9298,6 +9327,8 @@ var addressForm = {
             lookupZipCode: lookupZipCode,
             zipCodeErrorMessage: zipCodeErrorMessage,
             errors: errors,
+            applyPhoneMask: applyPhoneMask,
+            applyZipcodeMask: applyZipcodeMask,
             defaultCountryID: defaultCountryID,
             fields: fields,
             international: international,
@@ -9309,7 +9340,9 @@ var addressForm = {
         var fields = ctrl.fields,
             international = ctrl.international,
             errors = ctrl.errors,
-            address = {
+
+        // hash to send to rails
+        address = {
             id: fields.id(),
             country_id: fields.countryID(),
             state_id: fields.stateID(),
@@ -9323,15 +9356,17 @@ var addressForm = {
             phone_number: fields.phoneNumber()
         };
 
-        args.fields().addresses_attributes = address;
-        args.countryName(ctrl.countries() && fields.countryID() ? _$1.find(ctrl.countries(), function (country) {
-            return country.id === parseInt(fields.countryID());
-        }).name_en : '');
-        args.stateName(ctrl.states() && fields.stateID() ? _$1.find(ctrl.states(), function (state) {
-            return state.id === parseInt(fields.stateID());
-        }).name : '');
+        args.fields().address(address);
+        if (args.countryName && args.stateName) {
+            args.countryName(ctrl.countries() && fields.countryID() ? _$1.find(ctrl.countries(), function (country) {
+                return country.id === parseInt(fields.countryID());
+            }).name_en : '');
+            args.stateName(ctrl.states() && fields.stateID() ? _$1.find(ctrl.states(), function (state) {
+                return state.id === parseInt(fields.stateID());
+            }).name : '');
+        }
 
-        return m('#address-form.u-marginbottom-30.w-form', [m('.fontsize-smaller.u-marginbottom-20', '* Preenchimento obrigatório'), m('.u-marginbottom-30', [m('div', m('.w-row', [m('.w-col.w-col-4', m('.fontsize-small.fontweight-semibold', 'Nacionalidade:')), m('.w-col.w-col-4', m('.fontsize-small.w-radio', [m("input.w-radio-input[name='nationality'][type='radio']", {
+        return m('#address-form.u-marginbottom-30.w-form', [m('.fontsize-smaller.u-marginbottom-20', '* Preenchimento obrigatório'), m('.divider.u-marginbottom-20'), m('.u-marginbottom-30', [m('div', m('.w-row', [m('.w-col.w-col-4', m('.fontsize-small.fontweight-semibold', 'Nacionalidade:')), m('.w-col.w-col-4', m('.fontsize-small.w-radio', [m("input.w-radio-input[name='nationality'][type='radio']", {
             checked: !international(),
             onclick: function onclick() {
                 fields.countryID(ctrl.defaultCountryID);
@@ -9342,7 +9377,7 @@ var addressForm = {
             onclick: function onclick() {
                 international(true);
             }
-        }), m('label.w-form-label', 'International backer')]))]))]),
+        }), m('label.w-form-label', 'International')]))]))]),
         // @TODO move to another component
         international() ? m('form', [m('.u-marginbottom-30.w-row', [m('.w-col.w-col-6', [m('.field-label.fontweight-semibold', ['País / ', m('em', 'Country'), ' *']), m('select.positive.text-field.w-select', {
             onchange: m.withAttr('value', ctrl.fields.countryID)
@@ -9351,13 +9386,13 @@ var addressForm = {
                 selected: country.id === ctrl.fields.countryID(),
                 value: country.id
             }, country.name_en);
-        }) : ''])]), m('.w-col.w-col-6')]), m('div', [m('.field-label.fontweight-semibold', 'Address *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
+        }) : ''])]), m('.w-col.w-col-6')]), m('div', [m('.w-row', m('.w-col.w-col-12', [m('.field-label.fontweight-semibold', 'Address *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
             class: errors.addressStreet() ? 'error' : '',
             value: ctrl.fields.addressStreet(),
             onchange: m.withAttr('value', ctrl.fields.addressStreet)
         }), errors.addressStreet() ? m(inlineError, {
             message: 'Please fill in an address.'
-        }) : '', m('div', m('.w-row', [m('.w-sub-col.w-col.w-col-4', [m('.field-label.fontweight-semibold', 'Zip Code *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
+        }) : ''])), m('div', m('.w-row', [m('.w-sub-col.w-col.w-col-4', [m('.field-label.fontweight-semibold', 'Zip Code *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
             class: errors.addressZipCode() ? 'error' : '',
             value: ctrl.fields.addressZipCode(),
             onchange: m.withAttr('value', ctrl.fields.addressZipCode)
@@ -9382,15 +9417,18 @@ var addressForm = {
                 selected: country.id === ctrl.fields.countryID(),
                 value: country.id
             }, country.name_en);
-        }) : ''])]), m('.w-col.w-col-6')]), m('div', [m('.w-row', [m('.w-col.w-col-6', [m('.field-label', [m('span.fontweight-semibold', I18n$1.t('address_zip_code', I18nScope$29()) + ' *'), m("a.fontsize-smallest.alt-link.u-right[href='http://www.buscacep.correios.com.br/sistemas/buscacep/'][target='_blank']", I18n$1.t('zipcode_unknown', I18nScope$29()))]), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][maxlength='8'][type='text']", {
+        }) : ''])]), m('.w-col.w-col-6')]), m('div', [m('.w-row', [m('.w-col.w-col-6', [m('.field-label', [m('span.fontweight-semibold', I18n$1.t('address_zip_code', I18nScope$29()) + ' *'), m("a.fontsize-smallest.alt-link.u-right[href='http://www.buscacep.correios.com.br/sistemas/buscacep/'][target='_blank']", I18n$1.t('zipcode_unknown', I18nScope$29()))]), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
             class: errors.addressZipCode() ? 'error' : '',
             value: ctrl.fields.addressZipCode(),
+            onkeyup: m.withAttr('value', function (value) {
+                return ctrl.applyZipcodeMask(value);
+            }),
             oninput: function oninput(e) {
                 ctrl.lookupZipCode(e.target.value);
             }
         }), errors.addressZipCode() ? m(inlineError, {
             message: ctrl.zipCodeErrorMessage() ? ctrl.zipCodeErrorMessage() : 'Informe um CEP válido.'
-        }) : '']), m('.w-col.w-col-6')]), m('div', [m('.field-label.fontweight-semibold', I18n$1.t('address_street', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[maxlength='256'][required='required'][type='text']", {
+        }) : '']), m('.w-col.w-col-6')]), m('.w-row', [m('.field-label.fontweight-semibold', I18n$1.t('address_street', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[maxlength='256'][required='required'][type='text']", {
             class: errors.addressStreet() ? 'error' : '',
             value: ctrl.fields.addressStreet(),
             onchange: m.withAttr('value', ctrl.fields.addressStreet)
@@ -9402,7 +9440,7 @@ var addressForm = {
             onchange: m.withAttr('value', ctrl.fields.addressNumber)
         }), errors.addressNumber() ? m(inlineError, {
             message: 'Informe um número.'
-        }) : '']), m('.w-sub-col.w-col.w-col-4', [m('.field-label.fontweight-semibold', I18n$1.t('address_complement', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
+        }) : '']), m('.w-sub-col.w-col.w-col-4', [m('.field-label.fontweight-semibold', I18n$1.t('address_complement', I18nScope$29())), m("input.positive.text-field.w-input[required='required'][type='text']", {
             value: ctrl.fields.addressComplement(),
             onchange: m.withAttr('value', ctrl.fields.addressComplement)
         })]), m('.w-col.w-col-4', [m('.field-label.fontweight-semibold', I18n$1.t('address_neighbourhood', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
@@ -9417,23 +9455,26 @@ var addressForm = {
             onchange: m.withAttr('value', ctrl.fields.addressCity)
         }), errors.addressCity() ? m(inlineError, {
             message: 'Informe uma cidade.'
-        }) : '']), m('.w-col.w-col-6', [m('.field-label.fontweight-semibold', I18n$1.t('address_state', I18nScope$29()) + ' *'), m('select.positive.text-field.w-select', {
+        }) : '']), m('.w-sub-col.w-col.w-col-2', [m('.field-label.fontweight-semibold', I18n$1.t('address_state', I18nScope$29()) + ' *'), m('select.positive.text-field.w-select', {
             class: errors.stateID() ? 'error' : '',
             onchange: m.withAttr('value', ctrl.fields.stateID)
         }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
             return m('option', {
                 value: state.id,
                 selected: state.id === ctrl.fields.stateID()
-            }, state.name);
+            }, state.acronym);
         }) : '']), errors.stateID() ? m(inlineError, {
             message: 'Informe um estado.'
-        }) : ''])]), m('.w-row', [m('.w-col.w-col-6', [m('.field-label.fontweight-semibold', I18n$1.t('phone_number', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
+        }) : '']), m('.w-col.w-col-4', [m('.field-label.fontweight-semibold', I18n$1.t('phone_number', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
             class: errors.phoneNumber() ? 'error' : '',
             value: ctrl.fields.phoneNumber(),
+            onkeyup: m.withAttr('value', function (value) {
+                return ctrl.applyPhoneMask(value);
+            }),
             onchange: m.withAttr('value', ctrl.fields.phoneNumber)
         }), errors.phoneNumber() ? m(inlineError, {
             message: 'Informe um telefone.'
-        }) : '']), m('.w-col.w-col-6')])])])])]);
+        }) : ''])])])])])]);
     }
 };
 
@@ -9444,6 +9485,7 @@ var surveysShow = {
         var survey_id = args.survey_id,
             contributionId = m.route.param('contribution_id'),
             survey = m.prop(),
+            idVM = h.idVM,
             displayModal = h.toggleProp(false, true),
             showPreview = h.toggleProp(false, true),
             showThanks = h.toggleProp(false, true),
@@ -9454,7 +9496,7 @@ var surveysShow = {
             fields = m.prop({}),
             openQuestions = m.prop([]),
             multipleChoiceQuestions = m.prop([]),
-            user = userVM.getCurrentUser(),
+            user = m.prop({}),
             reward = m.prop(),
             sendMessage = function sendMessage() {
             displayModal(true);
@@ -9481,7 +9523,7 @@ var surveysShow = {
             sendAnswer = function sendAnswer() {
             var data = {};
             _$1.extend(data, {
-                survey_address_answers_attributes: fields()
+                survey_address_answers_attributes: { addresses_attributes: fields().address() }
             });
             _$1.extend(data, {
                 survey_open_question_answers_attributes: _$1.map(openQuestions(), function (question) {
@@ -9515,16 +9557,24 @@ var surveysShow = {
         };
 
         surveyLoader().load().then(function (data) {
-            survey(data);
-            survey(_$1.first(survey()));
+            survey(_$1.first(data));
             finished(!_$1.isEmpty(survey().finished_at));
             answeredAt(survey().survey_answered_at);
             projectVM.fetchProject(survey().project_id);
             rewardVM.rewardLoader(survey().reward_id).load().then(reward);
             var surveyData = survey();
-            fields({
-                addresses_attributes: surveyData.address || {}
+
+            idVM.id(h.getUserID());
+
+            var lUser = postgrest$1.loaderWithToken(models.userDetail.getRowOptions(idVM.parameters()));
+
+            lUser.load().then(function (userData) {
+                user(_$1.first(userData));
+                fields({
+                    address: m.prop(surveyData.address || _$1.omit(user().address, 'id') || {})
+                });
             });
+
             _$1.map(surveyData.open_questions, function (question) {
                 openQuestions().push({
                     question: question,
@@ -9580,14 +9630,14 @@ var surveysShow = {
             confirmAddress: survey.confirm_address,
             countryName: countryName(),
             stateName: stateName(),
-            fields: ctrl.fields,
+            fields: ctrl.fields().address(),
             openQuestions: openQuestions,
             multipleChoiceQuestions: multipleChoiceQuestions
         })]) : ctrl.showPreview() ? m('.survey-preview', [m('.bg-white.page-header', m('.w-container', m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', [m('.u-marginbottom-20.u-text-center', m('img.big.thumb.u-marginbottom-20.u-round[src=\'' + profileImage + '\']')), m('.u-text-center', m('.fontsize-larger', 'Você confirma as respostas abaixo?'))]), m('.w-col.w-col-2')]))), m(surveyPreview, {
             confirmAddress: survey.confirm_address,
             countryName: countryName(),
             stateName: stateName(),
-            fields: ctrl.fields,
+            fields: ctrl.fields().address(),
             openQuestions: openQuestions,
             multipleChoiceQuestions: multipleChoiceQuestions
         }), m('div', m('.w-container', m('.w-row', [m('.w-col.w-col-2'), m('.w-col.w-col-8', m('.w-row', [m('.w-col-small-6.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col', m('a.btn.btn-large.btn-terciary', {
@@ -9602,7 +9652,7 @@ var surveysShow = {
             confirmAddress: survey.confirm_address,
             countryName: countryName(),
             stateName: stateName(),
-            fields: ctrl.fields,
+            fields: ctrl.fields().address(),
             openQuestions: openQuestions,
             multipleChoiceQuestions: multipleChoiceQuestions
         }) : '', m('.w-col.w-col-1')])))] : [m('div', m('.w-container', m('.w-row', [m('.w-col.w-col-1'), m('.w-col.w-col-10', m('.card.card-terciary.medium.u-marginbottom-30', [ctrl.answeredAt() ? m('.card.card-message.u-marginbottom-40.u-radius', m('.fontsize-base', [m('span.fa.fa-exclamation-circle', ''), ' Voc\xEA j\xE1 enviou as respostas abaixo no dia ' + h.momentify(ctrl.answeredAt(), 'DD/MM/YYYY') + '. Se notou algo errado, n\xE3o tem problema: basta alterar as informa\xE7\xF5es necess\xE1rias abaixo e reenviar as respostas.'])) : '', survey.confirm_address ? [m('.fontcolor-secondary.fontsize-base.fontweight-semibold', I18n$1.t('delivery_address', addressScope())), m(addressForm, {
@@ -10189,12 +10239,11 @@ var userPrivateContributed = {
     }
 };
 
-var UserOwnerBox = {
+var bigCard = {
     view: function view(ctrl, args) {
-        var project = args.project,
-            user = args.user;
+        var cardClass = '.card.medium.card-terciary.u-marginbottom-30';
 
-        return m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [args.hideAvatar ? '' : m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Dados do apoiador ' : 'Dados do usuário ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + '"]', 'Não é você?')]), m('.fontsize-base.fontweight-semibold', user.name), m('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]);
+        return m(cardClass, [m('div.u-marginbottom-30', [m('label.fontweight-semibold.fontsize-base', args.label), args.label_hint ? m('.fontsize-small', args.label_hint) : '']), m('div', args.children)]);
     }
 };
 
@@ -10277,36 +10326,22 @@ var userSettings = {
         var parsedErrors = userSettingsVM.mapRailsErrors(railsErrorsVM.railsErrors());
         var deleteFormSubmit = void 0;
         var user = args.user,
-            fields = {
+            fields = m.prop({
             owner_document: m.prop(user.owner_document || ''),
-            country_id: m.prop(user.address.country_id || 36),
-            street: m.prop(user.address.street || ''),
-            number: m.prop(user.address.number || ''),
-            city: m.prop(user.address.city || ''),
-            zipcode: m.prop(user.address.zipcode || ''),
-            complement: m.prop(user.address.complement || ''),
-            neighbourhood: m.prop(user.address.neighbourhood || ''),
-            state: m.prop(user.address.state || ''),
-            phonenumber: m.prop(user.address.phonenumber || ''),
             name: m.prop(user.name || ''),
             state_inscription: m.prop(''),
+            address: m.prop(user.address || {}),
             birth_date: m.prop(user.birth_date ? h.momentify(user.birth_date) : ''),
             account_type: m.prop(user.account_type || '')
-        },
+        }),
             loading = m.prop(false),
             user_id = args.userId,
             error = m.prop(''),
-            countries = m.prop(),
-            states = m.prop(),
             loader = m.prop(true),
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),
-            countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
-            statesLoader = postgrest$1.loader(models.state.getPageOptions()),
-            phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
             documentMask = _$1.partial(h.mask, '999.999.999-99'),
             documentCompanyMask = _$1.partial(h.mask, '99.999.999/9999-99'),
-            zipcodeMask = _$1.partial(h.mask, '99999-999'),
             birthDayMask = _$1.partial(h.mask, '99/99/9999'),
             creditCards = m.prop(),
             toDeleteCard = m.prop(-1),
@@ -10328,19 +10363,11 @@ var userSettings = {
         },
             updateUserData = function updateUserData() {
             var userData = {
-                country_id: fields.country_id(),
-                address_street: fields.street(),
-                address_number: fields.number(),
-                address_city: fields.city(),
-                address_zip_code: fields.zipcode(),
-                address_complement: fields.complement(),
-                address_state: fields.state(),
-                address_neighbourhood: fields.neighbourhood(),
-                phone_number: fields.phonenumber(),
-                cpf: fields.owner_document(),
-                name: fields.name(),
-                account_type: fields.account_type(),
-                birth_date: fields.birth_date()
+                cpf: fields().owner_document(),
+                name: fields().name(),
+                address_attributes: fields().address(),
+                account_type: fields().account_type(),
+                birth_date: fields().birth_date()
             };
 
             if (args.publishingUserSettings) {
@@ -10384,14 +10411,12 @@ var userSettings = {
             updateUserData();
             return false;
         },
-            applyZipcodeMask = _$1.compose(fields.zipcode, zipcodeMask),
-            applyBirthDateMask = _$1.compose(fields.birth_date, birthDayMask),
-            applyPhoneMask = _$1.compose(fields.phonenumber, phoneMask),
+            applyBirthDateMask = _$1.compose(fields().birth_date, birthDayMask),
             applyDocumentMask = function applyDocumentMask(value) {
-            if (fields.account_type() != 'pf') {
-                fields.owner_document(documentCompanyMask(value));
+            if (fields().account_type() != 'pf') {
+                fields().owner_document(documentCompanyMask(value));
             } else {
-                fields.owner_document(documentMask(value));
+                fields().owner_document(documentMask(value));
             }
         },
             handleError = function handleError() {
@@ -10401,11 +10426,6 @@ var userSettings = {
         };
 
         userVM.getUserCreditCards(args.userId).then(creditCards).catch(handleError);
-        countriesLoader.load().then(function (data) {
-            return countries(_$1.sortBy(data, 'name_en'));
-        });
-        statesLoader.load().then(states);
-
         if (parsedErrors.hasError('country_id')) {
             parsedErrors.inlineError('country_id', false);
         }
@@ -10413,10 +10433,6 @@ var userSettings = {
         return {
             handleError: handleError,
             applyDocumentMask: applyDocumentMask,
-            applyZipcodeMask: applyZipcodeMask,
-            applyPhoneMask: applyPhoneMask,
-            countries: countries,
-            states: states,
             fields: fields,
             loader: loader,
             showSuccess: showSuccess,
@@ -10435,12 +10451,12 @@ var userSettings = {
     },
     view: function view(ctrl, args) {
         var user = ctrl.user,
-            fields = ctrl.fields,
+            fields = ctrl.fields(),
             hasContributedOrPublished = user.total_contributed_projects >= 1 || user.total_published_projects >= 1,
             disableFields = user.is_admin_role ? false : hasContributedOrPublished && !_$1.isEmpty(user.name) && !_$1.isEmpty(user.owner_document);
 
         return m('[id=\'settings-tab\']', [ctrl.showSuccess() ? m.component(popNotification, {
-            message: I18n.t('update_success_msg', I18nScope$31()),
+            message: I18n$1.t('update_success_msg', I18nScope$31()),
             toggleOpt: ctrl.showSuccess
         }) : '', ctrl.showError() ? m.component(popNotification, {
             message: m.trust(ctrl.error()),
@@ -10450,90 +10466,57 @@ var userSettings = {
             onsubmit: ctrl.onSubmit
         }, [m('div', [m('.w-container', m('.w-col.w-col-10.w-col-push-1',
         // ( _.isEmpty(fields.name()) && _.isEmpty(fields.owner_document()) ? '' : m(UserOwnerBox, {user: user}) ),
-        m('.w-form.card.card-terciary', [m('.fontsize-base.fontweight-semibold', I18n.t('legal_title', I18nScope$31())), m('.fontsize-small.u-marginbottom-20', [m.trust(I18n.t('legal_subtitle', I18nScope$31()))]), m('.divider.u-marginbottom-20'), m('.w-row', [m('.w-col.w-col-6.w-sub-col', m('.input.select.required.user_bank_account_bank_id', [m('select.select.required.w-input.text-field.bank-select.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_bank_id\']', {
-            name: 'user[bank_account_attributes][bank_id]',
-            onchange: m.withAttr('value', fields.account_type),
-            disabled: disableFields
-        }, [m('option[value=\'pf\']', {
-            selected: fields.account_type() === 'pf'
-        }, I18n.t('account_types.pf', I18nScope$31())), m('option[value=\'pj\']', {
-            selected: fields.account_type() === 'pj'
-        }, I18n.t('account_types.pj', I18nScope$31())), m('option[value=\'mei\']', {
-            selected: fields.account_type() === 'mei'
-        }, I18n.t('account_types.mei', I18nScope$31()))])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', I18n.t(fields.account_type() == 'pf' ? 'pf_label_name' : 'pj_label_name', I18nScope$31())), m('input.string.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
-            value: fields.name(),
-            name: 'user[name]',
-            class: ctrl.parsedErrors.hasError('name') ? 'error' : false,
-            onchange: m.withAttr('value', fields.name),
-            disabled: disableFields
-        }), ctrl.parsedErrors.inlineError('name')]), m('.w-col.w-col-6', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', I18n.t(fields.account_type() == 'pf' ? 'pf_label_document' : 'pj_label_document', I18nScope$31())), m('input.string.tel.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
-            value: fields.owner_document(),
-            class: ctrl.parsedErrors.hasError('owner_document') ? 'error' : false,
-            disabled: disableFields,
-            name: 'user[cpf]',
-            onchange: m.withAttr('value', ctrl.applyDocumentMask),
-            onkeyup: m.withAttr('value', ctrl.applyDocumentMask)
-        }), ctrl.parsedErrors.inlineError('owner_document')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', fields.account_type() == 'pf' ? [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', I18n.t('label_birth_date', I18nScope$31())), m('input.string.tel.required.w-input.text-field.positive' + (disableFields && !_$1.isEmpty(user.birth_date) ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
-            value: fields.birth_date(),
-            name: 'user[birth_date]',
-            class: ctrl.parsedErrors.hasError('birth_date') ? 'error' : false,
-            disabled: disableFields && !_$1.isEmpty(user.birth_date),
-            onchange: m.withAttr('value', ctrl.applyBirthDateMask),
-            onkeyup: m.withAttr('value', ctrl.applyBirthDateMask)
-        }), ctrl.parsedErrors.inlineError('birth_date')] : [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', I18n.t('label_state_inscription', I18nScope$31())), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
-            value: fields.state_inscription(),
-            class: ctrl.parsedErrors.hasError('state_inscription') ? 'error' : false,
-            name: 'user[state_inscription]',
-            onchange: m.withAttr('value', fields.state_inscription)
-        }), ctrl.parsedErrors.inlineError('state_inscription')])])])])]), m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', I18n.t('address_title', I18nScope$31())), m('.fontsize-small.u-marginbottom-20.u-marginbottom-20', [I18n.t('address_subtitle', I18nScope$31())]), m('.w-row', [m('.input.select.optional.user_country.w-col.w-col-6.w-sub-col', [m('label.field-label', I18n.t('label_country', I18nScope$31())), m('select.select.optional.w-input.text-field.w-select.positive[id=\'user_country_id\'][name=\'user[country_id]\']', {
-            onchange: m.withAttr('value', fields.country_id),
-            class: ctrl.parsedErrors.hasError('country_id') ? 'error' : false
-        }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
-            return m('option' + (country.id == fields.country_id() ? '[selected="selected"]' : ''), {
-                value: country.id
-            }, country.name_en);
-        }) : '']), ctrl.parsedErrors.inlineError('country_id')]), m('.w-col.w-col-6')]), m('.w-row', [m('.input.string.optional.user_address_street.w-col.w-col-6.w-sub-col', [m('label.field-label', I18n.t('label_address_street', I18nScope$31())), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_street\'][name=\'user[address_street]\'][type=\'text\']', {
-            value: fields.street(),
-            class: ctrl.parsedErrors.hasError('street') ? 'error' : false,
-            onchange: m.withAttr('value', fields.street)
-        }), ctrl.parsedErrors.inlineError('street')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', I18n.t('label_address_number', I18nScope$31())), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_number\'][name=\'user[address_number]\'][type=\'tel\']', {
-            value: fields.number(),
-            class: ctrl.parsedErrors.hasError('number') ? 'error' : false,
-            onchange: m.withAttr('value', fields.number)
-        }), ctrl.parsedErrors.inlineError('number')]), m('.input.string.optional.user_address_complement.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', I18n.t('label_address_complement', I18nScope$31())), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_complement\'][name=\'user[address_complement]\'][type=\'text\']', {
-            value: fields.complement(),
-            class: ctrl.parsedErrors.hasError('complement') ? 'error' : false,
-            onchange: m.withAttr('value', fields.complement)
-        }), ctrl.parsedErrors.inlineError('complement')])]))]), m('.w-row', [m('.input.string.optional.user_address_neighbourhood.w-col.w-col-6.w-sub-col', [m('label.field-label', I18n.t('label_address_neighbourhood', I18nScope$31())), m('input.string.optional.w-input.text-field.w-input.text-field.positive[id=\'user_address_neighbourhood\'][name=\'user[address_neighbourhood]\'][type=\'text\']', {
-            value: fields.neighbourhood(),
-            class: ctrl.parsedErrors.hasError('neighbourhood') ? 'error' : false,
-            onchange: m.withAttr('value', fields.neighbourhood)
-        }), ctrl.parsedErrors.inlineError('neighbourhood')]), m('.input.string.optional.user_address_city.w-col.w-col-6', [m('label.field-label', I18n.t('label_address_city', I18nScope$31())), m('input.string.optional.w-input.text-field.w-input.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_city\'][name=\'user[address_city]\'][type=\'text\']', {
-            value: fields.city(),
-            class: ctrl.parsedErrors.hasError('city') ? 'error' : false,
-            onchange: m.withAttr('value', fields.city)
-        }), ctrl.parsedErrors.inlineError('city')])]), m('.w-row', [m('.input.select.optional.user_address_state.w-col.w-col-6.w-sub-col', [m('label.field-label', I18n.t('label_address_state', I18nScope$31())), m('select.select.optional.w-input.text-field.w-select.text-field.positive[data-required-in-brazil=\'true\'][id=\'user_address_state\'][name=\'user[address_state]\']', {
-            class: ctrl.parsedErrors.hasError('state') ? 'error' : false,
-            onchange: m.withAttr('value', fields.state)
-        }, [m('option[value=\'\']'), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
-            return m('option[value=\'' + state.acronym + '\']' + (state.acronym == fields.state() ? '[selected="selected"]' : ''), {
-                value: state.acronym
-            }, state.name);
-        }) : '', m('option[value=\'outro / other\']', I18n.t('label_other_option', I18nScope$31()))]), ctrl.parsedErrors.inlineError('state')]), m('.w-col.w-col-6', m('.w-row', [m('.input.tel.optional.user_address_zip_code.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.field-label', I18n.t('label_address_zipcode', I18nScope$31())), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'99999-999\'][data-required-in-brazil=\'true\'][id=\'user_address_zip_code\'][name=\'user[address_zip_code]\'][type=\'tel\']', {
-            value: fields.zipcode(),
-            class: ctrl.parsedErrors.hasError('zipcode') ? 'error' : false,
-            onchange: m.withAttr('value', fields.zipcode)
-        }), ctrl.parsedErrors.inlineError('zipcode')]), m('.input.tel.optional.user_phone_number.w-col.w-col-6.w-col-small-6.w-col-tiny-6', [m('label.field-label', I18n.t('label_address_phone', I18nScope$31())), m('input.string.tel.optional.w-input.text-field.w-input.text-field.positive[data-fixed-mask=\'(99) 9999-99999\'][data-required-in-brazil=\'true\'][id=\'user_phone_number\'][name=\'user[phone_number]\'][type=\'tel\']', {
-            value: fields.phonenumber(),
-            onchange: m.withAttr('value', fields.phonenumber),
-            class: ctrl.parsedErrors.hasError('phonenumber') ? 'error' : false,
-            onkeyup: m.withAttr('value', function (value) {
-                return ctrl.applyPhoneMask(value);
-            })
-        }), ctrl.parsedErrors.inlineError('phonenumber')])]))])]), args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', I18n.t('credit_cards.title', I18nScope$31())), m('.fontsize-small.u-marginbottom-20', m.trust(I18n.t('credit_cards.subtitle', I18nScope$31()))), m('.divider.u-marginbottom-20'), m('.w-row.w-hidden-tiny.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', I18n.t('credit_cards.card_label', I18nScope$31()))), m('.w-col.w-col-5.w-col-small-5', m('.fontweight-semibold.fontsize-small', I18n.t('credit_cards.provider_label', I18nScope$31()))), m('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
+
+        m(bigCard, {
+            label: I18n$1.t('legal_title', I18nScope$31()),
+            label_hint: m.trust(I18n$1.t('legal_subtitle', I18nScope$31())),
+            children: [m('.divider.u-marginbottom-20'), m('.w-row', [m('.w-col.w-col-6.w-sub-col', m('.input.select.required.user_bank_account_bank_id', [m('select.select.required.w-input.text-field.bank-select.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_bank_id\']', {
+                name: 'user[bank_account_attributes][bank_id]',
+                onchange: m.withAttr('value', fields.account_type),
+                disabled: disableFields
+            }, [m('option[value=\'pf\']', {
+                selected: fields.account_type() === 'pf'
+            }, I18n$1.t('account_types.pf', I18nScope$31())), m('option[value=\'pj\']', {
+                selected: fields.account_type() === 'pj'
+            }, I18n$1.t('account_types.pj', I18nScope$31())), m('option[value=\'mei\']', {
+                selected: fields.account_type() === 'mei'
+            }, I18n$1.t('account_types.mei', I18nScope$31()))])]))]), m('.w-row', [m('.w-col.w-col-6.w-sub-col', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_name\']', I18n$1.t(fields.account_type() == 'pf' ? 'pf_label_name' : 'pj_label_name', I18nScope$31())), m('input.string.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[id=\'user_bank_account_attributes_owner_name\'][type=\'text\']', {
+                value: fields.name(),
+                name: 'user[name]',
+                class: ctrl.parsedErrors.hasError('name') ? 'error' : false,
+                onchange: m.withAttr('value', fields.name),
+                disabled: disableFields
+            }), ctrl.parsedErrors.inlineError('name')]), m('.w-col.w-col-6', [m('.w-row', [m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6.w-sub-col-middle', [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', I18n$1.t(fields.account_type() == 'pf' ? 'pf_label_document' : 'pj_label_document', I18nScope$31())), m('input.string.tel.required.w-input.text-field.positive' + (disableFields ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+                value: fields.owner_document(),
+                class: ctrl.parsedErrors.hasError('owner_document') ? 'error' : false,
+                disabled: disableFields,
+                name: 'user[cpf]',
+                onchange: m.withAttr('value', ctrl.applyDocumentMask),
+                onkeyup: m.withAttr('value', ctrl.applyDocumentMask)
+            }), ctrl.parsedErrors.inlineError('owner_document')]), m('.w-col.w-col-6.w-col-small-6.w-col-tiny-6', fields.account_type() == 'pf' ? [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', I18n$1.t('label_birth_date', I18nScope$31())), m('input.string.tel.required.w-input.text-field.positive' + (disableFields && !_$1.isEmpty(user.birth_date) ? '.text-field-disabled' : '') + '[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+                value: fields.birth_date(),
+                name: 'user[birth_date]',
+                class: ctrl.parsedErrors.hasError('birth_date') ? 'error' : false,
+                disabled: disableFields && !_$1.isEmpty(user.birth_date),
+                onchange: m.withAttr('value', ctrl.applyBirthDateMask),
+                onkeyup: m.withAttr('value', ctrl.applyBirthDateMask)
+            }), ctrl.parsedErrors.inlineError('birth_date')] : [m('label.text.required.field-label.field-label.fontweight-semibold.force-text-dark[for=\'user_bank_account_attributes_owner_document\']', I18n$1.t('label_state_inscription', I18nScope$31())), m('input.string.tel.required.w-input.text-field.positive[data-validate-cpf-cnpj=\'true\'][id=\'user_bank_account_attributes_owner_document\'][type=\'tel\'][validation_text=\'true\']', {
+                value: fields.state_inscription(),
+                class: ctrl.parsedErrors.hasError('state_inscription') ? 'error' : false,
+                name: 'user[state_inscription]',
+                onchange: m.withAttr('value', fields.state_inscription)
+            }), ctrl.parsedErrors.inlineError('state_inscription')])])])])]
+        }), m(bigCard, {
+            label: I18n$1.t('address_title', I18nScope$31()),
+            label_hint: I18n$1.t('address_subtitle', I18nScope$31()),
+            children: [m(addressForm, {
+                fields: ctrl.fields,
+                parsedErrors: ctrl.parsedErrors
+            })]
+        }), args.hideCreditCards ? '' : m('.w-form.card.card-terciary.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold', I18n$1.t('credit_cards.title', I18nScope$31())), m('.fontsize-small.u-marginbottom-20', m.trust(I18n$1.t('credit_cards.subtitle', I18nScope$31()))), m('.divider.u-marginbottom-20'), m('.w-row.w-hidden-tiny.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', I18n$1.t('credit_cards.card_label', I18nScope$31()))), m('.w-col.w-col-5.w-col-small-5', m('.fontweight-semibold.fontsize-small', I18n$1.t('credit_cards.provider_label', I18nScope$31()))), m('.w-col.w-col-2.w-col-small-2')]), _$1.map(ctrl.creditCards(), function (card) {
             return m('.w-row.card', [m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold', ['XXXX XXXX XXXX', m.trust('&nbsp;'), card.last_digits])), m('.w-col.w-col-5.w-col-small-5', m('.fontsize-small.fontweight-semibold.u-marginbottom-10', card.card_brand.toUpperCase())), m('.w-col.w-col-2.w-col-small-2', m('a.btn.btn-terciary.btn-small[rel=\'nofollow\']', {
                 onclick: ctrl.deleteCard(card.id)
-            }, I18n.t('credit_cards.remove_label', I18nScope$31())))]);
+            }, I18n$1.t('credit_cards.remove_label', I18nScope$31())))]);
         }), m('form.w-hidden', {
             action: '/pt/users/' + user.id + '/credit_cards/' + ctrl.toDeleteCard(),
             method: 'POST',
@@ -10592,6 +10575,15 @@ var userNotifications = {
                 name: 'user[reminders][' + reminder.project_id + ']'
             }), m('label.w-form-label.fontsize-small', reminder.project_name)]);
         }) : ''])])]))), m('.u-margintop-30', m('.w-container', m('.w-row', m('.w-col.w-col-4.w-col-push-4', m('input.btn.btn-large[id=\'save\'][name=\'commit\'][type=\'submit\'][value=\'Salvar\']')))))])]));
+    }
+};
+
+var UserOwnerBox = {
+    view: function view(ctrl, args) {
+        var project = args.project,
+            user = args.user;
+
+        return m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [args.hideAvatar ? '' : m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Dados do apoiador ' : 'Dados do usuário ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + '"]', 'Não é você?')]), m('.fontsize-base.fontweight-semibold', user.name), m('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]);
     }
 };
 
@@ -11127,14 +11119,6 @@ var projectGoalVM = {
     updateProject: updateProject$1,
     e: e$3,
     genClickChangeMode: genClickChangeMode
-};
-
-var bigCard = {
-    view: function view(ctrl, args) {
-        var cardClass = '.card.medium.card-terciary.u-marginbottom-30';
-
-        return m(cardClass, [m('div.u-marginbottom-30', [m('label.fontweight-semibold.fontsize-base', args.label), args.label_hint ? m('.fontsize-small', args.label_hint) : '']), m('div', args.children)]);
-    }
 };
 
 var I18nScope$36 = _$1.partial(h.i18nScope, 'projects.dashboard_goal');
@@ -14934,4 +14918,4 @@ var c = {
 return c;
 
 }(m,I18n,_,moment,$,postgrest,CatarseAnalytics,replaceDiacritics,Chart));
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjpudWxsLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OyJ9
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjpudWxsLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7In0=
