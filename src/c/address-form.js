@@ -382,7 +382,7 @@ const addressForm = {
                                         class: errors.stateID() ? 'error' : '',
                                         onchange: m.withAttr('value', ctrl.fields.stateID)
                                     }, [
-                                        m('option[value=\'\']'),
+                                        m('option', { value: '' }),
                                         (!_.isEmpty(ctrl.states()) ?
                                             _.map(ctrl.states(), state => m('option', {
                                                 value: state.id,
