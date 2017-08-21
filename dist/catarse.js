@@ -1,4 +1,4 @@
-var c = (function (m,I18n$1,_$1,moment,$$1,postgrest$1,CatarseAnalytics$1,replaceDiacritics,Chart) {
+var c = (function (m,I18n$1,_$1,moment,$$1,postgrest$1,CatarseAnalytics$1,replaceDiacritics,Chart,select) {
 'use strict';
 
 m = 'default' in m ? m['default'] : m;
@@ -10,6 +10,7 @@ postgrest$1 = 'default' in postgrest$1 ? postgrest$1['default'] : postgrest$1;
 CatarseAnalytics$1 = 'default' in CatarseAnalytics$1 ? CatarseAnalytics$1['default'] : CatarseAnalytics$1;
 replaceDiacritics = 'default' in replaceDiacritics ? replaceDiacritics['default'] : replaceDiacritics;
 Chart = 'default' in Chart ? Chart['default'] : Chart;
+select = 'default' in select ? select['default'] : select;
 
 var models = {
     country: postgrest$1.model('countries'),
@@ -73,6 +74,7 @@ var models = {
 models.teamMember.pageSize(40);
 models.rewardDetail.pageSize(false);
 models.shippingFee.pageSize(false);
+models.projectReminder.pageSize(false);
 models.project.pageSize(30);
 models.category.pageSize(50);
 models.contributionActivity.pageSize(40);
@@ -3884,7 +3886,7 @@ var projectCard = {
             onclick: projectVM.routeToProject(project, args.ref)
         }, project.project_name || project.name)]), m(ctrl.css().author, I18n$1.t('by', I18nScope$3()) + ' ' + projectOwnerName), m(ctrl.css().headline, [m('a.link-hidden[href="/' + project.permalink + '?ref=' + args.ref + '"]', {
             onclick: projectVM.routeToProject(project, args.ref)
-        }, project.headline)])]), m(ctrl.css().city, [m('.fontsize-smallest.fontcolor-secondary', [m('span.fa.fa-map-marker.fa-1', ' '), projectAddress])]), m(ctrl.cardMeter(), [ctrl.isFinished(project) ? m('div', project.state === 'successful' && ctrl.progress < 100 ? I18n$1.t('display_status.flex_successful', I18nScope$3()) : I18n$1.t('display_status.' + project.state, I18nScope$3())) : m('.meter', [m('.meter-fill', {
+        }, project.headline)])]), m(ctrl.css().city, [m('.fontsize-smallest.fontcolor-secondary', [m('span.fa.fa-fw.fa-map-marker.fa-1', ' '), projectAddress])]), m(ctrl.cardMeter(), [ctrl.isFinished(project) ? m('div', project.state === 'successful' && ctrl.progress < 100 ? I18n$1.t('display_status.flex_successful', I18nScope$3()) : I18n$1.t('display_status.' + project.state, I18nScope$3())) : m('.meter', [m('.meter-fill', {
             style: {
                 width: (ctrl.progress > 100 ? 100 : ctrl.progress) + '%'
             }
@@ -4723,9 +4725,9 @@ var projectSuccessfulOnboard = {
             content: [successfulProjectTaxModal, {
                 projectTransfer: projectTransfer
             }]
-        }) : '', !lpa() && !lpt() ? m('.w-container', [m('.w-row.u-marginbottom-40', [m('.w-col.w-col-6.w-col-push-3', [m('.u-text-center', [m('img.u-marginbottom-20', { src: I18n$1.t('start.icon', I18nScope$6()), width: 94 }), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n$1.t('start.title', I18nScope$6())), m('.fontsize-base.u-marginbottom-30', {
+        }) : '', !lpa() && !lpt() ? m('.w-container', [m('.w-row.u-marginbottom-40', [m('.w-col.w-col-6.w-col-push-3', [m('.u-text-center', [m('img.u-marginbottom-20', { src: I18n$1.t('finished.icon', I18nScope$6()), width: 94 }), m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n$1.t('finished.title', I18nScope$6())), m('.fontsize-base.u-marginbottom-30', {
             config: ctrl.listenToReplace
-        }, m.trust(I18n$1.t('start.text', I18nScope$6({ total_amount: h.formatNumber(projectTransfer.total_amount, 2) })))), m('a.btn.btn-large.btn-inline', { href: '/users/' + args.project().user_id + '/edit#balance' }, I18n$1.t('start.cta', I18nScope$6()))])])])]) : h.loader()]);
+        }, m.trust(I18n$1.t('finished.text', I18nScope$6({ link_news: '/projects/' + args.project().id + '/posts' }))))])])])]) : h.loader()]);
     }
 };
 
@@ -4780,24 +4782,6 @@ var facebookButton = {
 var copyTextInput = {
     controller: function controller(args) {
         var showSuccess = m.prop(false);
-
-        var select = function select(el) {
-            var range = void 0,
-                selection = void 0;
-
-            if (document.body.createTextRange) {
-                range = document.body.createTextRange();
-                range.moveToElementText(el);
-                range.select();
-            } else if (window.getSelection) {
-                selection = window.getSelection();
-                range = document.createRange();
-                range.selectNodeContents(el);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        };
-
         var setClickHandler = function setClickHandler(el, isInitialized) {
             var copy = void 0;
             if (!isInitialized) {
@@ -4805,7 +4789,6 @@ var copyTextInput = {
                     var textarea = el.parentNode.previousSibling.firstChild;
 
                     textarea.innerText = args.value; //This fixes an issue when instantiating multiple copy clipboard components
-
                     el.onclick = function () {
                         select(textarea);
                         copy = document.execCommand('copy');
@@ -5877,20 +5860,20 @@ var projectContributionReportContentCard = {
             onclick: function onclick() {
                 return ctrl.selectContribution(contribution);
             }
-        }) : ''))), m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.w-row', [m('.w-col.w-col-1.w-col-tiny-1', [m('img.user-avatar.u-marginbottom-10[src=\'' + profileImg + '\']')]), m('.w-col.w-col-11.w-col-tiny-11', [m('.w-row', [m('.w-col.w-col-3', [m('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.user_name), m('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m('a.link-hidden-light.badge.badge-light', '+1 apoio ')] : '', contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' ' + I18n$1.t('contribution.anonymous_contribution', contributionScope()))) : '']), m('.fontsize-smallest.lineheight-looser', contribution.email)]), m('.w-col.w-col-3', [m('.lineheight-tighter', [m('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m('span.fontsize-large', 'R$ ' + h.formatNumber(contribution.value, 2, 3))])]), m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m('div', deliveryBadge()), m('.fontsize-smallest.fontweight-semibold', I18n$1.t('reward', I18nScope$16()) + ': ' + (reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : '')), m('.fontsize-smallest.fontweight-semibold', reward.title), m('.fontsize-smallest.fontcolor-secondary', reward.description.substring(0, 80) + '...')]), survey ? survey.survey_answered_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-success', 'respondido')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.survey_answered_at, 'DD/MM/YYYY'))]) : survey.finished_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-fail', 'sem resposta')]), m('.fontcolor-terciary.fontsize-smallest', 'finalizado em ' + h.momentify(survey.finished_at, 'DD/MM/YYYY'))]) : m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-waiting', 'enviado')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.sent_at, 'DD/MM/YYYY'))]) : ''])])]))]), m('a.arrow-admin.fa.fa-chevron-down.fontcolor-secondary.w-inline-block', {
+        }) : ''))), m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11', m('.w-row', [m('.w-col.w-col-1.w-col-tiny-1', [m('img.user-avatar.u-marginbottom-10[src=\'' + profileImg + '\']')]), m('.w-col.w-col-11.w-col-tiny-11', [m('.w-row', [m('.w-col.w-col-3', [m('.fontcolor-secondary.fontsize-mini.fontweight-semibold', h.momentify(contribution.created_at, 'DD/MM/YYYY, HH:mm')), m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.public_user_name || contribution.user_name), m('.fontsize-smallest.lineheight-looser', [contribution.has_another ? [m('a.link-hidden-light.badge.badge-light', '+1 apoio ')] : '', contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ' ' + I18n$1.t('contribution.anonymous_contribution', contributionScope()))) : '']), m('.fontsize-smallest.lineheight-looser', contribution.email)]), m('.w-col.w-col-3', [m('.lineheight-tighter', [m('span.fa.fontsize-smallest.' + ctrl.stateClass(contribution.state)), '   ', m('span.fontsize-large', 'R$ ' + h.formatNumber(contribution.value, 2, 3))])]), m('.w-col.w-col-3.w-hidden-small.w-hidden-tiny', [m('div', deliveryBadge()), m('.fontsize-smallest.fontweight-semibold', I18n$1.t('reward', I18nScope$16()) + ': ' + (reward.minimum_value ? h.formatNumber(reward.minimum_value, 2, 3) : '')), m('.fontsize-smallest.fontweight-semibold', reward.title), m('.fontsize-smallest.fontcolor-secondary', reward.description.substring(0, 80) + '...')]), survey ? survey.survey_answered_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-success', 'respondido')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.survey_answered_at, 'DD/MM/YYYY'))]) : survey.finished_at ? m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-fail', 'sem resposta')]), m('.fontcolor-terciary.fontsize-smallest', 'finalizado em ' + h.momentify(survey.finished_at, 'DD/MM/YYYY'))]) : m('.w-col.w-col-3.w-col-push-1', [m('.fontsize-smallest', [m('a.link-hidden', 'Questionário '), m('span.fontweight-semibold.text-waiting', 'enviado')]), m('.fontcolor-terciary.fontsize-smallest', 'em ' + h.momentify(survey.sent_at, 'DD/MM/YYYY'))]) : ''])])]))]), m('a.arrow-admin.fa.fa-chevron-down.fontcolor-secondary.w-inline-block', {
             onclick: ctrl.showDetail.toggle
         })]), ctrl.showDetail() ? m('.card.details-backed-project.w-tabs', [m('.w-tab-menu', [_$1.map(['info', 'profile'], function (tab) {
             return m('a.dashboard-nav-link.w-inline-block.w-tab-link' + (ctrl.currentTab() === tab ? '.w--current' : ''), { onclick: function onclick() {
                     return ctrl.currentTab(tab);
                 } }, m('div', I18n$1.t('report.' + tab, contributionScope())));
-        })]), m('.card.card-terciary.w-tab-content', [ctrl.currentTab() === 'info' ? m('.w-tab-pane.w--tab-active', m('.w-row', [m('.right-divider.w-col.w-col-6', [m('.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.value', contributionScope()) + ': R$' + contribution.value), m(paymentStatus, { item: { payment_method: contribution.payment_method, state: contribution.state } }), m('.fontcolor-secondary.fontsize-smallest', h.momentify(contribution.created_at, 'DD/MM/YYYY hh:mm'))]), m('.fontsize-base.fontweight-semibold', I18n$1.t('reward', I18nScope$16()) + ':'), m('.fontsize-small.fontweight-semibold.u-marginbottom-10', ['R$' + reward.minimum_value + ' ' + (reward.title ? '- ' + reward.title : '') + ' ', deliveryBadge()]), m('p.fontsize-smaller', reward.description), m('.u-marginbottom-10', [m('.fontsize-smaller', [m('span.fontweight-semibold', I18n$1.t('deliver_at', I18nScope$16()) + ' '), h.momentify(reward.deliver_at, 'MMMM/YYYY')]), reward.shipping_options ? m('.fontsize-smaller', [m('span.fontweight-semibold', I18n$1.t('delivery', I18nScope$16())), I18n$1.t('shipping_options.' + reward.shipping_options, I18nScope$16())]) : ''])]), survey ? m('.w-col.w-col-6', [m('.fontsize-base.fontweight-semibold', I18n$1.t('survey.survey', contributionScope())), m('.fontsize-smaller.lineheight-tighter.u-marginbottom-20', I18n$1.t('survey.answered_at', contributionScope({ date: moment(survey.survey_answered_at).format('DD/MM/YYYY') }))), survey.confirm_address && survey.address ? [m('.fontsize-small', [m('.fontweight-semibold.lineheight-looser', I18n$1.t('survey.address_title', contributionScope())), m('p', [contribution.user_name, m('br'), survey.address.address_street + ', ' + survey.address.address_number + ' ' + survey.address.address_complement, m('br'), I18n$1.t('survey.address_neighbourhood', contributionScope()) + ' ' + survey.address.address_neighbourhood, m('br'), survey.address.address_zip_code + ' ' + survey.address.address_city + '-' + survey.state_name, m('br'), survey.country_name])])] : '', _$1.map(survey.multiple_choice_questions, function (mcQuestion) {
+        })]), m('.card.card-terciary.w-tab-content', [ctrl.currentTab() === 'info' ? m('.w-tab-pane.w--tab-active', m('.w-row', [m('.right-divider.w-col.w-col-6', [m('.u-marginbottom-20', [m('.fontsize-base.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.value', contributionScope()) + ': R$' + contribution.value), m(paymentStatus, { item: { payment_method: contribution.payment_method, state: contribution.state } }), m('.fontcolor-secondary.fontsize-smallest', h.momentify(contribution.created_at, 'DD/MM/YYYY hh:mm'))]), m('.fontsize-base.fontweight-semibold', I18n$1.t('reward', I18nScope$16()) + ':'), m('.fontsize-small.fontweight-semibold.u-marginbottom-10', ['R$' + reward.minimum_value + ' ' + (reward.title ? '- ' + reward.title : '') + ' ', deliveryBadge()]), m('p.fontsize-smaller', reward.description), m('.u-marginbottom-10', [m('.fontsize-smaller', [m('span.fontweight-semibold', I18n$1.t('deliver_at', I18nScope$16()) + ' '), h.momentify(reward.deliver_at, 'MMMM/YYYY')]), reward.shipping_options ? m('.fontsize-smaller', [m('span.fontweight-semibold', I18n$1.t('delivery', I18nScope$16())), I18n$1.t('shipping_options.' + reward.shipping_options, I18nScope$16())]) : ''])]), survey ? m('.w-col.w-col-6', [m('.fontsize-base.fontweight-semibold', I18n$1.t('survey.survey', contributionScope())), m('.fontsize-smaller.lineheight-tighter.u-marginbottom-20', I18n$1.t('survey.answered_at', contributionScope({ date: moment(survey.survey_answered_at).format('DD/MM/YYYY') }))), survey.confirm_address && survey.address ? [m('.fontsize-small', [m('.fontweight-semibold.lineheight-looser', I18n$1.t('survey.address_title', contributionScope())), m('p', [contribution.public_user_name, m('br'), survey.address.address_street + ', ' + survey.address.address_number + ' ' + survey.address.address_complement, m('br'), I18n$1.t('survey.address_neighbourhood', contributionScope()) + ' ' + survey.address.address_neighbourhood, m('br'), survey.address.address_zip_code + ' ' + survey.address.address_city + '-' + survey.state_name, m('br'), survey.country_name])])] : '', _$1.map(survey.multiple_choice_questions, function (mcQuestion) {
             var answer = _$1.find(mcQuestion.question_choices, function (choice) {
                 return choice.id === mcQuestion.survey_question_choice_id;
             });
             return !answer ? '' : m('.fontsize-small', [m('.fontweight-semibold.lineheight-looser', mcQuestion.question), m('p', answer.option)]);
         }), _$1.map(survey.open_questions, function (openQuestion) {
             return m('.fontsize-small', [m('.fontweight-semibold.lineheight-looser', openQuestion.question), m('p', openQuestion.answer)]);
-        })]) : ''])) : m('.w-tab-pane', m('.fontsize-small', m('p', [contribution.user_name, m('br'), contribution.email, m('br'), I18n$1.t('user_since', contributionScope({ date: h.momentify(contribution.user_created_at, 'MMMM YYYY') })), m('br'), I18n$1.t('backed_projects', contributionScope({ count: contribution.total_contributed_projects })), m('br'), I18n$1.t('created_projects', contributionScope({ count: contribution.total_published_projects }))])))])]) : '']);
+        })]) : ''])) : m('.w-tab-pane', m('.fontsize-small', m('p', ['Nome completo: ' + contribution.user_name, m('br'), 'Nome p\xFAblico: ' + contribution.public_user_name, m('br'), contribution.email, m('br'), I18n$1.t('user_since', contributionScope({ date: h.momentify(contribution.user_created_at, 'MMMM YYYY') })), m('br'), I18n$1.t('backed_projects', contributionScope({ count: contribution.total_contributed_projects })), m('br'), I18n$1.t('created_projects', contributionScope({ count: contribution.total_published_projects }))])))])]) : '']);
     }
 };
 
@@ -6083,11 +6066,11 @@ var projectContributionReportContent = {
             onclick: function onclick() {
                 return ctrl.displayDeliverModal.toggle();
             }
-        }, 'Enviada'), m('a.dropdown-link.fontsize-smaller[href=\'#\']', {
+        }, 'Entregue'), m('a.dropdown-link.fontsize-smaller[href=\'#\']', {
             onclick: function onclick() {
                 return ctrl.displayErrorModal.toggle();
             }
-        }, 'Erro no envio')]) : '']) : '']), m('.w-clearfix.w-col.w-col-4', m('a.alt-link.fontsize-small.lineheight-looser.u-right', { onclick: function onclick() {
+        }, 'Erro na entrega')]) : '']) : '']), m('.w-clearfix.w-col.w-col-4', m('a.alt-link.fontsize-small.lineheight-looser.u-right', { onclick: function onclick() {
                 return args.showDownloads(true);
             } }, [m('span.fa.fa-download', ''), ' Baixar relatórios']))])), _$1.map(list.collection(), function (item) {
             var contribution = m.prop(item);
@@ -6193,7 +6176,7 @@ var ProjectContributionStateLegendModal = {
 
 var ProjectContributionDeliveryLegendModal = {
     view: function view(ctrl, args) {
-        return m('div', [m('.modal-dialog-header', [m('.fontsize-large.u-text-center', 'Status da entrega')]), m('.modal-dialog-content', [m('.fontsize-smaller.u-marginbottom-30', 'Todo apoio tem, por padrão, o status de entrega \'Não enviada\'. Para ajudar no seu controle da entrega de recompensas, você pode alterar esses status e filtrar a pesquisa de apoios com os seguintes rótulos:'), m('.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold', ['Não enviada', m.trust('&nbsp;')]), m('.fontsize-smaller', 'Você ainda não enviou a recompensa para o apoiador.')]), m('div', m('span.fontsize-smaller.badge.badge-success', 'Enviada')), m('.u-marginbottom-20', m('.fontsize-smaller', 'Você já enviou a recompensa para o apoiador.')), m('.u-marginbottom-20', [m('div', m('span.fontsize-smaller.badge.badge-attention', 'Erro no envio')), m('.fontsize-smaller', 'Você enviou a recompensa, mas houve algum problema com o envio (ex: endereço incorreto).')]), m('.u-marginbottom-20', [m('div', m('span.fontsize-smaller.badge.badge-success', [m('span.fa.fa-check-circle', ''), ' Recebida'])), m('.fontsize-smaller', 'O apoiador marcou a recompensa como \'Recebida\' no seu painel de controle \o/')])]), m('.divider.u-marginbottom-10'), m('.fontcolor-secondary.fontsize-smaller.u-marginbottom-30', ['Obs: mesmo que a recompensa não seja física (como uma cópia digital, por exemplo), você pode mesmo assim usar o sistema acima!'])]);
+        return m('div', [m('.modal-dialog-header', [m('.fontsize-large.u-text-center', 'Status da entrega')]), m('.modal-dialog-content', [m('.fontsize-smaller.u-marginbottom-30', 'Todo apoio tem, por padrão, o status de entrega \'Não enviada\'. Para ajudar no seu controle da entrega de recompensas, você pode alterar esses status e filtrar a pesquisa de apoios com os seguintes rótulos:'), m('.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold', ['Não enviada', m.trust('&nbsp;')]), m('.fontsize-smaller', 'Você ainda não enviou a recompensa para o apoiador.')]), m('div', m('span.fontsize-smaller.badge.badge-success', 'Entregue')), m('.u-marginbottom-20', m('.fontsize-smaller', 'Você já enviou a recompensa para o apoiador.')), m('.u-marginbottom-20', [m('div', m('span.fontsize-smaller.badge.badge-attention', 'Erro na entrega')), m('.fontsize-smaller', 'Você enviou a recompensa, mas houve algum problema com o envio (ex: endereço incorreto).')]), m('.u-marginbottom-20', [m('div', m('span.fontsize-smaller.badge.badge-success', [m('span.fa.fa-check-circle', ''), ' Recebida'])), m('.fontsize-smaller', 'O apoiador marcou a recompensa como \'Recebida\' no seu painel de controle \o/')])]), m('.divider.u-marginbottom-10'), m('.fontcolor-secondary.fontsize-smaller.u-marginbottom-30', ['Obs: mesmo que a recompensa não seja física (como uma cópia digital, por exemplo), você pode mesmo assim usar o sistema acima!'])]);
     }
 };
 
@@ -7772,7 +7755,7 @@ var projectRewardCard = {
 
             var shippingFee = vm.shippingFeeForCurrentReward(selectedDestination) ? Number(vm.shippingFeeForCurrentReward(selectedDestination).value) : 0;
             var rewardMinValue = Number(vm.selectedReward().minimum_value);
-            vm.applyMask(shippingFee + rewardMinValue + ',00');
+            vm.applyMask('' + h.formatNumber(shippingFee + rewardMinValue, 2, 3));
         };
 
         // @TODO: move submit, fee & value logic to VM
@@ -7783,7 +7766,7 @@ var projectRewardCard = {
             if (!selectedDestination() && rewardVM.hasShippingOptions(vm.selectedReward())) {
                 vm.error('Por favor, selecione uma opção de frete válida.');
             } else if (valueFloat < vm.selectedReward().minimum_value + shippingFee.value) {
-                vm.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + vm.selectedReward().minimum_value + ' + frete R$' + h.formatNumber(shippingFee.value));
+                vm.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + vm.selectedReward().minimum_value + ' + frete R$' + h.formatNumber(shippingFee.value, 2, 3));
             } else {
                 vm.error('');
                 var valueUrl = window.encodeURIComponent(String(valueFloat).replace('.', ','));
@@ -7861,7 +7844,7 @@ var projectRewardCard = {
             onchange: m.withAttr('value', ctrl.selectDestination),
             value: ctrl.selectedDestination()
         }, _$1.map(ctrl.locationOptions(reward, ctrl.selectedDestination), function (option) {
-            return m('option', { selected: option.value === ctrl.selectedDestination(), value: option.value }, [option.name + ' ', option.value != '' ? '+R$' + option.fee : null]);
+            return m('option', { selected: option.value === ctrl.selectedDestination(), value: option.value }, [option.name + ' ', option.value != '' ? '+R$' + h.formatNumber(option.fee, 2, 3) : null]);
         }))]) : '', m('.fontcolor-secondary.u-marginbottom-10', 'Valor do apoio'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('.back-reward-input-reward.placeholder', 'R$')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.w-input.back-reward-input-reward[type="tel"]', {
             config: ctrl.setInput,
             onkeyup: m.withAttr('value', ctrl.applyMask),
@@ -7986,7 +7969,7 @@ var projectContributions$1 = {
             stats = ctrl.contributionsStats(),
             groupedCollection = ctrl.groupedCollection(list.collection());
 
-        return m('#project_contributions', m('#contributions_top', [m('.section.w-section', m('.w-container', m('.w-row', ctrl.lContributionsStats() ? h.loader() : !_$1.isEmpty(stats) ? [m('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [m('.fontsize-megajumbo', stats.total), m('.fontsize-large', 'pessoas apoiam este projeto')]), m('.w-col.w-col-6', m('.card.card-terciary.u-radius', m('.w-row', [m('.u-marginbottom-20.w-col.w-col-6.w-col-small-6', [m('.fontweight-semibold.u-marginbottom-10', 'Apoiadores novos'), m('.fontsize-largest.u-marginbottom-10', Math.floor(stats.new_percent) + '%'), m('.fontsize-smallest', 'apoiadores que nunca tinham apoiado um projeto no Catarse')]), m('.w-col.w-col-6.w-col-small-6', [m('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'), m('.fontweight-semibold.u-marginbottom-10', 'Apoiadores recorrentes'), m('.fontsize-largest.u-marginbottom-10', Math.ceil(stats.returning_percent) + '%'), m('.fontsize-smallest', 'apoiadores que já tinham apoiado um projeto no Catarse')])])))] : ''))), m('.divider.w-section'), m('.section.w-section', m('.w-container', [m('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Apoiadores'), m('.project-contributions.w-clearfix', _$1.map(groupedCollection, function (group, idx) {
+        return m('#project_contributions', m('#contributions_top', [m('.section.w-section', m('.w-container', m('.w-row', ctrl.lContributionsStats() ? h.loader() : !_$1.isEmpty(stats) ? [m('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6', [m('.fontsize-megajumbo', stats.total), m('.fontsize-large', 'pessoas apoiam este projeto')]), m('.w-col.w-col-6', m('.card.card-terciary.u-radius', m('.w-row', [m('.u-marginbottom-20.w-col.w-sub-col.w-col-6.w-col-small-6', [m('.fontweight-semibold.u-marginbottom-10', 'Apoiadores novos'), m('.fontsize-largest.u-marginbottom-10', Math.floor(stats.new_percent) + '%'), m('.fontsize-smallest', 'apoiadores que nunca tinham apoiado um projeto no Catarse')]), m('.w-col.w-sub-col.w-col-6.w-col-small-6', [m('.divider.u-marginbottom-20.w-hidden-main.w-hidden-medium.w-hidden-small'), m('.fontweight-semibold.u-marginbottom-10', 'Apoiadores recorrentes'), m('.fontsize-largest.u-marginbottom-10', Math.ceil(stats.returning_percent) + '%'), m('.fontsize-smallest', 'apoiadores que já tinham apoiado um projeto no Catarse')])])))] : ''))), m('.divider.w-section'), m('.section.w-section', m('.w-container', [m('.fontsize-large.fontweight-semibold.u-marginbottom-40.u-text-center', 'Apoiadores'), m('.project-contributions.w-clearfix', _$1.map(groupedCollection, function (group, idx) {
             return m('.w-row', _$1.map(group, function (contribution) {
                 return m('.project-contribution-item.w-col.w-col-4', [
                 // here new card
@@ -8285,6 +8268,7 @@ var I18nIntScope = _$1.partial(h.i18nScope, 'projects.contributions.edit_interna
 
 var paymentVM = function paymentVM() {
     var pagarme = m.prop({}),
+        defaultCountryID = 36,
         submissionError = m.prop(false),
         isLoading = m.prop(false);
 
@@ -8296,19 +8280,9 @@ var paymentVM = function paymentVM() {
 
     var fields = {
         completeName: m.prop(''),
-        anonymous: m.prop(),
-        countries: m.prop(),
-        userCountryId: m.prop(),
-        zipCode: m.prop(''),
-        street: m.prop(''),
-        number: m.prop(''),
-        addressComplement: m.prop(''),
-        neighbourhood: m.prop(''),
-        city: m.prop(''),
-        states: m.prop([]),
-        userState: m.prop(),
+        anonymous: h.toggleProp(false, true),
+        address: m.prop({ country_id: defaultCountryID }),
         ownerDocument: m.prop(''),
-        phone: m.prop(''),
         errors: m.prop([])
     };
 
@@ -8324,24 +8298,14 @@ var paymentVM = function paymentVM() {
     };
 
     var populateForm = function populateForm(fetchedData) {
-        var data = _$1.first(fetchedData) || { address: {} },
-            defaultCountry = fields.countries() ? _$1.findWhere(fields.countries(), { name: 'Brasil' }).id : null,
-            countryId = data.address && data.address.country_id || defaultCountry;
+        var data = _$1.first(fetchedData) || { address: {} };
 
         if (!_$1.isEmpty(data.address)) {
-            fields.city(data.address.address_city);
-            fields.zipCode(data.address.address_zip_code);
-            fields.street(data.address.address_street);
-            fields.number(data.address.address_number);
-            fields.addressComplement(data.address.address_complement);
-            fields.userState(data.address.address_state);
-            fields.neighbourhood(data.address.address_neighbourhood);
-            fields.phone(data.address.phone_number);
+            fields.address(_$1.omit(data.address, 'id'));
         }
 
         fields.completeName(data.name);
         fields.ownerDocument(data.owner_document);
-        fields.userCountryId(countryId);
 
         creditCardFields.cardOwnerDocument(data.owner_document);
     };
@@ -8360,7 +8324,7 @@ var paymentVM = function paymentVM() {
     };
 
     var isInternational = function isInternational() {
-        return !_$1.isEmpty(fields.countries()) ? fields.userCountryId() != _$1.findWhere(fields.countries(), { name: 'Brasil' }).id : false;
+        return parseInt(fields.address().country_id) !== defaultCountryID;
     };
 
     var scope = function scope(data) {
@@ -8375,9 +8339,7 @@ var paymentVM = function paymentVM() {
         var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'aon';
         return I18n$1.translations[I18n$1.currentLocale()].projects.faq[mode];
     },
-        currentUser = h.getUser() || {},
-        countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
-        statesLoader = postgrest$1.loader(models.state.getPageOptions());
+        currentUser = h.getUser() || {};
 
     var checkEmptyFields = function checkEmptyFields(checkedFields) {
         return _$1.map(checkedFields, function (field) {
@@ -8416,37 +8378,17 @@ var paymentVM = function paymentVM() {
         }
     };
 
-    var checkUserState = function checkUserState() {
-        if (_$1.isEmpty(fields.userState()) || fields.userState() === 'null') {
-            fields.errors().push({ field: 'userState', message: I18n$1.t('validation.state', scope()) });
-        }
-    };
-
-    var checkPhone = function checkPhone() {
-        var phone = fields.phone(),
-            strippedPhone = String(phone).replace(/[\(|\)|\-|\s]*/g, ''),
-            error = { field: 'phone', message: I18n$1.t('validation.phone', scope()) };
-
-        if (strippedPhone.length < 10) {
-            fields.errors().push(error);
-        } else {
-            var controlDigit = Number(strippedPhone.charAt(2));
-            if (!(controlDigit >= 2 && controlDigit <= 9)) {
-                fields.errors().push(error);
-            }
-        }
-    };
-
     var validate = function validate() {
         fields.errors([]);
+        if (!fields.validate()) {
+            return false;
+        }
 
-        checkEmptyFields(['completeName', 'zipCode', 'street', 'userState', 'city', 'userCountryId']);
+        checkEmptyFields(['completeName']);
 
         if (!isInternational()) {
-            checkEmptyFields(['phone', 'number', 'neighbourhood', 'ownerDocument', 'userState']);
-            checkUserState();
+            checkEmptyFields(['ownerDocument']);
             checkDocument();
-            checkPhone();
         }
 
         return _$1.isEmpty(fields.errors());
@@ -8604,17 +8546,9 @@ var paymentVM = function paymentVM() {
     var updateContributionData = function updateContributionData(contribution_id, project_id) {
         var contributionData = {
             anonymous: fields.anonymous(),
-            country_id: fields.userCountryId(),
-            payer_name: fields.completeName(),
             payer_document: fields.ownerDocument(),
-            address_street: fields.street(),
-            address_number: fields.number(),
-            address_complement: fields.addressComplement(),
-            address_neighbourhood: fields.neighbourhood(),
-            address_zip_code: fields.zipCode(),
-            address_city: fields.city(),
-            address_state: fields.userState(),
-            address_phone_number: fields.phone(),
+            payer_name: fields.completeName(),
+            address_attributes: fields.address(),
             card_owner_document: creditCardFields.cardOwnerDocument()
         };
 
@@ -8711,22 +8645,12 @@ var paymentVM = function paymentVM() {
 
     var applyCreditCardMask = _$1.compose(creditCardFields.number, creditCardMask);
 
-    countriesLoader.load().then(function (data) {
-        var countryId = fields.userCountryId() || _$1.findWhere(data, { name: 'Brasil' }).id;
-        fields.countries(_$1.sortBy(data, 'name_en'));
-        fields.userCountryId(countryId);
-
-        userVM.fetchUser(currentUser.user_id, false).then(populateForm);
-    });
-
-    statesLoader.load().then(function (data) {
-        fields.states().push({ acronym: null, name: 'Estado' });
-        _$1.map(data, function (state) {
-            return fields.states().push(state);
-        });
-    });
+    var fetchUser = function fetchUser() {
+        return userVM.fetchUser(currentUser.user_id, false).then(populateForm);
+    };
 
     return {
+        fetchUser: fetchUser,
         fields: fields,
         validate: validate,
         isInternational: isInternational,
@@ -8764,6 +8688,10 @@ var rewardSelectCard = {
         };
         var selectedDestination = m.prop('');
         var queryRewardId = h.getParams('reward_id');
+        var queryRewardValue = h.getParams('value');
+        if (queryRewardValue) {
+            rewardVM.setValue(h.formatNumber(Number(queryRewardValue / 100), 2, 3));
+        }
 
         var submitContribution = function submitContribution(event) {
             var valueFloat = h.monetaryToFloat(rewardVM.contributionValue);
@@ -8774,7 +8702,7 @@ var rewardSelectCard = {
             if (!selectedDestination() && rewardVM.hasShippingOptions(rewardVM.selectedReward())) {
                 rewardVM.error('Por favor, selecione uma opção de frete válida.');
             } else if (valueFloat < rewardVM.selectedReward().minimum_value + shippingFee.value) {
-                rewardVM.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + rewardVM.selectedReward().minimum_value + ' + frete R$' + h.formatNumber(shippingFee.value));
+                rewardVM.error('O valor de apoio para essa recompensa deve ser de no m\xEDnimo R$' + rewardVM.selectedReward().minimum_value + ' + frete R$' + h.formatNumber(shippingFee.value, 2, 3));
             } else {
                 rewardVM.error('');
                 var valueUrl = window.encodeURIComponent(String(valueFloat).replace('.', ','));
@@ -8790,7 +8718,7 @@ var rewardSelectCard = {
             selectedDestination(destination);
             var shippingFee = rewardVM.shippingFeeForCurrentReward(selectedDestination) ? Number(rewardVM.shippingFeeForCurrentReward(selectedDestination).value) : 0;
             var rewardMinValue = Number(rewardVM.selectedReward().minimum_value);
-            rewardVM.applyMask(shippingFee + rewardMinValue + ',00');
+            rewardVM.applyMask('' + h.formatNumber(shippingFee + rewardMinValue, 2, 3));
         };
 
         var normalReward = function normalReward(reward) {
@@ -8840,7 +8768,7 @@ var rewardSelectCard = {
         }), m('label.w-form-label.fontsize-base.fontweight-semibold.u-marginbottom-10[for="contribution_reward_' + reward.id + '"]', 'R$ ' + h.formatNumber(reward.minimum_value) + ' ou mais'), !ctrl.isSelected(reward) ? '' : m('.w-row.back-reward-money', [rewardVM.hasShippingOptions(reward) ? m('.w-sub-col.w-col.w-col-4', [m('.fontcolor-secondary.u-marginbottom-10', 'Local de entrega'), m('select.positive.text-field.w-select', {
             onchange: m.withAttr('value', ctrl.selectDestination)
         }, _$1.map(ctrl.locationOptions(reward, ctrl.selectedDestination), function (option) {
-            return m('option', { value: option.value }, [option.name + ' ', option.value != '' ? '+R$' + option.fee : null]);
+            return m('option', { value: option.value }, [option.name + ' ', option.value != '' ? '+R$' + h.formatNumber(option.fee, 2, 3) : null]);
         }))]) : '', m('.w-sub-col.w-col.w-clearfix', {
             class: rewardVM.hasShippingOptions(reward) ? 'w-col-4' : 'w-col-8'
         }, [m('.fontcolor-secondary.u-marginbottom-10', 'Valor do apoio'), m('.w-row.u-marginbottom-20', [m('.w-col.w-col-3.w-col-small-3.w-col-tiny-3', m('.back-reward-input-reward.medium.placeholder', 'R$')), m('.w-col.w-col-9.w-col-small-9.w-col-tiny-9', m('input.back-reward-input-reward.medium.w-input', {
@@ -8882,7 +8810,7 @@ var faqBox = {
                 _.extend(updatedQuestions, defineProperty({}, idx + 1, {
                     question: I18n$1.t(tKey() + '.questions.' + idx + '.question', I18nScope$27()),
                     answer: I18n$1.t(tKey() + '.questions.' + idx + '.answer', I18nScope$27({ userLink: '/users/' + user().id,
-                        userName: user().name
+                        userName: user().public_name || user().name
                     }))
                 }));
             });
@@ -9233,32 +9161,129 @@ var surveyPreview = {
     }
 };
 
+var countrySelect = {
+    controller: function controller(args) {
+        var countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
+            countries = m.prop(),
+            defaultCountryID = args.defaultCountryID,
+            defaultForeignCountryID = args.defaultForeignCountryID,
+            fields = args.fields,
+            international = args.international(fields.countryID() !== '' && fields.countryID() !== defaultCountryID);
+
+        var changeCountry = function changeCountry(countryID) {
+            fields.countryID(parseInt(countryID));
+            args.international(parseInt(countryID) !== defaultCountryID);
+        };
+
+        countriesLoader.load().then(function (countryData) {
+            return countries(_$1.sortBy(countryData, 'name_en'));
+        });
+        return {
+            changeCountry: changeCountry,
+            defaultCountryID: defaultCountryID,
+            defaultForeignCountryID: defaultForeignCountryID,
+            fields: fields,
+            international: international,
+            countries: countries
+        };
+    },
+    view: function view(ctrl, args) {
+        var fields = ctrl.fields;
+        if (args.countryName) {
+            args.countryName(ctrl.countries() && fields.countryID() ? _$1.find(ctrl.countries(), function (country) {
+                return country.id === parseInt(fields.countryID());
+            }).name_en : '');
+        }
+
+        return m('.u-marginbottom-30.w-row', [m('.w-col.w-col-6', [m('.field-label.fontweight-semibold', ['País / ', m('em', 'Country'), ' *']), m('select#country.positive.text-field.w-select', {
+            onchange: function onchange(e) {
+                ctrl.changeCountry(e.target.value);
+            }
+        }, [!_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
+            return m('option', {
+                selected: country.id === ctrl.fields.countryID(),
+                value: country.id
+            }, country.name_en);
+        }) : ''])]), m('.w-col.w-col-6')]);
+    }
+};
+
+var nationalityRadio = {
+    controller: function controller(args) {
+        var defaultCountryID = args.defaultCountryID,
+            defaultForeignCountryID = args.defaultForeignCountryID,
+            international = args.international;
+
+        return {
+            defaultCountryID: defaultCountryID,
+            defaultForeignCountryID: defaultForeignCountryID,
+            international: international
+        };
+    },
+    view: function view(ctrl, args) {
+        var international = ctrl.international,
+            fields = args.fields;
+
+        return m('div', m('.w-row', [m('.w-col.w-col-4', m('.fontsize-small.fontweight-semibold', 'Nacionalidade:')), m('.w-col.w-col-4', m('.fontsize-small.w-radio', [m("input.w-radio-input[name='nationality'][type='radio']", {
+            checked: !international(),
+            onclick: function onclick() {
+                fields.countryID(ctrl.defaultCountryID);
+                international(false);
+            }
+        }), m('label.w-form-label', 'Brasileiro (a)')])), m('.w-col.w-col-4', m('.fontsize-small.w-radio', [m("input.w-radio-input[name='nationality'][type='radio']", {
+            checked: international(),
+            onclick: function onclick() {
+                if (fields.countryID() === ctrl.defaultCountryID) {
+                    fields.countryID(ctrl.defaultForeignCountryID); // USA
+                }
+                international(true);
+            }
+        }), m('label.w-form-label', 'International')]))]));
+    }
+};
+
+var addressVM = function addressVM(args) {
+    var data = args.data;
+    var international = m.prop();
+    var defaultCountryID = 36,
+        defaultForeignCountryID = 74;
+    var fields = {
+        id: m.prop(data.id || ''),
+        countryID: m.prop(data.country_id || defaultCountryID),
+        stateID: m.prop(data.state_id || ''),
+        addressStreet: m.prop(data.address_street || ''),
+        addressNumber: m.prop(data.address_number || ''),
+        addressComplement: m.prop(data.address_complement || ''),
+        addressNeighbourhood: m.prop(data.address_neighbourhood || ''),
+        addressCity: m.prop(data.address_city || ''),
+        addressState: m.prop(data.address_state || ''),
+        addressZipCode: m.prop(data.address_zip_code || ''),
+        phoneNumber: m.prop(data.phone_number || '')
+    };
+
+    return {
+        international: international,
+        defaultCountryID: defaultCountryID,
+        defaultForeignCountryID: defaultForeignCountryID,
+        fields: fields
+    };
+};
+
 var I18nScope$29 = _$1.partial(h.i18nScope, 'activerecord.attributes.address');
 
 var addressForm = {
     controller: function controller(args) {
         var parsedErrors = args.parsedErrors;
-        var countriesLoader = postgrest$1.loader(models.country.getPageOptions()),
-            statesLoader = postgrest$1.loader(models.state.getPageOptions()),
-            countries = m.prop(),
-            defaultCountryID = 36,
-            // @TODO get id from endpoint
-        states = m.prop(),
-            zipCodeErrorMessage = m.prop(''),
+        var statesLoader = postgrest$1.loader(models.state.getPageOptions()),
             data = args.fields().address(),
-            fields = {
-            id: m.prop(data.id || ''),
-            countryID: m.prop(data.country_id || defaultCountryID),
-            stateID: m.prop(data.state_id || ''),
-            addressStreet: m.prop(data.address_street || ''),
-            addressNumber: m.prop(data.address_number || ''),
-            addressComplement: m.prop(data.address_complement || ''),
-            addressNeighbourhood: m.prop(data.address_neighbourhood || ''),
-            addressCity: m.prop(data.address_city || ''),
-            addressState: m.prop(data.address_state || ''),
-            addressZipCode: m.prop(data.address_zip_code || ''),
-            phoneNumber: m.prop(data.phone_number || '')
-        },
+            vm = addressVM({
+            data: data
+        }),
+            defaultCountryID = vm.defaultCountryID,
+            defaultForeignCountryID = vm.defaultForeignCountryID,
+            states = m.prop(),
+            zipCodeErrorMessage = m.prop(''),
+            fields = args.addressFields || vm.fields,
             errors = {
             countryID: m.prop(parsedErrors ? parsedErrors.hasError('country_id') : false),
             stateID: m.prop(parsedErrors ? parsedErrors.hasError('state') : false),
@@ -9275,21 +9300,44 @@ var addressForm = {
             zipcodeMask = _$1.partial(h.mask, '99999-999'),
             applyZipcodeMask = _$1.compose(fields.addressZipCode, zipcodeMask),
             applyPhoneMask = _$1.compose(fields.phoneNumber, phoneMask),
-            international = m.prop(fields.countryID() !== '' && fields.countryID() !== defaultCountryID);
+            international = args.international || vm.international;
 
+        var checkPhone = function checkPhone() {
+            var hasError = false;
+            var phone = fields.phoneNumber(),
+                strippedPhone = String(phone).replace(/[\(|\)|\-|\s]*/g, '');
+
+            if (strippedPhone.length < 10) {
+                errors.phoneNumber(true);
+                hasError = true;
+            } else {
+                var controlDigit = Number(strippedPhone.charAt(2));
+                if (!(controlDigit >= 2 && controlDigit <= 9)) {
+                    errors.phoneNumber(true);
+                    hasError = true;
+                }
+            }
+            return hasError;
+        };
         _$1.extend(args.fields(), {
             validate: function validate() {
                 var hasError = false;
-                var fieldsToIgnore = international() ? ['id', 'stateID', 'addressComplement', 'addressNumber', 'addressNeighbourhood', 'phoneNumber'] : ['id', 'addressComplement', 'addressState'];
+                var fieldsToIgnore = international() ? ['id', 'stateID', 'addressComplement', 'addressNumber', 'addressNeighbourhood', 'phoneNumber'] : ['id', 'addressComplement', 'addressState', 'phoneNumber'];
+                // clear all errors
                 _$1.mapObject(errors, function (val, key) {
                     val(false);
                 });
+                // check for empty fields
                 _$1.mapObject(_$1.omit(fields, fieldsToIgnore), function (val, key) {
                     if (!val()) {
                         errors[key](true);
                         hasError = true;
                     }
                 });
+                if (!international()) {
+                    var hasPhoneError = checkPhone();
+                    hasError = hasError || hasPhoneError;
+                }
                 return !hasError;
             }
         });
@@ -9319,9 +9367,6 @@ var addressForm = {
             }
         };
 
-        countriesLoader.load().then(function (countryData) {
-            return countries(_$1.sortBy(countryData, 'name_en'));
-        });
         statesLoader.load().then(states);
         return {
             lookupZipCode: lookupZipCode,
@@ -9330,15 +9375,17 @@ var addressForm = {
             applyPhoneMask: applyPhoneMask,
             applyZipcodeMask: applyZipcodeMask,
             defaultCountryID: defaultCountryID,
+            defaultForeignCountryID: defaultForeignCountryID,
             fields: fields,
             international: international,
-            states: states,
-            countries: countries
+            states: states
         };
     },
     view: function view(ctrl, args) {
         var fields = ctrl.fields,
             international = ctrl.international,
+            defaultCountryID = ctrl.defaultCountryID,
+            defaultForeignCountryID = ctrl.defaultForeignCountryID,
             errors = ctrl.errors,
 
         // hash to send to rails
@@ -9357,36 +9404,26 @@ var addressForm = {
         };
 
         args.fields().address(address);
-        if (args.countryName && args.stateName) {
-            args.countryName(ctrl.countries() && fields.countryID() ? _$1.find(ctrl.countries(), function (country) {
-                return country.id === parseInt(fields.countryID());
-            }).name_en : '');
+        if (args.stateName) {
             args.stateName(ctrl.states() && fields.stateID() ? _$1.find(ctrl.states(), function (state) {
                 return state.id === parseInt(fields.stateID());
             }).name : '');
         }
 
-        return m('#address-form.u-marginbottom-30.w-form', [m('.fontsize-smaller.u-marginbottom-20', '* Preenchimento obrigatório'), m('.divider.u-marginbottom-20'), m('.u-marginbottom-30', [m('div', m('.w-row', [m('.w-col.w-col-4', m('.fontsize-small.fontweight-semibold', 'Nacionalidade:')), m('.w-col.w-col-4', m('.fontsize-small.w-radio', [m("input.w-radio-input[name='nationality'][type='radio']", {
-            checked: !international(),
-            onclick: function onclick() {
-                fields.countryID(ctrl.defaultCountryID);
-                international(false);
-            }
-        }), m('label.w-form-label', 'Brasileiro (a)')])), m('.w-col.w-col-4', m('.fontsize-small.w-radio', [m("input.w-radio-input[name='nationality'][type='radio']", {
-            checked: international(),
-            onclick: function onclick() {
-                international(true);
-            }
-        }), m('label.w-form-label', 'International')]))]))]),
+        return m('#address-form.u-marginbottom-30.w-form', [!args.hideNationality ? m('.u-marginbottom-30', m(nationalityRadio, {
+            fields: fields,
+            defaultCountryID: defaultCountryID,
+            defaultForeignCountryID: defaultForeignCountryID,
+            international: international
+        })) : '',
         // @TODO move to another component
-        international() ? m('form', [m('.u-marginbottom-30.w-row', [m('.w-col.w-col-6', [m('.field-label.fontweight-semibold', ['País / ', m('em', 'Country'), ' *']), m('select.positive.text-field.w-select', {
-            onchange: m.withAttr('value', ctrl.fields.countryID)
-        }, [!_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
-            return m('option', {
-                selected: country.id === ctrl.fields.countryID(),
-                value: country.id
-            }, country.name_en);
-        }) : ''])]), m('.w-col.w-col-6')]), m('div', [m('.w-row', m('.w-col.w-col-12', [m('.field-label.fontweight-semibold', 'Address *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
+        international() ? m('form', [m(countrySelect, {
+            countryName: args.countryName,
+            fields: fields,
+            international: international,
+            defaultCountryID: defaultCountryID,
+            defaultForeignCountryID: defaultForeignCountryID
+        }), m('div', [m('.w-row', m('.w-col.w-col-12', [m('.field-label.fontweight-semibold', 'Address *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
             class: errors.addressStreet() ? 'error' : '',
             value: ctrl.fields.addressStreet(),
             onchange: m.withAttr('value', ctrl.fields.addressStreet)
@@ -9404,20 +9441,19 @@ var addressForm = {
             onchange: m.withAttr('value', ctrl.fields.addressCity)
         }), errors.addressCity() ? m(inlineError, {
             message: 'City is required'
-        }) : '']), m('.w-col.w-col-4', [m('.field-label.fontweight-semibold', 'State *'), m("input.positive.text-field.w-input[required='required'][type='text']", {
+        }) : '']), m('.w-col.w-col-4', [m('.field-label.fontweight-semibold', 'State *'), m("input#address-state.positive.text-field.w-input[required='required'][type='text']", {
             class: errors.addressState() ? 'error' : '',
             value: ctrl.fields.addressState(),
             onchange: m.withAttr('value', ctrl.fields.addressState)
         }), errors.addressState() ? m(inlineError, {
             message: 'State is required'
-        }) : ''])]))])]) : m('.w-form', [m('div', [m('.u-marginbottom-30.w-row', [m('.w-col.w-col-6', [m('.field-label.fontweight-semibold', ['País / ', m('em', 'Country'), ' *']), m('select.positive.text-field.w-select', {
-            onchange: m.withAttr('value', ctrl.fields.countryID)
-        }, [!_$1.isEmpty(ctrl.countries()) ? _$1.map(ctrl.countries(), function (country) {
-            return m('option', {
-                selected: country.id === ctrl.fields.countryID(),
-                value: country.id
-            }, country.name_en);
-        }) : ''])]), m('.w-col.w-col-6')]), m('div', [m('.w-row', [m('.w-col.w-col-6', [m('.field-label', [m('span.fontweight-semibold', I18n$1.t('address_zip_code', I18nScope$29()) + ' *'), m("a.fontsize-smallest.alt-link.u-right[href='http://www.buscacep.correios.com.br/sistemas/buscacep/'][target='_blank']", I18n$1.t('zipcode_unknown', I18nScope$29()))]), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
+        }) : ''])]))])]) : m('.w-form', [m('div', [m(countrySelect, {
+            countryName: args.countryName,
+            fields: fields,
+            international: international,
+            defaultCountryID: defaultCountryID,
+            defaultForeignCountryID: defaultForeignCountryID
+        }), m('div', [m('.w-row', [m('.w-col.w-col-6', [m('.field-label', [m('span.fontweight-semibold', I18n$1.t('address_zip_code', I18nScope$29()) + ' *'), m("a.fontsize-smallest.alt-link.u-right[href='http://www.buscacep.correios.com.br/sistemas/buscacep/'][target='_blank']", I18n$1.t('zipcode_unknown', I18nScope$29()))]), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
             class: errors.addressZipCode() ? 'error' : '',
             value: ctrl.fields.addressZipCode(),
             onkeyup: m.withAttr('value', function (value) {
@@ -9455,7 +9491,7 @@ var addressForm = {
             onchange: m.withAttr('value', ctrl.fields.addressCity)
         }), errors.addressCity() ? m(inlineError, {
             message: 'Informe uma cidade.'
-        }) : '']), m('.w-sub-col.w-col.w-col-2', [m('.field-label.fontweight-semibold', I18n$1.t('address_state', I18nScope$29()) + ' *'), m('select.positive.text-field.w-select', {
+        }) : '']), m('.w-sub-col.w-col.w-col-2', [m('.field-label.fontweight-semibold', I18n$1.t('address_state', I18nScope$29()) + ' *'), m('select#address-state.positive.text-field.w-select', {
             class: errors.stateID() ? 'error' : '',
             onchange: m.withAttr('value', ctrl.fields.stateID)
         }, [m('option', { value: '' }), !_$1.isEmpty(ctrl.states()) ? _$1.map(ctrl.states(), function (state) {
@@ -9465,7 +9501,7 @@ var addressForm = {
             }, state.acronym);
         }) : '']), errors.stateID() ? m(inlineError, {
             message: 'Informe um estado.'
-        }) : '']), m('.w-col.w-col-4', [m('.field-label.fontweight-semibold', I18n$1.t('phone_number', I18nScope$29()) + ' *'), m("input.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
+        }) : '']), m('.w-col.w-col-4', [m('.field-label.fontweight-semibold', I18n$1.t('phone_number', I18nScope$29()) + ' *'), m("input#phone.positive.text-field.w-input[placeholder='Digite apenas números'][required='required'][type='text']", {
             class: errors.phoneNumber() ? 'error' : '',
             value: ctrl.fields.phoneNumber(),
             onkeyup: m.withAttr('value', function (value) {
@@ -9473,7 +9509,7 @@ var addressForm = {
             }),
             onchange: m.withAttr('value', ctrl.fields.phoneNumber)
         }), errors.phoneNumber() ? m(inlineError, {
-            message: 'Informe um telefone.'
+            message: 'Informe um telefone válido.'
         }) : ''])])])])])]);
     }
 };
@@ -10154,12 +10190,14 @@ var userContributedList = {
             hideSurveys = ctrl.hideSurveys,
             title = ctrl.title;
 
-        return !_$1.isEmpty(collection) ? m('.section-one-column.u-marginbottom-30', m('.w-container', [m('.fontsize-larger.fontweight-semibold.u-marginbottom-30.u-text-center', title), m('.card.card-secondary.w-hidden-small.w-hidden-tiny.w-row', [m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', I18n$1.t('project_col', I18nScope$30()))), m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', I18n$1.t('contribution_col', I18nScope$30()))), m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', I18n$1.t('reward_col', I18nScope$30()))), m('.w-col.w-col-1'), !hideSurveys ? m('.w-col.w-col-2', m('.fontsize-small.fontweight-semibold', I18n$1.t('survey_col', I18nScope$30()))) : '']), _$1.map(collection, function (contribution) {
-            return m(userContributedBox, { contribution: contribution });
+        return !_$1.isEmpty(collection) ? m('div', [m('.section-one-column.u-marginbottom-30', m('.w-container', [m('.fontsize-larger.fontweight-semibold.u-marginbottom-30.u-text-center', title), m('.card.card-secondary.w-hidden-small.w-hidden-tiny.w-row', [m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', I18n$1.t('project_col', I18nScope$30()))), m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', I18n$1.t('contribution_col', I18nScope$30()))), m('.w-col.w-col-3', m('.fontsize-small.fontweight-semibold', I18n$1.t('reward_col', I18nScope$30()))), m('.w-col.w-col-1'), !hideSurveys ? m('.w-col.w-col-2', m('.fontsize-small.fontweight-semibold', I18n$1.t('survey_col', I18nScope$30()))) : '']), _$1.map(collection, function (contribution) {
+            return m(userContributedBox, {
+                contribution: contribution
+            });
         }), m('.w-row.u-marginbottom-40.u-margintop-30', [m(loadMoreBtn, {
             collection: pagination,
             cssClass: '.w-col-push-4'
-        })])])) : m('div', '');
+        })])])), m('.divider.u-marginbottom-80.u-margintop-80')]) : m('div', '');
     }
 };
 
@@ -10226,11 +10264,11 @@ var userPrivateContributed = {
             title: 'Projetos em andamento',
             collection: onlineCollection,
             pagination: ctrl.onlinePages
-        }), m('.divider.u-marginbottom-80.u-margintop-80'), m.component(userContributedList, {
+        }), m.component(userContributedList, {
             title: 'Projetos bem-sucedidos',
             collection: successfulCollection,
             pagination: ctrl.successfulPages
-        }), m('.divider.u-marginbottom-80.u-margintop-80'), m.component(userContributedList, {
+        }), m.component(userContributedList, {
             title: 'Projetos não-financiados',
             collection: failedCollection,
             pagination: ctrl.failedPages,
@@ -10509,7 +10547,7 @@ var userSettings = {
         }), m(bigCard, {
             label: I18n$1.t('address_title', I18nScope$31()),
             label_hint: I18n$1.t('address_subtitle', I18nScope$31()),
-            children: [m(addressForm, {
+            children: [m('.divider.u-marginbottom-20'), m(addressForm, {
                 fields: ctrl.fields,
                 parsedErrors: ctrl.parsedErrors
             })]
@@ -10583,7 +10621,7 @@ var UserOwnerBox = {
         var project = args.project,
             user = args.user;
 
-        return m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [args.hideAvatar ? '' : m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Dados do apoiador ' : 'Dados do usuário ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + '"]', 'Não é você?')]), m('.fontsize-base.fontweight-semibold', user.name), m('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]);
+        return m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [args.hideAvatar ? '' : m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Dados do apoiador ' : 'Dados do usuário ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + (args.reward ? '&reward_id=' + args.reward.id : '') + (args.value ? '&value=' + args.value : '') + '"]', 'Não é você?')]), m('.fontsize-base.fontweight-semibold', user.name), m('label.field-label', 'CPF/CNPJ: ' + user.owner_document)])])]);
     }
 };
 
@@ -12000,7 +12038,7 @@ var shippingFeeInput = {
             fees = args.fees,
             feeIndex = args.feeIndex,
             deleted = h.toggleProp(false, true),
-            feeValue = m.prop(fee.value || 0),
+            feeValue = m.prop(fee.value ? '' + h.formatNumber(fee.value, 2, 3) : '0,00'),
             feeDestination = m.prop(fee.destination),
             index = args.index,
             stateInUse = function stateInUse(state) {
@@ -12010,10 +12048,12 @@ var shippingFeeInput = {
             var feeToUpdateIndex = _$1.indexOf(fees(), fee);
             fee.destination = feeDestination();
             fees()[feeToUpdateIndex] = fee;
-        };
+        },
+            applyMask = _$1.compose(feeValue, h.applyMonetaryMask);
 
         return {
             fee: fee,
+            applyMask: applyMask,
             fees: fees,
             deleted: deleted,
             feeValue: feeValue,
@@ -12025,7 +12065,7 @@ var shippingFeeInput = {
             states: states
         };
     },
-    view: function view(ctrl, args) {
+    view: function view(ctrl) {
         var feeIndex = ctrl.feeIndex,
             index = ctrl.index,
             deleted = ctrl.deleted,
@@ -12053,8 +12093,11 @@ var shippingFeeInput = {
                 value: state.acronym,
                 disabled: ctrl.stateInUse(state)
             }, state.name);
-        })])), m('.w-col.w-col-1'), m('.w-col.w-col-4', m('.w-row', [m('.no-hover.positive.prefix.text-field.w-col.w-col-3', m('.fontcolor-secondary.fontsize-mini.u-text-center', 'R$')), m('.w-col.w-col-9', m("input.positive.postfix.text-field.w-input[type='text']", {
+        })])), m('.w-col.w-col-1'), m('.w-col.w-col-4', m('.w-row', [m('.no-hover.positive.prefix.text-field.w-col.w-col-3', m('.fontcolor-secondary.fontsize-mini.u-text-center', 'R$')), m('.w-col.w-col-9', m('input.positive.postfix.text-field.w-input', {
             value: ctrl.feeValue(),
+            autocomplete: 'off',
+            type: 'text',
+            onkeyup: m.withAttr('value', ctrl.applyMask),
             name: 'project[rewards_attributes][' + index + '][shipping_fees_attributes][' + feeIndex + '][value]',
             oninput: m.withAttr('value', ctrl.feeValue)
         }))])), m('.w-col.w-col-1', [m('input[id=\'project_rewards_shipping_fees_attributes_' + index + '__destroy\'][type=\'hidden\']', {
@@ -13668,19 +13711,20 @@ var projectsPayment = {
         var project = projectVM.currentProject,
             vm = paymentVM(),
             showPaymentForm = m.prop(false),
+            addVM = m.prop(),
             contribution = contributionVM.getCurrentContribution(),
             reward = m.prop(contribution().reward),
             value = contribution().value,
-            phoneMask = _$1.partial(h.mask, '(99) 9999-99999'),
             documentMask = _$1.partial(h.mask, '999.999.999-99'),
             documentCompanyMask = _$1.partial(h.mask, '99.999.999/9999-99'),
-            zipcodeMask = _$1.partial(h.mask, '99999-999'),
             isCnpj = m.prop(false),
             currentUserID = h.getUserID(),
             user = userVM.getCurrentUser();
 
         var shippingFee = function shippingFee() {
-            return _$1.findWhere(rewardVM.fees(), { id: contribution().shipping_fee_id });
+            return _$1.findWhere(rewardVM.fees(), {
+                id: contribution().shipping_fee_id
+            });
         };
 
         var validateForm = function validateForm() {
@@ -13700,12 +13744,6 @@ var projectsPayment = {
             }) : '';
         };
 
-        var setStateOther = function setStateOther(el, isInit) {
-            if (!isInit) {
-                vm.fields.userState('');
-            }
-        };
-
         var applyDocumentMask = function applyDocumentMask(value) {
             if (value.length > 14) {
                 isCnpj(true);
@@ -13715,10 +13753,6 @@ var projectsPayment = {
                 vm.fields.ownerDocument(documentMask(value));
             }
         };
-
-        var applyZipcodeMask = _$1.compose(vm.fields.zipCode, zipcodeMask);
-
-        var applyPhoneMask = _$1.compose(vm.fields.phone, phoneMask);
 
         var addressChange = function addressChange(fn) {
             return function (e) {
@@ -13744,23 +13778,25 @@ var projectsPayment = {
         if (_$1.isNull(currentUserID)) {
             return h.navigateToDevise();
         }
-        rewardVM.getStates();
         rewardVM.getFees(reward()).then(rewardVM.fees);
+        vm.fetchUser().then(function () {
+            addVM(addressVM({
+                data: vm.fields.address()
+            }));
+        });
         vm.similityExecute(contribution().id);
         projectVM.getCurrentProject();
 
         return {
             addressChange: addressChange,
             applyDocumentMask: applyDocumentMask,
-            applyZipcodeMask: applyZipcodeMask,
-            applyPhoneMask: applyPhoneMask,
             fieldHasError: fieldHasError,
-            setStateOther: setStateOther,
             validateForm: validateForm,
             showPaymentForm: showPaymentForm,
             contribution: contribution,
             reward: reward,
             value: value,
+            addVM: addVM,
             scope: scope,
             isCnpj: isCnpj,
             vm: vm,
@@ -13773,113 +13809,61 @@ var projectsPayment = {
     },
     view: function view(ctrl) {
         var user = ctrl.user(),
+            addVM = ctrl.addVM(),
             project = ctrl.project(),
-            formatedValue = h.formatNumber(Number(ctrl.value), 2, 3);
+            formatedValue = h.formatNumber(Number(ctrl.value), 2, 3),
+            anonymousCheckbox = m('.w-row', [m('.w-checkbox.w-clearfix', [m('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']', {
+            onclick: function onclick() {
+                return CatarseAnalytics.event({
+                    cat: 'contribution_finish',
+                    act: 'contribution_anonymous_change'
+                });
+            },
+            onchange: function onchange() {
+                ctrl.vm.fields.anonymous.toggle();
+            },
+            checked: ctrl.vm.fields.anonymous()
+        }), m('label.w-form-label.fontsize-smallest[for=\'anonymous\']', I18n$1.t('fields.anonymous', ctrl.scope()))]), ctrl.vm.fields.anonymous() ? m('.card.card-message.u-radius.zindex-10.fontsize-smallest', m('div', [m('span.fontweight-bold', [I18n$1.t('anonymous_confirmation_title', ctrl.scope()), m('br')]), m('br'), I18n$1.t('anonymous_confirmation', ctrl.scope())])) : '']);
 
-        return m('#project-payment.w-section.w-clearfix.section', !_$1.isEmpty(project) ? [m('.w-col', m('.w-clearfix.w-hidden-main.w-hidden-medium.card.u-radius.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m('.w-clearfix', [m('.fontsize-larger.text-success.u-left', 'R$ ' + formatedValue), m('a.alt-link.fontsize-smaller.u-right[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', 'Editar')]), m('.divider.u-marginbottom-10.u-margintop-10'), m('.back-payment-info-reward', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest.fontweight-semibold', ctrl.reward().title), m('.fontsize-smallest.reward-description.opened.fontcolor-secondary', {
+        return m('#project-payment.w-section.w-clearfix.section', addVM && !_$1.isEmpty(project) ? [m('.w-col', m('.w-clearfix.w-hidden-main.w-hidden-medium.card.u-radius.u-marginbottom-20', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m('.w-clearfix', [m('.fontsize-larger.text-success.u-left', 'R$ ' + formatedValue), m('a.alt-link.fontsize-smaller.u-right[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', 'Editar')]), m('.divider.u-marginbottom-10.u-margintop-10'), m('.back-payment-info-reward', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest.fontweight-semibold', ctrl.reward().title), m('.fontsize-smallest.reward-description.opened.fontcolor-secondary', {
             class: ctrl.isLongDescription(ctrl.reward()) ? ctrl.toggleDescription() ? 'extended' : '' : 'extended'
-        }, ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_$1.extend({ value: formatedValue }))))), ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
+        }, ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_$1.extend({
+            value: formatedValue
+        }))))), ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
             onclick: ctrl.toggleDescription.toggle
         }, [ctrl.toggleDescription() ? 'menos ' : 'mais ', m('span.fa.fa-angle-down', {
             class: ctrl.toggleDescription() ? 'reversed' : ''
-        })]) : '', ctrl.reward().deliver_at ? m('.fontcolor-secondary.fontsize-smallest.u-margintop-10', [m('span.fontweight-semibold', 'Entrega prevista:'), ' ' + h.momentify(ctrl.reward().deliver_at, 'MMM/YYYY')]) : '', rewardVM.hasShippingOptions(ctrl.reward()) || ctrl.reward().shipping_options === 'presential' ? m('.fontcolor-secondary.fontsize-smallest', [m('span.fontweight-semibold', 'Forma de envio: '), I18n$1.t('shipping_options.' + ctrl.reward().shipping_options, { scope: 'projects.contributions' })]) : ''])])), m('.w-container', m('.w-row', [m('.w-col.w-col-8', [m('.w-form', [m('form.u-marginbottom-40', [m('.u-marginbottom-40.u-text-center-small-only', [m('.fontweight-semibold.lineheight-tight.fontsize-large', I18n$1.t('title', ctrl.scope())), m('.fontsize-smaller', I18n$1.t('required', ctrl.scope()))]), user.name && user.owner_document ? m(UserOwnerBox, { user: user, project: project }) : '', m('.w-row.u-marginbottom-30', [m('.w-col.w-col-7.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'country\']', ['País / ', m('em', 'Country'), ' *']), m('select.w-select.text-field[id=\'country\']', {
-            onfocus: ctrl.vm.resetFieldError('userCountryId'),
-            class: ctrl.fieldHasError('userCountryId') ? 'error' : false,
-            onchange: m.withAttr('value', ctrl.vm.fields.userCountryId),
-            value: ctrl.vm.fields.userCountryId()
-        }, _$1.map(ctrl.vm.fields.countries(), function (country, idx) {
-            return m('option', {
-                value: country.id,
-                key: idx,
-                selected: country.id === ctrl.vm.fields.userCountryId()
-            }, country.name_en);
-        })), ctrl.fieldHasError('userCountryId')]), m('.w-col.w-col-5')]), user.name && user.owner_document ? '' : m('.w-row', [m('.w-col.w-col-7.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'complete-name\']', I18n$1.t('fields.complete_name', ctrl.scope())), m('input.w-input.text-field[id=\'complete-name\'][name=\'complete-name\']', {
+        })]) : '', ctrl.reward().deliver_at ? m('.fontcolor-secondary.fontsize-smallest.u-margintop-10', [m('span.fontweight-semibold', 'Entrega prevista:'), ' ' + h.momentify(ctrl.reward().deliver_at, 'MMM/YYYY')]) : '', rewardVM.hasShippingOptions(ctrl.reward()) || ctrl.reward().shipping_options === 'presential' ? m('.fontcolor-secondary.fontsize-smallest', [m('span.fontweight-semibold', 'Forma de envio: '), I18n$1.t('shipping_options.' + ctrl.reward().shipping_options, {
+            scope: 'projects.contributions'
+        })]) : ''])])), m('.w-container', m('.w-row', [m('.w-col.w-col-8', [m('.w-form', [m('form.u-marginbottom-40', [m('.u-marginbottom-40.u-text-center-small-only', [m('.fontweight-semibold.lineheight-tight.fontsize-large', I18n$1.t('title', ctrl.scope())), m('.fontsize-smaller', I18n$1.t('required', ctrl.scope()))]), user.name && user.owner_document ? m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row.u-marginbottom-20', [m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2.w-hidden-tiny', [m('img.thumb.u-margintop-10.u-round[src="' + h.useAvatarOrDefault(user.profile_img_thumbnail) + '"][width="100"]')]), m('.w-col.w-col-10.w-col-small-10.w-col-tiny-10', [m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10', [project ? 'Dados do apoiador ' : 'Dados do usuário ', m('a.alt-link[href="/not-my-account' + (project ? '?project_id=' + project.project_id : '') + (ctrl.reward() ? '&reward_id=' + ctrl.reward().id : '') + (ctrl.value ? '&value=' + ctrl.value * 100 : '') + '"]', 'Não é você?')]), m('.fontsize-base.fontweight-semibold', user.name), user.owner_document ? m('label.field-label', 'CPF/CNPJ: ' + user.owner_document) : ''])]), anonymousCheckbox]) : '', m('.card.card-terciary.u-marginbottom-30.u-radius.w-form', m(nationalityRadio, {
+            fields: addVM.fields,
+            defaultCountryID: addVM.defaultCountryID,
+            defaultForeignCountryID: addVM.defaultForeignCountryID,
+            international: addVM.international
+        })), user.name && user.owner_document ? '' : m('.card.card-terciary.u-radius.u-marginbottom-40', [m('.w-row', [m('.w-col.w-col-7.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'complete-name\']', I18n$1.t('fields.complete_name', ctrl.scope())), m('input.positive.w-input.text-field[id=\'complete-name\'][name=\'complete-name\']', {
             onfocus: ctrl.vm.resetFieldError('completeName'),
             class: ctrl.fieldHasError('completeName') ? 'error' : false,
             type: 'text',
             onchange: m.withAttr('value', ctrl.vm.fields.completeName),
             value: ctrl.vm.fields.completeName(),
             placeholder: 'Nome Completo'
-        }), ctrl.fieldHasError('completeName')]), m('.w-col.w-col-5', ctrl.vm.isInternational() ? '' : [m('label.field-label.fontweight-semibold[for=\'document\']', I18n$1.t('fields.owner_document', ctrl.scope())), m('input.w-input.text-field[id=\'document\']', {
+        }), ctrl.fieldHasError('completeName')]), m('.w-col.w-col-5', addVM.international() ? '' : [m('label.field-label.fontweight-semibold[for=\'document\']', I18n$1.t('fields.owner_document', ctrl.scope())), m('input.positive.w-input.text-field[id=\'document\']', {
             onfocus: ctrl.vm.resetFieldError('ownerDocument'),
             class: ctrl.fieldHasError('ownerDocument') ? 'error' : false,
             type: 'tel',
             onkeyup: m.withAttr('value', ctrl.applyDocumentMask),
             value: ctrl.vm.fields.ownerDocument()
-        }), ctrl.fieldHasError('ownerDocument')])]), m('.w-checkbox.w-clearfix', [m('input.w-checkbox-input[id=\'anonymous\'][name=\'anonymous\'][type=\'checkbox\']', {
+        }), ctrl.fieldHasError('ownerDocument')])]), anonymousCheckbox]), m('.card.card-terciary.u-radius.u-marginbottom-40', m(addressForm, {
+            addressFields: addVM.fields,
+            fields: m.prop(ctrl.vm.fields),
+            international: addVM.international,
+            hideNationality: true
+        }))])]), m('.w-row.u-marginbottom-40', !ctrl.showPaymentForm() ? m('.w-col.w-col-push-3.w-col-6', m('button.btn.btn-large', {
             onclick: function onclick() {
-                return CatarseAnalytics.event({ cat: 'contribution_finish', act: 'contribution_anonymous_change' });
-            },
-            onchange: m.withAttr('value', ctrl.vm.fields.anonymous),
-            checked: ctrl.vm.fields.anonymous()
-        }), m('label.w-form-label.fontsize-smallest[for=\'anonymous\']', I18n$1.t('fields.anonymous', ctrl.scope()))]), ctrl.vm.fields.anonymous() ? m('.card.card-message.u-radius.zindex-10.fontsize-smallest', m('div', [m('span.fontweight-bold', [I18n$1.t('anonymous_confirmation_title', ctrl.scope()), m('br')]), m('br'), I18n$1.t('anonymous_confirmation', ctrl.scope())])) : ''])]), m('.u-marginbottom-40', m('.w-form', [m('label.field-label.fontweight-semibold[for=\'street\']', I18n$1.t('fields.street', ctrl.scope())), m('input.w-input.text-field[id=\'street\']', {
-            type: 'text',
-            onfocus: ctrl.vm.resetFieldError('street'),
-            class: ctrl.fieldHasError('street') ? 'error' : false,
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.street)),
-            value: ctrl.vm.fields.street(),
-            placeholder: 'Rua Da Minha Casa'
-        }), ctrl.fieldHasError('street'), m('.w-row', ctrl.vm.isInternational() ? '' : [m('.w-col.w-col-4.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'number\']', I18n$1.t('fields.street_number', ctrl.scope())), m('input.w-input.text-field[id=\'number\']', {
-            onfocus: ctrl.vm.resetFieldError('number'),
-            class: ctrl.fieldHasError('number') ? 'error' : false,
-            type: 'text',
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.number)),
-            value: ctrl.vm.fields.number(),
-            placeholder: '421'
-        }), ctrl.fieldHasError('number')]), m('.w-col.w-col-4.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'address-complement\']', I18n$1.t('fields.street_complement', ctrl.scope())), m('input.w-input.text-field[id=\'address-complement\']', {
-            onfocus: ctrl.vm.resetFieldError('addressComplement'),
-            class: ctrl.fieldHasError('addressComplement') ? 'error' : false,
-            type: 'text',
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.addressComplement)),
-            value: ctrl.vm.fields.addressComplement(),
-            placeholder: 'Residencial 123'
-        }), ctrl.fieldHasError('addressComplement')]), m('.w-col.w-col-4', ctrl.vm.isInternational() ? '' : [m('label.field-label.fontweight-semibold[for=\'neighbourhood\']', I18n$1.t('fields.neighbourhood', ctrl.scope())), m('input.w-input.text-field[id=\'neighbourhood\']', {
-            onfocus: ctrl.vm.resetFieldError('neighbourhood'),
-            class: ctrl.fieldHasError('neighbourhood') ? 'error' : false,
-            type: 'text',
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.neighbourhood)),
-            value: ctrl.vm.fields.neighbourhood(),
-            placeholder: 'São José'
-        }), ctrl.fieldHasError('neighbourhood')])]), m('.w-row', [m('.w-col.w-col-4.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'zip-code\']', I18n$1.t('fields.zipcode', ctrl.scope())), m('input.w-input.text-field[id=\'zip-code\']', {
-            type: 'tel',
-            onfocus: ctrl.vm.resetFieldError('zipCode'),
-            class: ctrl.fieldHasError('zipCode') ? 'error' : false,
-            onchange: ctrl.addressChange(),
-            onkeyup: m.withAttr('value', function (value) {
-                return !ctrl.vm.isInternational() ? ctrl.applyZipcodeMask(value) : ctrl.vm.fields.zipCode(value);
-            }),
-            value: ctrl.vm.fields.zipCode(),
-            placeholder: '42100000'
-        }), ctrl.fieldHasError('zipCode')]), m('.w-col.w-col-4.w-sub-col', [m('label.field-label.fontweight-semibold[for=\'city\']', I18n$1.t('fields.city', ctrl.scope())), m('input.w-input.text-field[id=\'city\']', {
-            onfocus: ctrl.vm.resetFieldError('city'),
-            class: ctrl.fieldHasError('city') ? 'error' : false,
-            type: 'text',
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.city)),
-            value: ctrl.vm.fields.city(),
-            placeholder: 'Cidade'
-        }), ctrl.fieldHasError('city')]), m('.w-col.w-col-4', [m('label.field-label.fontweight-semibold[for=\'state\']', I18n$1.t('fields.state', ctrl.scope())), ctrl.vm.isInternational() ? m('input.w-input.text-field[id=\'address-state\']', {
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.userState)),
-            class: ctrl.fieldHasError('userState') ? 'error' : false,
-            value: ctrl.vm.fields.userState()
-        }) : m('select.w-select.text-field[id=\'address-state\']', {
-            onfocus: ctrl.vm.resetFieldError('userState'),
-            class: ctrl.fieldHasError('userState') ? 'error' : false,
-            onchange: ctrl.addressChange(m.withAttr('value', ctrl.vm.fields.userState)),
-            value: ctrl.vm.fields.userState()
-        }, _$1.map(ctrl.vm.fields.states(), function (state, idx) {
-            return m('option', {
-                value: state.acronym,
-                selected: state.acronym === ctrl.vm.fields.userState()
-            }, state.name);
-        })), ctrl.fieldHasError('userState')])]), !ctrl.vm.isInternational() ? m('.w-row', [m('.w-col.w-col-6', [m('label.field-label.fontweight-semibold[for=\'phone\']', I18n$1.t('fields.phone', ctrl.scope())), m('input.w-input.text-field[id=\'phone\']', {
-            onfocus: ctrl.vm.resetFieldError('phone'),
-            class: ctrl.fieldHasError('phone') ? 'error' : false,
-            type: 'tel',
-            onkeyup: m.withAttr('value', ctrl.applyPhoneMask),
-            value: ctrl.vm.fields.phone()
-        }), ctrl.fieldHasError('phone')])]) : ''])), m('.w-row.u-marginbottom-40', !ctrl.showPaymentForm() ? m('.w-col.w-col-push-3.w-col-6', m('button.btn.btn-large', {
-            onclick: function onclick() {
-                return CatarseAnalytics.event({ cat: 'contribution_finish', act: 'contribution_next_click' }, ctrl.validateForm);
+                return CatarseAnalytics.event({
+                    cat: 'contribution_finish',
+                    act: 'contribution_next_click'
+                }, ctrl.validateForm);
             }
         }, I18n$1.t('next_step', ctrl.scope()))) : ''), ctrl.showPaymentForm() ? m.component(paymentForm, {
             vm: ctrl.vm,
@@ -13888,11 +13872,15 @@ var projectsPayment = {
             user_id: user.id
         }) : '']), m('.w-col.w-col-4', [m('.card.u-marginbottom-20.u-radius.w-hidden-small.w-hidden-tiny', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-20', I18n$1.t('selected_reward.value', ctrl.scope())), m('.w-clearfix', [m('.fontsize-larger.text-success.u-left', 'R$ ' + formatedValue), m('a.alt-link.fontsize-smaller.u-right[href="/projects/' + projectVM.currentProject().project_id + '/contributions/new' + (ctrl.reward().id ? '?reward_id=' + ctrl.reward().id : '') + '"]', 'Editar')]), m('.divider.u-marginbottom-10.u-margintop-10'), m('.back-payment-info-reward', [m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10', I18n$1.t('selected_reward.reward', ctrl.scope())), m('.fontsize-smallest.fontweight-semibold', ctrl.reward().title), m('.fontsize-smallest.reward-description.opened.fontcolor-secondary', {
             class: ctrl.isLongDescription(ctrl.reward()) ? ctrl.toggleDescription() ? 'extended' : '' : 'extended'
-        }, ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_$1.extend({ value: Number(ctrl.value).toFixed() }))))), ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
+        }, ctrl.reward().description ? ctrl.reward().description : m.trust(I18n$1.t('selected_reward.review_without_reward_html', ctrl.scope(_$1.extend({
+            value: Number(ctrl.value).toFixed()
+        }))))), ctrl.isLongDescription(ctrl.reward()) ? m('a[href="javascript:void(0);"].link-hidden.link-more.u-marginbottom-20', {
             onclick: ctrl.toggleDescription.toggle
         }, [ctrl.toggleDescription() ? 'menos ' : 'mais ', m('span.fa.fa-angle-down', {
             class: ctrl.toggleDescription() ? 'reversed' : ''
-        })]) : '', ctrl.reward().deliver_at ? m('.fontcolor-secondary.fontsize-smallest.u-margintop-10', [m('span.fontweight-semibold', 'Entrega prevista:'), ' ' + h.momentify(ctrl.reward().deliver_at, 'MMM/YYYY')]) : '', rewardVM.hasShippingOptions(ctrl.reward()) || ctrl.reward().shipping_options === 'presential' ? m('.fontcolor-secondary.fontsize-smallest', [m('span.fontweight-semibold', 'Forma de envio: '), I18n$1.t('shipping_options.' + ctrl.reward().shipping_options, { scope: 'projects.contributions' })]) : '', m('div')])]), m.component(faqBox, {
+        })]) : '', ctrl.reward().deliver_at ? m('.fontcolor-secondary.fontsize-smallest.u-margintop-10', [m('span.fontweight-semibold', 'Entrega prevista:'), ' ' + h.momentify(ctrl.reward().deliver_at, 'MMM/YYYY')]) : '', rewardVM.hasShippingOptions(ctrl.reward()) || ctrl.reward().shipping_options === 'presential' ? m('.fontcolor-secondary.fontsize-smallest', [m('span.fontweight-semibold', 'Forma de envio: '), I18n$1.t('shipping_options.' + ctrl.reward().shipping_options, {
+            scope: 'projects.contributions'
+        })]) : '', m('div')])]), m.component(faqBox, {
             mode: project.mode,
             vm: ctrl.vm,
             faq: ctrl.vm.faq(project.mode),
@@ -14321,7 +14309,7 @@ var start = {
             return [m('.w-col.w-col-5', [m('.fontsize-jumbo.u-marginbottom-20', category.name), m('a.w-button.btn.btn-medium.btn-inline.btn-dark[href="#start-form"]', {
                 config: h.scrollTo()
             }, I18n$1.t('submit', I18nScope$49()))]), m('.w-col.w-col-7', [m('.fontsize-megajumbo.fontcolor-negative', 'R$ ' + (category.total_successful_value ? h.formatNumber(category.total_successful_value, 2, 3) : '...')), m('.fontsize-large.u-marginbottom-20', 'Doados para projetos'), m('.fontsize-megajumbo.fontcolor-negative', category.successful_projects ? category.successful_projects : '...'), m('.fontsize-large.u-marginbottom-30', 'Projetos financiados'), !_$1.isEmpty(ctrl.featuredProjects()) ? _$1.map(ctrl.featuredProjects(), function (project) {
-                return !_$1.isUndefined(project) ? m('.w-row.u-marginbottom-10', [m('.w-col.w-col-1', [m('img.user-avatar[src="' + h.useAvatarOrDefault(project.userThumb) + '"]')]), m('.w-col.w-col-11', [m('.fontsize-base.fontweight-semibold', project.user.name), m('.fontsize-smallest', [I18n$1.t('categories.pledged', I18nScope$49({ pledged: h.formatNumber(project.pledged), contributors: project.total_contributors })), m('a.link-hidden[href="/' + project.permalink + '"]', project.name)])])]) : m('.fontsize-base', I18n$1.t('categories.loading_featured', I18nScope$49()));
+                return !_$1.isUndefined(project) ? m('.w-row.u-marginbottom-10', [m('.w-col.w-col-1', [m('img.user-avatar[src="' + h.useAvatarOrDefault(project.userThumb) + '"]')]), m('.w-col.w-col-11', [m('.fontsize-base.fontweight-semibold', project.user.public_name || project.user.name), m('.fontsize-smallest', [I18n$1.t('categories.pledged', I18nScope$49({ pledged: h.formatNumber(project.pledged), contributors: project.total_contributors })), m('a.link-hidden[href="/' + project.permalink + '"]', project.name)])])]) : m('.fontsize-base', I18n$1.t('categories.loading_featured', I18nScope$49()));
             }) : ''])];
         }) : '')])])])])]), m.component(slider, {
             slides: testimonials(),
@@ -14920,5 +14908,5 @@ var c = {
 
 return c;
 
-}(m,I18n,_,moment,$,postgrest,CatarseAnalytics,replaceDiacritics,Chart));
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjpudWxsLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7In0=
+}(m,I18n,_,moment,$,postgrest,CatarseAnalytics,replaceDiacritics,Chart,select));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjpudWxsLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7In0=
