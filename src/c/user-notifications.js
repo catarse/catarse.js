@@ -1,13 +1,16 @@
 import m from 'mithril';
 import _ from 'underscore';
+import I18n from 'i18n-js';
 import h from '../h';
 import userVM from '../vms/user-vm';
 import inlineError from './inline-error';
 
+const I18nScope = _.partial(h.i18nScope, 'users.edit.notifications_fields');
 const userNotifications = {
     controller(args) {
         const contributedProjects = m.prop(),
             projectReminders = m.prop(),
+            mailMarketingLists = m.prop(),
             user_id = args.userId,
             showNotifications = h.toggleProp(false, true),
             error = m.prop(false);
@@ -19,6 +22,14 @@ const userNotifications = {
             m.redraw();
         });
 
+        userVM.getMailMarketingLists().then((data) => {
+            mailMarketingLists(generateListHandler(data))
+        }
+        ).catch((err) => {
+            error(true);
+            m.redraw()
+        });
+
         userVM.getUserContributedProjects(user_id, null).then(
             contributedProjects
         ).catch((err) => {
@@ -26,17 +37,57 @@ const userNotifications = {
             m.redraw();
         });
 
+        const generateListHandler = (list) => {
+            const user_lists = args.user.mail_marketing_lists;
+            return _.map(list, (item, i) => {
+                let user_signed = !_.isEmpty(user_lists) && !_.isUndefined(_.find(user_lists, userList => {
+                    return userList.marketing_list ? userList.marketing_list.list_id === item.list_id : false;
+                }));
+                let handler = {
+                    item: item,
+                    in_list: user_signed,
+                    should_insert: m.prop(false),
+                    should_destroy: m.prop(false),
+                    isInsertInListState: h.toggleProp(false, true),
+                    hovering: m.prop(false)
+                };
+                handler.isInsertInListState(!handler.in_list);
+                return handler;
+            });
+        };
+
+        const getUserMarketingListId = (list) => {
+            const currentList = _.find(args.user.mail_marketing_lists, userList => userList.marketing_list.list_id === list.list_id);
+
+            return currentList ? currentList['user_marketing_list_id'] : null;
+        }
+
+        const isOnCurrentList = (userLists, currentList) => {
+            return Boolean(_.find(userLists, userList => {
+                if (userList.marketing_list) {
+                    return userList.marketing_list.list_id === currentList.list_id;
+                }
+
+                return false;
+            }));
+        };
+
         return {
             projects: contributedProjects,
+            mailMarketingLists,
             showNotifications,
             projectReminders,
-            error
+            error,
+            generateListHandler,
+            getUserMarketingListId,
+            isOnCurrentList,
         };
     },
     view(ctrl, args) {
         const user = args.user,
-            reminders = ctrl.projectReminders();
-        const projects_collection = ctrl.projects();
+            reminders = ctrl.projectReminders(),
+            projects_collection = ctrl.projects(),
+            marketing_lists = ctrl.mailMarketingLists();
 
         return m('[id=\'notifications-tab\']', ctrl.error() ? m.component(inlineError, {
             message: 'Erro ao carregar a página.'
@@ -56,19 +107,55 @@ const userNotifications = {
                                             'Newsletters:'
                                         )
                                     ),
-                                    m('.w-col.w-col-8',
-                                        m('.w-checkbox.w-clearfix', [
-                                            m('input[name=user[newsletter]][type=\'hidden\'][value=\'0\']'),
-                                            m(`input.w-checkbox-input${user.newsletter ? '[checked=\'checked\']' : ''}[id='user_newsletter'][name=user[newsletter]][type='checkbox'][value='1']`),
-                                            m('label.w-form-label.fontsize-base.fontweight-semibold[for=\'checkbox\']',
-                                                ' Newsletter do Catarse (semanal)'
-                                            ),
-                                            m('div', [
-                                                'Projetos em destaque e posts do nosso Blog',
-                                                m.trust('&nbsp;')
-                                            ])
-                                        ])
-                                    )
+                                    m('.w-col.w-col-8', (_.isEmpty(marketing_lists) ? h.loader() : _.map(marketing_lists, (_item, i) => {
+                                        const item = _item.item;
+
+                                        return m('.card.u-marginbottom-20.u-radius.u-text-center-small-only',
+                                            m('.w-row',
+                                                [
+                                                    m('.w-sub-col.w-col.w-col-6', 
+                                                        m('img', {
+                                                            src: I18n.t(`newsletters.${item.list_id}.image_src`, I18nScope())
+                                                        })
+                                                    ),
+                                                    m('.w-col.w-col-6',
+                                                        [   
+                                                            m('.fontsize-base.fontweight-semibold', 
+                                                                I18n.t(`newsletters.${item.list_id}.title`, I18nScope())
+                                                            ),
+                                                            m('.fontsize-small.u-marginbottom-30', 
+                                                                I18n.t(`newsletters.${item.list_id}.description`, I18nScope())
+                                                            ),
+                                                            (_item.should_insert() || _item.should_destroy() ? m(`input[type='hidden']`, { name: `user[mail_marketing_users_attributes][${i}][mail_marketing_list_id]`, value: item.id }) : ''),
+                                                            (_item.should_destroy() ? m(`input[type='hidden']`, { name: `user[mail_marketing_users_attributes][${i}][id]`, value: ctrl.getUserMarketingListId(item) }) : ''),
+                                                            (_item.should_destroy() ? m(`input[type='hidden']`, { name: `user[mail_marketing_users_attributes][${i}][_destroy]`, value: _item.should_destroy() }) : ''),
+                                                            m('button.btn.btn-medium.w-button',
+                                                                {   
+                                                                    class: !_item.isInsertInListState() ? 'btn-terciary' : null,
+                                                                    onclick: (event) => {
+                                                                        // If user already has this list, click should enable destroy state
+                                                                        if(ctrl.isOnCurrentList(user.mail_marketing_lists, item)) {
+                                                                            _item.should_destroy(true);
+
+                                                                            return;
+                                                                        }
+                                                                        _item.should_insert(true);
+                                                                    },
+                                                                    onmouseenter: () => {
+                                                                        _item.hovering(true);
+                                                                    },
+                                                                    onmouseout: () => {
+                                                                        _item.hovering(false);
+                                                                    }
+                                                                }, 
+                                                                _item.in_list ? _item.hovering() ? 'Descadastrar' : 'Assinado' : 'Assinar'
+                                                            )
+                                                        ]
+                                                    )
+                                                ]
+                                            )
+                                        );
+                                    })))
                                 ]),
                                 m('.w-row.u-marginbottom-20', [
                                     m('.w-col.w-col-4',
