@@ -174,7 +174,7 @@ const start = {
                         m('.w-col.w-col-10.w-col-push-1.u-text-center', [
                             m('.fontsize-larger.u-marginbottom-10.fontweight-semibold', I18n.t('page-title', I18nScope())),
                             m('.fontsize-small', I18n.t('page-subtitle', I18nScope()))
-                        ]),
+                        ])
                     ]),
                     m('.w-clearfix.how-row', [
                         m('.w-hidden-small.w-hidden-tiny.how-col-01', [
@@ -363,7 +363,7 @@ const start = {
                                                     m(`a.link-hidden[href="/${project.permalink}"]`, project.name)
                                                 ])
                                             ])
-                                        ]) : m('.fontsize-base', I18n.t('categories.loading_featured', I18nScope()))) : '',
+                                        ]) : m('.fontsize-base', I18n.t('categories.loading_featured', I18nScope()))) : ''
                                     ])
                                 ]) : '')
                             ])
@@ -436,7 +436,7 @@ const start = {
                             m('.w-row.u-marginbottom-20', [
                                 m('.w-col.w-col-4.w-col-push-4.u-margintop-40', [
                                     m(`input[type="submit"][value="${I18n.t('form.submit', I18nScope())}"].w-button.btn.btn-large`)
-                                ]),
+                                ])
                             ]),
                             m('.w-row.u-marginbottom-80', (ctrl.projectNameError() || ctrl.projectCategoryError()) ? m.component(inlineError, { message: 'Por favor, verifique novamente os campos acima!' }) : '')
                         ])

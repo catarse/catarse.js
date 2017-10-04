@@ -106,7 +106,7 @@ const userPrivateContributed = {
                     collection: failedCollection,
                     pagination: ctrl.failedPages,
                     hideSurveys: true
-                }),
+                })
 
             ]);
     }

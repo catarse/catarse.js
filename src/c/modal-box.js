@@ -24,7 +24,7 @@ const modalBox = {
                         onclick: args.displayModal.toggle
                     }),
                     m.component(args.content[0], args.content[1])
-                ]),
+                ])
             ])
         ]);
     }

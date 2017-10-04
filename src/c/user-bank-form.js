@@ -256,7 +256,7 @@ const userBankForm = {
                             }, 'Conta corrente conjunta'),
                             m('option[value=\'conta_poupanca_conjunta\']', {
                                 selected: fields.bank_account_type() === 'conta_poupanca_conjunta'
-                            }, 'Conta poupança conjunta'),
+                            }, 'Conta poupança conjunta')
                         ]),
                         ctrl.parsedErrors.inlineError('account_type')
                     ])

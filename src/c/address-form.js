@@ -192,7 +192,7 @@ const addressForm = {
                                     }),
                                     errors.addressZipCode() ? m(inlineError, {
                                         message: 'ZipCode is required'
-                                    }) : '',
+                                    }) : ''
                                 ]),
                                 m('.w-sub-col.w-col.w-col-4', [
                                     m('.field-label.fontweight-semibold',
@@ -337,7 +337,7 @@ const addressForm = {
                                                 selected: state.id === ctrl.fields.stateID()
                                             },
                                                 state.acronym
-                                            )) : ''),
+                                            )) : '')
                                     ]),
                                     errors.stateID() ? m(inlineError, {
                                         message: 'Informe um estado.'

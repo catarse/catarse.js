@@ -50,7 +50,7 @@ const projectDataChart = {
                     !_.isEmpty(ctrl.source) ? m('canvas[id="chart"][width="860"][height="300"]', {
                         config: ctrl.renderChart
                     }) : m('.w-col.w-col-8.w-col-push-2', m('p.fontsize-base', args.emptyState))
-                ]),
+                ])
             ])
         ]);
     }

@@ -134,7 +134,7 @@ const adminBalanceTranfers = {
                                   m('.w-row.fontweight-semibold', [
                                       m('.w-col.w-col-6', 'Nome'),
                                       m('.w-col.w-col-3', 'Valor'),
-                                      m('.w-col.w-col-3', 'Solicitado em'),
+                                      m('.w-col.w-col-3', 'Solicitado em')
                                   ]),
                                   _.map(selectedItemsIDs(), (item, index) => {
                                       return m('.divider.fontsize-smallest.lineheight-looser', [
@@ -147,7 +147,7 @@ const adminBalanceTranfers = {
                                               ]),
                                               m('.w-col.w-col-3', [
                                                   m('span', h.momentify(item.created_at))
-                                              ]),
+                                              ])
                                           ])
                                       ]);
                                   }),
@@ -157,7 +157,7 @@ const adminBalanceTranfers = {
                                         `R$ ${h.formatNumber(_.reduce(selectedItemsIDs(), (t, i) => {
                                             return t + i.amount;
                                         }, 0), 2, 3)}`),
-                                      m('.w-col.w-col-3'),
+                                      m('.w-col.w-col-3')
                                   ]),
                                   m('.w-row.u-margintop-40', [
                                       m('.w-col.w-col-1'),
@@ -253,7 +253,7 @@ const adminBalanceTranfers = {
                            m('button.btn.btn-inline.btn-small.btn-terciary.w-button', {
                                onclick: actionMenuToggle.toggle
                            }, [
-                               `Marcar como (${selectedItemsIDs().length})`,
+                               `Marcar como (${selectedItemsIDs().length})`
                            ]),
                            (actionMenuToggle() ?
                             m('.card.dropdown-list.dropdown-list-medium.u-radius.zindex-10[id=\'transfer\']', [

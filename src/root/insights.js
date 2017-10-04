@@ -204,7 +204,7 @@ const insights = {
                                     xAxis: item => h.momentify(item.day),
                                     emptyState: I18n.t('visitors_per_day_empty', I18nScope())
                                 }) : h.loader()
-                            ]),
+                            ])
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', {
@@ -219,7 +219,7 @@ const insights = {
                                     xAxis: item => h.momentify(item.paid_at),
                                     emptyState: I18n.t('amount_per_day_empty', I18nScope())
                                 }) : h.loader()
-                            ]),
+                            ])
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', {
@@ -234,7 +234,7 @@ const insights = {
                                     xAxis: item => h.momentify(item.paid_at),
                                     emptyState: I18n.t('contributions_per_day_empty', I18nScope())
                                 }) : h.loader()
-                            ]),
+                            ])
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', [
@@ -255,7 +255,7 @@ const insights = {
                                             )
                                         ) : h.loader()
                                 ])
-                            ]),
+                            ])
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', [
@@ -272,15 +272,15 @@ const insights = {
                                             )
                                         ) : h.loader()
                                 ])
-                            ]),
+                            ])
                         ]),
                         m('.w-row', [
                             m('.w-col.w-col-12.u-text-center', [
                                 m.component(projectReminderCount, {
                                     resource: project
                                 })
-                            ]),
-                        ]),
+                            ])
+                        ])
                     ])
                 ]),
             (project.can_cancel ?

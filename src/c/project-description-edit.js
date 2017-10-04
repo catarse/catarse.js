@@ -14,7 +14,7 @@ const projectDescriptionEdit = {
     controller(args) {
         const vm = projectDescriptionVM,
             mapErrors = [
-                  ['about_html', ['about_html']],
+                  ['about_html', ['about_html']]
             ],
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),

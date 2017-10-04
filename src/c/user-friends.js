@@ -65,7 +65,7 @@ const userFriends = {
                     ])
                 ]),
                 m('.w-row', [
-                    _.map(listVM.collection(), friend => m.component(UserFollowCard, { friend })),
+                    _.map(listVM.collection(), friend => m.component(UserFollowCard, { friend }))
                 ]),
                 m('.w-section.section.bg-gray', [
                     m('.w-container', [

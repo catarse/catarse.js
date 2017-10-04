@@ -644,7 +644,7 @@ const
     monetaryToFloat = (propValue: Function): number => parseFloat(propValue().replace('.', '').replace(',', '.')),
 
     applyMonetaryMask = (number: number): string => {
-        let onlyNumbers = String(number).replace(/[^0-9]|[.,]/g, ''),
+        let onlyNumbers = String(number).replace(/[^0-9]|[.]/g, ''),
             integerPart = onlyNumbers.slice(0, onlyNumbers.length - 2),
             decimalPart = onlyNumbers.slice(onlyNumbers.length - 2);
 

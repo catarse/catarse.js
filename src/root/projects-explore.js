@@ -225,7 +225,7 @@ const projectsExplore = {
                         m('.w-row.u-marginbottom-30', [
                             _.map(ctrl.categories(), category => m.component(categoryButton, { category }))
                         ])
-                    ]),
+                    ])
                 ])
             ]),
 
@@ -298,7 +298,7 @@ const projectsExplore = {
                     m('.w-row', [
                         m('.w-col.w-col-2.w-col-push-5', [
                             (ctrl.projects().isLastPage() || ctrl.projects().isLoading() || _.isEmpty(projectsCollection)) ? '' : m('a.btn.btn-medium.btn-terciary[href=\'#loadMore\']', { onclick: () => { ctrl.projects().nextPage(); return false; } }, 'Carregar mais')
-                        ]),
+                        ])
                     ])
                 ])
             ]),

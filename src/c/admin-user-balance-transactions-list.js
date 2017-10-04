@@ -47,7 +47,7 @@ const adminUserBalanceTransactionsList = {
                         m('.w-col.w-col-2', [
                             m('span', I18n.t('shared.currency', {
                                 amount: h.formatNumber(item.total_amount, 2, 3)}))
-                        ]),
+                        ])
                     ]),
                     m('.w-row', [
                         _.map(item.source, (source, index) => {

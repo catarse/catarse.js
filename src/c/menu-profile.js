@@ -73,7 +73,7 @@ const menuProfile = {
                                                     m('span', [
                                                         'Saldo ',
                                                         (ctrl.userBalance() > 0 ? m('span.fontcolor-secondary',
-                                                          `R$ ${h.formatNumber(ctrl.userBalance(), 2, 3)}`) : ''),
+                                                          `R$ ${h.formatNumber(ctrl.userBalance(), 2, 3)}`) : '')
                                                     ])
                                                    )
                                                  ),
@@ -102,7 +102,7 @@ const menuProfile = {
                                                 m('li.lineheight-looser',
                                                   m('a.alt-link.fontsize-smaller[href=\'/connect-facebook/\']',
                                                     'Encontre amigos'
-                                                   ),
+                                                   )
                                                  ),
                                                 m('li.lineheight-looser',
                                                     m(`a.alt-link.fontsize-smaller[href='/pt/users/${user.id}/edit#about_me']`,

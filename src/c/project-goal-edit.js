@@ -134,8 +134,8 @@ const projectGoalEdit = {
                                                                 value: vm.fields.goal(),
                                                                 maxlength: 14,
                                                                 onkeyup: m.withAttr('value', ctrl.applyGoalMask)
-                                                            }),
-                                                        ]),
+                                                            })
+                                                        ])
                                                     ])
                                             ]),
                                             m('.u-text-center', vm.e.inlineError('goal'))
@@ -160,7 +160,7 @@ const projectGoalEdit = {
                                             m('.fontsize-base', I18n.t('want_more', I18nScope())),
                                             m.trust(I18n.t('goal_taxes_watch_video_html', I18nScope()))
                                         ])
-                                    ]) : ''),
+                                    ]) : '')
                                 ]
                             }),
                             m(bigCard, {
@@ -196,7 +196,7 @@ const projectGoalEdit = {
                                             onclick: () => { vm.fields.online_days(''); }
                                         }, [
                                             m('.fontsize-base.fontweight-semibold.u-marginbottom-20', I18n.t('online_days_open', I18nScope())),
-                                            m('.w-hidden-tiny', I18n.t('online_days_open_hint', I18nScope())),
+                                            m('.w-hidden-tiny', I18n.t('online_days_open_hint', I18nScope()))
                                         ]),
                                         m('a.choose-time.choose-limited.w-inline-block.btn-select.flex-column.u-text-center', {
                                             class: _.isEmpty(vm.fields.online_days().toString()) ? '' : 'selected',
@@ -213,7 +213,7 @@ const projectGoalEdit = {
                                                             value: vm.fields.online_days(),
                                                             class: vm.e.hasError('online_days') ? 'error' : false
                                                         })
-                                                    ]),
+                                                    ])
                                                 ]),
                                                 m('.w-col.w-col-6', [
                                                     m('.text-field.medium.prefix-permalink', {

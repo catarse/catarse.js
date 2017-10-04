@@ -506,7 +506,7 @@ const userAboutEdit = {
                                                     message: 'A sua nova senha deve ter no mínimo 6 caracteres.'
                                                 })
                                             ])
-                                        ]),
+                                        ])
 
                                     ])
                                 )),

@@ -89,7 +89,7 @@ const dashboardRewardCard = {
                     reward.title()
                 ),
                 m('.fontsize-small.fontcolor-secondary',
-                    m.trust(h.simpleFormat(h.strip(reward.description()))),
+                    m.trust(h.simpleFormat(h.strip(reward.description())))
                 ),
                 (reward.limited() ? (ctrl.availableCount() <= 0) ?
                     m('.u-margintop-10',
@@ -116,7 +116,7 @@ const dashboardRewardCard = {
                         m('.w-col.w-col-4', [
                             m('button.btn.btn-small.btn-terciary.w-button', {
                                 onclick: ctrl.toggleShowLimit
-                            }, 'Alterar limite'),
+                            }, 'Alterar limite')
 
                         ])),
                     m('.w-col.w-col-8')
@@ -169,7 +169,7 @@ const dashboardRewardCard = {
                 ),
                 ctrl.limitError() ? m(inlineError, {
                     message: 'Limite deve ser maior que quantidade de apoios.'
-                }) : '', ,
+                }) : ''
             ]),
             m('.u-margintop-20', [
                 m('.fontcolor-secondary.fontsize-smallest.fontweight-semibold',
@@ -182,11 +182,11 @@ const dashboardRewardCard = {
                     m('.w-col.w-col-6',
                         m.component(copyTextInput, {
                             value: `https://www.catarse.me/pt/projects/${args.project_id}/contributions/new?reward_id=${reward.id()}`
-                        }),
+                        })
                     )
-                ),
+                )
 
-            ]),
+            ])
         ]);
     }
 };

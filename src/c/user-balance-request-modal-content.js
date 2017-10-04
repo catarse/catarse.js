@@ -185,7 +185,7 @@ const userBalanceRequestModelContent = {
                          : [
                              m('a.btn.btn-medium.btn-request-fund[href="javascript:void(0);"]',
                                { onclick: () => ctrl.requestFund() },
-                               I18n.t('shared.confirm_text')),
+                               I18n.t('shared.confirm_text'))
                          ])
                     ),
                     m('.w-col.w-col-5',

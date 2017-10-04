@@ -15,7 +15,7 @@ const projectEditTab = {
                        )
                   ])
                  )
-               ),
+               )
              ),
             m('.u-marginbottom-80', args.content)
         ]);

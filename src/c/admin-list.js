@@ -54,7 +54,7 @@ const adminList = {
                                         h.loader() :
                                         m('button#load-more.btn.btn-medium.btn-terciary', {
                                             onclick: list.nextPage
-                                        }, 'Carregar mais'),
+                                        }, 'Carregar mais')
                                     ])
                                 ])
                             ])

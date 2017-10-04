@@ -96,7 +96,7 @@ const projectSuccessfulOnboardConfirmAccount = {
                         m('div', [
                             m('span.fontcolor-secondary', I18n.t('person.zip_code', I18nScope())),
                             projectAccount.address_zip_code
-                        ]),
+                        ])
                     ])
                 ])
             ]),

@@ -42,7 +42,7 @@ const projectContributionReport = {
                     {
                         value: 'refunded,chargeback,deleted,pending_refund',
                         option: 'Contestado'
-                    },
+                    }
                     ],
                     waiting_funds: [{
                         value: 'paid',
@@ -55,7 +55,7 @@ const projectContributionReport = {
                     {
                         value: 'refunded,chargeback,deleted,pending_refund',
                         option: 'Contestado'
-                    },
+                    }
                     ],
                     failed: [{
                         value: 'pending_refund',
@@ -68,7 +68,7 @@ const projectContributionReport = {
                     {
                         value: 'paid',
                         option: 'Reembolso não iniciado'
-                    },
+                    }
                     ],
                     successful: [{
                         value: 'paid',
@@ -77,7 +77,7 @@ const projectContributionReport = {
                     {
                         value: 'refunded,chargeback,deleted,pending_refund',
                         option: 'Contestado'
-                    },
+                    }
                     ]
                 };
 

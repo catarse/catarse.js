@@ -45,7 +45,7 @@ const CheckEmail = {
             return ((user && !userCreatedRecently && !user.email_active && !ctrl.hideAlert()) ? m('.card-alert.section.u-text-center', { style: (args.menuTransparency ? { 'padding-top': '100px' } : {}) }, [
                 m('.w-container', (ctrl.confirmedEmail() ? [
                     m('.fontsize-large.fontweight-semibold', I18n.t('confirmed_title', I18nScope())),
-                    m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('confirmed_sub', I18nScope())),
+                    m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('confirmed_sub', I18nScope()))
                 ] : [
                     m('.fontsize-large.fontweight-semibold', _.isNull(user.name) ? 'Olá' : I18n.t('hello', I18nScope({ name: user.name }))),
                     m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('hello_sub', I18nScope())),

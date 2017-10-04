@@ -164,7 +164,7 @@ const surveysShow = {
                             m('.w-col.w-col-2'),
                             m('.w-col.w-col-8', [
                                 m('.u-marginbottom-20.u-text-center',
-                                    m(`img.big.thumb.u-marginbottom-20.u-round[src='${profileImage}']`),
+                                    m(`img.big.thumb.u-marginbottom-20.u-round[src='${profileImage}']`)
                                 ),
                                 m('.u-text-center',
                                     m('.fontsize-larger.u-marginbottom-10',
@@ -204,7 +204,7 @@ const surveysShow = {
                             m('.w-col.w-col-2'),
                             m('.w-col.w-col-8', [
                                 m('.u-marginbottom-20.u-text-center',
-                                    m(`img.big.thumb.u-marginbottom-20.u-round[src='${profileImage}']`),
+                                    m(`img.big.thumb.u-marginbottom-20.u-round[src='${profileImage}']`)
                                 ),
                                 m('.u-text-center',
                                     m('.fontsize-larger',

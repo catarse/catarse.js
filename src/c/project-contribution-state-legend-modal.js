@@ -53,7 +53,7 @@ const ProjectContributionStateLegendModal = {
                         label: translate('successful.refunded.label'),
                         text: translate('successful.refunded.text'),
                         i_class: '.fa.fa-circle.text-error'
-                    },
+                    }
                 ],
 
             }

@@ -182,10 +182,10 @@ const userSettings = {
                                                     }, I18n.t('account_types.pj', I18nScope())),
                                                     m('option[value=\'mei\']', {
                                                         selected: fields.account_type() === 'mei'
-                                                    }, I18n.t('account_types.mei', I18nScope())),
+                                                    }, I18n.t('account_types.mei', I18nScope()))
                                                 ])
                                             ])
-                                        ),
+                                        )
                                     ]),
                                     m('.w-row', [
                                         m('.w-col.w-col-6.w-sub-col', [
@@ -316,9 +316,9 @@ const userSettings = {
                                 }, [
                                     m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'),
                                     m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'),
-                                    m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
+                                    m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`)
                                 ])
-                            ])),
+                            ]))
                         )
 
                     ),

@@ -268,8 +268,8 @@ const projectBasicsEdit = {
                                                 value: vm.fields.permalink(),
                                                 class: vm.e.hasError('permalink') ? 'error' : '',
                                                 onchange: m.withAttr('value', vm.fields.permalink)
-                                            }),
-                                        ]),
+                                            })
+                                        ])
                                     ]),
                                     m('.w-row', vm.e.inlineError('permalink'))
                                 ]
