@@ -52,7 +52,7 @@ const adminReward = {
                 m('br'),
                 m('div', [
                     'Status da Entrega: ',
-                    h.contributionStatusBadge(contribution),
+                    h.contributionStatusBadge(contribution)
                 ]),
                 (reward.title ? [`Título: ${reward.title}`,
                     m('br')

@@ -72,7 +72,7 @@ const liveStatistics = {
                 m('a.link-hidden.fontcolor-negative[href="https://github.com/catarse"][target="_blank"]', [
                     m('span.fa.fa-github', '.'), ' Open Source com orgulho! '
                 ])
-            ]),
+            ])
         ]);
     }
 };

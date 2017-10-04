@@ -18,13 +18,13 @@ const adminBalanceTransferItem = {
                             }
                         }
                     })
-                ]),
+                ])
             ]),
             m('.w-col.w-col-3', [
                 m('.fontsize-smaller.fontweight-semibold.lineheight-tighter', [
                     `${item.user_name}`,
                     m('span.fontcolor-secondary.fontsize-smallest',
-                      `(${item.user_public_name})`),
+                      `(${item.user_public_name})`)
                 ]),
                 m('.fontcolor-secondary.fontsize-smallest',
                   item.user_email),
@@ -52,9 +52,9 @@ const adminBalanceTransferItem = {
             m('.w-col.w-col-2', [
                 m('.fontsize-smallest', [
                     'Confirmado em: ',
-                    (item.transferred_at ? m('span.fontsize-small.lineheight-tightest', h.momentify(item.transferred_at)) : '' ),
+                    (item.transferred_at ? m('span.fontsize-small.lineheight-tightest', h.momentify(item.transferred_at)) : '' )
                 ])
-            ]),
+            ])
         ]);
     }
 };

@@ -84,8 +84,8 @@ const projectUserCard = {
                     ] : ''),
                     args.project().is_admin_role ?
                         m('p', userDetail.email) : ''
-                ]),
-            ]),
+                ])
+            ])
         ])
         );
     }

@@ -14,7 +14,7 @@ const projectBudgetEdit = {
     controller(args) {
         const vm = projectVideoVM,
             mapErrors = [
-                  ['video_url', ['video_url']],
+                  ['video_url', ['video_url']]
             ],
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),

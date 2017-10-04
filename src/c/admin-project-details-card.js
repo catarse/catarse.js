@@ -54,8 +54,8 @@ const adminProjectDetailsCard = {
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
                             m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'levantados'),
                             m('.fontweight-semibold.fontsize-large.lineheight-tight', [
-                                `R$ ${h.formatNumber(project.pledged, 2)}`,
-                            ]),
+                                `R$ ${h.formatNumber(project.pledged, 2)}`
+                            ])
                         ]),
                         m('.w-col.w-col-3.w-col-small-3.w-col-tiny-6', [
                             m('.fontcolor-secondary.lineheight-tighter.fontsize-small', 'apoios'),

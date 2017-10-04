@@ -275,7 +275,7 @@ const paymentCreditCard = {
                                  }),
                                  ctrl.fieldHasError('cardOwnerDocument')
                              ]) : '')
-                        ]),
+                        ])
                     ]),
                     m('div#credit-card-number', [
                         m('label.field-label.fontweight-semibold[for="credit-card-number"]',

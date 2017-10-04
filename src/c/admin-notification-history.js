@@ -43,7 +43,7 @@ const adminNotificationHistory = {
                 m('.w-col.w-col-24', [
                     m('.fontcolor-secondary', h.momentify(cEvent.sent_at, 'DD/MM/YYYY, HH:mm'),
                           ' - ', m(`a[target="blank"][href="/notifications/${cEvent.relation}/${cEvent.id}"]`, cEvent.template_name), cEvent.origin ? ` - ${cEvent.origin}` : '')
-                ]),
+                ])
             ]))
         ]);
     }

@@ -129,7 +129,7 @@ const Flex = {
                                 m.component(landingQA, {
                                     question: 'Qual a diferença entre o flexível e o "tudo ou nada"?',
                                     answer: 'Atualmente o Catarse utiliza apenas o modelo "tudo ou nada", onde você só fica com o dinheiro se bater a meta de arrecadação dentro do prazo da campanha. O modelo flexível é diferente pois permite que o realizador fique com o que arrecadar, independente de atingir ou não a meta do projeto no prazo da campanha. Não haverá limite de tempo para as campanhas. Nosso sistema flexível será algo novo em relação aos modelos que existem atualmente no mercado.'
-                                }),
+                                })
                             ]), m('.w-col.w-col-6', [
                                 m.component(landingQA, {
                                     question: 'Posso inscrever projetos para a modalidade flexível já?',

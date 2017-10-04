@@ -115,8 +115,8 @@ const ownerMessageContent = {
                                     }) : h.loader())
                                 )
                             )
-                        ]),
-                    ]),
+                        ])
+                    ])
                 ])
             ];
 

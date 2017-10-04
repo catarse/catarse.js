@@ -132,9 +132,9 @@ const projectCard = {
                                 m('.fontsize-smaller.fontweight-semibold', `R$ ${h.formatNumber(project.pledged)}`),
                                 m('.fontsize-smallest.lineheight-tightest', 'Levantados')
                             ]),
-                            m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', ctrl.cardCopy(project)),
+                            m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', ctrl.cardCopy(project))
                         ])
-                    ]),
+                    ])
                 ]),
                 (args.showFriends && ctrl.type === 'big' ?
                  m('.w-col.w-col-4.w-col-medium-6', [m.component(projectFriends, { project })]) : '')

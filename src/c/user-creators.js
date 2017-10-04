@@ -69,7 +69,7 @@ const userCreators = {
                             friend: _.extend({}, {
                                 friend_id: friend.user_id
                             }, friend)
-                        })),
+                        }))
                 ]),
                 m('.w-section.section.bg-gray', [
                     m('.w-container', [

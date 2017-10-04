@@ -42,7 +42,7 @@ const userFollowers = {
             m('.w-container', [
                 m('.w-row', [
                     _.map(followersVM.collection(), friend => m.component(UserFollowCard,
-                                           { friend: _.extend({}, { friend_id: friend.user_id }, friend.source) })),
+                                           { friend: _.extend({}, { friend_id: friend.user_id }, friend.source) }))
                 ]),
                 m('.w-section.section.bg-gray', [
                     m('.w-container', [

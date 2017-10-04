@@ -131,7 +131,7 @@ const projectContributionReportContentCard = {
                                         m('.fontweight-semibold.fontsize-smaller.lineheight-tighter', contribution.public_user_name || contribution.user_name),
                                         m('.fontsize-smallest.lineheight-looser', [
                                             (contribution.has_another ? [
-                                                m('a.link-hidden-light.badge.badge-light', '+1 apoio '),
+                                                m('a.link-hidden-light.badge.badge-light', '+1 apoio ')
                                             ] : ''),
                                             (contribution.anonymous ? m('span.fa.fa-eye-slash.fontcolor-secondary', m('span.fontcolor-secondary[style="font-size:11px;"]', ` ${I18n.t('contribution.anonymous_contribution', contributionScope())}`)) : '')
                                         ]),

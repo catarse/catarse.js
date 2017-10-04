@@ -16,7 +16,7 @@ const projectCardEdit = {
         const vm = projectCardVM,
             mapErrors = [
                   ['uploaded_image', ['uploaded_image']],
-                  ['headline', ['headline']],
+                  ['headline', ['headline']]
             ],
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),

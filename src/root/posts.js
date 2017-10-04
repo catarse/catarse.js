@@ -291,7 +291,7 @@ const posts = {
                                     }, [
                                         m('input[name=\'utf8\'][type=\'hidden\'][value=\'✓\']'),
                                         m('input[name=\'_method\'][type=\'hidden\'][value=\'delete\']'),
-                                        m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`),
+                                        m(`input[name='authenticity_token'][type='hidden'][value='${h.authenticityToken()}']`)
                                     ])
 
                                 ]) : h.loader())

@@ -14,7 +14,7 @@ const projectBudgetEdit = {
     controller(args) {
         const vm = projectBudgetVM,
             mapErrors = [
-                  ['budget', ['budget']],
+                  ['budget', ['budget']]
             ],
             showSuccess = h.toggleProp(false, true),
             showError = h.toggleProp(false, true),

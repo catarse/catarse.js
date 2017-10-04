@@ -248,7 +248,7 @@ const editRewardCard = {
                                     ])
                                 )
                             ),
-                            ctrl.deliverAtError() ? inlineError('Data de entrega não pode ser no passado.') : '',
+                            ctrl.deliverAtError() ? inlineError('Data de entrega não pode ser no passado.') : ''
                         )
                     ]),
                     m('.w-row',
@@ -304,7 +304,7 @@ const editRewardCard = {
                                         fees: ctrl.fees,
                                         feeIndex,
                                         states: ctrl.states
-                                    }),
+                                    })
 
                                     ])),
                                     m('.u-margintop-20',

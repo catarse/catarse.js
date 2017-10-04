@@ -53,7 +53,7 @@ const userCard = {
                     _.map(user.links, link => m('li', [
                         m(`a.link-hidden[itemprop="url"][href="${link.link}"][target="_blank"]`, link.link)
                     ]))
-                ]),
+                ])
             ]),
             (ctrl.displayModal() ? m.component(modalBox, {
                 displayModal: ctrl.displayModal,

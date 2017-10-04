@@ -238,7 +238,7 @@ const projectsPayment = {
                                                 ]),
                                                 m('.fontsize-base.fontweight-semibold', user.name),
                                                 (user.owner_document ?
-                                                    m('label.field-label', `CPF/CNPJ: ${user.owner_document}`) : ''),
+                                                    m('label.field-label', `CPF/CNPJ: ${user.owner_document}`) : '')
 
                                             ])
                                         ]),
@@ -283,7 +283,7 @@ const projectsPayment = {
                                                 value: ctrl.vm.fields.ownerDocument()
                                             }),
                                             ctrl.fieldHasError('ownerDocument')
-                                        ])),
+                                        ]))
                                     ])),
                                     anonymousCheckbox
                                 ]),
@@ -375,7 +375,7 @@ const projectsPayment = {
                                     })
                                 ]) :
                                 '',
-                                m('div',
+                                m('div'//,
                                     // ctrl.contribution().shipping_fee_id ? [
                                     //     m('.divider.u-marginbottom-10.u-margintop-10'),
                                     //     m('.fontsize-smaller.fontweight-semibold',
@@ -390,7 +390,7 @@ const projectsPayment = {
                                     //     m('p.fontsize-smaller', `(R$ ${rewardVM.shippingFeeById(ctrl.contribution().shipping_fee_id) ? rewardVM.shippingFeeById(ctrl.contribution().shipping_fee_id).value : '...'})`)
                                     // ] : ''
                                 )
-                            ]),
+                            ])
                         ]),
                         m.component(faqBox, {
                             mode: project.mode,

@@ -33,7 +33,7 @@ const errorContributionModalContent = {
                             value: args.message(),
                             onchange: m.withAttr('value', args.message)
                         })
-                    ]),
+                    ])
                 ]),
                 m('.w-row', [
                     m('.w-col.w-col-1'),

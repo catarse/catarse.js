@@ -48,7 +48,7 @@ const menu = {
                     ]
                 ),
                 m('.text-align-right.w-col.w-col-4.w-col-small-4.w-col-tiny-4', [
-                    ctrl.user ? m.component(menuProfile, { user: ctrl.user }) : m('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/pt/login?ref=ctrse_header\']', 'Login'),
+                    ctrl.user ? m.component(menuProfile, { user: ctrl.user }) : m('a.w-nav-link.header-link.w-nav-link.btn-edit.u-right[href=\'/pt/login?ref=ctrse_header\']', 'Login')
                 ])
 
             ]),

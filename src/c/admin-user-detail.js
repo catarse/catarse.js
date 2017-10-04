@@ -72,7 +72,7 @@ const adminUserDetail = {
                     wrapperClass: '.w-col.w-col-4'
                 }),
                 m(adminUserBalanceTransactionsList, {user_id: item.id})
-            ]),
+            ])
         ]);
     }
 };

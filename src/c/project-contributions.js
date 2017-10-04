@@ -174,7 +174,7 @@ const projectContributions = {
                     m('.w-col.w-col-2.w-col-push-5', [!list.isLoading() ?
                                                       list.isLastPage() ? '' : m('button#load-more.btn.btn-medium.btn-terciary', {
                                                           onclick: list.nextPage
-                                                      }, 'Carregar mais') : h.loader(),
+                                                      }, 'Carregar mais') : h.loader()
                     ])
                 ])
             ]))
@@ -191,7 +191,7 @@ const projectContributions = {
                              dataKey: 'total_amount',
                              xAxis: item => h.momentify(item.paid_at),
                              emptyState: 'Apoios não contabilizados'
-                         }) : h.loader()]),
+                         }) : h.loader()])
                      ]),
                      m('.w-row',
                        m('.w-col.w-col-12.u-text-center', [

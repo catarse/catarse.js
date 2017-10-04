@@ -178,7 +178,7 @@ const publish = {
                         ' ',
                         m('span', { style: { 'font-weight': ' 600' } }, 'Meta de arrecadação')
                     ]),
-                    m('div', 'A meta não poderá ser alterada após o publicação do projeto.'),
+                    m('div', 'A meta não poderá ser alterada após o publicação do projeto.')
 
                 ]),
 
