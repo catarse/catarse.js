@@ -18,7 +18,8 @@ const projectMain = {
                     },
                     tabs = {
                         '#rewards': m('.w-col.w-col-12', m.component(projectRewardList, _.extend({}, {
-                            rewardDetails: args.rewardDetails
+                            rewardDetails: args.rewardDetails,
+                            showReport: true
                         }, c_opts))),
                         '#contribution_suggestions': m.component(projectSuggestedContributions, c_opts),
                         '#contributions': m.component(projectContributions, c_opts),
@@ -39,7 +40,7 @@ const projectMain = {
                 hash(window.location.hash);
 
                 if (_.isEmpty(hash()) || hash() === '#_=_' || hash() === '#preview') {
-                    return tabs['#about'];
+                    return tabs[h.mobileScreen()?'#rewards':'#about'];
                 }
 
                 return tabs[hash()];
