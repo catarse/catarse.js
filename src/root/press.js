@@ -52,7 +52,7 @@ const press = {
                                 I18n.t('history.subtitle', I18nScope())
                             ),
                             m('a.alt-link.fontsize-large[href=\'https://docs.google.com/document/d/1g29ITtXrqBnThAWDHdPz1KqCrmIAb07urVF8Ru6735Q/edit?usp=sharing\'][target=\'_blank\']', [
-                                m.trust(I18n.t('history.cta_html', I18nScope()))                            
+                                m.trust(I18n.t('history.cta_html', I18nScope()))]                            
                         ])
                     )
                 )
