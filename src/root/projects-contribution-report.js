@@ -58,10 +58,6 @@ const projectContributionReport = {
                     }
                     ],
                     failed: [{
-                        value: 'pending_refund',
-                        option: 'Reembolso em andamento'
-                    },
-                    {
                         value: 'refunded',
                         option: 'Reembolsado'
                     },
