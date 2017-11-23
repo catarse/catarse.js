@@ -4,10 +4,9 @@ import _ from 'underscore';
 import moment from 'moment';
 import $ from 'jquery';
 import m from 'mithril';
-import postgrest from 'mithril-postgrest';
+import {catarse} from './api';
 import CatarseAnalytics from 'CatarseAnalytics';
 import contributionVM from './vms/contribution-vm';
-import replaceDiacritics from 'replaceDiacritics';
 
 const
     _dataCache : Object = {},
@@ -23,7 +22,22 @@ const
     setMomentifyLocale = (): void => {
         moment.locale('pt', {
             months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
-            monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_')
+            monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
+            relativeTime : {
+                future : 'em %s',
+                past : 'há %s',
+                s : 'segundos',
+                m : 'um minuto',
+                mm : '%d minutos',
+                h : 'uma hora',
+                hh : '%d horas',
+                d : 'um dia',
+                dd : '%d dias',
+                M : 'um mês',
+                MM : '%d meses',
+                y : 'um ano',
+                yy : '%d anos'
+            }
         });
     },
     existy = (x: any): boolean => x != null,
@@ -263,7 +277,7 @@ const
         return p;
     },
 
-    idVM: Function = postgrest.filtersVM({
+    idVM: Function = catarse.filtersVM({
         id: 'eq'
     }),
 
