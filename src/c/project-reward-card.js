@@ -51,7 +51,8 @@ const projectRewardCard = {
 
                 if (projectVM.isSubscription(projectVM.currentProject())) {
                     vm.contributionValue(valueFloat);
-                    m.route(`/projects/${projectVM.currentProject().project_id}/subscriptions/checkout?reward_id=${vm.selectedReward().id}&contribution_value=${vm.contributionValue()}`);
+                    m.route(`/projects/${projectVM.currentProject().project_id}/subscriptions/checkout`, {contribution_value: valueFloat, reward_id: vm.selectedReward().id});
+
                     return false;
                 }
 
@@ -117,7 +118,7 @@ const projectRewardCard = {
                 m('.fontsize-mini.lineheight-tightest', 's/ juros')
             ]) : '',
             m('.u-marginbottom-20', [
-                m('.fontsize-base.fontweight-semibold', `Para R$ ${h.formatNumber(reward.minimum_value)} ou mais${isSub ? ' por mês' : ''}`)
+                m('.fontsize-base.fontweight-semibold', `R$ ${h.formatNumber(reward.minimum_value)} ou mais${isSub ? ' por mês' : ''}`)
             ]),
             m('.fontsize-smaller.fontweight-semibold',
                     reward.title

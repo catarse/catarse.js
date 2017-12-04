@@ -29,7 +29,9 @@ const fetchSubData = (projectUuid) => {
         subscriptionData(data || {
             amount_paid_for_valid_period: 0,
             total_subscriptions: 0,
-            total_subscribers: 0
+            total_subscribers: 0,
+            new_percent: 0,
+            returning_percent: 0
         });
     });
 };
@@ -88,12 +90,13 @@ const getCurrentProject = () => {
             currentProject(jsonData);
         }
 
-        m.redraw(true);
-
         init((project_id || projectId), (project_user_id || projectUserId));
+
+        m.redraw();
 
         return currentProject();
     }
+
     return false;
 };
 
@@ -131,6 +134,18 @@ const updateProject = (projectId, projectData) => m.request({
     config: h.setCsrfToken
 });
 
+const subscribeActionKey = 'subscribeProject';
+const storeSubscribeAction = (route) => {
+    h.storeAction(subscribeActionKey, route);
+};
+
+const checkSubscribeAction = () => {
+    const actionRoute = h.callStoredAction(subscribeActionKey);
+    if (actionRoute) {
+        m.route(actionRoute);
+    }
+};
+
 
 const projectVM = {
     userDetails,
@@ -146,7 +161,9 @@ const projectVM = {
     fetchSubData,
     subscriptionData,
     updateProject,
-    isSubscription
+    isSubscription,
+    storeSubscribeAction,
+    checkSubscribeAction
 };
 
 export default projectVM;
