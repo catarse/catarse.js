@@ -193,6 +193,42 @@ const paymentVM = () => {
         }
     };
 
+    const sendBtcPayment = (contribution_id, project_id, error, loading, completed) => {
+        m.request({
+            method: 'post',
+            url: `/payment/redecoin/${contribution_id}/pay.json`,
+            dataType: 'json'
+        }).then((data) => {
+            completed(true);
+            window.location.href = `/projects/${project_id}/contributions/${contribution_id}`;
+        }).catch((err) => {
+            error(I18n.t('submission.btc_submission', scope()));
+            loading(false);
+            completed(false);
+            m.redraw();
+        });
+    };
+
+    const payBtc = (contribution_id, project_id, error, loading, completed) => {
+        error(false);
+        m.redraw()
+        if (validate()) {
+            updateContributionData(contribution_id, project_id)
+                .then(() => {
+                    sendBtcPayment(contribution_id, project_id, error, loading, completed);
+                })
+                .catch(() => {
+                    loading(false);
+                    error(I18n.t('submission.btc_validation', scope()));
+                    m.redraw();
+                })
+        } else {
+            loading(false);
+            error(I18n.t('submission.btc_validation', scope()));
+            m.redraw();
+        }
+    };
+
     const savedCreditCards = m.prop([]);
 
     const getSavedCreditCards = (user_id) => {
@@ -398,6 +434,7 @@ const paymentVM = () => {
         resetFieldError,
         getSlipPaymentDate,
         paySlip,
+        payBtc,
         installments,
         getInstallments,
         savedCreditCards,

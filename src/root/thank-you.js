@@ -12,14 +12,15 @@ const I18nScope = _.partial(h.i18nScope, 'projects.contributions');
 const thankYou = {
     controller(args) {
         const recommendedProjects = userVM.getUserRecommendedProjects(),
-            isSlip = args.contribution && !_.isEmpty(args.contribution.slip_url);
+            isSlip = args.contribution && !_.isEmpty(args.contribution.slip_url),
+            isBtc = args.contribution && args.contribution.payment_method == 'Bitcoin';
 
         const setEvents = (el, isInitialized) => {
             if (!isInitialized) {
                 CatarseAnalytics.event({
                     cat: 'contribution_finish',
                     act: 'contribution_finished',
-                    lbl: isSlip ? 'slip' : 'creditcard',
+                    lbl: isSlip ? 'slip' : isBtc ? 'bitcoin' : 'creditcard',
                     val: args.contribution.value,
                     extraData: {
                         contribution_id: args.contribution.contribution_id
@@ -28,7 +29,7 @@ const thankYou = {
 
                 CatarseAnalytics.checkout(
                     `${args.contribution.contribution_id}`,
-                    `[${args.contribution.project.permalink}] ${args.contribution.reward ? args.contribution.reward.minimum_value : '10'} [${isSlip ? 'slip' : 'creditcard'}]`,
+                    `[${args.contribution.project.permalink}] ${args.contribution.reward ? args.contribution.reward.minimum_value : '10'} [${isSlip ? 'slip' : isBtc ? 'bitcoin' : 'creditcard'}]`,
                     `${args.contribution.reward ? args.contribution.reward.reward_id : ''}`,
                     `${args.contribution.project.category}`,
                     `${args.contribution.value}`,
@@ -41,12 +42,13 @@ const thankYou = {
             setEvents,
             displayShareBox: h.toggleProp(false, true),
             isSlip,
+            isBtc,
             recommendedProjects
         };
     },
     view(ctrl, args) {
         return m('#thank-you', { config: ctrl.setEvents }, [
-            m('.page-header.u-marginbottom-30',
+            m('.page-header',
               m('.w-container',
                 m('.w-row',
                   m('.w-col.w-col-10.w-col-push-1',
@@ -54,7 +56,7 @@ const thankYou = {
                           m('.u-marginbottom-20.u-text-center',
                           m(`img.big.thumb.u-round[src='${args.contribution.project.user_thumb}']`)
                          ),
-                          m('#thank-you.u-text-center', !ctrl.isSlip ?
+                          m('#thank-you.u-text-center', !ctrl.isSlip && !ctrl.isBtc ?
                           [
                               m('#creditcard-thank-you.fontsize-larger.text-success.u-marginbottom-20',
                                 I18n.t('thank_you.thank_you', I18nScope())
@@ -74,7 +76,7 @@ const thankYou = {
                               m('.fontsize-base.fontweight-semibold.u-marginbottom-20',
                                 'Compartilhe com seus amigos e ajude esse projeto a bater a meta!'
                                )
-                          ] : [
+                          ] : ctrl.isSlip && !ctrl.isBtc ? [
                               m('#slip-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n.t('thank_you_slip.thank_you', I18nScope())),
                               m('.fontsize-base.u-marginbottom-40',
                                 m.trust(I18n.t('thank_you_slip.thank_you_text_html',
@@ -82,9 +84,16 @@ const thankYou = {
                                                    email: args.contribution.contribution_email,
                                                    link_email: `/pt/users/${h.getUser().user_id}/edit#about_me`
                                                }))))
+                          ] : [
+                              m('#btc-thank-you.fontsize-largest.text-success.u-marginbottom-20', I18n.t('thank_you_btc.thank_you', I18nScope())),
+                              m('.fontsize-base.u-marginbottom-40',
+                                  m.trust(I18n.t('thank_you_btc.thank_you_text_html',
+                                      I18nScope({
+                                          btc_amount: args.contribution.payment_gateway_data.valBtc
+                                      }))))
                           ]
                          ),
-                          ctrl.isSlip ? '' : m('.w-row',
+                          ctrl.isSlip || ctrl.isBtc ? '' : m('.w-row',
                               [
                                   m('.w-hidden-small.w-hidden-tiny',
                                       [
@@ -123,9 +132,16 @@ const thankYou = {
                  )
                )
              ),
-            m('.section.u-marginbottom-40',
+            m(`.section${ctrl.isBtc ? '' : '.u-marginbottom-40'}`,
               m('.w-container',
-                ctrl.isSlip ? m('.w-row',
+                  ctrl.isBtc ? m('.w-row', m(
+                      '.w-col.w-col-8.w-col-offset-2.u-text-center',
+                      [
+                          m('img', { src: args.contribution.payment_gateway_data.qrcode}),
+                          m('.fontsize-base', args.contribution.payment_gateway_data.address)
+                      ]
+                  )) : '',
+                  ctrl.isSlip && !ctrl.isBtc ? m('.w-row',
                                 m('.w-col.w-col-8.w-col-offset-2',
                                   m('iframe.slip', {
                                       src: args.contribution.slip_url,
@@ -135,7 +151,8 @@ const thankYou = {
                                       style: 'overflow: hidden;'
                                   })
                                  )
-                               ) : [
+                  ) : '',
+                  !ctrl.isSlip && !ctrl.isBtc ? [
                                    m('.fontsize-large.fontweight-semibold.u-marginbottom-30.u-text-center',
                                      I18n.t('thank_you.project_recommendations', I18nScope())
                                     ),
@@ -143,7 +160,7 @@ const thankYou = {
                                        collection: ctrl.recommendedProjects,
                                        ref: 'ctrse_thankyou_r'
                                    })
-                               ]
+                               ] : ''
                )
              )
         ]);
