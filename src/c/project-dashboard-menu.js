@@ -56,7 +56,7 @@ const projectDashboardMenu = {
             editLinksToggle.toggle(false);
         }
 
-        if (args.hidePublish) {
+        if (args.hidePublish || projectVM.isSubscription(args.project())) {
             showPublish.toggle(false);
         }
 
@@ -81,7 +81,9 @@ const projectDashboardMenu = {
         return m('#project-nav', [
             m('.project-nav-wrapper', [
                 m('nav.w-section.dashboard-nav.side', [
-                    m(`a#dashboard_preview_link.w-inline-block.dashboard-project-name[href="${project.is_published ? `/${project.permalink}` : `${editRoute}#preview`}"]`, [
+                    m(`a#dashboard_preview_link.w-inline-block.dashboard-project-name[href="${project.is_published ? `/${project.permalink}` : `${editRoute}#preview`}"]`, {
+                        onclick: projectVM.routeToProject(project, args.ref)
+                    }, [
                         m(`img.thumb-project-dashboard[src="${project ? ctrl.projectThumb(project) : '/assets/thumb-project.png'}"][width="114"]`),
                         m('.fontcolor-negative.lineheight-tight.fontsize-small', project.name),
                         m(`img.u-margintop-10[src="/assets/catarse_bootstrap/badge-${project.mode}-h.png"]`, {
@@ -89,33 +91,41 @@ const projectDashboardMenu = {
                         })
                     ]),
                     m('#info-links.u-marginbottom-20', [
-                        (project.state === 'draft' && projectVM.isSubscription(project))
-                            ? m(`a#dashboard_home_link[class="${editLinkClass('#start')}"][href="${editRoute}#start"]`, [
-                                m('span.fa.fa-info.fa-lg.fa-fw'), I18n.t('draft_start_tab', I18nScope())
-                            ])
-                            : m(`a#dashboard_home_link[class="dashboard-nav-link-left ${h.locationActionMatch('insights') ? 'selected' : ''}"][href="${projectRoute}/insights"]`, [
-                                m('span.fa.fa-bar-chart.fa-lg.fa-fw'), I18n.t('start_tab', I18nScope())
-                            ]), (project.is_published ? [
-                                projectVM.isSubscription(project) ?
-                                m(`a#dashboard_subscriptions_link[class="dashboard-nav-link-left ${h.locationActionMatch('subscriptions_report') ? 'selected' : ''}"][href="${projectRoute}/subscriptions_report"]`, [
-                                    m('span.fa.fa.fa-users.fa-lg.fa-fw'), I18n.t('subscriptions_tab', I18nScope())
-                                ]) :
-                                m(`a#dashboard_reports_link[class="dashboard-nav-link-left ${h.locationActionMatch('contributions_report') ? 'selected' : ''}"][href="${projectRoute}/contributions_report"]`, [
-                                    m('span.fa.fa.fa-table.fa-lg.fa-fw'), I18n.t('reports_tab', I18nScope())
-                                ]),
-                                m(`a#dashboard_posts_link[class="dashboard-nav-link-left ${h.locationActionMatch('posts') ? 'selected' : ''}"][href="${projectRoute}/posts"]`, [
-                                    m('span.fa.fa-bullhorn.fa-fw.fa-lg'),
-                                    I18n.t('posts_tab', I18nScope()),
-                                    project.posts_count > 0 ?
+                        (project.state === 'draft' && projectVM.isSubscription(project)) ?
+                        m(`a#dashboard_home_link[class="${editLinkClass('#start')}"][href="${editRoute}#start"]`, [
+                            m('span.fa.fa-info.fa-lg.fa-fw'), I18n.t('draft_start_tab', I18nScope())
+                        ]) :
+                        m(`a#dashboard_home_link[class="dashboard-nav-link-left ${h.locationActionMatch('insights') ? 'selected' : ''}"][href="${projectRoute}/insights"]`, {
+                            config: m.route
+                        }, [
+                            m('span.fa.fa-bar-chart.fa-lg.fa-fw'), I18n.t('start_tab', I18nScope())
+                        ]), (project.is_published ? [
+                            projectVM.isSubscription(project) ?
+                            m(`a#dashboard_subscriptions_link[class="dashboard-nav-link-left ${h.locationActionMatch('subscriptions_report') ? 'selected' : ''}"][href="${projectRoute}/subscriptions_report"]`, {
+                                config: m.route
+                            }, [
+                                m('span.fa.fa.fa-users.fa-lg.fa-fw'), I18n.t('subscriptions_tab', I18nScope())
+                            ]) :
+                            m(`a#dashboard_reports_link[class="dashboard-nav-link-left ${h.locationActionMatch('contributions_report') ? 'selected' : ''}"][href="${projectRoute}/contributions_report"]`, {
+                                config: m.route
+                            }, [
+                                m('span.fa.fa.fa-table.fa-lg.fa-fw'), I18n.t('reports_tab', I18nScope())
+                            ]),
+                            m(`a#dashboard_posts_link[class="dashboard-nav-link-left ${h.locationActionMatch('posts') ? 'selected' : ''}"][href="${projectRoute}/posts"]`, [
+                                m('span.fa.fa-bullhorn.fa-fw.fa-lg'),
+                                I18n.t('posts_tab', I18nScope()),
+                                project.posts_count > 0 ?
                                 m('span.badge', project.posts_count) :
                                 m('span.badge.badge-attention', 'Nenhuma')
-                                ]),
+                            ]),
 
-                                (projectVM.isSubscription(project) ? '' :
-                                m(`a#dashboard_surveys_link[class="dashboard-nav-link-left ${h.locationActionMatch('surveys') ? 'selected' : ''}"][href="${projectRoute}/surveys"]`, [
+                            (projectVM.isSubscription(project) ? '' :
+                                m(`a#dashboard_surveys_link[class="dashboard-nav-link-left ${h.locationActionMatch('surveys') ? 'selected' : ''}"][href="${projectRoute}/surveys"]`, {
+                                    config: m.route
+                                }, [
                                     m('span.fa.fa.fa-check-square-o.fa-lg.fa-fw'), I18n.t('surveys_tab', I18nScope())
                                 ]))
-                            ] : '')
+                        ] : '')
                     ]),
                     m('.edit-project-div', [
                         (!project.is_published ? '' : m('button#toggle-edit-menu.dashboard-nav-link-left', {
