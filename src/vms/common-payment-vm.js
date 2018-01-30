@@ -6,10 +6,13 @@ import models from '../models';
 import h from '../h';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions.edit.errors');
+const paymentInfoId = m.prop();
 const {commonPayment, commonPaymentInfo} = models;
-const sendPaymentRequest = data => commonPayment.postWithToken({data}, null, {
-    'X-forwarded-For': '127.0.0.1'
-});
+const sendPaymentRequest = data => commonPayment.postWithToken(
+    {data: _.extend({}, data, {payment_id: paymentInfoId()})},
+    null,
+    {'X-forwarded-For': '127.0.0.1'}
+);
 
 const updateUser = user => m.request({
     method: 'PUT',
@@ -60,7 +63,6 @@ const paymentInfo = (paymentId) => {
     });
 };
 
-
 let retries = 10;
 const resolvePayment = (gateway_payment_method, payment_confirmed, payment_id) => m.route(`/projects/subscriptions/thank_you?project_id=${projectVM.currentProject().project_id}&payment_method=${gateway_payment_method}&payment_confirmed=${payment_confirmed}&payment_id=${payment_id}`)
 const requestInfo = (promise, paymentInfoId, defaultPaymentMethod) => {
@@ -71,7 +73,7 @@ const requestInfo = (promise, paymentInfoId, defaultPaymentMethod) => {
     paymentInfo(paymentInfoId).then((infoR) => {
         if(_.isNull(infoR.gateway_payment_method) || _.isUndefined(infoR.gateway_payment_method)) {
             if(!_.isNull(infoR.gateway_errors)) {
-                return promise.reject({message: infoR.gateway_errors})
+                return promise.reject(_.first(infoR.gateway_errors));
             } 
 
             return h.sleep(4000).then(() => {
@@ -87,6 +89,8 @@ const requestInfo = (promise, paymentInfoId, defaultPaymentMethod) => {
 
 const getPaymentInfoUntilNoError = (paymentMethod) => ({id}) => {
     let p = m.deferred();
+
+    paymentInfoId(id);
 
     requestInfo(p, id, paymentMethod);
 
@@ -107,17 +111,19 @@ const sendCreditCardPayment = (selectedCreditCard, fields, commonData) => {
     const address = customer.address();
     const phoneDdd = address.phone_number.match(/\(([^)]*)\)/)[1];
     const phoneNumber = address.phone_number.substr(5, address.phone_number.length);
-    const addressState = _.findWhere(addressVM.states(), {id: address.state_id});
-    const addressCountry = _.findWhere(addressVM.countries(), {id: address.country_id});
+    const addressState = _.findWhere(addressVM.states(), {id: address.state_id}) || {};
+    const addressCountry = _.findWhere(addressVM.countries(), {id: address.country_id}) || {};
 
     card.generateHash(cardHash => {
         const payload = {
             subscription: true,
+            anonymous: customer.anonymous(),
             user_id: commonData.userCommonId,
             project_id: commonData.projectCommonId,
             amount: commonData.amount,
             payment_method: 'credit_card',
             card_hash: cardHash,
+            credit_card_owner_document: fields.creditCardFields.cardOwnerDocument(),
             customer: {
                 name: customer.completeName(),
                 document_number: customer.ownerDocument(),
@@ -164,6 +170,7 @@ const sendSlipPayment = (fields, commonData) => {
     const addressCountry = _.findWhere(addressVM.countries(), {id: address.country_id});
     const payload = {
         subscription: true,
+        anonymous: customer.anonymous(),
         user_id: commonData.userCommonId,
         project_id: commonData.projectCommonId,
         amount: commonData.amount,
