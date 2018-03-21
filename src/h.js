@@ -282,6 +282,13 @@ const
         id: 'eq'
     }),
 
+    isDevEnv = (): ?boolean => {
+        const root = document.getElementById('catarse_bootstrap'),
+            data = root && root.getAttribute('data-environment');
+
+        return (data && data == 'development');
+    },
+
     getCurrentProject = (): ?Object => {
         if (_dataCache.currentProject) { return _dataCache.currentProject; }
 
@@ -1007,5 +1014,6 @@ export default {
     rootUrl,
     redactor,
     setCsrfToken,
-    userSignedIn
+    userSignedIn,
+    isDevEnv
 };
