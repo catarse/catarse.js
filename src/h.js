@@ -40,6 +40,7 @@ const
             }
         });
     },
+    lastDayOfNextMonth = () => moment().add(1, 'months').format('D/MMMM'),
     existy = (x: any): boolean => x != null,
 
     slugify = (str: string): string => replaceDiacritics(str.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'')),
@@ -778,10 +779,11 @@ const
     isProjectPage = (): boolean => {
         const path = window.location.pathname,
             isOnInsights = path.indexOf('/insights') > -1,
+            isOnFiscal = path.indexOf('/fiscal') > -1,
             isOnEdit = path.indexOf('/edit') > -1,
             isOnContribution = path.indexOf('/contribution') > -1;
 
-        return !isOnEdit && !isOnInsights && !isOnContribution;
+        return !isOnEdit && !isOnInsights && !isOnContribution && !isOnFiscal;
     },
     setPageTitle = (title: string): mConfig => (el, isInitialized) => {
         const titleEl = document.getElementsByTagName('title')[0],
@@ -942,6 +944,7 @@ export default {
     validateCnpj,
     momentify,
     momentFromString,
+    lastDayOfNextMonth,
     formatNumber,
     idVM,
     getUser,

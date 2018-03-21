@@ -7,11 +7,21 @@ import h from '../h';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions.edit.errors');
 const paymentInfoId = m.prop();
-const {commonPayment, commonPaymentInfo} = models;
+const {commonPayment, commonSubscriptionUpgrade, commonPaymentInfo, commonCreditCard, commonCreditCards} = models;
 const sendPaymentRequest = data => commonPayment.postWithToken(
     {data: _.extend({}, data, {payment_id: paymentInfoId()})},
     null,
     {'X-forwarded-For': '127.0.0.1'}
+);
+
+const sendSubscriptionUpgrade = data => commonSubscriptionUpgrade.postWithToken(
+    {data},
+    null,
+    {'X-forwarded-For': '127.0.0.1'}
+);
+
+const saveCreditCard = creditCardHash => commonCreditCard.postWithToken(
+    {data: {card_hash: creditCardHash}}
 );
 
 const updateUser = user => m.request({
@@ -63,14 +73,20 @@ const paymentInfo = (paymentId) => {
     });
 };
 
+const creditCardInfo = (creditCard) => commonCreditCards.getRowWithToken(h.idVM.id(creditCard.id).parameters());
+
 let retries = 10;
-const resolvePayment = (gateway_payment_method, payment_confirmed, payment_id) => m.route(`/projects/${projectVM.currentProject().project_id}/subscriptions/thank_you?project_id=${projectVM.currentProject().project_id}&payment_method=${gateway_payment_method}&payment_confirmed=${payment_confirmed}&payment_id=${payment_id}`)
-const requestInfo = (promise, paymentInfoId, defaultPaymentMethod) => {
+const isReactivation = () => {
+    const subscriptionStatus = m.route.param('subscription_status');
+    return subscriptionStatus === 'inactive' || subscriptionStatus === 'canceled';
+};
+const resolvePayment = (gateway_payment_method, payment_confirmed, payment_id, isEdit) => m.route(`/projects/${projectVM.currentProject().project_id}/subscriptions/thank_you?project_id=${projectVM.currentProject().project_id}&payment_method=${gateway_payment_method}&payment_confirmed=${payment_confirmed}${payment_id ? '&payment_id=' + payment_id : ''}${isEdit && !isReactivation() ? '&is_edit=1' : ''}`);
+const requestInfo = (promise, paymentId, defaultPaymentMethod, isEdit) => {
     if (retries <= 0) {
-        return promise.resolve(resolvePayment(defaultPaymentMethod, false, paymentInfoId));
+        return promise.resolve(resolvePayment(defaultPaymentMethod, false, paymentId, isEdit));
     }
 
-    paymentInfo(paymentInfoId).then((infoR) => {
+    paymentInfo(paymentId).then((infoR) => {
         if(_.isNull(infoR.gateway_payment_method) || _.isUndefined(infoR.gateway_payment_method)) {
             if(!_.isNull(infoR.gateway_errors)) {
                 return promise.reject(_.first(infoR.gateway_errors));
@@ -79,25 +95,71 @@ const requestInfo = (promise, paymentInfoId, defaultPaymentMethod) => {
             return h.sleep(4000).then(() => {
                 retries = retries - 1;
 
-                return requestInfo(promise, paymentInfoId, defaultPaymentMethod)
+                return requestInfo(promise, paymentId, defaultPaymentMethod);
             });
         }
 
-        return promise.resolve(resolvePayment(infoR.gateway_payment_method, true, paymentInfoId));
+        return promise.resolve(resolvePayment(infoR.gateway_payment_method, true, paymentId, isEdit));
     }).catch(() => promise.reject({}));
 };
 
-const getPaymentInfoUntilNoError = (paymentMethod) => ({id}) => {
+const getPaymentInfoUntilNoError = (paymentMethod, isEdit) => ({id, catalog_payment_id}) => {
     let p = m.deferred();
 
-    paymentInfoId(id);
+    const paymentId = isEdit ? catalog_payment_id : id;
 
-    requestInfo(p, id, paymentMethod);
+    if (paymentId) {
+        paymentInfoId(paymentId);
+        requestInfo(p, paymentId, paymentMethod, isEdit);
+    } else {
+        resolvePayment(paymentMethod, false, null, isEdit);
+    }
 
     return p.promise;
 };
 
+
+let creditCardRetries = 5;
+const waitForSavedCreditCard = promise => creditCardId => {
+    if(creditCardRetries <= 0) {
+        return promise.reject({message: 'Could not save card'});
+    }
+
+    creditCardInfo(creditCardId).then(([infoR]) => {
+        if(_.isEmpty(infoR.gateway_data)) {
+            if(!_.isEmpty(infoR.gateway_errors)) {
+                return promise.reject(_.first(infoR.gateway_errors));
+            }
+
+            return h.sleep(4000).then(() => {
+                creditCardRetries = creditCardRetries - 1;
+
+                return waitForSavedCreditCard(promise)(creditCardId);
+            });
+        }
+
+        return promise.resolve({creditCardId});
+    }).catch(() => promise.reject({message: 'Really couldnt save your card'}));
+
+
+    return promise;
+};
+
+const processCreditCard = (cardHash, fields) => {
+    const p = m.deferred();
+
+    saveCreditCard(cardHash)
+        .then(waitForSavedCreditCard(p))
+        .catch(p.reject);
+
+    return p.promise;
+
+};
+
 const sendCreditCardPayment = (selectedCreditCard, fields, commonData) => {
+    if (!fields) {
+        return false;
+    }
     fields.isLoading(true);
     m.redraw();
 
@@ -122,7 +184,6 @@ const sendCreditCardPayment = (selectedCreditCard, fields, commonData) => {
             project_id: commonData.projectCommonId,
             amount: commonData.amount,
             payment_method: 'credit_card',
-            card_hash: cardHash,
             credit_card_owner_document: fields.creditCardFields.cardOwnerDocument(),
             customer: {
                 name: customer.completeName(),
@@ -136,7 +197,7 @@ const sendCreditCardPayment = (selectedCreditCard, fields, commonData) => {
                     country: 'Brasil',
                     state: addressState.acronym,
                     city: address.address_city,
-                    complementary: address.address_complement,
+                    complementary: address.address_complement
                 },
                 phone: {
                     ddi: '55',
@@ -145,15 +206,38 @@ const sendCreditCardPayment = (selectedCreditCard, fields, commonData) => {
                 }
             }
         };
-    
+
         if (commonData.rewardCommonId) {
             _.extend(payload, {reward_id: commonData.rewardCommonId});
         }
-  
-        const sendPayment = () => sendPaymentRequest(payload);
+
+        if (commonData.subscription_id) {
+            _.extend(payload, {id: commonData.subscription_id});
+        }
+
+        const pay = ({creditCardId}) => {
+            const p = m.deferred();
+
+            if (creditCardId) {
+                _.extend(payload, {
+                    card_id: creditCardId.id,
+                    credit_card_id: creditCardId.id
+                });
+            }
+
+            if (commonData.subscription_id){
+                sendSubscriptionUpgrade(payload).then(p.resolve).catch(p.reject);
+            } else {
+                sendPaymentRequest(payload).then(p.resolve).catch(p.reject);
+            }
+
+            return p.promise;
+        };
+
         updateUser(userPayload(customer, address))
-            .then(sendPayment)
-            .then(getPaymentInfoUntilNoError(payload.payment_method))
+            .then(() => processCreditCard(cardHash, fields))
+            .then(pay)
+            .then(getPaymentInfoUntilNoError(payload.payment_method, Boolean(commonData.subscription_id)))
             .catch(displayError(fields));
     });
 };
@@ -187,7 +271,7 @@ const sendSlipPayment = (fields, commonData) => {
                 country: 'Brasil',
                 state: addressState.acronym,
                 city: address.address_city,
-                complementary: address.address_complement,
+                complementary: address.address_complement
             },
             phone: {
                 ddi: '55',
@@ -201,10 +285,25 @@ const sendSlipPayment = (fields, commonData) => {
         _.extend(payload, {reward_id: commonData.rewardCommonId});
     }
 
-    const sendPayment = () => sendPaymentRequest(payload);
+    if (commonData.subscription_id) {
+        _.extend(payload, {id: commonData.subscription_id});
+    }
+
+    const sendPayment = () => {
+        const p = m.deferred();
+
+        if (commonData.subscription_id) {
+            sendSubscriptionUpgrade(payload).then(p.resolve).catch(p.reject);
+        } else {
+            sendPaymentRequest(payload).then(p.resolve).catch(p.reject);
+        }
+
+        return p.promise;
+    };
+
     updateUser(userPayload(customer, address))
         .then(sendPayment)
-        .then(getPaymentInfoUntilNoError(payload.payment_method))
+        .then(getPaymentInfoUntilNoError(payload.payment_method, Boolean(commonData.subscription_id)))
         .catch(displayError(fields));
 };
 

@@ -34,9 +34,11 @@ const adminSubscriptionDetail = {
         const loadNotifications = () => {
             const notifications = m.prop([]);
             const notificationFilterVM = commonNotification.filtersVM({
-                user_id: 'eq'
+                user_id: 'eq',
+                project_id: 'eq'
             });
             notificationFilterVM.user_id(args.item.user_id);
+            notificationFilterVM.project_id(args.item.project_id);
 
             const lNotifications = commonNotification.loaderWithToken(
                 models.userNotification.getPageOptions(notificationFilterVM.parameters()));
@@ -178,6 +180,8 @@ const adminSubscriptionDetail = {
                         // 'Anônimo: Não',
                         m('br'),
                         `Id pagamento: ${currentPayment().id}`,
+                        m('br'),
+                        `Id gateway: ${currentPayment().gateway_id}`,
                         m('br'),
                         'Apoio:',
                         m.trust('&nbsp;'),

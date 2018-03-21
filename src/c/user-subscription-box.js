@@ -10,6 +10,8 @@ import {
 import contributionVM from '../vms/contribution-vm';
 import commonPaymentVM from '../vms/common-payment-vm';
 import ownerMessageContent from '../c/owner-message-content';
+import subscriptionStatusIcon from '../c/subscription-status-icon';
+import paymentMethodIcon from '../c/payment-method-icon';
 import cancelSubscriptionContent from '../c/cancel-subscription-content';
 import modalBox from '../c/modal-box';
 import userVM from '../vms/user-vm';
@@ -117,20 +119,10 @@ const userSubscriptionBox = {
                             `Iniciou há ${moment(subscription.created_at).locale('pt').fromNow(true)}`
                         ),
                         m('.u-marginbottom-10', [
-                            m(`span.fa.fa-${{canceled: 'times-', canceling: 'times-'}[subscription.status] || ''}circle${subscription.status === 'canceling' ? '-o' : ''}.text-${{
-                                started: 'waiting',
-                                active:  'success'
-                            }[subscription.status] || 'error'}`),
-                            {
-                                started: ' Iniciada',
-                                active: ' Ativa',
-                                inactive: ' Inativa',
-                                canceled: ' Cancelada',
-                                canceling: ' Cancelamento solicitado',
-                                deleted: ' Apagada'
-                            }[subscription.status] || ' Erro',
+                            m(subscriptionStatusIcon, {subscription}),
                             m.trust('&nbsp;&nbsp;&nbsp;'),
-                            (subscription.payment_method === 'credit_card' ? [m('span.fa.fa-credit-card'), ' Cartão de Crédito'] : [m('span.fa.fa-barcode'), ' Boleto'])
+                            m(paymentMethodIcon, {subscription})
+                            
                         ])
                     ]),
                     m('.u-marginbottom-20.w-col.w-col-3', [
@@ -150,13 +142,27 @@ const userSubscriptionBox = {
                                 (subscription.boleto_url ? m(`a.btn.btn-inline.btn-small.w-button[target=_blank][href=${subscription.boleto_url}]`, 'Imprimir boleto') : null)
                             ] :
                             (subscription.status === 'inactive' ? [
-                                    m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
-                                        m('span.fa.fa-exclamation-triangle'),
-                                        m.trust('&nbsp;'),
-                                        'Sua assinatura está inativa por falta de pagamento'
-                                    ]),
-                                    m(`a.btn.btn-inline.btn-small.w-button[target=_blank][href=/projects/${subscription.project_external_id}/subscriptions/start${subscription.reward_external_id?'?reward_id='+subscription.reward_external_id:''}]`, 'Assinar novamente')
-                                ] : subscription.status === 'canceled' ? [
+                                (subscription.payment_status === 'pending'
+                                    && subscription.boleto_url
+                                    && subscription.boleto_expiration_date ? [
+                                        m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
+                                            m('span.fa.fa-exclamation-triangle'),
+                                            ` O boleto de sua assinatura vence dia ${h.momentify(subscription.boleto_expiration_date)}` 
+                                        ]),
+                                        m(`a.btn.btn-inline.btn-small.w-button[target=_blank][href=${subscription.boleto_url}]`, 'Imprimir boleto')
+                                    ] : [ 
+                                        m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
+                                            m('span.fa.fa-exclamation-triangle'),
+                                            m.trust('&nbsp;'),
+                                            'Sua assinatura está inativa por falta de pagamento'
+                                        ]),
+                                        m(`a.btn.btn-inline.btn-small.w-button[target=_blank][href=/projects/${subscription.project_external_id}/subscriptions/start?subscription_id=${subscription.id}${subscription.reward_external_id ? '&reward_id=' + subscription.reward_external_id : ''}&subscription_status=${subscription.status}]`, 'Assinar novamente')
+                                    ])
+                            ] : subscription.status === 'canceled' ? [
+                                    m('a.btn.btn-terciary.u-marginbottom-20.btn-inline.w-button', 
+                                        {href: `/projects/${subscription.project_external_id}/subscriptions/start?subscription_id=${subscription.id}${subscription.reward_external_id ? '&reward_id=' + subscription.reward_external_id : ''}&subscription_status=${subscription.status}`},
+                                        'Reativar assinatura'
+                                    ),
                                     m('.card-error.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
                                         m('span.fa.fa-exclamation-triangle'),
                                         m.trust('&nbsp;'),
@@ -171,6 +177,10 @@ const userSubscriptionBox = {
                                         ` Sua assinatura será cancelada no dia ${h.momentify( subscription.next_charge_at, 'DD/MM/YYYY' )}. Até lá, ela ainda será considerada ativa.`
                                     ])
                                 ) : (subscription.status === 'active' ? [
+                                    m('a.btn.btn-terciary.u-marginbottom-20.btn-inline.w-button', 
+                                        {href: `/projects/${subscription.project_external_id}/subscriptions/start?${subscription.reward_external_id ? 'reward_id=' + subscription.reward_external_id : ''}&subscription_id=${subscription.id}&subscription_status=${subscription.status}`},
+                                        'Editar assinatura'
+                                    ),
                                     subscription.payment_status === 'pending'
                                     && subscription.boleto_url
                                     && subscription.boleto_expiration_date ?
