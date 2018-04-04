@@ -2,6 +2,8 @@ import m from 'mithril';
 import _ from 'underscore';
 import I18n from 'i18n-js';
 import moment from 'moment';
+import {catarse} from '../api'
+import models from '../models';
 import h from '../h';
 import contributionVM from '../vms/contribution-vm';
 import rewardVM from '../vms/reward-vm';
@@ -31,6 +33,7 @@ const projectsSubscriptionCheckout = {
             currentUserID = h.getUserID(),
             user = usersVM.getCurrentUser(),
             oldSubscription = m.prop({}),
+            countriesLoader = catarse.loader(models.country.getPageOptions()),
             error = m.prop();
 
         const subscriptionId = m.prop(m.route.param('subscription_id'));
@@ -60,7 +63,7 @@ const projectsSubscriptionCheckout = {
         }
 
         const valueParam = m.route.param('contribution_value');
-        const rewardIdParam = m.route.param('reward_id'); 
+        const rewardIdParam = m.route.param('reward_id');
 
         if (valueParam) {
             value = rewardVM.contributionValue(Number(valueParam));
@@ -121,7 +124,13 @@ const projectsSubscriptionCheckout = {
             addVM(addressVM({
                 data: vm.fields.address()
             }));
+            countriesLoader
+                .load()
+                .then(countryData => {
+                    addVM().countries(_.sortBy(countryData, 'name_en'));
+                });
         });
+
 
         projectVM.getCurrentProject();
 
@@ -299,7 +308,7 @@ const projectsSubscriptionCheckout = {
                                             }),
                                             ctrl.fieldHasError('completeName')
                                         ]),
-                                        m('.w-col.w-col-5', [
+                                        m('.w-col.w-col-5', addVM.international() ? '' : [
                                             m('label.field-label.fontweight-semibold[for=\'document\']',
                                                 I18n.t('fields.owner_document', ctrl.scope())
                                             ),
@@ -318,11 +327,11 @@ const projectsSubscriptionCheckout = {
 
                                 m('.card.card-terciary.u-radius.u-marginbottom-40',
                                     m(addressForm, {
+                                        addVM,
                                         addressFields: addVM.fields,
                                         fields: m.prop(ctrl.vm.fields),
-                                        international: false,
-                                        hideNationality: true,
-                                        disableInternational: true
+                                        international: addVM.international,
+                                        hideNationality: true
                                     })
                                 )
                             ])
@@ -338,6 +347,7 @@ const projectsSubscriptionCheckout = {
                             )
                         ) : ''),
                         ctrl.showPaymentForm() ? m.component(paymentForm, {
+                            addressVM: addVM,
                             vm: ctrl.vm,
                             project_id: projectVM.currentProject().project_id,
                             isSubscriptionEdit: ctrl.isEdit,
@@ -364,21 +374,20 @@ const projectsSubscriptionCheckout = {
                                     `R$ ${formatedValue}`
                                 ),
                                 m(`a.alt-link.fontsize-smaller.u-right[href="/projects/${projectVM.currentProject().project_id}/subscriptions/start?${ctrl.reward().id ? `reward_id=${ctrl.reward().id}` : ''}${ctrl.isEdit() ? `&subscription_id=${ctrl.subscriptionId()}` : ''}${ctrl.subscriptionStatus ? '&subscription_status=' + ctrl.subscriptionStatus : ''}"]`,
-                                    {config: m.route}
-                                    ,
-                                    'Editar'
+                                    {config: m.route},
+                                    I18n.t('selected_reward.edit', ctrl.scope())
                                 )
                             ]),
                             m('.divider.u-marginbottom-10.u-margintop-10'),
                             m('.fontsize-smaller.fontweight-semibold.u-marginbottom-10',
-                                'Plano de pagamento'
+                                I18n.t('selected_reward.payment_plan', ctrl.scope())
                             ),
                             m('.fontsize-smaller',
                                 [
                                     m('span.fontweight-semibold',
                                         [
                                             m('span.fa.fa-money.text-success'),
-                                            ' Cobrança hoje: '
+                                            ` ${I18n.t('selected_reward.charged_today', ctrl.scope())} ` 
                                         ]
                                     ),
                                     ctrl.isEdit() && !ctrl.isReactivation()
@@ -391,7 +400,7 @@ const projectsSubscriptionCheckout = {
                                     m('span.fontweight-semibold',
                                         [
                                             m('span.fa.fa-calendar-o.text-success'),
-                                            ' Próxima cobrança: '
+                                            ` ${I18n.t('selected_reward.next_charge', ctrl.scope())} `
                                         ]
                                     ),
                                     ctrl.isEdit() && !ctrl.isReactivation()

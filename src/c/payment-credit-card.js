@@ -31,7 +31,7 @@ const paymentCreditCard = {
 
         const sendSubscriptionPayment = (selectedCreditCard, vm, commonData) => {
             if (!isSubscriptionEdit()) {
-                commonPaymentVM.sendCreditCardPayment(selectedCreditCard, vm, commonData);
+                commonPaymentVM.sendCreditCardPayment(selectedCreditCard, vm, commonData, args.addressVM);
 
                 return false;
             }
@@ -46,8 +46,9 @@ const paymentCreditCard = {
 
             commonPaymentVM.sendCreditCardPayment(
                 selectedCreditCard,
-                vm, 
-                data
+                vm,
+                data,
+                args.addressVM
             );
 
             return false;
@@ -432,7 +433,7 @@ const paymentCreditCard = {
                         }),
                         m('.fontsize-smallest.u-text-center.u-marginbottom-30',
                             m.trust(
-                                I18n.t(args.isSubscription ? 'credit_card.terms_of_use_agreement_sub' : 'credit_card.terms_of_use_agreement', ctrl.scope())
+                                I18n.t('credit_card.terms_of_use_agreement', ctrl.scope())
                             )
                         )
                     ])
