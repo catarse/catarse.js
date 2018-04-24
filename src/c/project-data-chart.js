@@ -18,21 +18,38 @@ const projectDataChart = {
             source = (!_.isUndefined(resource) ? resource.source : []),
 
             mountDataset = () => [{
-                fillColor: 'rgba(126,194,69,0.2)',
-                strokeColor: 'rgba(126,194,69,1)',
-                pointColor: 'rgba(126,194,69,1)',
-                pointStrokeColor: '#fff',
-                pointHighlightFill: '#fff',
-                pointHighlightStroke: 'rgba(220,220,220,1)',
+                backgroundColor: 'rgba(126,194,69,0.2)',
+                borderColor: 'rgba(126,194,69,1)',
+                pointBackgroundColor: 'rgba(126,194,69,1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(220,220,220,1)',
                 data: _.map(source, item => item[args.dataKey])
             }],
             renderChart = (element, isInitialized) => {
                 if (!isInitialized) {
                     const ctx = element.getContext('2d');
 
-                    new Chart(ctx).Line({
-                        labels: args.xAxis ? _.map(source, item => args.xAxis(item)) : [],
-                        datasets: mountDataset()
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: args.xAxis ? _.map(source, item => args.xAxis(item)) : [],
+                            datasets: mountDataset()
+                        },
+                        options: {
+                            legend: {
+                                display: false,
+                            },
+                            scales: {
+                                xAxes: [{
+                                    // type: 'linear',
+                                    // position: 'bottom',
+                                    ticks: {
+                                       maxTicksLimit: 30
+                                    }
+                                }]
+                            }
+                        }
                     });
                 }
             };

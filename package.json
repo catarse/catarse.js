@@ -57,7 +57,7 @@
     "test": "gulp test"
   },
   "dependencies": {
-    "chart.js": "1.0.2",
+    "chart.js": "^2.0.0",
     "i18n-js": "^1.0.0",
     "jquery": "^3.1.1",
     "liquidjs": "^2.0.3",
