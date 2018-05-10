@@ -4,13 +4,14 @@ import _ from 'underscore';
 import {
     catarse,
     commonAnalytics
-} from '../api'
+} from '../api';
 import models from '../models';
 import I18n from 'i18n-js';
 import h from '../h';
 import projectDashboardMenu from '../c/project-dashboard-menu';
 import projectDataChart from '../c/project-data-chart';
 import projectInviteCard from '../c/project-invite-card';
+import subscriptionsPerMonthTable from '../c/subscriptions-per-month-table';
 import projectGoalsBoxDashboard from './project-goals-box-dashboard';
 import insightsInfoBox from './insights-info-box';
 import projectGoalsVM from '../vms/project-goals-vm';
@@ -31,6 +32,7 @@ const projectInsightsSub = {
         const lastWeekSubscriptions = m.prop([]);
         const weekTransitions = m.prop([]);
         const lastWeekTransitions = m.prop([]);
+        const subscriptionsPerMonth = m.prop([]);
         const subVM = commonAnalytics.filtersVM({
             project_id: 'eq'
         });
@@ -57,12 +59,15 @@ const projectInsightsSub = {
             .then(weekTransitions);
         subscriptionVM.getSubscriptionTransitions(args.project.common_id, ['inactive', 'canceled'], 'active', moment().utc().subtract(2, 'weeks').format(), moment().utc().subtract(1, 'weeks').format())
             .then(lastWeekTransitions);
+        subscriptionVM.getSubscriptionsPerMonth(args.project.common_id)
+            .then(subscriptionsPerMonth);
 
         projectGoalsVM.fetchGoals(filtersVM.project_id());
         const balanceLoader = userVM.getUserBalance(args.project.user_id);
 
         return {
             weekSubscriptions,
+            subscriptionsPerMonth,
             lastWeekSubscriptions,
             weekTransitions,
             lastWeekTransitions,
@@ -144,7 +149,7 @@ const projectInsightsSub = {
                         project
                     })) : ''),
 
-                    m('.u-marginbottom-60', [
+                    m('.u-marginbottom-30', [
                         m('.flex-row.u-marginbottom-40.u-text-center-small-only', [
                             m('.flex-column.card.u-radius.u-marginbottom-10', [
                                 m('div',
@@ -163,20 +168,21 @@ const projectInsightsSub = {
                                 info: ctrl.weekSubscriptions().length,
                                 newCount: ctrl.weekSubscriptions().length,
                                 oldCount: ctrl.lastWeekSubscriptions().length
-                            }),                            
+                            }),
                             m(insightsInfoBox, {
                                 label: 'Nova receita',
                                 info: `R$${weekSum}`,
                                 newCount: weekSum,
                                 oldCount: lastWeekSum
                             })
+                        ]),
+                        m(".fontsize-large.fontweight-semibold.u-marginbottom-10.u-text-center[id='origem']", [
+                          I18n.t('visitors_per_day_label', I18nScope())
+                        ]),
+                        m(".u-text-center.fontsize-smaller.fontcolor-secondary.lineheight-tighter.u-marginbottom-20", [
+                            I18n.t('last_30_days_indication', I18nScope())
                         ])
-                    ]),
-                    m('.fontweight-semibold.u-marginbottom-10.fontsize-large.u-text-center', [
-                        I18n.t('visitors_per_day_label', I18nScope()),
-                        h.newFeatureBadge()
-                    ]),
-                    !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
+                    ]), !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
                         collection: ctrl.visitorsPerDay,
                         dataKey: 'visitors',
                         xAxis: item => h.momentify(item.day),
@@ -187,28 +193,29 @@ const projectInsightsSub = {
                         style: {
                             'min-height': '300px'
                         }
-                    }, [
-                        !ctrl.lSubscriptionsPerDay() ? m.component(projectDataChart, {
-                            collection: ctrl.subscriptionsPerDay,
-                            label: I18n.t('amount_per_day_label_sub', I18nScope()),
-                            dataKey: 'total_amount',
-                            xAxis: item => h.momentify(item.paid_at),
-                            emptyState: I18n.t('amount_per_day_empty_sub', I18nScope())
-                        }) : h.loader()
-                    ]),
+                    }, [!ctrl.lSubscriptionsPerDay() ? m.component(projectDataChart, {
+                        collection: ctrl.subscriptionsPerDay,
+                        label: I18n.t('amount_per_day_label_sub', I18nScope()),
+                        subLabel: I18n.t('last_30_days_indication', I18nScope()),
+                        dataKey: 'total_amount',
+                        xAxis: item => h.momentify(item.paid_at),
+                        emptyState: m.trust(I18n.t('amount_per_day_empty_sub', I18nScope()))
+                    }) : h.loader()]),
                     m('.u-text-center', {
                         style: {
                             'min-height': '300px'
                         }
-                    }, [
-                        !ctrl.lSubscriptionsPerDay() ? m.component(projectDataChart, {
-                            collection: ctrl.subscriptionsPerDay,
-                            label: I18n.t('contributions_per_day_label_sub', I18nScope()),
-                            dataKey: 'total',
-                            xAxis: item => h.momentify(item.paid_at),
-                            emptyState: I18n.t('contributions_per_day_empty_sub', I18nScope())
-                        }) : h.loader()
-                    ])
+                    }, [!ctrl.lSubscriptionsPerDay() ? m.component(projectDataChart, {
+                        collection: ctrl.subscriptionsPerDay,
+                        label: I18n.t('contributions_per_day_label_sub', I18nScope()),
+                        subLabel: I18n.t('last_30_days_indication', I18nScope()),
+                        dataKey: 'total',
+                        xAxis: item => h.momentify(item.paid_at),
+                        emptyState: m.trust(I18n.t('contributions_per_day_empty_sub', I18nScope()))
+                    }) : h.loader()]),
+                    m(subscriptionsPerMonthTable, {
+                        data: ctrl.subscriptionsPerMonth()
+                    })
                 ])
             ])
         ] : h.loader());
