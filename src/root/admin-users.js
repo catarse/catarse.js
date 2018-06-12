@@ -9,6 +9,9 @@ import adminUserDetail from '../c/admin-user-detail';
 import adminUser from '../c/admin-user';
 import filterMain from '../c/filter-main';
 import filterDropdown from '../c/filter-dropdown';
+import ElmAdminUsers from './admin-users.elm';
+
+console.log(ElmAdminUsers);
 
 const adminUsers = {
     controller() {

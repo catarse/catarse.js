@@ -1,4 +1,5 @@
 import babel from 'rollup-plugin-babel';
+import elm from 'rollup-plugin-elm';
 
 //This is the standalone rollup config file to bundle and build dist files.
 //With rollup installed globally in your environment, you can simple run rollup -c.
@@ -8,7 +9,10 @@ export default {
   sourceMap: true,
   format: 'iife',
   moduleName: 'c',
-  plugins: [babel()],
+  plugins: [
+    elm({ exclude: 'elm-stuff/**' }),
+    babel(),
+  ],
   globals: {
       chartjs: 'Chart',
       mithril: 'm',

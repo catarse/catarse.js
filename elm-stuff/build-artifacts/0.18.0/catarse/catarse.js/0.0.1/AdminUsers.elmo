@@ -1,0 +1,46 @@
+var _catarse$catarse.js$AdminUsers$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$main_,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Hello world!'),
+			_1: {ctor: '[]'}
+		});
+};
+var _catarse$catarse.js$AdminUsers$update = F2(
+	function (action, model) {
+		var _p0 = action;
+		if (_p0.ctor === 'SearchUsers') {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		} else {
+			return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		}
+	});
+var _catarse$catarse.js$AdminUsers$init = {
+	ctor: '_Tuple2',
+	_0: {
+		users: {ctor: '[]'},
+		error: _elm_lang$core$Maybe$Nothing
+	},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
+var _catarse$catarse.js$AdminUsers$main = _elm_lang$html$Html$program(
+	{
+		init: _catarse$catarse.js$AdminUsers$init,
+		update: _catarse$catarse.js$AdminUsers$update,
+		view: _catarse$catarse.js$AdminUsers$view,
+		subscriptions: function (_p1) {
+			return _elm_lang$core$Platform_Sub$none;
+		}
+	})();
+var _catarse$catarse.js$AdminUsers$Model = F2(
+	function (a, b) {
+		return {users: a, error: b};
+	});
+var _catarse$catarse.js$AdminUsers$Error = function (a) {
+	return {ctor: 'Error', _0: a};
+};
+var _catarse$catarse.js$AdminUsers$SearchUsers = function (a) {
+	return {ctor: 'SearchUsers', _0: a};
+};
