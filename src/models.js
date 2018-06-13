@@ -1,9 +1,8 @@
-import { catarse, catarseMoments, commonPayment, commonAnalytics, commonProject, commonNotification, commonRecommender } from './api';
+import { catarse, catarseMoments, commonPayment, commonAnalytics, commonProject, commonNotification, commonRecommender, commonCommunity } from './api';
 
 const models = {
-    recommendedProjectsCf: commonRecommender.model('predictions/cf'),
-    recommendedProjectsCb: commonRecommender.model('predictions/cb'),
-    recommendedProjectsHybrid: commonRecommender.model('predictions/hybrid'),
+    recommendedProjects1: commonRecommender.model('predictions/1'),
+    recommendedProjects2: commonRecommender.model('predictions/2'),
     notificationTemplates: commonNotification.model('notification_templates'),
     userNotification: commonNotification.model('user_notifications'),
     commonNotificationTemplate: commonNotification.model('rpc/notification_template'),
@@ -80,7 +79,8 @@ const models = {
     deleteProject: catarse.model('rpc/delete_project'),
     cancelProject: catarse.model('rpc/cancel_project'),
     city: catarse.model('cities'),
-    mailMarketingList: catarse.model('mail_marketing_lists')
+    mailMarketingList: catarse.model('mail_marketing_lists'),
+    commonUserDetails: commonCommunity.model('rpc/user_details')
 };
 
 models.teamMember.pageSize(40);
