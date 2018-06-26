@@ -24,7 +24,8 @@ const userSubscriptionBox = {
         const subscription = args.subscription,
             displayModal = h.toggleProp(false, true),
             displayCancelModal = h.toggleProp(false, true),
-            contactModalInfo = m.prop({});
+            contactModalInfo = m.prop({}),
+            isGeneratingSecondSlip = h.toggleProp(false, true);
 
         const filterProjVM = catarse.filtersVM({
                 project_id: 'eq'
@@ -58,6 +59,23 @@ const userSubscriptionBox = {
                 subscription.reward = arr[0];
             });
         }
+
+        //Generate second slip payment and wait for result to update the view. In case of timeout, reloads the page.
+        const generateSecondSlip = () => {
+            isGeneratingSecondSlip.toggle();
+            commonPaymentVM
+                .tryRechargeSubscription(subscription.id)
+                .then((info) => {
+                    subscription.boleto_url = info.boleto_url;
+                    subscription.boleto_expiration_date = info.boleto_expiration_date;
+                    subscription.payment_status = info.status;
+                    isGeneratingSecondSlip.toggle();
+                    m.redraw();
+                })
+                .catch((e) => {
+                    window.location.reload();
+                })
+        };
 
         const showLastSubscriptionVersionValueIfHasOne = () => {
             const is_active = subscription.status === 'active';
@@ -204,7 +222,9 @@ const userSubscriptionBox = {
             showLastSubscriptionVersionValueIfHasOne,
             showLastSubscriptionVersionPaymentMethodIfHasOne,
             showLastSubscriptionVersionRewardTitleIfHasOne,
-            showLastSubscriptionVersionEditionNextCharge
+            showLastSubscriptionVersionEditionNextCharge,
+            isGeneratingSecondSlip,
+            generateSecondSlip
         };
     },
     view(ctrl) {
@@ -260,14 +280,55 @@ const userSubscriptionBox = {
                     ]),
                     m('.u-marginbottom-20.w-col.w-col-3', ctrl.showLastSubscriptionVersionRewardTitleIfHasOne()),
                     m('.u-marginbottom-10.u-text-center.w-col.w-col-3',
-                        (subscription.status === 'started' ? [
-                            m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
-                                m('span.fa.fa-exclamation-triangle'),
-                                m.trust('&nbsp;'),
-                                'Aguardando confirmação do pagamento'
-                            ]),
-                                (subscription.boleto_url ? m(`a.btn.btn-inline.btn-small.w-button[target=_blank][href=${subscription.boleto_url}]`, 'Imprimir boleto') : null)
-                        ] :
+                        (subscription.status === 'started' ? (
+                            subscription.last_payment_data.status === 'refused' && subscription.payment_method != 'boleto' ? [
+                                m(".card-alert.u-radius.fontsize-smaller.u-marginbottom-10.fontweight-semibold", 
+                                    m("div",
+                                        [
+                                            m("span.fa.fa-exclamation-triangle", "."),
+                                            `Seu pagamento foi recusado em ${h.momentify(subscription.last_payment_data.refused_at)}. Vamos tentar uma nova cobrança em ${h.momentify(subscription.last_payment_data.next_retry_at)}`
+                                        ]
+                                    )
+                                ),
+                                m(`a.btn.btn-inline.btn-small.w-button[href='/projects/${subscription.project_external_id}/subscriptions/start?subscription_id=${subscription.id}${subscription.reward_external_id ? `&reward_id=${subscription.reward_external_id}` : ''}&subscription_status=inactive']`, 
+                                    "Refazer pagamento"
+                                )
+                            ] :  (
+                                subscription.payment_status === 'pending'
+                                && subscription.boleto_url
+                                && subscription.boleto_expiration_date ?
+                                [
+                                    moment(subscription.boleto_expiration_date).add(1, 'days').isBefore(Date.now())
+                                    ? [
+                                        m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
+                                            m('span.fa.fa-exclamation-triangle'),
+                                            ` O boleto de sua assinatura venceu dia ${h.momentify(subscription.boleto_expiration_date)}`,
+                                        ]),
+                                        (ctrl.isGeneratingSecondSlip() ? h.loader() :
+                                            m(`button.btn.btn-inline.btn-small.u-marginbottom-20.w-button`, {
+                                                disabled: ctrl.isGeneratingSecondSlip(),
+                                                onclick: ctrl.generateSecondSlip
+                                            }, 'Gerar segunda via'))
+                                    ]
+                                    : [
+                                        m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
+                                            m('span.fa.fa-exclamation-triangle'),
+                                            ` O boleto de sua assinatura vence dia ${h.momentify(subscription.boleto_expiration_date)}`
+                                        ]),
+                                        m(`a.btn.btn-inline.btn-small.u-marginbottom-20.w-button[target=_blank][href=${subscription.boleto_url}]`, 'Imprimir boleto')
+                                    ]
+                                ] : (
+                                    subscription.payment_status === 'pending' && subscription.payment_method != 'boleto' ? [
+                                        m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
+                                            m('span.fa.fa-exclamation-triangle'),
+                                            m.trust('&nbsp;'),
+                                            'Aguardando confirmação do pagamento'
+                                        ])
+                                    ] : ''
+                                )
+                            )
+
+                        ) :
                             (subscription.status === 'inactive' ? [
                                 (subscription.payment_status === 'pending'
                                     && subscription.boleto_url
@@ -303,7 +364,20 @@ const userSubscriptionBox = {
                                         ),
                                         ` Sua assinatura será cancelada no dia ${h.momentify(subscription.next_charge_at, 'DD/MM/YYYY')}. Até lá, ela ainda será considerada ativa.`
                                     ])
-                                ) : (subscription.status === 'active' ? [
+                                ) : (subscription.status === 'active' ? (
+                                    subscription.last_payment_data.status == 'refused' ? [
+                                        m(".card-alert.u-radius.fontsize-smaller.u-marginbottom-10.fontweight-semibold", 
+                                            m("div",
+                                                [
+                                                    m("span.fa.fa-exclamation-triangle", "."),
+                                                    `Seu pagamento foi recusado em ${h.momentify(subscription.last_payment_data.refused_at)}. Vamos tentar uma nova cobrança em ${h.momentify(subscription.last_payment_data.next_retry_at)}`
+                                                ]
+                                            )
+                                        ),
+                                        m(`a.btn.btn-inline.btn-small.w-button[href='/projects/${subscription.project_external_id}/subscriptions/start?subscription_id=${subscription.id}${subscription.reward_external_id ? `&reward_id=${subscription.reward_external_id}` : ''}&subscription_status=inactive']`, 
+                                            "Refazer pagamento"
+                                        )
+                                    ] : [
                                     ctrl.showLastSubscriptionVersionEditionNextCharge(),
                                     subscription.payment_status !== 'pending' ? m('a.btn.btn-terciary.u-marginbottom-20.btn-inline.w-button',
                                         { href: `/projects/${subscription.project_external_id}/subscriptions/start?${subscription.reward_external_id ? `reward_id=${subscription.reward_external_id}` : ''}&subscription_id=${subscription.id}&subscription_status=${subscription.status}` },
@@ -314,10 +388,17 @@ const userSubscriptionBox = {
                                     && subscription.boleto_expiration_date ?
                                     [
                                         moment(subscription.boleto_expiration_date).add(1, 'days').isBefore(Date.now())
-                                            ? m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
-                                                m('span.fa.fa-exclamation-triangle'),
-                                                ` O boleto de sua assinatura venceu dia ${h.momentify(subscription.boleto_expiration_date)}`
-                                            ])
+                                            ? [
+                                                m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
+                                                    m('span.fa.fa-exclamation-triangle'),
+                                                    ` O boleto de sua assinatura venceu dia ${h.momentify(subscription.boleto_expiration_date)}`,
+                                                ]),
+                                                (ctrl.isGeneratingSecondSlip() ? h.loader() :
+                                                    m(`button.btn.btn-inline.btn-small.u-marginbottom-20.w-button`, {
+                                                        disabled: ctrl.isGeneratingSecondSlip(),
+                                                        onclick: ctrl.generateSecondSlip
+                                                    }, 'Gerar segunda via'))
+                                            ]
                                             : [
                                                 m('.card-alert.fontsize-smaller.fontweight-semibold.u-marginbottom-10.u-radius', [
                                                     m('span.fa.fa-exclamation-triangle'),
@@ -333,7 +414,7 @@ const userSubscriptionBox = {
                                     },
                                         'Cancelar assinatura'
                                     )
-                                ] : null)
+                                ]) : null)
 
                             ))
                     )
