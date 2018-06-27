@@ -429,8 +429,12 @@ const
         }
     },
 
-    navigateToDevise = () => {
-        window.location.href = '/pt/login';
+    navigateToDevise = (params) => {
+        if(_.isUndefined(params)) {
+            let params = '';
+        }
+
+        window.location.href = '/pt/login' + params;
         return false;
     },
 
