@@ -1,7 +1,6 @@
 import m from 'mithril';
-import {catarse} from '../api';
+import { catarse } from '../api';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import models from '../models';
 import projectFilters from '../vms/project-filters-vm';
@@ -14,7 +13,7 @@ import UnsignedFriendFacebookConnect from '../c/unsigned-friend-facebook-connect
 const I18nScope = _.partial(h.i18nScope, 'projects.home');
 
 const projectsHome = {
-    controller(args) {
+    controller: function(args) {
         const sample6 = _.partial(_.sample, _, 6),
             loader = catarse.loaderWithToken,
             project = models.project,
@@ -57,7 +56,7 @@ const projectsHome = {
             hasFBAuth
         };
     },
-    view(ctrl) {
+    view: function(ctrl) {
         const slides = () => _.map(ctrl.slidesContent, (slide) => {
             const customStyle = `background-image: url(${slide.image});`;
             const content = m('.w-container.u-text-center', [
@@ -74,7 +73,7 @@ const projectsHome = {
             };
         });
 
-        return m('#projects-home-component', { config: h.setPageTitle(I18n.t('header_html', I18nScope())) }, [
+        return m('#projects-home-component', { config: h.setPageTitle(window.I18n.t('header_html', I18nScope())) }, [
             // m.component(menu, {transparent: true}),
             m.component(slider, {
                 slides: slides(),

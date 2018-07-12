@@ -1,10 +1,11 @@
 import m from 'mithril';
+import _ from 'underscore'
 import h from '../h';
-import {catarse} from '../api'
+import { catarse } from '../api';
 import models from '../models';
 
 const adminReward = {
-    controller(args) {
+    controller: function(args) {
         let l;
         const loadShippingFee = () => {
             const shippingFee = m.prop({});
@@ -27,7 +28,7 @@ const adminReward = {
         };
     },
 
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const reward = args.reward(),
             contribution = args.contribution,
             available = parseInt(reward.paid_count) + parseInt(reward.waiting_payment_count),
@@ -40,7 +41,7 @@ const adminReward = {
                 m('br'),
                 `Local de entrega: ${(shippingFee.destination ? `${shippingFee.destination} R$ ${shippingFee.value}` : 'Nenhum')}`,
                 m('br'),
-                `Envio: ${I18n.t(`shared.shipping_options.${reward.shipping_options}`)}`,
+                `Envio: ${window.I18n.t(`shared.shipping_options.${reward.shipping_options}`)}`,
                 m('br'),
                 `Valor mínimo: R$${h.formatNumber(reward.minimum_value, 2, 3)}`,
                 m('br'),

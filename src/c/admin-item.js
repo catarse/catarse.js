@@ -3,21 +3,21 @@ import _ from 'underscore';
 import h from '../h';
 
 const adminItem = {
-    controller(args) {
+    controller: function(args) {
         return {
             displayDetailBox: h.toggleProp(false, true)
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const item = args.item,
-              listWrapper = args.listWrapper || {},
-              selectedItem = (_.isFunction(listWrapper.isSelected) ?
+            listWrapper = args.listWrapper || {},
+            selectedItem = (_.isFunction(listWrapper.isSelected) ?
                               listWrapper.isSelected(item.id) : false);
 
 
         return m('.w-clearfix.card.u-radius.u-marginbottom-20.results-admin-items', {
             class: (selectedItem ? 'card-alert' : '')
-        },[
+        }, [
             m.component(args.listItem, {
                 item,
                 listWrapper: args.listWrapper,

@@ -9,7 +9,7 @@ import inlineError from './inline-error';
 import projectEditSaveBtn from './project-edit-save-btn';
 
 const userAboutEdit = {
-    controller(args) {
+    controller: function(args) {
         let parsedErrors = userAboutVM.mapRailsErrors(railsErrorsVM.railsErrors());
         let deleteUser;
         const user = args.user || {},
@@ -216,7 +216,7 @@ const userAboutEdit = {
             parsedErrors
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const user = args.user || {},
             fields = ctrl.fields;
 
@@ -510,7 +510,7 @@ const userAboutEdit = {
 
                                     ])
                                 )),
-                                (!user.is_admin && ( args.hideDisableAcc || user.total_published_projects > 0 ) ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
+                                (!user.is_admin && (args.hideDisableAcc || user.total_published_projects > 0) ? '' : m('.w-form.card.card-terciary.u-marginbottom-30',
                                     m('.w-row.u-marginbottom-10', [
                                         m('.fontweight-semibold.fontsize-smaller',
                                             'Desativar minha conta'

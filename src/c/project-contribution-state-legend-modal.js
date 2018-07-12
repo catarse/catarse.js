@@ -1,13 +1,12 @@
 import m from 'mithril';
-import I18n from 'i18n-js';
 import _ from 'underscore';
 import h from '../h';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions_report.legend_labels');
 
 const ProjectContributionStateLegendModal = {
-    controller(args) {
-        const translate = path => I18n.t(path, I18nScope());
+    controller: function(args) {
+        const translate = path => window.I18n.t(path, I18nScope());
 
         return {
             stages: {
@@ -49,7 +48,7 @@ const ProjectContributionStateLegendModal = {
             }
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = _.first(args.project()),
             project_stage = (project.state == 'waiting_funds' ? 'online' : project.state);
 

@@ -5,10 +5,10 @@
  *
  * Example:
  * m.component(c.ProjectSuccessfulOnboard, {project: project})
- **/
+ * */
 import m from 'mithril';
-import {catarse} from '../api'
-import I18n from 'i18n-js';
+import _ from 'underscore';
+import { catarse } from '../api';
 import h from '../h';
 import models from '../models';
 import projectSuccessfulOnboardConfirmAccount from './project-successful-onboard-confirm-account';
@@ -19,33 +19,33 @@ import insightVM from '../vms/insight-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.successful_onboard');
 
 const projectSuccessfulOnboard = {
-    controller(args) {
+    controller: function(args) {
         const projectIdVM = catarse.filtersVM({ project_id: 'eq' }),
-              projectAccounts = m.prop([]),
-              projectTransfers = m.prop([]),
-              showTaxModal = h.toggleProp(false, true),
-              loader = catarse.loaderWithToken,
-              listenToReplace = (element, isInitialized, context) => {
-                  if (isInitialized) return;
+            projectAccounts = m.prop([]),
+            projectTransfers = m.prop([]),
+            showTaxModal = h.toggleProp(false, true),
+            loader = catarse.loaderWithToken,
+            listenToReplace = (element, isInitialized, context) => {
+                if (isInitialized) return;
 
-                  const toRedraw = {
-                      tax_link: {
-                          action: 'onclick',
-                          actionSource: () => {
-                              showTaxModal.toggle();
-                              m.redraw();
-                          }
-                      }
-                  };
+                const toRedraw = {
+                    tax_link: {
+                        action: 'onclick',
+                        actionSource: () => {
+                            showTaxModal.toggle();
+                            m.redraw();
+                        }
+                    }
+                };
 
-                  _.map(element.children, (item) => {
-                      const toR = toRedraw[item.getAttribute('id')];
+                _.map(element.children, (item) => {
+                    const toR = toRedraw[item.getAttribute('id')];
 
-                      if (toR) {
-                          item[toR.action] = toR.actionSource;
-                      }
-                  });
-              };
+                    if (toR) {
+                        item[toR.action] = toR.actionSource;
+                    }
+                });
+            };
 
 
         projectIdVM.project_id(args.project().project_id);
@@ -68,11 +68,11 @@ const projectSuccessfulOnboard = {
             listenToReplace
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const projectAccount = _.first(ctrl.projectAccounts()),
-              projectTransfer = _.first(ctrl.projectTransfers()),
-              lpa = ctrl.lProjectAccount,
-              lpt = ctrl.lProjectTransfer;
+            projectTransfer = _.first(ctrl.projectTransfers()),
+            lpa = ctrl.lProjectAccount,
+            lpt = ctrl.lProjectTransfer;
 
         return m('.w-section.section', [
             (ctrl.showTaxModal() ? m.component(modalBox, {
@@ -86,13 +86,13 @@ const projectSuccessfulOnboard = {
                  m('.w-row.u-marginbottom-40', [
                      m('.w-col.w-col-6.w-col-push-3', [
                          m('.u-text-center', [
-                             m('img.u-marginbottom-20', { src: I18n.t('finished.icon', I18nScope()), width: 94 }),
-                             m('.fontsize-large.fontweight-semibold.u-marginbottom-20', I18n.t('finished.title', I18nScope())),
+                             m('img.u-marginbottom-20', { src: window.I18n.t('finished.icon', I18nScope()), width: 94 }),
+                             m('.fontsize-large.fontweight-semibold.u-marginbottom-20', window.I18n.t('finished.title', I18nScope())),
                              m('.fontsize-base.u-marginbottom-30', {
                                  config: ctrl.listenToReplace
                              }, m.trust(
-                                 I18n.t('finished.text', I18nScope({ link_news: `/projects/${args.project().id}/posts` , link_surveys: `/projects/${args.project().id}/surveys` })))),
-                             //m('a.btn.btn-large.btn-inline', { href: `/users/${args.project().user_id}/edit#balance` }, I18n.t('start.cta', I18nScope()))
+                                 window.I18n.t('finished.text', I18nScope({ link_news: `/projects/${args.project().id}/posts`, link_surveys: `/projects/${args.project().id}/surveys` })))),
+                             // m('a.btn.btn-large.btn-inline', { href: `/users/${args.project().user_id}/edit#balance` }, window.I18n.t('start.cta', I18nScope()))
                          ])
                      ])
                  ])

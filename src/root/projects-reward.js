@@ -1,19 +1,18 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import projectVM from '../vms/project-vm';
 import rewardVM from '../vms/reward-vm';
 import faqBox from '../c/faq-box';
 
 const projectsReward = {
-    controller(args) {
+    controller: function(args) {
         const vm = rewardVM,
             selectedReward = vm.selectedReward,
             selectReward = vm.selectReward,
             rewards = vm.rewards(),
             mode = projectVM.currentProject().mode,
-            faq = I18n.translations[I18n.currentLocale()].projects.faq[mode];
+            faq = window.I18n.translations[window.I18n.currentLocale()].projects.faq[mode];
 
         // TODO unify projectsReward and project-reward-list reward submission. fix routing issue.
         const submitContribution = () => {
@@ -22,6 +21,7 @@ const projectsReward = {
             if (valueFloat < vm.selectedReward().minimum_value) {
                 vm.error(`O valor de apoio para essa recompensa deve ser de no mínimo R$${vm.selectedReward().minimum_value}`);
             } else if (!h.getUser()) {
+				const storeKey = 'selectedReward';
                 h.storeObject(storeKey, { value: valueFloat, reward: vm.selectedReward() });
 
                 return h.navigateToDevise(`/${projectVM.currentProject().permalink}`);
@@ -55,7 +55,7 @@ const projectsReward = {
             faq
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = ctrl.project;
 
         return m('#project-rewards', [
@@ -70,10 +70,10 @@ const projectsReward = {
             ]),
             m('.w-section.header-cont-new',
                     m('.w-container',
-                        m(".fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only", [
-                            "Escolha a recompensa e o valor do apoio",
+                        m('.fontweight-semibold.lineheight-tight.text-success.fontsize-large.u-text-center-small-only', [
+                            'Escolha a recompensa e o valor do apoio',
                             m.trust('&nbsp;'),
-                            m("span.fontsize-small.badge.badge-success", "(parcele em até 6x)")
+                            m('span.fontsize-small.badge.badge-success', '(parcele em até 6x)')
                         ])
                     )
                 ),

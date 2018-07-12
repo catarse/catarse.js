@@ -1,12 +1,11 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions');
 
 const projectGoalCard = {
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const goal = args.goal();
         const project = args.project;
         const currentGoal = args.currentGoal;

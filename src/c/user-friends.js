@@ -10,7 +10,7 @@
  * }
  */
 import m from 'mithril';
-import {catarse} from '../api';
+import { catarse } from '../api';
 import _ from 'underscore';
 import h from '../h';
 import models from '../models';
@@ -18,7 +18,7 @@ import UserFollowCard from '../c/user-follow-card';
 import loadMoreBtn from '../c/load-more-btn';
 
 const userFriends = {
-    controller(args) {
+    controller: function(args) {
         models.userFriend.pageSize(9);
 
         const userFriendVM = catarse.filtersVM({ user_id: 'eq' }),
@@ -49,7 +49,7 @@ const userFriends = {
             allLoading
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const listVM = ctrl.friendListVM;
         return m('.w-section.bg-gray.before-footer.section', [
             m('.w-container', [

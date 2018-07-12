@@ -1,21 +1,20 @@
 import m from 'mithril';
 import _ from 'underscore';
-import {catarse} from '../api'
+import { catarse } from '../api';
 import h from '../h';
 import userVM from '../vms/user-vm';
 import models from '../models';
 import adminUserBalanceTransactionsList from './admin-user-balance-transactions-list';
 import popNotification from './pop-notification';
-import I18n from 'i18n-js';
 
 const I18nScope = _.partial(h.i18nScope, 'admin.balance_transfers');
 
 const adminBalanceTransferItemDetail = {
-    controller(args) {
+    controller: function(args) {
         const userBankAccount = m.prop(null),
             showPopNotification = m.prop(false),
             popNotificationAttributes = m.prop({}),
-            metadata = args.item.last_transition_metadata || {transfer_data: {}},
+            metadata = args.item.last_transition_metadata || { transfer_data: {} },
             transferData = metadata.transfer_data || {},
             metaBank = transferData.bank_account,
             userBalance = m.prop({}),
@@ -38,14 +37,14 @@ const adminBalanceTransferItemDetail = {
                 }).then((data) => {
                     showPopNotification(true);
                     popNotificationAttributes({
-                        message: I18n.t('admin_notes.success_update', I18nScope()),
+                        message: window.I18n.t('admin_notes.success_update', I18nScope()),
                         toggleOpt: showPopNotification
                     });
                     loadingNotes(false);
                 }, (err) => {
                     showPopNotification(true);
                     popNotificationAttributes({
-                        message: I18n.t('admin_notes.failed_update', I18nScope()),
+                        message: window.I18n.t('admin_notes.failed_update', I18nScope()),
                         error: true,
                         toggleOpt: showPopNotification
                     });
@@ -53,8 +52,8 @@ const adminBalanceTransferItemDetail = {
                 });
             };
 
-        if(!_.isUndefined(metaBank)) {
-            if(metaBank.conta) {
+        if (!_.isUndefined(metaBank)) {
+            if (metaBank.conta) {
                 transitionBankAccount({
                     account: metaBank.conta,
                     account_digit: metaBank.conta_dv,
@@ -86,22 +85,22 @@ const adminBalanceTransferItemDetail = {
         };
     },
 
-    view(ctrl, args) {
-        let bankAccount = (_.isUndefined(ctrl.metaBank) ? ctrl.userBankAccount() : ctrl.transitionBankAccount());
+    view: function(ctrl, args) {
+        const bankAccount = (_.isUndefined(ctrl.metaBank) ? ctrl.userBankAccount() : ctrl.transitionBankAccount());
 
         return m('#admin-balance-transfer-item-detail-box', [
             m('.divider.u-margintop-20.u-marginbottom-20'),
-            m('.w-row.card.card-terciary.u-radius',[
+            m('.w-row.card.card-terciary.u-radius', [
                 m('.w-col.w-col-4', [
                     (bankAccount ? [
                         m('.fontsize-smaller.fontweight-semibold.lineheight-tighter.u-marginbottom-20', 'Dados bancários'),
                         m('.fontsize-smallest.lineheight-looser', [
                             m('span.fontweight-semibold', 'Banco:'),
-                            `${bankAccount.bank_code} - ${(bankAccount.bank_name ? bankAccount.bank_name : '' )}`,m('br'),
+                            `${bankAccount.bank_code} - ${(bankAccount.bank_name ? bankAccount.bank_name : '')}`, m('br'),
                             m('span.fontweight-semibold', 'Agencia:'),
-                            ` ${bankAccount.agency} - ${bankAccount.agency_digit ? bankAccount.agency_digit : ''}`,m('br'),
-                            m('span.fontweight-semibold', "Conta:"),
-                            ` ${bankAccount.account} - ${bankAccount.account_digit ? bankAccount.account_digit : ''}`,m('br'),
+                            ` ${bankAccount.agency} - ${bankAccount.agency_digit ? bankAccount.agency_digit : ''}`, m('br'),
+                            m('span.fontweight-semibold', 'Conta:'),
+                            ` ${bankAccount.account} - ${bankAccount.account_digit ? bankAccount.account_digit : ''}`, m('br'),
                             m('span.fontweight-semibold', 'Nome:'),
                             bankAccount.owner_name, m('br'),
                             m('span.fontweight-semibold', 'CPF:'),
@@ -116,13 +115,13 @@ const adminBalanceTransferItemDetail = {
                         m('.u-text-center',
                             m('button.btn.btn-terciary', {
                                 onclick: ctrl.submitNotes
-                            }, I18n.t('shared.save_text'))
+                            }, window.I18n.t('shared.save_text'))
                         ),
                         (ctrl.showPopNotification() ? m(popNotification, ctrl.popNotificationAttributes()) : '')
 
                     ]))
                 ]),
-                m(adminUserBalanceTransactionsList, {user_id: args.item.user_id})
+                m(adminUserBalanceTransactionsList, { user_id: args.item.user_id })
             ])
         ]);
     }

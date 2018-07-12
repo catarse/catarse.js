@@ -1,7 +1,6 @@
 import m from 'mithril';
-import {catarse} from '../api';
+import { catarse } from '../api';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import models from '../models';
 import surveyVM from '../vms/survey-vm';
@@ -15,7 +14,7 @@ import inlineError from '../c/inline-error';
 const I18nScope = _.partial(h.i18nScope, 'projects.reward_fields');
 
 const surveyCreate = {
-    controller(args) {
+    controller: function(args) {
         const
             showError = m.prop(false),
             loader = catarse.loaderWithToken,
@@ -127,7 +126,7 @@ const surveyCreate = {
             sendQuestions
         };
     },
-    view(ctrl) {
+    view: function(ctrl) {
         const project = _.first(ctrl.projectDetails());
         const reward = _.first(ctrl.reward());
         return (project ? m('.project-surveys', (project.is_owner_or_admin ? m.component(projectDashboardMenu, {
@@ -212,7 +211,7 @@ const surveyCreate = {
                             },
                                 'Pré-visualizar'
                             ),
-                            ctrl.showError() 
+                            ctrl.showError()
                                 ? m('.u-text-center.u-margintop-10', m(inlineError, { message: 'Erro ao salvar formulário.' }))
                                 : null
                         )

@@ -11,7 +11,6 @@ import {
     catarse,
     commonRecommender
 } from '../api';
-import I18n from 'i18n-js';
 import _ from 'underscore';
 import h from '../h';
 import models from '../models';
@@ -24,7 +23,7 @@ import UnsignedFriendFacebookConnect from '../c/unsigned-friend-facebook-connect
 const I18nScope = _.partial(h.i18nScope, 'pages.explore');
 // TODO Slim down controller by abstracting logic to view-models where it fits
 const projectsExplore = {
-    controller(args) {
+    controller: function(args) {
         const filters = catarse.filtersVM,
             projectFiltersVM = projectFilters(),
             filtersMap = projectFiltersVM.filters,
@@ -94,7 +93,7 @@ const projectsExplore = {
             loadCategories = () => models.category.getPageWithToken(filters({}).order({
                 name: 'asc'
             }).parameters()).then(categoryCollection),
-            externalLinkCategories = I18n.translations[I18n.currentLocale()].projects.index.explore_categories,
+            externalLinkCategories = window.I18n.translations[window.I18n.currentLocale()].projects.index.explore_categories,
             hasSpecialFooter = categoryId => !_.isUndefined(externalLinkCategories[categoryId]),
             // just small fix when have two scored projects only
             checkForMinScoredProjects = collection => _.size(_.filter(collection, x => x.score >= 1)) >= 3,
@@ -132,11 +131,11 @@ const projectsExplore = {
                     recommendedProjects = (alg) => {
                         let model;
                         switch (alg) {
-                            case '1':
-                                model = models.recommendedProjects1;
-                                break;
-                            default:
-                                model = models.recommendedProjects2;
+                        case '1':
+                            model = models.recommendedProjects1;
+                            break;
+                        default:
+                            model = models.recommendedProjects2;
                         }
                         const pages = commonRecommender.paginationVM(model, '', {}, false);
                         const rFilter = commonRecommender.filtersVM({
@@ -272,7 +271,7 @@ const projectsExplore = {
             externalLinkCategories
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const categoryId = ctrl.categoryId,
             projectsCollection = ctrl.projects().collection(),
             projectsCount = projectsCollection.length,
@@ -281,19 +280,19 @@ const projectsExplore = {
             hasSpecialFooter = ctrl.hasSpecialFooter(categoryId());
         const categoryColumn = (categories, start, finish) => _.map(categories.slice(start, finish), category =>
             m(`a.explore-filter-link[href='#by_category_id/${category.id}']`, {
-                    onclick: () => {
-                        ctrl.categoryToggle.toggle();
-                        ctrl.selectedCategory(category);
-                    },
-                    class: ctrl.selectedCategory() === category ? 'selected' : ''
+                onclick: () => {
+                    ctrl.categoryToggle.toggle();
+                    ctrl.selectedCategory(category);
                 },
+                class: ctrl.selectedCategory() === category ? 'selected' : ''
+            },
                 category.name
             )
         );
         let widowProjects = [];
 
         return m('#explore', {
-            config: h.setPageTitle(I18n.t('header_html', I18nScope()))
+            config: h.setPageTitle(window.I18n.t('header_html', I18nScope()))
         }, [
             m('.hero-search.explore', [
                 m('.u-text-center.w-container', [
@@ -315,27 +314,27 @@ const projectsExplore = {
                         ctrl.modeToggle() ? '' :
                         m('.explore-filter-select', [
                             m("a.explore-filter-link[href=\'javascript:void(0);\']", {
-                                    onclick: () => {
-                                        ctrl.changeMode('all_modes');
-                                    },
-                                    class: ctrl.currentMode() === null ? 'selected' : ''
+                                onclick: () => {
+                                    ctrl.changeMode('all_modes');
                                 },
+                                class: ctrl.currentMode() === null ? 'selected' : ''
+                            },
                                 'Todos os projetos'
                             ),
                             m("a.explore-filter-link[href=\'javascript:void(0);\']", {
-                                    onclick: () => {
-                                        ctrl.changeMode('not_sub');
-                                    },
-                                    class: ctrl.currentMode() === 'not_sub' ? 'selected' : ''
+                                onclick: () => {
+                                    ctrl.changeMode('not_sub');
                                 },
+                                class: ctrl.currentMode() === 'not_sub' ? 'selected' : ''
+                            },
                                 'Projetos pontuais'
                             ),
                             m("a.explore-filter-link[href=\'javascript:void(0);\']", {
-                                    onclick: () => {
-                                        ctrl.changeMode('sub');
-                                    },
-                                    class: ctrl.currentMode() === 'sub' ? 'selected' : ''
+                                onclick: () => {
+                                    ctrl.changeMode('sub');
                                 },
+                                class: ctrl.currentMode() === 'sub' ? 'selected' : ''
+                            },
                                 'Projetos recorrentes'
                             ),
                             m('a.modal-close.fa.fa-close.fa-lg.w-hidden-main.w-hidden-medium.w-inline-block', {
@@ -363,15 +362,15 @@ const projectsExplore = {
                             m('.explore-filer-select-row', [
                                 m('.explore-filter-select-col', [
                                     m("a.explore-filter-link[href='#']", {
-                                            onclick: () => {
-                                                ctrl.categoryToggle.toggle();
-                                                ctrl.selectedCategory({
-                                                    name: 'Todas as categorias',
-                                                    id: null
-                                                });
-                                            },
-                                            class: ctrl.selectedCategory().id === null ? 'selected' : ''
+                                        onclick: () => {
+                                            ctrl.categoryToggle.toggle();
+                                            ctrl.selectedCategory({
+                                                name: 'Todas as categorias',
+                                                id: null
+                                            });
                                         },
+                                        class: ctrl.selectedCategory().id === null ? 'selected' : ''
+                                    },
                                         'Todas as categorias'
                                     ),
                                     categoryColumn(ctrl.categories(), 0, Math.floor(_.size(ctrl.categories()) / 2))
@@ -404,12 +403,12 @@ const projectsExplore = {
                             ctrl.filterToggle() ? '' :
                             m('.explore-filter-select', [
                                 _.map(ctrl.projectFiltersVM.getContextFilters(), (pageFilter, idx) => m("a.explore-filter-link[href=\'javascript:void(0);\']", {
-                                        onclick: () => {
-                                            ctrl.changeFilter(pageFilter.keyName);
-                                            ctrl.filterToggle.toggle();
-                                        },
-                                        class: ctrl.currentFilter() === pageFilter ? 'selected' : ''
+                                    onclick: () => {
+                                        ctrl.changeFilter(pageFilter.keyName);
+                                        ctrl.filterToggle.toggle();
                                     },
+                                    class: ctrl.currentFilter() === pageFilter ? 'selected' : ''
+                                },
                                     pageFilter.nicename
                                 )),
                                 m('a.modal-close.fa.fa-close.fa-lg.w-hidden-main.w-hidden-medium.w-inline-block', {

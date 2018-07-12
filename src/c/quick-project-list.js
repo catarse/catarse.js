@@ -1,8 +1,9 @@
 import m from 'mithril';
+import _ from 'underscore';
 import projectVM from '../vms/project-vm';
 
 const quickProjectList = {
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         return m('.quickProjectList', _.map(args.projects(), (project, idx) => m('li.u-marginbottom-10', {
             key: idx
         }, m('.w-row',

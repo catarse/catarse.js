@@ -6,7 +6,7 @@ import models from '../models';
 import { catarse } from '../api';
 
 const menuProfile = {
-    controller(args) {
+    controller: function(args) {
         const contributedProjects = m.prop(),
             latestProjects = m.prop([]),
             userDetails = m.prop({}),
@@ -40,7 +40,7 @@ const menuProfile = {
             userBalance
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const user = ctrl.userDetails();
 
         return m('.w-dropdown.user-profile',
@@ -181,7 +181,7 @@ const menuProfile = {
                                         )
                                     ]
                                 ),
-                                //m(`.w-col.w-col-4.w-hidden-small.w-hidden-tiny`,
+                                // m(`.w-col.w-col-4.w-hidden-small.w-hidden-tiny`,
                                 //    [
                                 //        m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
                                 //            `Projetos apoiados`
@@ -204,8 +204,8 @@ const menuProfile = {
                                 //            }) : 'carregando...'
                                 //        )
                                 //    ]
-                                //),
-                                //m(`.w-col.w-col-4.w-hidden-small.w-hidden-tiny`,
+                                // ),
+                                // m(`.w-col.w-col-4.w-hidden-small.w-hidden-tiny`,
                                 //    [
                                 //        m(`.fontweight-semibold.fontsize-smaller.u-marginbottom-10`,
                                 //            `Projetos criados`
@@ -219,7 +219,7 @@ const menuProfile = {
                                 //            }) : 'carregando...'
                                 //        )
                                 //    ]
-                                //)
+                                // )
                             ]
                         )
                     ]

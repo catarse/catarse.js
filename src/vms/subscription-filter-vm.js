@@ -2,8 +2,9 @@ import m from 'mithril';
 import {
     commonPayment
 } from '../api';
-import replaceDiacritics from 'replaceDiacritics';
 import h from '../h';
+
+const { replaceDiacritics } = window;
 
 const vm = commonPayment.filtersVM({
         status: 'eq',
@@ -11,7 +12,7 @@ const vm = commonPayment.filtersVM({
         payment_method: 'eq'
     }),
 
-    paramToString = function(p) {
+    paramToString = function (p) {
         return (p || '').toString().trim();
     };
 
@@ -22,7 +23,7 @@ vm.order({
     id: 'desc'
 });
 
-vm.search_index.toFilter = function() {
+vm.search_index.toFilter = function () {
     const filter = paramToString(vm.search_index());
     return filter && replaceDiacritics(filter) || undefined;
 };

@@ -1,12 +1,11 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 // Add translations to payment state.
 const I18nScope = _.partial(h.i18nScope, 'projects.payment');
 
 const paymentStatus = {
-    controller(args) {
+    controller: function(args) {
         const payment = args.item;
         let card = null,
             displayPaymentMethod,
@@ -80,12 +79,12 @@ const paymentStatus = {
             stateClass
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const payment = args.item;
 
         return m('.w-row.payment-status', [
             m('.fontsize-smallest.lineheight-looser.fontweight-semibold', [
-                m(`span.fa.fa-circle${ctrl.stateClass()}`), ` ${I18n.t(payment.state, I18nScope())}`
+                m(`span.fa.fa-circle${ctrl.stateClass()}`), ` ${window.window.I18n.t(payment.state, I18nScope())}`
             ]),
             m('.fontsize-smallest.fontweight-semibold', [
                 m(`span.fa${ctrl.paymentMethodClass()}`), ' ', m('a.link-hidden[href="#"]', payment.payment_method)

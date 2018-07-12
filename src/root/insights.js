@@ -7,7 +7,7 @@ import projectInsights from '../c/project-insights';
 import projectInsightsSub from '../c/project-insights-sub';
 
 const insights = {
-    controller(args) {
+    controller: function(args) {
         const filtersVM = catarse.filtersVM({
                 project_id: 'eq'
             }),
@@ -30,7 +30,7 @@ const insights = {
 
         l.load().then((data) => {
             projectDetails(data);
-            if(_.first(data).mode === 'sub') {
+            if (_.first(data).mode === 'sub') {
                 const l2 = commonAnalytics.loaderWithToken(models.projectSubscribersInfo.postOptions({
                     id: _.first(data).common_id
                 }));
@@ -45,7 +45,7 @@ const insights = {
             projectDetails
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = _.first(ctrl.projectDetails()) || {
                 user: {
                     name: 'Realizador'

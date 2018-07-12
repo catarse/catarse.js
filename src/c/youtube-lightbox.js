@@ -11,11 +11,12 @@
  */
 
 import m from 'mithril';
+import _ from 'underscore';
 import models from '../models';
 import h from '../h';
 
 const youtubeLightbox = {
-    controller(args) {
+    controller: function(args) {
         let player;
         const showLightbox = h.toggleProp(false, true),
             setYoutube = (el, isInitialized) => {
@@ -37,7 +38,7 @@ const youtubeLightbox = {
                 return false;
             },
             createPlayer = () => {
-                player = new YT.Player('ytvideo', {
+                player = new window.YT.Player('ytvideo', {
                     height: '528',
                     width: '940',
                     videoId: args.src,
@@ -57,7 +58,7 @@ const youtubeLightbox = {
             closeVideo
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         return m('#youtube-lightbox', [
             m('a#youtube-play.w-lightbox.w-inline-block.fa.fa-play-circle.fontcolor-negative.fa-5x[href=\'javascript:void(0);\']', {
                 onclick: () => {

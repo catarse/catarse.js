@@ -1,6 +1,6 @@
 import m from 'mithril';
 import _ from 'underscore';
-import {catarse} from '../api';
+import { catarse } from '../api';
 import h from '../h';
 import models from '../models';
 import adminInputAction from './admin-input-action';
@@ -11,7 +11,7 @@ import adminTransactionHistory from './admin-transaction-history';
 import adminReward from './admin-reward';
 
 const adminContributionDetail = {
-    controller(args) {
+    controller: function(args) {
         let l;
         const loadReward = () => {
             const model = models.rewardDetail,
@@ -80,7 +80,7 @@ const adminContributionDetail = {
             l
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const actions = ctrl.actions,
             item = args.item,
             reward = ctrl.reward,

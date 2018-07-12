@@ -9,13 +9,13 @@
  *  }
  */
 import m from 'mithril';
-import {catarse} from '../api';
+import { catarse } from '../api';
 import models from '../models';
 import h from '../h';
 import popNotification from './pop-notification';
 
 const projectReminder = {
-    controller(args) {
+    controller: function(args) {
         let l = m.prop(false);
         const project = args.project,
             filterVM = catarse.filtersVM({
@@ -26,7 +26,7 @@ const projectReminder = {
             submitReminder = () => {
                 if (!h.getUser()) {
                     h.storeAction(storeReminderName, project().project_id);
-                    return h.navigateToDevise();
+                    return h.navigateToDevise(`?redirect_to=/projects/${project().project_id}`);
                 }
                 const loaderOpts = project().in_reminder ? models.projectReminder.deleteOptions(filterVM.parameters()) : models.projectReminder.postOptions({
                     project_id: project().project_id
@@ -60,7 +60,7 @@ const projectReminder = {
             popNotification
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const mainClass = (args.type === 'button') ? '' : '.u-text-center.u-marginbottom-30',
             buttonClass = (args.type === 'button') ? 'w-button btn btn-terciary btn-no-border' : 'btn-link link-hidden fontsize-large',
             hideTextOnMobile = args.hideTextOnMobile || false,

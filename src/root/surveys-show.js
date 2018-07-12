@@ -1,7 +1,6 @@
 import m from 'mithril';
 import _ from 'underscore';
-import {catarse} from '../api';
-import I18n from 'i18n-js';
+import { catarse } from '../api';
 import models from '../models';
 import h from '../h';
 import modalBox from '../c/modal-box';
@@ -16,7 +15,7 @@ import addressForm from '../c/address-form';
 const addressScope = _.partial(h.i18nScope, 'activerecord.attributes.address');
 
 const surveysShow = {
-    controller(args) {
+    controller: function(args) {
         const {
             survey_id
         } = args,
@@ -150,7 +149,7 @@ const surveysShow = {
             survey
         };
     },
-    view(ctrl) {
+    view: function(ctrl) {
         const user = ctrl.user(),
             survey = ctrl.survey(),
             countryName = ctrl.countryName,
@@ -350,7 +349,7 @@ const surveysShow = {
                                                 ) : ''),
                                             (survey.confirm_address ? [
                                                 m('.fontcolor-secondary.fontsize-base.fontweight-semibold',
-                                                        I18n.t('delivery_address', addressScope())
+                                                        window.I18n.t('delivery_address', addressScope())
                                                     ),
                                                 m(addressForm, {
                                                     countryName,

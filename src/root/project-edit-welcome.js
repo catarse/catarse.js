@@ -1,12 +1,11 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import rewardVM from '../vms/reward-vm';
 import popNotification from '../c/pop-notification';
 
 const projectEditWelcome = {
-    controller(args) {
+    controller: function(args) {
         const rewards = m.prop([]),
             currentRewardId = m.prop(),
             currentReward = m.prop(),
@@ -14,9 +13,7 @@ const projectEditWelcome = {
             error = m.prop(false);
 
         const changeReward = () => {
-            const reward = _.find(rewards(), (r) => {
-                return r.id == currentRewardId();
-            });
+            const reward = _.find(rewards(), r => r.id == currentRewardId());
             currentReward(reward);
             m.redraw();
         };
@@ -85,7 +82,7 @@ const projectEditWelcome = {
         };
     },
 
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const error = ctrl.error,
             project = args.project;
         return m("[id='dashboard-welcome-tab']",
@@ -154,8 +151,8 @@ const projectEditWelcome = {
                                                 m('.w-col.w-col-3'),
                                                 m('._w-sub-col.w-col.w-col-6',
                                                     m('a.btn.btn-large', {
-                                                            onclick: ctrl.updateRewards
-                                                        },
+                                                        onclick: ctrl.updateRewards
+                                                    },
                                                         'Salvar'
                                                     )
                                                 ),

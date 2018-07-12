@@ -1,16 +1,15 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.insights');
 
 const insightsInfoBox = {
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const newCount = args.newCount,
-              oldCount = args.oldCount,
-              countIncrease = Math.abs( newCount - oldCount ),
-              arrowClass = !args.inverted && ( newCount > oldCount ) ? 'success' : 'error';
+            oldCount = args.oldCount,
+            countIncrease = Math.abs(newCount - oldCount),
+            arrowClass = !args.inverted && (newCount > oldCount) ? 'success' : 'error';
 
         return m('.flex-column.card.u-radius.u-marginbottom-10', [
             m('div',

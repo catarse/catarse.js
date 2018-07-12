@@ -1,5 +1,6 @@
 import m from 'mithril';
-import {catarse} from '../api';
+import _ from 'underscore';
+import { catarse } from '../api';
 import h from '../h';
 import models from '../models';
 import landingSignup from '../c/landing-signup';
@@ -7,7 +8,7 @@ import projectRow from '../c/project-row';
 import landingQA from '../c/landing-qa';
 
 const Flex = {
-    controller() {
+    controller: function() {
         const stats = m.prop([]),
             projects = m.prop([]),
             l = m.prop(),
@@ -47,7 +48,7 @@ const Flex = {
             }
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const stats = _.first(ctrl.stats());
 
         return [

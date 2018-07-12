@@ -4,7 +4,7 @@ import h from '../h';
 import projectGoalsVM from '../vms/project-goals-vm';
 
 const projectGoalEditCard = {
-    controller(args) {
+    controller: function(args) {
         const goal = args.goal(),
             project = args.project,
             descriptionError = m.prop(false),
@@ -28,7 +28,7 @@ const projectGoalEditCard = {
                     args.error(true);
                     valueError(true);
                 }
-                if  (parseInt(goal.value()) >= 10 && project.state !== 'draft' && args.currentGoal() && parseInt(goal.value()) <= args.currentGoal().value()) {
+                if (parseInt(goal.value()) >= 10 && project.state !== 'draft' && args.currentGoal() && parseInt(goal.value()) <= args.currentGoal().value()) {
                     args.error(true);
                     currentError(true);
                 }
@@ -96,7 +96,7 @@ const projectGoalEditCard = {
             saveGoal
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const goal = args.goal(),
             inlineError = message => m('.fontsize-smaller.text-error.u-marginbottom-20.fa.fa-exclamation-triangle',
                 m('span',

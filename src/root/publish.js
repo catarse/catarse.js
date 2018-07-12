@@ -2,7 +2,6 @@ import m from 'mithril';
 import _ from 'underscore';
 import moment from 'moment';
 import { catarse } from '../api';
-import I18n from 'i18n-js';
 import models from '../models';
 import h from '../h';
 import projectDashboardMenu from '../c/project-dashboard-menu';
@@ -11,7 +10,7 @@ import publishVM from '../vms/publish-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.publish');
 
 const publish = {
-    controller(args) {
+    controller: function(args) {
         const filtersVM = catarse.filtersVM({
                 project_id: 'eq'
             }),
@@ -43,7 +42,7 @@ const publish = {
             projectDetails
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = _.first(ctrl.projectDetails()),
             acceptedIndex = ctrl.acceptedIndex,
             account = _.first(ctrl.projectAccount());
@@ -85,7 +84,7 @@ const publish = {
                                 m('.u-marginbottom-30.fontsize-base', [
                                     m('div', [m('span.fontweight-semibold', 'Título: '), project.name]),
                                     m('div', [m('span.fontweight-semibold', 'Link: '), `www.catarse.me/${project.permalink}`]),
-                                    m('div', [m('span.fontweight-semibold', 'Modalidade de financiamento: '), I18n.t(project.mode, I18nScope())]),
+                                    m('div', [m('span.fontweight-semibold', 'Modalidade de financiamento: '), window.I18n.t(project.mode, I18nScope())]),
                                     (project.mode !== 'sub' ?
                                         m('div', [m('span.fontweight-semibold', 'Meta de arrecadação: '), `R$ ${h.formatNumber(project.goal, 2, 3)}`]) :
                                         ''),
@@ -124,10 +123,10 @@ const publish = {
                                     m('div', [
                                         m((index + 1 > acceptedIndex()) ? 'a.w-inline-block.checkbox-big' : 'a.w-inline-block.checkbox-big.checkbox--selected.fa.fa-check.fa-lg', {
                                             onclick: () => {
-                                                    if(index >= acceptedIndex()) {
-                                                        acceptedIndex(acceptedIndex() + 1);
-                                                    }
+                                                if (index >= acceptedIndex()) {
+                                                    acceptedIndex(acceptedIndex() + 1);
                                                 }
+                                            }
                                         })
                                     ])
                                 ]),

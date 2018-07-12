@@ -1,5 +1,4 @@
 import m from 'mithril';
-import I18n from 'i18n-js';
 import {
     catarse
 } from '../api';
@@ -10,7 +9,7 @@ import h from '../h';
 const I18nScope = _.partial(h.i18nScope, 'projects.posts');
 
 const projectPosts = {
-    controller(args) {
+    controller: function(args) {
         const listVM = catarse.paginationVM(models.projectPostDetail),
             filterVM = catarse.filtersVM({
                 project_id: 'eq',
@@ -38,7 +37,7 @@ const projectPosts = {
             scrollTo
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const list = ctrl.listVM,
             project = args.project() || {};
 
@@ -106,7 +105,7 @@ const projectPosts = {
                             !project.is_owner_or_admin ? m('.w-col.w-col-10.w-col-push-1',
                                 m('p.fontsize-base',
                                     m.trust(
-                                        I18n.t('empty',
+                                        window.I18n.t('empty',
                                             I18nScope({
                                                 project_user_name: args.userDetails().name,
                                                 project_id: project.project_id

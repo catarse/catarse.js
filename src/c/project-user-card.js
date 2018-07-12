@@ -7,14 +7,14 @@ import UserFollowBtn from './user-follow-btn';
 import userVM from '../vms/user-vm';
 
 const projectUserCard = {
-    controller(args) {
+    controller: function(args) {
         const project = args.project || m.prop({}),
             displayModal = h.toggleProp(false, true),
             storeId = 'message',
             sendMessage = () => {
                 if (!h.getUser()) {
                     h.storeAction(storeId, project().project_id);
-                    return h.navigateToDevise();
+                    return h.navigateToDevise(`?redirect_to=/projects/${project().project_id}`);
                 }
 
                 displayModal(true);
@@ -29,7 +29,7 @@ const projectUserCard = {
             sendMessage
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = args.project;
         const contactModalC = [ownerMessageContent, m.prop(_.extend(args.userDetails(), {
             project_id: project().id
@@ -47,22 +47,21 @@ const projectUserCard = {
                 ]),
                 m('.w-col.w-col-8', [
                     m('.fontsize-small.link-hidden.fontweight-semibold.u-marginbottom-10.lineheight-tight[itemprop="name"]', [
-                        m(`a.link-hidden${args.isDark ? '.link-hidden-white' : ''}[href="${_.isNull(userDetail.deactivated_at) ? `/users/${userDetail.id}` : 'javascript:void(0);' }"]`, {
+                        m(`a.link-hidden${args.isDark ? '.link-hidden-white' : ''}[href="${_.isNull(userDetail.deactivated_at) ? `/users/${userDetail.id}` : 'javascript:void(0);'}"]`, {
                             config: m.route,
                             onclick: () => {
                                 if (!_.isNull(userDetail.deactivated_at)) {
                                     return false;
-                                } else {
-                                    m.route(`/users/${userDetail.id}`, {
-                                        user_id: userDetail.id
-                                    });
-                                    h.analytics.event({
-                                        cat: 'project_view',
-                                        act: 'project_creator_link',
-                                        lbl: userDetail.id,
-                                        project: project()
-                                    });
                                 }
+                                m.route(`/users/${userDetail.id}`, {
+                                    user_id: userDetail.id
+                                });
+                                h.analytics.event({
+                                    cat: 'project_view',
+                                    act: 'project_creator_link',
+                                    lbl: userDetail.id,
+                                    project: project()
+                                });
                             }
                         }, userVM.displayName(userDetail))
                     ]),

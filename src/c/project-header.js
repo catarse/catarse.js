@@ -11,7 +11,7 @@ import subscriptionVM from '../vms/subscription-vm';
 import projectVM from '../vms/project-vm';
 
 const projectHeader = {
-    controller(args) {
+    controller: function(args) {
         const project = args.project,
             currentUser = h.getUser(),
             userProjectSubscriptions = args.userProjectSubscriptions,
@@ -32,15 +32,11 @@ const projectHeader = {
             showContributions: h.toggleProp(false, true)
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = args.project,
             rewardDetails = args.rewardDetails,
-            activeSubscriptions = _.filter(ctrl.userProjectSubscriptions(), (sub) => {
-                return sub.status === 'active';
-            }),
-            sortedSubscriptions = _.sortBy(ctrl.userProjectSubscriptions(), (sub) => {
-                return _.indexOf(['active', 'started', 'canceling', 'inactive', 'canceled'], sub.status);
-            });
+            activeSubscriptions = _.filter(ctrl.userProjectSubscriptions(), sub => sub.status === 'active'),
+            sortedSubscriptions = _.sortBy(ctrl.userProjectSubscriptions(), sub => _.indexOf(['active', 'started', 'canceling', 'inactive', 'canceled'], sub.status));
 
         const hasContribution = (
             (!_.isEmpty(ctrl.projectContributions()) || ctrl.hasSubscription()) ?
@@ -61,7 +57,7 @@ const projectHeader = {
                      _.map(activeSubscriptions.length > 0 ? activeSubscriptions : sortedSubscriptions, subscription => m.component(userSubscriptionDetail, {
                          subscription,
                          project: project()
-                        }))
+                     }))
                     )
                 ) : ''
             ]) :

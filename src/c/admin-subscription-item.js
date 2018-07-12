@@ -1,4 +1,5 @@
 import m from 'mithril';
+import _ from 'underscore';
 import h from '../h';
 import adminSubProject from './admin-sub-project';
 import adminSubscription from './admin-subscription';
@@ -6,7 +7,7 @@ import adminSubscriptionUser from './admin-subscription-user';
 import subPaymentStatus from './sub-payment-status';
 
 const adminSubscriptionItem = {
-    controller() {
+    controller: function() {
         return {
             itemBuilder: [{
                 component: adminSubscriptionUser,
@@ -23,7 +24,7 @@ const adminSubscriptionItem = {
             }]
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         // console.log(args.item);
         return m(
             '.w-row',

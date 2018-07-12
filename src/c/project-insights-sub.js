@@ -7,7 +7,6 @@ import {
     commonAnalytics
 } from '../api';
 import models from '../models';
-import I18n from 'i18n-js';
 import h from '../h';
 import projectDashboardMenu from '../c/project-dashboard-menu';
 import projectDataChart from '../c/project-data-chart';
@@ -22,7 +21,7 @@ import userVM from '../vms/user-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.insights');
 
 const projectInsightsSub = {
-    controller(args) {
+    controller: function(args) {
         const filtersVM = args.filtersVM,
             visitorsTotal = m.prop(0),
             visitorLoader = catarseMoments.loaderWithToken,
@@ -81,7 +80,7 @@ const projectInsightsSub = {
             balanceLoader
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const sumAmount = list => _.reduce(list, (memo, sub) => memo + (sub.amount / 100), 0);
         const weekSum = sumAmount(ctrl.weekSubscriptions());
         const lastWeekSum = sumAmount(ctrl.lastWeekSubscriptions());
@@ -160,7 +159,7 @@ const projectInsightsSub = {
                                     `em ${moment().format('DD/MM/YYYY')}`
                                 ),
                                 m('.fontsize-largest.fontweight-semibold',
-                                    `R$${averageRevenue ? `${h.formatNumber( averageRevenue, 2, 3 )}` : '--'}`
+                                    `R$${averageRevenue ? `${h.formatNumber(averageRevenue, 2, 3)}` : '--'}`
                                 )
 
                             ]),
@@ -178,17 +177,17 @@ const projectInsightsSub = {
                             })
                         ]),
                         m(".fontsize-large.fontweight-semibold.u-marginbottom-10.u-text-center[id='origem']", [
-                          I18n.t('visitors_per_day_label', I18nScope())
+                            window.I18n.t('visitors_per_day_label', I18nScope())
                         ]),
-                        m(".u-text-center.fontsize-smaller.fontcolor-secondary.lineheight-tighter.u-marginbottom-20", [
-                            I18n.t('last_30_days_indication', I18nScope())
+                        m('.u-text-center.fontsize-smaller.fontcolor-secondary.lineheight-tighter.u-marginbottom-20', [
+                            window.I18n.t('last_30_days_indication', I18nScope())
                         ])
                     ]), !ctrl.lVisitorsPerDay() ? m.component(projectDataChart, {
                         collection: ctrl.visitorsPerDay,
                         dataKey: 'visitors',
                         limitDataset: 30,
                         xAxis: item => h.momentify(item.day),
-                        emptyState: I18n.t('visitors_per_day_empty', I18nScope())
+                        emptyState: window.I18n.t('visitors_per_day_empty', I18nScope())
                     }) : h.loader(),
 
                     m('.u-text-center', {
@@ -197,11 +196,11 @@ const projectInsightsSub = {
                         }
                     }, [!ctrl.lSubscriptionsPerDay() ? m.component(projectDataChart, {
                         collection: ctrl.subscriptionsPerDay,
-                        label: I18n.t('amount_per_day_label_sub', I18nScope()),
-                        subLabel: I18n.t('last_30_days_indication', I18nScope()),
+                        label: window.I18n.t('amount_per_day_label_sub', I18nScope()),
+                        subLabel: window.I18n.t('last_30_days_indication', I18nScope()),
                         dataKey: 'total_amount',
                         xAxis: item => h.momentify(item.paid_at),
-                        emptyState: m.trust(I18n.t('amount_per_day_empty_sub', I18nScope()))
+                        emptyState: m.trust(window.I18n.t('amount_per_day_empty_sub', I18nScope()))
                     }) : h.loader()]),
                     m('.u-text-center', {
                         style: {
@@ -209,11 +208,11 @@ const projectInsightsSub = {
                         }
                     }, [!ctrl.lSubscriptionsPerDay() ? m.component(projectDataChart, {
                         collection: ctrl.subscriptionsPerDay,
-                        label: I18n.t('contributions_per_day_label_sub', I18nScope()),
-                        subLabel: I18n.t('last_30_days_indication', I18nScope()),
+                        label: window.I18n.t('contributions_per_day_label_sub', I18nScope()),
+                        subLabel: window.I18n.t('last_30_days_indication', I18nScope()),
                         dataKey: 'total',
                         xAxis: item => h.momentify(item.paid_at),
-                        emptyState: m.trust(I18n.t('contributions_per_day_empty_sub', I18nScope()))
+                        emptyState: m.trust(window.I18n.t('contributions_per_day_empty_sub', I18nScope()))
                     }) : h.loader()]),
                     m(subscriptionsPerMonthTable, {
                         data: ctrl.subscriptionsPerMonth()

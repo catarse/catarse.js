@@ -1,9 +1,10 @@
 import m from 'mithril';
+import _ from 'underscore';
 import h from '../h';
-import {catarse} from '../api';
+import { catarse } from '../api';
 
 const adminInputAction = {
-    controller(args) {
+    controller: function(args) {
         const builder = args.data,
             complete = m.prop(false),
             error = m.prop(false),
@@ -51,7 +52,7 @@ const adminInputAction = {
             unload
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const data = args.data,
             btnValue = (ctrl.l()) ? 'por favor, aguarde...' : data.callToAction;
 

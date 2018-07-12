@@ -1,6 +1,5 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import rewardVM from '../vms/reward-vm';
 import projectVM from '../vms/project-vm';
@@ -8,7 +7,7 @@ import projectVM from '../vms/project-vm';
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions');
 
 const projectRewardCard = {
-    controller(args) {
+    controller: function(args) {
         const storeKey = 'selectedReward',
             reward = args.reward,
             vm = rewardVM,
@@ -51,7 +50,7 @@ const projectRewardCard = {
 
                 if (projectVM.isSubscription(projectVM.currentProject())) {
                     vm.contributionValue(valueFloat);
-                    m.route(`/projects/${projectVM.currentProject().project_id}/subscriptions/checkout`, {contribution_value: valueFloat, reward_id: vm.selectedReward().id});
+                    m.route(`/projects/${projectVM.currentProject().project_id}/subscriptions/checkout`, { contribution_value: valueFloat, reward_id: vm.selectedReward().id });
 
                     return false;
                 }
@@ -94,7 +93,7 @@ const projectRewardCard = {
             contributionValue: vm.contributionValue
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         // FIXME: MISSING ADJUSTS
         // - add draft admin modifications
         const reward = ctrl.reward,
@@ -151,7 +150,7 @@ const projectRewardCard = {
                        )
                      ),
                     m('.fontsize-smallest',
-                      I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope())
+                      window.I18n.t(`shipping_options.${reward.shipping_options}`, I18nScope())
                      )
                 ] : '')
             ]),
@@ -191,10 +190,10 @@ const projectRewardCard = {
                                   ctrl.locationOptions(reward, ctrl.selectedDestination),
                                   option => m('option',
                                               { selected: option.value === ctrl.selectedDestination(), value: option.value },
-                                              [
-                                                  `${option.name} `,
-                                                  option.value != '' ? `+R$${h.formatNumber(option.fee, 2, 3)}` : null
-                                              ]
+                                      [
+                                          `${option.name} `,
+                                          option.value != '' ? `+R$${h.formatNumber(option.fee, 2, 3)}` : null
+                                      ]
                                              )
                               )
                              )

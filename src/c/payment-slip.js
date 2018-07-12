@@ -1,6 +1,5 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import inlineError from './inline-error';
 import projectVM from '../vms/project-vm';
@@ -10,24 +9,24 @@ import subscriptionEditModal from './subscription-edit-modal';
 const I18nScope = _.partial(h.i18nScope, 'projects.contributions.edit');
 
 const paymentSlip = {
-    controller(args) {
+    controller: function(args) {
         const vm = args.vm,
-              isSubscriptionEdit = args.isSubscriptionEdit || m.prop(false),
-              slipPaymentDate = projectVM.isSubscription() ? null : vm.getSlipPaymentDate(args.contribution_id),
-              loading = m.prop(false),
-              error = m.prop(false),
-              completed = m.prop(false),
-              subscriptionEditConfirmed = m.prop(false),
-              showSubscriptionModal = m.prop(false),
-              isReactivation = args.isReactivation || m.prop(false);
+            isSubscriptionEdit = args.isSubscriptionEdit || m.prop(false),
+            slipPaymentDate = projectVM.isSubscription() ? null : vm.getSlipPaymentDate(args.contribution_id),
+            loading = m.prop(false),
+            error = m.prop(false),
+            completed = m.prop(false),
+            subscriptionEditConfirmed = m.prop(false),
+            showSubscriptionModal = m.prop(false),
+            isReactivation = args.isReactivation || m.prop(false);
 
         const buildSlip = () => {
             vm.isLoading(true);
             m.redraw();
 
-            if (isSubscriptionEdit ()
+            if (isSubscriptionEdit()
                 && !subscriptionEditConfirmed()
-                && !isReactivation()){
+                && !isReactivation()) {
                 showSubscriptionModal(true);
 
                 return false;
@@ -42,7 +41,7 @@ const paymentSlip = {
                 };
 
                 if (isSubscriptionEdit()) {
-                    commonPaymentVM.sendSlipPayment(vm, _.extend({}, commonData, {subscription_id: args.subscriptionId()}));
+                    commonPaymentVM.sendSlipPayment(vm, _.extend({}, commonData, { subscription_id: args.subscriptionId() }));
 
                     return false;
                 }
@@ -69,8 +68,8 @@ const paymentSlip = {
             isReactivation
         };
     },
-    view(ctrl, args) {
-        const buttonLabel = ctrl.isSubscriptionEdit() && !args.isReactivation() ? I18n.t('subscription_edit', I18nScope()) : I18n.t('pay_slip', I18nScope());
+    view: function(ctrl, args) {
+        const buttonLabel = ctrl.isSubscriptionEdit() && !args.isReactivation() ? window.I18n.t('subscription_edit', I18nScope()) : window.I18n.t('pay_slip', I18nScope());
 
         return m('.w-row',
                     m('.w-col.w-col-12',

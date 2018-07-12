@@ -9,7 +9,7 @@ import projectReport from './project-report';
 import projectSuggestedContributions from './project-suggested-contributions';
 
 const projectAbout = {
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = args.project() || {},
             onlineDays = () => {
                 const diff = moment(project.zone_online_date).diff(moment(project.zone_expires_at)),
@@ -34,7 +34,7 @@ const projectAbout = {
                     m('.fontsize-base.u-marginbottom-30.w-hidden-small.w-hidden-tiny', [
                         m('span.fontweight-semibold', titleText),
                         m.trust('&nbsp;'),
-                        m("span.badge.fontsize-smaller.badge-success", "parcele em até 6x")
+                        m('span.badge.fontsize-smaller.badge-success', 'parcele em até 6x')
                     ])
                 ],
                 hasRewards ? [

@@ -1,12 +1,11 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 
 const I18nScope = _.partial(h.i18nScope, 'activerecord.attributes.address');
 
 const surveyPreview = {
-    controller(args) {
+    controller: function(args) {
         const fields = args.fields,
             multipleChoiceQuestions = args.multipleChoiceQuestions,
             openQuestions = args.openQuestions;
@@ -17,7 +16,7 @@ const surveyPreview = {
             openQuestions
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         return m('.section.u-marginbottom-40',
             m('.w-container',
                 m('.w-row', [
@@ -27,58 +26,58 @@ const surveyPreview = {
                             (args.confirmAddress ?
                             m('.u-marginbottom-30', [
                                 m('.fontcolor-secondary.fontsize-base.fontweight-semibold.u-marginbottom-20',
-                                    I18n.t('delivery_address', I18nScope())
+                                    window.I18n.t('delivery_address', I18nScope())
                                 ),
                                 m('.fontsize-base', [
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('country', I18nScope())}: `
+                                        `${window.I18n.t('country', I18nScope())}: `
                                     ),
                                     args.countryName,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_street', I18nScope())}:`
+                                        `${window.I18n.t('address_street', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.address_street,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_number', I18nScope())}:`
+                                        `${window.I18n.t('address_number', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.address_number,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_complement', I18nScope())}:`
+                                        `${window.I18n.t('address_complement', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.address_complement,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_neighbourhood', I18nScope())}:`
+                                        `${window.I18n.t('address_neighbourhood', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.address_neighbourhood,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_city', I18nScope())}:`
+                                        `${window.I18n.t('address_city', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.address_city,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_state', I18nScope())}:`
+                                        `${window.I18n.t('address_state', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     args.stateName,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('address_zip_code', I18nScope())}:`
+                                        `${window.I18n.t('address_zip_code', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.address_zip_code,
                                     m('br'),
                                     m('span.fontweight-semibold',
-                                        `${I18n.t('phone_number', I18nScope())}:`
+                                        `${window.I18n.t('phone_number', I18nScope())}:`
                                     ),
                                     m.trust('&nbsp;'),
                                     ctrl.fields.phone_number

@@ -13,7 +13,7 @@ import h from '../h';
 import models from '../models';
 
 const cancelSubscriptionContent = {
-    controller(args) {
+    controller: function(args) {
         const canceling = m.prop(false);
 
         const cancelSubscription = () => {
@@ -32,32 +32,32 @@ const cancelSubscriptionContent = {
             canceling
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const successMessage = m('.modal-dialog-content', [
-            m('.fontsize-megajumbo.u-text-center.u-marginbottom-20',
+                m('.fontsize-megajumbo.u-text-center.u-marginbottom-20',
               '🙁'
              ),
-            m('.fontsize-base.u-marginbottom-20', [
-                'Sua assinatura de ',
-                m('span.fontweight-semibold',
+                m('.fontsize-base.u-marginbottom-20', [
+                    'Sua assinatura de ',
+                    m('span.fontweight-semibold',
                   `R$${args.subscription.amount / 100}`
                  ),
-                ' para o projeto ',
-                m('span.fontweight-semibold',
+                    ' para o projeto ',
+                    m('span.fontweight-semibold',
                   args.subscription.project.project_name
                  ),
-                ` foi cancelada. Como sua próxima data de vencimento é no dia ${h.momentify(args.subscription.next_charge_at, 'DD/MM/YYYY')}, sua assinatura ainda estará ativa até este dia. Mas não se preocupe, que você não terá mais nenhuma cobrança em seu nome daqui pra frente.`,
-                m('br'),
-                m('br'),
-                'Se por algum motivo você quiser um reembolso de seu apoio mensal, entre em contato direto com ',
-                m(`a.alt-link[href='/users/${args.subscription.project.project_user_id}#about']`,
+                    ` foi cancelada. Como sua próxima data de vencimento é no dia ${h.momentify(args.subscription.next_charge_at, 'DD/MM/YYYY')}, sua assinatura ainda estará ativa até este dia. Mas não se preocupe, que você não terá mais nenhuma cobrança em seu nome daqui pra frente.`,
+                    m('br'),
+                    m('br'),
+                    'Se por algum motivo você quiser um reembolso de seu apoio mensal, entre em contato direto com ',
+                    m(`a.alt-link[href='/users/${args.subscription.project.project_user_id}#about']`,
                   args.subscription.project.owner_name
                  ),
-                '.',
-                m('br'),
-                m('br'),
-                'Até logo!'
-            ])
+                    '.',
+                    m('br'),
+                    m('br'),
+                    'Até logo!'
+                ])
             ]),
             contactForm = [
                 m('.modal-dialog-content', [
@@ -66,15 +66,15 @@ const cancelSubscriptionContent = {
                             m('.w-col.w-col-2'),
                             m('.u-text-center.w-col.w-col-5',
                                 m('a.btn.btn-large.u-marginbottom-20', {
-                                        onclick: ctrl.cancelSubscription
-                                    },
+                                    onclick: ctrl.cancelSubscription
+                                },
                                     'Cancelar assinatura'
                                 )
                             ),
                             m('.w-col.w-col-3',
                                 m('a.btn.btn-large.u-marginbottom-20.btn-terciary.btn-no-border', {
-                                        onclick: args.displayModal.toggle
-                                    },
+                                    onclick: args.displayModal.toggle
+                                },
                                     'Voltar'
                                 )
                             ),

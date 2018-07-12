@@ -1,7 +1,6 @@
 import m from 'mithril';
 import { catarse } from '../api';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import models from '../models';
 import projectDashboardMenu from '../c/project-dashboard-menu';
@@ -10,7 +9,7 @@ import projectVM from '../vms/project-vm';
 const fiscalScope = _.partial(h.i18nScope, 'projects.dashboard_fiscal');
 
 const projectsFiscal = {
-    controller(args) {
+    controller: function(args) {
         const loader = catarse.loaderWithToken,
             filterVM = catarse.filtersVM({
                 project_id: 'eq'
@@ -36,7 +35,7 @@ const projectsFiscal = {
             projectFiscalData
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = ctrl.projectDetail();
         const projectFiscalData = ctrl.projectFiscalData();
         const loading = ctrl.l() || ctrl.l2();
@@ -52,10 +51,10 @@ const projectsFiscal = {
                         m('.w-col.w-col-2'),
                         m('.w-col.w-col-8', [
                             m('.fontsize-larger.fontweight-semibold.lineheight-looser.u-text-center',
-                                I18n.t('title', fiscalScope())
+                                window.I18n.t('title', fiscalScope())
                             ),
                             m('.fontsize-base.u-text-center',
-                                I18n.t('subtitle', fiscalScope())
+                                window.I18n.t('subtitle', fiscalScope())
                             ),
                             m('.u-margintop-20.u-text-center',
                                 m('.w-inline-block.card.fontsize-small.u-radius', [
@@ -63,7 +62,7 @@ const projectsFiscal = {
                                         ''
                                     ),
                                     m.trust('&nbsp;'),
-                                    m.trust(I18n.t('help_link', fiscalScope()))
+                                    m.trust(window.I18n.t('help_link', fiscalScope()))
                                 ])
                             )
                         ]),
@@ -84,7 +83,7 @@ const projectsFiscal = {
                                         m('span.fa.fa-exclamation-circle',
                                             ''
                                         ),
-                                        I18n.t(!projectVM.isSubscription(project) ?
+                                        window.I18n.t(!projectVM.isSubscription(project) ?
                                             'nodoc_explanation'
                                             : 'nodoc_explanation_sub', fiscalScope())
                                     ])
@@ -101,13 +100,13 @@ const projectsFiscal = {
                                         m('span.fa.fa-download',
                                             m.trust('&nbsp;')
                                         ),
-                                        I18n.t('doc_download', fiscalScope())
+                                        window.I18n.t('doc_download', fiscalScope())
                                     ]),
                                     m('.card.u-radius.u-marginbottom-20', [
                                         m('span.fontweight-semibold',
                                             m.trust('Atenção:')
                                         ),
-                                        m.trust(I18n.t('doc_download_explanation', fiscalScope()))
+                                        m.trust(window.I18n.t('doc_download_explanation', fiscalScope()))
                                     ]),
                                     m('ul.w-list-unstyled', _.map(projectFiscalData.informs, (inform, idx) => [
                                         (idx > 0 ? m('li.divider.u-marginbottom-10') : ''),
@@ -141,7 +140,7 @@ const projectsFiscal = {
                         ])
 
                     ),
-                    ]
+                ]
                 )
             )
             : h.loader())

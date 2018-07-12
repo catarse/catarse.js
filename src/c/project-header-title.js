@@ -5,10 +5,10 @@ import projectVM from '../vms/project-vm';
 import h from '../h';
 
 const projectHeaderTitle = {
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = args.project,
             isSub = projectVM.isSubscription(project);
-        
+
         return !_.isUndefined(project()) ? m(`.w-section.page-header${isSub ? '.transparent-background' : ''}`, [
             m('.w-container', [
                 args.children,

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import _ from 'underscore';
-import {catarse} from '../api';
+import { catarse } from '../api';
 import projectListVM from '../vms/project-list-vm';
 import models from '../models';
 import projectFilterVM from '../vms/project-filter-vm';
@@ -14,7 +14,7 @@ import filterMain from '../c/filter-main';
 import filterDropdown from '../c/filter-dropdown';
 
 const adminProjects = {
-    controller() {
+    controller: function() {
         const listVM = projectListVM,
             filterVM = projectFilterVM,
             categories = m.prop([]),
@@ -70,6 +70,9 @@ const adminProjects = {
                     }, {
                         value: 'flex',
                         option: 'Flex'
+                    }, {
+                        value: 'sub',
+                        option: 'Recorrente'
                     }
                     ]
                 }
@@ -172,7 +175,7 @@ const adminProjects = {
             submit
         };
     },
-    view(ctrl) {
+    view: function(ctrl) {
         const label = 'Projetos';
 
         return m('', [

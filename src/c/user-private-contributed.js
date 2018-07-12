@@ -1,6 +1,6 @@
 import m from 'mithril';
 import models from '../models';
-import {catarse, commonPayment} from '../api';
+import { catarse, commonPayment } from '../api';
 import _ from 'underscore';
 import h from '../h';
 import contributionVM from '../vms/contribution-vm';
@@ -8,7 +8,7 @@ import inlineError from './inline-error';
 import userContributedList from './user-contributed-list';
 
 const userPrivateContributed = {
-    controller(args) {
+    controller: function(args) {
         const user_id = args.userId,
             userCommonId = args.user && args.user.common_id,
             subscriptions = commonPayment.paginationVM(models.userSubscription),
@@ -43,7 +43,7 @@ const userPrivateContributed = {
             loader(false);
         }).catch(handleError);
 
-        contextVM.order({created_at: 'desc'}).user_id(user_id).state(['refunded', 'pending_refund', 'paid', 'refused', 'pending']);
+        contextVM.order({ created_at: 'desc' }).user_id(user_id).state(['refunded', 'pending_refund', 'paid', 'refused', 'pending']);
 
         contextVM.project_state(['online', 'waiting_funds']);
         onlinePages.firstPage(contextVM.parameters()).then(() => {
@@ -69,7 +69,7 @@ const userPrivateContributed = {
             loader
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const subsCollection = ctrl.subscriptions.collection(),
             onlineCollection = ctrl.onlinePages.collection(),
             successfulCollection = ctrl.successfulPages.collection(),

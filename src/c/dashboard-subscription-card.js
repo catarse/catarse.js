@@ -1,7 +1,6 @@
 import m from 'mithril';
 import _ from 'underscore';
 import moment from 'moment';
-import I18n from 'i18n-js';
 import {
     catarse
 } from '../api';
@@ -14,7 +13,7 @@ import h from '../h';
 const I18nScope = _.partial(h.i18nScope, 'projects.subscription_fields');
 
 const dashboardSubscriptionCard = {
-    controller(args) {
+    controller: function(args) {
         const subscription = args.subscription,
             reward = m.prop(),
             toggleDetails = h.toggleProp(false, true),
@@ -47,14 +46,14 @@ const dashboardSubscriptionCard = {
             user
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const subscription = args.subscription,
             user = ctrl.user(),
             cardClass = ctrl.toggleDetails() ? '.card-detailed-open' : '';
 
         return m(`div${cardClass}`, [m('.card.card-clickable', {
-                    onclick: ctrl.toggleDetails.toggle
-                }, ctrl.user() ?
+            onclick: ctrl.toggleDetails.toggle
+        }, ctrl.user() ?
                 m('.w-row', [
                     m('.table-col.w-col.w-col-3',
                         m('.w-row', [

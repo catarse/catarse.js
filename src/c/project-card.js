@@ -1,5 +1,4 @@
 import m from 'mithril';
-import I18n from 'i18n-js';
 import _ from 'underscore';
 import h from '../h';
 import projectVM from '../vms/project-vm';
@@ -8,7 +7,7 @@ import progressMeter from './progress-meter';
 
 const I18nScope = _.partial(h.i18nScope, 'projects.card');
 const projectCard = {
-    controller(args) {
+    controller: function(args) {
         const project = args.project,
             progress = project.progress.toFixed(2),
             remainingTextObj = h.translatedTime(project.remaining_time),
@@ -59,7 +58,7 @@ const projectCard = {
 
         const cardCopy = (project) => {
             if (projectVM.isSubscription(project)) {
-                return m('img.product-label[src="https://s3.amazonaws.com/cdn.catarse/assets/assinatura-label.png"]')
+                return m('img.product-label[src="https://s3.amazonaws.com/cdn.catarse/assets/assinatura-label.png"]');
             }
             if (project.expires_at) {
                 return isFinished(project) ? [
@@ -86,7 +85,7 @@ const projectCard = {
             isFinished
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = args.project,
             projectOwnerName = (project.user ? (
                   project.user.public_name || project.user.name
@@ -112,7 +111,7 @@ const projectCard = {
                             },
                             project.project_name || project.name)
                         ]),
-                        m(ctrl.css().author, `${I18n.t('by', I18nScope())} ${projectOwnerName}`),
+                        m(ctrl.css().author, `${window.I18n.t('by', I18nScope())} ${projectOwnerName}`),
                         m(ctrl.css().headline, [
                             m(`a.link-hidden[href="/${project.permalink}?ref=${args.ref}"]`, {
                                 onclick: projectVM.routeToProject(project, args.ref)
@@ -133,7 +132,7 @@ const projectCard = {
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-center-small-only', [
                                 m('.fontsize-smaller.fontweight-semibold', `R$ ${h.formatNumber(project.pledged)}`),
-                                m('.fontsize-smallest.lineheight-tightest', I18n.t(`pledged.${project.mode}`, I18nScope()))
+                                m('.fontsize-smallest.lineheight-tightest', window.I18n.t(`pledged.${project.mode}`, I18nScope()))
                             ]),
                             m('.w-col.w-col-4.w-col-small-4.w-col-tiny-4.u-text-right', ctrl.cardCopy(project))
                         ])

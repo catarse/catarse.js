@@ -1,12 +1,11 @@
 import m from 'mithril';
-import I18n from 'i18n-js';
 import _ from 'underscore';
 import h from '../h';
 import models from '../models';
-import {catarse} from '../api';
+import { catarse } from '../api';
 
 const inviteEmailsFromImport = {
-    controller(args) {
+    controller: function(args) {
         const checkedList = m.prop([]),
             loading = m.prop(false),
             filterTerm = m.prop(''),
@@ -68,7 +67,7 @@ const inviteEmailsFromImport = {
             filtering
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const project = args.project;
 
         return m('div', [

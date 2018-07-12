@@ -1,6 +1,5 @@
 import m from 'mithril';
 import _ from 'underscore';
-import I18n from 'i18n-js';
 import h from '../h';
 import copyTextInput from './copy-text-input';
 import rewardVM from '../vms/reward-vm';
@@ -10,7 +9,7 @@ import inlineError from './inline-error';
 const I18nScope = _.partial(h.i18nScope, 'projects.reward_fields');
 
 const dashboardRewardCard = {
-    controller(args) {
+    controller: function(args) {
         const reward = args.reward(),
             availableCount = () => reward.maximum_contributions() - reward.paid_count() - reward.waiting_payment_count(),
             limitError = m.prop(false),
@@ -58,7 +57,7 @@ const dashboardRewardCard = {
             limitError
         };
     },
-    view(ctrl, args) {
+    view: function(ctrl, args) {
         const reward = args.reward();
         const project = args.project();
         const isSubscription = projectVM.isSubscription(project);
@@ -68,7 +67,7 @@ const dashboardRewardCard = {
                 m('.w-row', [
                     m('.w-col.w-col-11.w-col-small-11.w-col-tiny-11',
                         m('.fontsize-base.fontweight-semibold',
-                            I18n.t(
+                            window.I18n.t(
                                 isSubscription ?
                                 'minimum_value_subscription_title' :
                                 'minimum_value_title', I18nScope({
@@ -79,17 +78,17 @@ const dashboardRewardCard = {
                     (rewardVM.canEdit(reward, project.state, args.user) ?
                         m('.w-col.w-col-1.w-col-small-1.w-col-tiny-1',
                             m("a.show_reward_form[href='javascript:void(0);']", {
-                                    onclick: () => {
-                                        reward.edit.toggle();
-                                    }
-                                },
+                                onclick: () => {
+                                    reward.edit.toggle();
+                                }
+                            },
                                 m('.btn.btn-small.btn-terciary.fa.fa-lg.fa-edit.btn-no-border')
                             )
                         ) : '')
                 ]),
                 m('.u-marginbottom-20', [
                     m('.fontsize-smaller.fontweight-semibold',
-                        I18n.t(
+                        window.I18n.t(
                             isSubscription ?
                             'paid_subscribers' :
                             'paid_contributors', I18nScope({
@@ -97,7 +96,7 @@ const dashboardRewardCard = {
                             })
                         )
                     ),
-                    m('.fontsize-smaller.fontcolor-secondary', I18n.t('index.contributions_to_confirm', I18nScope({
+                    m('.fontsize-smaller.fontcolor-secondary', window.I18n.t('index.contributions_to_confirm', I18nScope({
                         count: reward.waiting_payment_count()
                     })))
                 ]),
@@ -110,15 +109,15 @@ const dashboardRewardCard = {
                 (reward.limited() ? (ctrl.availableCount() <= 0) ?
                     m('.u-margintop-10',
                         m('span.badge.badge-gone.fontsize-smaller',
-                            I18n.t('reward_gone', I18nScope())
+                            window.I18n.t('reward_gone', I18nScope())
                         )
                     ) :
                     m('.u-margintop-10',
                         m('span.badge.badge-attention.fontsize-smaller', [
                             m('span.fontweight-bold',
-                                I18n.t('reward_limited', I18nScope())
+                                window.I18n.t('reward_limited', I18nScope())
                             ),
-                            I18n.t('reward_available', I18nScope({
+                            window.I18n.t('reward_available', I18nScope({
                                 available: ctrl.availableCount(),
                                 maximum: reward.maximum_contributions()
                             }))
@@ -126,12 +125,12 @@ const dashboardRewardCard = {
                     ) : ''),
 
                 reward.deliver_at() && !isSubscription ? m('.fontsize-smallest', [
-                    m('b', I18n.t('delivery_estimation', I18nScope())),
+                    m('b', window.I18n.t('delivery_estimation', I18nScope())),
                     h.momentify(reward.deliver_at(), 'MMM/YYYY')
                 ]) : null,
                 isSubscription ? null : m('.fontsize-smallest',
-                    m('b', `${I18n.t('delivery', I18nScope())}: `),
-                    I18n.t(`shipping_options.${reward.shipping_options()}`, I18nScope())),
+                    m('b', `${window.I18n.t('delivery', I18nScope())}: `),
+                    window.I18n.t(`shipping_options.${reward.shipping_options()}`, I18nScope())),
                 m('.u-margintop-40.w-row', [
                     (ctrl.showLimited() ? '' :
                         m('.w-col.w-col-4', [
@@ -144,10 +143,10 @@ const dashboardRewardCard = {
                 ]),
                 m(`div${ctrl.showLimited() ? '' : '.w-hidden'}`,
                     m('.card.card-terciary.div-display-none.u-radius', {
-                            style: {
-                                display: 'block'
-                            }
-                        },
+                        style: {
+                            display: 'block'
+                        }
+                    },
                         m('.w-form', [
                             [
                                 m('.w-row', [
@@ -158,7 +157,7 @@ const dashboardRewardCard = {
                                                 checked: reward.limited()
                                             }),
                                             m('label.fontsize-smaller.fontweight-semibold.w-form-label',
-                                                I18n.t('reward_limited_input', I18nScope())
+                                                window.I18n.t('reward_limited_input', I18nScope())
                                             )
                                         ])
                                     ),
@@ -178,8 +177,8 @@ const dashboardRewardCard = {
                                     ),
                                     m('.w-sub-col.w-col.w-col-4',
                                         m('button.btn.btn-small.btn-terciary.w-button', {
-                                                onclick: ctrl.toggleShowLimit
-                                            },
+                                            onclick: ctrl.toggleShowLimit
+                                        },
                                             'Cancelar'
                                         )
                                     ),
@@ -196,10 +195,10 @@ const dashboardRewardCard = {
             ]),
         m('.u-margintop-20', [
                 m('.fontcolor-secondary.fontsize-smallest.fontweight-semibold',
-                    I18n.t('reward_link_label', I18nScope())
+                    window.I18n.t('reward_link_label', I18nScope())
                 ),
                 m('.fontcolor-secondary.fontsize-smallest.u-marginbottom-10',
-                    I18n.t('reward_link_hint', I18nScope())
+                    window.I18n.t('reward_link_hint', I18nScope())
                 ),
                 m('.w-form',
                     m('.w-col.w-col-6',

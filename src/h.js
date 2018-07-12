@@ -1,16 +1,15 @@
-import I18n from 'i18n-js';
 import _ from 'underscore';
 import moment from 'moment';
 import $ from 'jquery';
 import m from 'mithril';
-import {catarse} from './api';
-import CatarseAnalytics from 'CatarseAnalytics';
+import { catarse } from './api';
 import contributionVM from './vms/contribution-vm';
 
+const { CatarseAnalytics } = window;
 const
     _dataCache = {},
-    hashMatch = (str) => window.location.hash === str,
-    mobileScreen = () => window.screen && window.screen.width<=767,
+    hashMatch = str => window.location.hash === str,
+    mobileScreen = () => window.screen && window.screen.width <= 767,
     paramByName = (name) => {
         const normalName = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]'),
             regex = new RegExp(`[\\?&]${normalName}=([^&#]*)`),
@@ -22,27 +21,27 @@ const
         moment.locale('pt', {
             months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
             monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
-            relativeTime : {
-                future : 'em %s',
-                past : 'há %s',
-                s : 'segundos',
-                m : 'um minuto',
-                mm : '%d minutos',
-                h : 'uma hora',
-                hh : '%d horas',
-                d : 'um dia',
-                dd : '%d dias',
-                M : 'um mês',
-                MM : '%d meses',
-                y : 'um ano',
-                yy : '%d anos'
+            relativeTime: {
+                future: 'em %s',
+                past: 'há %s',
+                s: 'segundos',
+                m: 'um minuto',
+                mm: '%d minutos',
+                h: 'uma hora',
+                hh: '%d horas',
+                d: 'um dia',
+                dd: '%d dias',
+                M: 'um mês',
+                MM: '%d meses',
+                y: 'um ano',
+                yy: '%d anos'
             }
         });
     },
     lastDayOfNextMonth = () => moment().add(1, 'months').format('D/MMMM'),
-    existy = (x) => x != null,
+    existy = x => x != null,
 
-    slugify = (str) => replaceDiacritics(str.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'')),
+    slugify = str => window.replaceDiacritics(str.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')),
 
     momentify = (date, format) => {
         format = format || 'DD/MM/YYYY';
@@ -76,7 +75,7 @@ const
         return null;
     },
 
-    capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1),
+    capitalize = string => string.charAt(0).toUpperCase() + string.slice(1),
 
     discuss = (page, identifier) => {
         const d = document,
@@ -361,21 +360,21 @@ const
         return action === act;
     },
 
-    useAvatarOrDefault = (avatarPath) => avatarPath || '/assets/catarse_bootstrap/user.jpg',
+    useAvatarOrDefault = avatarPath => avatarPath || '/assets/catarse_bootstrap/user.jpg',
 
     // Templates
     loader = () => m('.u-text-center.u-margintop-30 u-marginbottom-30', [
         m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]')
     ]),
 
-    newFeatureBadge = () => m('span.badge.badge-success.margin-side-5', I18n.t('projects.new_feature_badge')),
+    newFeatureBadge = () => m('span.badge.badge-success.margin-side-5', window.I18n.t('projects.new_feature_badge')),
 
     fbParse = () => {
         const tryParse = () => {
             try {
                 window.FB.XFBML.parse();
             } catch (e) {
-                //console.log(e);
+                // console.log(e);
             }
         };
 
@@ -400,10 +399,10 @@ const
         return str;
     },
 
-    rewardSouldOut = (reward) => (reward.maximum_contributions > 0 ?
+    rewardSouldOut = reward => (reward.maximum_contributions > 0 ?
             (reward.paid_count + reward.waiting_payment_count >= reward.maximum_contributions) : false),
 
-    rewardRemaning = (reward) => reward.maximum_contributions - (reward.paid_count + reward.waiting_payment_count),
+    rewardRemaning = reward => reward.maximum_contributions - (reward.paid_count + reward.waiting_payment_count),
 
     parseUrl = (href) => {
         const l = document.createElement('a');
@@ -429,8 +428,13 @@ const
         }
     },
 
-    navigateToDevise = () => {
-        window.location.href = '/pt/login';
+    navigateToDevise = (params) => {
+        if (params) {
+            window.location.href = `/pt/login${params}`;
+        } else {
+            window.location.href = `/pt/login`;
+        }
+
         return false;
     },
 
@@ -605,13 +609,12 @@ const
             return {
                 cssClass: 'text-error',
                 text: 'AGUARDANDO CANCELAMENTO'
-            }
-        } else {
-            return statusText[state];
+            };
         }
+        return statusText[state];
     },
 
-    RDTracker = (eventId) => (el, isInitialized) => {
+    RDTracker = eventId => (el, isInitialized) => {
         if (!isInitialized) {
             const integrationScript = document.createElement('script');
             integrationScript.type = 'text/javascript';
@@ -639,7 +642,7 @@ const
                 if (!eventObj.user) { eventObj.user = getUser(); }
                 CatarseAnalytics.event(eventObj);
             } catch (e) {
-                //console.error('[h.analyticsEvent] error:', e);
+                // console.error('[h.analyticsEvent] error:', e);
             }
             fn(data);
         };
@@ -681,20 +684,20 @@ const
         return `${integerPart},${decimalPart}`;
     },
 
-    noNumbersMask = (value) => value.replace(/[0-9]/g, ''),
+    noNumbersMask = value => value.replace(/[0-9]/g, ''),
 
-    numbersOnlyMask = (value) => value.replace(/[^0-9]/g, ''),
+    numbersOnlyMask = value => value.replace(/[^0-9]/g, ''),
 
-    addChar = (position, maskChar) => (char) => (string) => {
+    addChar = (position, maskChar) => char => (string) => {
         if (string.length === position && char !== maskChar) {
             return (string + maskChar);
         }
         return string;
     },
 
-    readMaskDefinition = (maskCharDefinitions) => (maskDefinition) => _.compact(_.map(maskDefinition, (letter, index) => (letter in maskCharDefinitions ? null : [index, letter]))),
+    readMaskDefinition = maskCharDefinitions => maskDefinition => _.compact(_.map(maskDefinition, (letter, index) => (letter in maskCharDefinitions ? null : [index, letter]))),
 
-    isCharAllowed = (maskCharDefinitions) => (maskDefinition) => (position, newChar) => {
+    isCharAllowed = maskCharDefinitions => maskDefinition => (position, newChar) => {
         if (position >= maskDefinition.length) {
             return false;
         }
@@ -718,7 +721,7 @@ const
     // Adapted from https://github.com/diogob/jquery.fixedmask
     mask = (maskDefinition, value) => {
         const maskCharDefinitions = {
-                '9': /\d/, // String key needed to avoid flowType error
+                9: /\d/, // String key needed to avoid flowType error
                 A: /[a-zA-Z]/
             },
             readMask = readMaskDefinition(maskCharDefinitions),
@@ -734,7 +737,7 @@ const
         }, '');
     },
 
-    removeStoredObject = (sessionKey) => sessionStorage.removeItem(sessionKey),
+    removeStoredObject = sessionKey => sessionStorage.removeItem(sessionKey),
 
     currentProject = m.prop(),
     setProject = (project) => {
@@ -791,7 +794,7 @@ const
 
         return !isOnEdit && !isOnInsights && !isOnContribution && !isOnFiscal;
     },
-    setPageTitle = (title) => (el, isInitialized) => {
+    setPageTitle = title => (el, isInitialized) => {
         const titleEl = document.getElementsByTagName('title')[0],
             currentTitle = titleEl.innerText;
 
