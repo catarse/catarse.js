@@ -2,12 +2,13 @@ module Main exposing (..)
 
 import Html exposing (Html, img, form, div, input, text, a, button)
 import Html.Attributes exposing (class, id, src, href, type_, target, attribute, value, placeholder)
+import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode as Decode
 
 
 main =
-    Html.program { init = init, view = view, update = update, subscriptions = subscription }
+    Html.program { init = init, view = view, update = update, subscriptions = subscriptions }
 
 
 type alias User =
@@ -29,12 +30,26 @@ init =
         model =
             Model "" []
     in
-        ( model, fetchResults model )
+        ( model, fetchResults model.search )
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    model
+    case msg of
+        Search search ->
+            ( { model | search = search }, Cmd.none )
+
+        Fetch search ->
+            ( model, fetchResults search )
+
+        GetResponse _ ->
+            ( model, Cmd.none )
+
+
+type Msg
+    = Search String
+    | Fetch String
+    | GetResponse (Result Http.Error String)
 
 
 subscriptions : Model -> Sub Msg
@@ -42,7 +57,7 @@ subscriptions model =
     Sub.none
 
 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
     div []
         [ viewFilter model.search
@@ -56,17 +71,17 @@ view model =
         ]
 
 
-viewFilter : String -> Html msg
+viewFilter : String -> Html Msg
 viewFilter searchTerm =
     div [ class "w-section page-header", id "admin-contributions-filter" ]
         [ div [ class "w-container" ]
             [ div [ class "fontsize-larger u-text-center u-marginbottom-30" ]
                 [ text "Usuários" ]
             , div [ class "w-form" ]
-                [ form [ attribute "_lpchecked" "1" ]
+                [ form [ onSubmit (Fetch searchTerm) ]
                     [ div [ class "w-row" ]
                         [ div [ class "w-col w-col-8" ]
-                            [ input [ class "w-input text-field positive medium", placeholder "Busque por nome, e-mail, Ids do usuário...", type_ "text", value searchTerm ]
+                            [ input [ onInput Search, class "w-input text-field positive medium", placeholder "Busque por nome, e-mail, Ids do usuário...", type_ "text", value searchTerm ]
                                 []
                             ]
                         , div [ class "w-col w-col-4" ]
@@ -129,13 +144,13 @@ viewAdminItem =
         ]
 
 
-fetchResults : Model -> Cmd Msg
-fetchResults model =
+fetchResults : String -> Cmd Msg
+fetchResults search =
     let
         url =
-            "http://localhost:3010/users?order=id.desc&full_text_index=" ++ model.search
+            "http://localhost:3010/users?order=id.desc&full_text_index=" ++ search
     in
-        Http.send Fetch (Http.get url decodeResponse)
+        Http.send GetResponse (Http.get url decodeResponse)
 
 
 decodeResponse : Decode.Decoder String
