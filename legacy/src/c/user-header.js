@@ -4,11 +4,12 @@ import userVM from '../vms/user-vm';
 import UserFollowBtn from './user-follow-btn';
 
 const userHeader = {
-    view: function(ctrl, args) {
-        const user = args.user,
-            hideDetails = args.hideDetails,
+    view: function({attrs}) {
+        const user = attrs.user,
+            hideDetails = attrs.hideDetails,
             profileImage = userVM.displayImage(user),
-            coverImage = userVM.displayCover(user);
+            coverImage = userVM.displayCover(user),
+            userDisplayName = userVM.displayName(user);
 
         return !user.id ? m('') : m(`.hero-${hideDetails ? 'small' : 'half'}`, [
             m('.w-container.content-hero-profile',
@@ -22,7 +23,7 @@ const userHeader = {
                           )
                         )),
                         m('.fontsize-larger.fontweight-semibold.u-marginbottom-20',
-                        userVM.displayName(user)
+                        userDisplayName
                        ),
                       (hideDetails ? '' :
                       [m('.w-hidden-small.w-hidden-tiny.u-marginbottom-40.fontsize-base',
@@ -39,7 +40,7 @@ const userHeader = {
                               [
                                   m('.w-col.w-col-4'),
                                   m('.w-col.w-col-4',
-                                  m.component(UserFollowBtn, {
+                                  m(UserFollowBtn, {
                                       disabledClass: '.btn.btn-medium.btn-secondary-dark.w-button',
                                       following: user.following_this_user,
                                       follow_id: user.id })

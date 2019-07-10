@@ -4,8 +4,8 @@ import moment from 'moment';
 import h from '../h';
 
 const subscriptionsPerMonthTable = {
-    controller: function() {
-        return {
+    oninit: function(vnode) {
+        vnode.state = {
             emptyRow: {
                 total_amount: 0,
                 new_amount: 0,
@@ -15,10 +15,10 @@ const subscriptionsPerMonthTable = {
         };
     },
 
-    view: function(ctrl, args) {
+    view: function({state, attrs}) {
         return m('div', [
             m(".fontsize-large.fontweight-semibold.u-text-center.u-marginbottom-30[id='origem']",
-                'Crescimento mensal das assinaturas'
+                'Pagamentos confirmados por mês'
             ),
             m('.table-outer.u-marginbottom-60', [
                 m('.table-row.fontweight-semibold.fontsize-smaller.header.lineheight-tighter.w-row', [
@@ -29,30 +29,30 @@ const subscriptionsPerMonthTable = {
                     ),
                     m('.table-col.w-hidden-small.w-hidden-tiny.w-col.w-col-2.w-col-small-2.w-col-tiny-2',
                         m('div', [
-                            'Novos assinantes',
+                            'Pagamentos confirmados de Novas Assinaturas',
                             m.trust('&nbsp;')
                         ])
                     ),
                     m('.table-col.w-hidden-small.w-hidden-tiny.w-col.w-col-2.w-col-small-2.w-col-tiny-2',
                         m('div',
-                            'Receita com novos assinantes'
+                            'Arrecadação com Novas Assinaturas'
                         )
                     ),
                     m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2',
                         m('div',
-                            'Assinantes totais'
+                            'Pagamentos confirmados totais'
                         )
                     ),
                     m('.w-col.w-col-2.w-col-small-2.w-col-tiny-2',
                         m('div',
-                            'Receita total'
+                            'Arrecadação total'
                         )
                     )
                 ]),
-                m('.table-inner.fontsize-small', [!args.data ? '' :
-                    _.map(_.groupBy(args.data, 'month'), (subscription) => {
-                        const slip = _.filter(subscription, sub => sub.payment_method === 'boleto')[0] || ctrl.emptyRow;
-                        const credit_card = _.filter(subscription, sub => sub.payment_method === 'credit_card')[0] || ctrl.emptyRow;
+                m('.table-inner.fontsize-small', [!attrs.data ? '' :
+                    _.map(_.groupBy(attrs.data, 'month'), (subscription) => {
+                        const slip = _.filter(subscription, sub => sub.payment_method === 'boleto')[0] || state.emptyRow;
+                        const credit_card = _.filter(subscription, sub => sub.payment_method === 'credit_card')[0] || state.emptyRow;
 
                         return m('.table-row.w-row', [
                             m('.table-col.w-col.w-col-4.w-col-small-4.w-col-stack.w-col-tiny-4', [

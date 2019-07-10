@@ -1,22 +1,86 @@
 import _ from 'underscore';
 import moment from 'moment';
 import m from 'mithril';
+import prop from 'mithril/stream';
 import { catarse } from './api';
 import contributionVM from './vms/contribution-vm';
 
+function getCallStack() {
+    const callStackStr = new Error().stack;
+    const callStackLines = callStackStr.split('\n');
+    const callStackTrimmedLines = callStackLines.map(d => d.trim());
+    const realCallStack = callStackTrimmedLines.filter((k, i) => i > 0);
+    return realCallStack;
+}
+
+function RedrawScheduler() {
+    let redrawsRequestCounter = 0;
+    const markedCallStack = {};
+    const requestAnimationFramePolyfill = (function() {
+        if (window.requestAnimationFrame !== undefined) {
+            return window.requestAnimationFrame;
+        } else {
+            return function requesterTimeout(functionToCall) {
+                setTimeout(functionToCall, 100);
+            };
+        }
+    })();
+
+    RedrawScheduler.schedule = () => {
+        redrawsRequestCounter++;
+        /// #if DEBUG
+        markedCallStack[redrawsRequestCounter] = getCallStack();
+        /// #endif
+    };
+
+    function start() {
+        if (redrawsRequestCounter > 0) {
+            /// #if DEBUG
+            const callStack = markedCallStack[redrawsRequestCounter];
+            /// #endif
+
+            if (redrawsRequestCounter === 1) {
+                m.redraw();
+            }
+
+            redrawsRequestCounter = Math.max(0, --redrawsRequestCounter);
+        }
+
+        requestAnimationFramePolyfill(start);
+    }
+
+    start();
+}
+
+RedrawScheduler();
 
 const { CatarseAnalytics, $ } = window;
-const
-    _dataCache = {},
+const _dataCache = {},
+    autoRedrawProp = startData => {
+        const p = prop(startData);
+
+        function dataUpdater(newData) {
+            if (newData !== undefined) {
+                p(newData);
+                //m.redraw();
+                RedrawScheduler.schedule();
+            }
+
+            return p();
+        }
+
+        dataUpdater.prototype = p;
+        return dataUpdater;
+    },
     hashMatch = str => window.location.hash === str,
     mobileScreen = () => window.screen && window.screen.width <= 767,
-    paramByName = (name) => {
+    paramByName = name => {
         const normalName = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]'),
             regex = new RegExp(`[\\?&]${normalName}=([^&#]*)`),
             results = regex.exec(location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
-  	selfOrEmpty = (obj, emptyState = '') => obj || emptyState,
+    selfOrEmpty = (obj, emptyState = '') => obj || emptyState,
     setMomentifyLocale = () => {
         moment.locale('pt', {
             months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
@@ -34,38 +98,44 @@ const
                 M: 'um mês',
                 MM: '%d meses',
                 y: 'um ano',
-                yy: '%d anos'
-            }
+                yy: '%d anos',
+            },
         });
     },
-    lastDayOfNextMonth = () => moment().add(1, 'months').format('D/MMMM'),
+    lastDayOfNextMonth = () =>
+        moment()
+            .add(1, 'months')
+            .format('D/MMMM'),
     existy = x => x != null,
-
-    slugify = str => window.replaceDiacritics(str.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')),
-
+    slugify = str =>
+        window.replaceDiacritics(
+            str
+                .toLowerCase()
+                .replace(/ /g, '-')
+                .replace(/[^\w-]+/g, '')
+        ),
     momentify = (date, format) => {
         format = format || 'DD/MM/YYYY';
-        return date ? moment(date).locale('pt').format(format) : 'no date';
+        return date
+            ? moment(date)
+                  .locale('pt')
+                  .format(format)
+            : 'no date';
     },
-
     getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
-
     storeAction = (action, value) => {
         if (!localStorage.getItem(action)) {
             return localStorage.setItem(action, String(value));
         }
     },
-
     storeObject = (sessionKey, obj) => sessionStorage.setItem(sessionKey, JSON.stringify(obj)),
-
-    getStoredObject = (sessionKey) => {
+    getStoredObject = sessionKey => {
         if (sessionStorage.getItem(sessionKey)) {
             return JSON.parse(String(sessionStorage.getItem(sessionKey)));
         }
         return null;
     },
-
-    callStoredAction = (action) => {
+    callStoredAction = action => {
         const item = localStorage.getItem(action);
 
         if (item) {
@@ -74,13 +144,11 @@ const
         }
         return null;
     },
-
     capitalize = string => string.charAt(0).toUpperCase() + string.slice(1),
-
     discuss = (page, identifier) => {
         const d = document,
             s = d.createElement('script');
-        window.disqus_config = function () {
+        window.disqus_config = function() {
             this.page.url = page;
             this.page.identifier = identifier;
         };
@@ -89,19 +157,12 @@ const
         (d.head || d.body).appendChild(s);
         return m('');
     },
-
-    validateEmail = (email) => {
+    validateEmail = email => {
         const re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
         return re.test(email);
     },
-
-    validateCnpj = (cnpjStr) => {
-        let tamanho,
-            numeros,
-            digitos,
-            soma,
-            pos,
-            resultado;
+    validateCnpj = cnpjStr => {
+        let tamanho, numeros, digitos, soma, pos, resultado;
         const cnpj = cnpjStr.replace(/[^\d]+/g, '');
 
         if (cnpj == '') {
@@ -112,7 +173,8 @@ const
             return false;
         }
 
-        if (cnpj == '00000000000000' ||
+        if (
+            cnpj == '00000000000000' ||
             cnpj == '11111111111111' ||
             cnpj == '22222222222222' ||
             cnpj == '33333333333333' ||
@@ -121,7 +183,8 @@ const
             cnpj == '66666666666666' ||
             cnpj == '77777777777777' ||
             cnpj == '88888888888888' ||
-            cnpj == '99999999999999') {
+            cnpj == '99999999999999'
+        ) {
             return false;
         }
 
@@ -137,8 +200,10 @@ const
                 pos = 9;
             }
         }
-        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-        if (String(resultado) != digitos.charAt(0)) { return false; }
+        resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+        if (String(resultado) != digitos.charAt(0)) {
+            return false;
+        }
 
         tamanho += 1;
         numeros = cnpj.substring(0, tamanho);
@@ -150,15 +215,14 @@ const
                 pos = 9;
             }
         }
-        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
         if (String(resultado) != digitos.charAt(1)) {
             return false;
         }
 
         return true;
     },
-
-    validateCpf = (strCPF) => {
+    validateCpf = strCPF => {
         let sum = 0,
             remainder;
 
@@ -169,7 +233,7 @@ const
         }
         remainder = (sum * 10) % 11;
 
-        if ((remainder == 10) || (remainder == 11)) {
+        if (remainder == 10 || remainder == 11) {
             remainder = 0;
         }
 
@@ -185,7 +249,7 @@ const
 
         remainder = (sum * 10) % 11;
 
-        if ((remainder == 10) || (remainder == 11)) {
+        if (remainder == 10 || remainder == 11) {
             remainder = 0;
         }
 
@@ -195,29 +259,32 @@ const
 
         return true;
     },
-
-    validationErrors = m.prop([]),
-
+    validationErrors = prop([]),
     resetValidations = () => validationErrors([]),
-
     validate = () => {
-        const errorFields = m.prop([]);
+        const errorFields = prop([]);
 
         return {
             submit(fields, fn) {
                 return () => {
                     resetValidations();
 
-                    _.map(fields, (field) => {
+                    _.map(fields, field => {
                         if (field.rule === 'email') {
                             if (!validateEmail(field.prop())) {
-                                validationErrors().push({ field: field.prop, message: 'E-mail inválido.' });
+                                validationErrors().push({
+                                    field: field.prop,
+                                    message: 'E-mail inválido.',
+                                });
                             }
                         }
 
                         if (field.rule === 'text') {
                             if (field.prop().trim() === '') {
-                                validationErrors().push({ field: field.prop, message: 'O campo não pode ser vazio.' });
+                                validationErrors().push({
+                                    field: field.prop,
+                                    message: 'O campo não pode ser vazio.',
+                                });
                             }
                         }
                     });
@@ -227,36 +294,33 @@ const
             },
             hasError(fieldProp) {
                 return _.reduce(validationErrors(), (memo, fieldError) => fieldError.field() === fieldProp() || memo, false);
-            }
+            },
         };
     },
-
     momentFromString = (date, format) => {
         const european = moment(date, format || 'DD/MM/YYYY');
         return european.isValid() ? european : moment(date);
     },
-
     translatedTimeUnits = {
         days: 'dias',
         minutes: 'minutos',
         hours: 'horas',
-        seconds: 'segundos'
+        seconds: 'segundos',
     },
     // Object manipulation helpers
-    translatedTime = (time) => {
+    translatedTime = time => {
         const translatedTime = translatedTimeUnits,
             unit = () => {
                 const projUnit = translatedTime[time.unit || 'seconds'];
 
-                return (Number(time.total) <= 1) ? projUnit.slice(0, -1) : projUnit;
+                return Number(time.total) <= 1 ? projUnit.slice(0, -1) : projUnit;
             };
 
         return {
             unit: unit(),
-            total: time.total
+            total: time.total,
         };
     },
-
     // Number formatting helpers
     generateFormatNumber = (s, c) => (number, n, x) => {
         if (!_.isNumber(number)) {
@@ -268,107 +332,102 @@ const
         return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), `$&${s || ','}`);
     },
     formatNumber = generateFormatNumber('.', ','),
-
     toggleProp = (defaultState, alternateState) => {
-        const p = m.prop(defaultState);
-        p.toggle = () => p(((p() === alternateState) ? defaultState : alternateState));
+        const p = prop(defaultState);
+        p.toggle = () => p(p() === alternateState ? defaultState : alternateState);
 
         return p;
     },
-
     idVM = catarse.filtersVM({
-        id: 'eq'
+        id: 'eq',
     }),
-
     isDevEnv = () => {
         const root = document.getElementById('catarse_bootstrap'),
             data = root && root.getAttribute('data-environment');
 
-        return (data && data == 'development');
+        return data && data == 'development';
     },
-
     getCurrentProject = () => {
-        if (_dataCache.currentProject) { return _dataCache.currentProject; }
+        if (_dataCache.currentProject) {
+            return _dataCache.currentProject;
+        }
 
         const root = document.getElementById('application'),
             data = root && root.getAttribute('data-parameters');
         if (data) {
-            return _dataCache.currentProject = JSON.parse(data);
+            return (_dataCache.currentProject = JSON.parse(data));
         }
         return null;
     },
-
     getRdToken = () => {
-        if (_dataCache.rdToken) { return _dataCache.rdToken; }
+        if (_dataCache.rdToken) {
+            return _dataCache.rdToken;
+        }
 
         const meta = _.first(document.querySelectorAll('[name=rd-token]'));
         return meta ? (_dataCache.rdToken = meta.getAttribute('content')) : null;
     },
-
     getSimilityCustomer = () => {
-        if (_dataCache.similityCustomer) { return _dataCache.similityCustomer; }
+        if (_dataCache.similityCustomer) {
+            return _dataCache.similityCustomer;
+        }
 
         const meta = _.first(document.querySelectorAll('[name=simility-customer]'));
         return meta ? (_dataCache.similityCustomer = meta.getAttribute('content')) : null;
     },
-
     getNewsletterUrl = () => {
-        if (_dataCache.newsletterUrl) { return _dataCache.newsletterUrl; }
+        if (_dataCache.newsletterUrl) {
+            return _dataCache.newsletterUrl;
+        }
 
         const meta = _.first(document.querySelectorAll('[name=newsletter-url]'));
         return meta ? (_dataCache.newsletterUrl = meta.getAttribute('content')) : null;
     },
-
     getUser = () => {
-        if (_dataCache.user) { return _dataCache.user; }
+        if (_dataCache.user) {
+            return _dataCache.user;
+        }
 
         const body = document.getElementsByTagName('body'),
             data = _.first(body).getAttribute('data-user');
         if (data) {
-            return _dataCache.user = JSON.parse(data);
+            return (_dataCache.user = JSON.parse(data));
         }
         return null;
     },
-
     getUserID = () => {
         const user = getUser();
         return user == null || user.user_id == null ? null : user.user_id;
     },
-
     userSignedIn = () => !_.isNull(getUserID()),
-
     getBlogPosts = () => {
-        if (_dataCache.blogPosts) { return _dataCache.blogPosts; }
+        if (_dataCache.blogPosts) {
+            return _dataCache.blogPosts;
+        }
 
         const posts = _.first(document.getElementsByTagName('body')).getAttribute('data-blog');
 
         if (posts) {
-            return _dataCache.blogPosts = JSON.parse(posts);
+            return (_dataCache.blogPosts = JSON.parse(posts));
         }
         return null;
     },
-
     getApiHost = () => {
-        if (_dataCache.apiHost) { return _dataCache.apiHost; }
+        if (_dataCache.apiHost) {
+            return _dataCache.apiHost;
+        }
 
         const el = document.getElementById('api-host');
-        return _dataCache.apiHost = el && el.getAttribute('content');
+        return (_dataCache.apiHost = el && el.getAttribute('content'));
     },
-
-    locationActionMatch = (action) => {
+    locationActionMatch = action => {
         const act = window.location.pathname.split('/').slice(-1)[0];
         return action === act;
     },
-
     useAvatarOrDefault = avatarPath => avatarPath || '/assets/catarse_bootstrap/user.jpg',
-
     // Templates
-    loader = () => m('.u-text-center.u-margintop-30 u-marginbottom-30', [
-        m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]')
-    ]),
-
+    loader = () => m('.u-text-center.u-margintop-30 u-marginbottom-30', [m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]')]),
     newFeatureBadge = () => m('span.badge.badge-success.margin-side-5', window.I18n.t('projects.new_feature_badge')),
-
     fbParse = () => {
         const tryParse = () => {
             try {
@@ -380,15 +439,12 @@ const
 
         return window.setTimeout(tryParse, 500); // use timeout to wait async of facebook
     },
-
     pluralize = (count, s, p) => (count > 1 ? count + p : count + s),
-
-    strip = (html) => {
+    strip = html => {
         const tmp = document.createElement('div');
         tmp.innerHTML = html;
         return tmp.textContent || tmp.innerText || '';
     },
-
     simpleFormat = (str = '') => {
         str = str.replace(/\r\n?/, '\n');
         if (str.length > 0) {
@@ -398,37 +454,31 @@ const
         }
         return str;
     },
-
-    rewardSouldOut = reward => (reward.maximum_contributions > 0 ?
-            (reward.paid_count + reward.waiting_payment_count >= reward.maximum_contributions) : false),
-
+    rewardSouldOut = reward => {
+        const noRemainingRewards = reward.maximum_contributions > 0 ? reward.paid_count + reward.waiting_payment_count >= reward.maximum_contributions : false;
+        return noRemainingRewards || reward.run_out;
+    },
     rewardRemaning = reward => reward.maximum_contributions - (reward.paid_count + reward.waiting_payment_count),
-
-    parseUrl = (href) => {
+    parseUrl = href => {
         const l = document.createElement('a');
         l.href = href;
         return l;
     },
-
-    UIHelper = () => (el, isInitialized) => {
-        if (!isInitialized && window.$ && window.UIHelper) {
-            window.UIHelper.setupResponsiveIframes($(el));
+    UIHelper = () => vnode => {
+        if (window.$ && window.UIHelper) {
+            window.UIHelper.setupResponsiveIframes($(vnode.dom));
         }
     },
-
-    toAnchor = () => (el, isInitialized) => {
-        if (!isInitialized) {
-            const hash = window.location.hash.substr(1);
-            if (hash === el.id) {
-                window.location.hash = '';
-                setTimeout(() => {
-                    window.location.hash = el.id;
-                });
-            }
+    toAnchor = () => vnode => {
+        const hash = window.location.hash.substr(1);
+        if (hash === vnode.dom.id) {
+            window.location.hash = '';
+            setTimeout(() => {
+                window.location.hash = vnode.dom.id;
+            });
         }
     },
-
-    navigateToDevise = (params) => {
+    navigateToDevise = params => {
         if (params) {
             window.location.href = `/${window.I18n.locale}/login${params}`;
         } else {
@@ -437,13 +487,11 @@ const
 
         return false;
     },
-
-    navigateTo = (path) => {
+    navigateTo = path => {
         window.location.href = path;
         return false;
     },
-
-    cumulativeOffset = (element) => {
+    cumulativeOffset = element => {
         let top = 0,
             left = 0;
         do {
@@ -454,10 +502,9 @@ const
 
         return {
             top,
-            left
+            left,
         };
     },
-
     closeModal = () => {
         // Temp for rails unstyled close links
         const close = (elm, selector) => {
@@ -474,27 +521,26 @@ const
 
         const elById = document.getElementById('modal-close');
         if (_.isElement(elById)) {
-            elById.onclick = (event) => {
+            elById.onclick = event => {
                 event.preventDefault();
                 close(elById, 'modal-backdrop');
             };
         }
 
         const els = document.getElementsByClassName('modal-close');
-        _.map(els, (el) => {
+        _.map(els, el => {
             if (_.isElement(el)) {
-                el.onclick = (event) => {
+                el.onclick = event => {
                     event.preventDefault();
                     close(el, 'modal-backdrop');
                 };
             }
         });
     },
-
     closeFlash = () => {
         const el = document.getElementsByClassName('icon-close')[0];
         if (_.isElement(el)) {
-            el.onclick = (event) => {
+            el.onclick = event => {
                 event.preventDefault();
                 if (el.parentElement) {
                     el.parentElement.remove();
@@ -502,40 +548,38 @@ const
             };
         }
     },
-
     i18nScope = (scope, obj) => {
         obj = obj || {};
-        return _.extend({}, obj, { scope });
+        return _.extend({}, obj, {
+            scope,
+        });
     },
-
-    redrawHashChange = (before) => {
-        const callback = _.isFunction(before) ?
-                  () => {
-                      before();
-                      m.redraw();
-                  } : m.redraw;
+    redrawHashChange = before => {
+        const callback = _.isFunction(before)
+            ? () => {
+                  before();
+                  m.redraw();
+              }
+            : m.redraw;
 
         window.addEventListener('hashchange', callback, false);
     },
-
     authenticityToken = () => {
         const meta = _.first(document.querySelectorAll('[name=csrf-token]'));
         return meta ? meta.getAttribute('content') : null;
     },
-
     authenticityParam = () => {
         const meta = _.first(document.querySelectorAll('[name=csrf-param]'));
         return meta ? meta.getAttribute('content') : null;
     },
-
-    animateScrollTo = (el) => {
+    animateScrollTo = el => {
         let scrolled = window.scrollY;
 
         const offset = cumulativeOffset(el).top,
             duration = 300,
             dFrame = (offset - scrolled) / duration,
             // EaseInOutCubic easing function. We'll abstract all animation funs later.
-            eased = t => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1,
+            eased = t => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1),
             animation = setInterval(() => {
                 const pos = eased(scrolled / offset) * scrolled;
 
@@ -562,84 +606,83 @@ const
             };
         };
 
-        return (el, isInitialized) => {
-            if (!isInitialized && el.hash) {
-                setTrigger(el, el.hash.slice(1));
+        return localVnode => {
+            if (localVnode.dom.hash) {
+                setTrigger(localVnode.dom, localVnode.dom.hash.slice(1));
             }
         };
     },
-
     projectStateTextClass = (state, has_cancelation_request) => {
         const statusText = {
             online: {
                 cssClass: 'text-success',
-                text: 'NO AR'
+                text: 'NO AR',
             },
             successful: {
                 cssClass: 'text-success',
-                text: 'FINANCIADO'
+                text: 'FINANCIADO',
             },
             failed: {
                 cssClass: 'text-error',
-                text: 'NÃO FINANCIADO'
+                text: 'NÃO FINANCIADO',
             },
             waiting_funds: {
                 cssClass: 'text-waiting',
-                text: 'AGUARDANDO'
+                text: 'AGUARDANDO',
             },
             rejected: {
                 cssClass: 'text-error',
-                text: 'CANCELADO'
+                text: 'CANCELADO',
             },
             draft: {
                 cssClass: '',
-                text: 'RASCUNHO'
+                text: 'RASCUNHO',
             },
             in_analysis: {
                 cssClass: '',
-                text: 'EM ANÁLISE'
+                text: 'EM ANÁLISE',
             },
             approved: {
                 cssClass: 'text-success',
-                text: 'APROVADO'
-            }
+                text: 'APROVADO',
+            },
         };
 
         if (has_cancelation_request) {
             return {
                 cssClass: 'text-error',
-                text: 'AGUARDANDO CANCELAMENTO'
+                text: 'AGUARDANDO CANCELAMENTO',
             };
         }
         return statusText[state];
     },
+    RDTracker = eventId => () => {
+        const integrationScript = document.createElement('script');
+        integrationScript.type = 'text/javascript';
+        integrationScript.id = 'RDIntegration';
 
-    RDTracker = eventId => (el, isInitialized) => {
-        if (!isInitialized) {
-            const integrationScript = document.createElement('script');
-            integrationScript.type = 'text/javascript';
-            integrationScript.id = 'RDIntegration';
-
-            if (!document.getElementById(integrationScript.id)) {
-                document.body.appendChild(integrationScript);
-                integrationScript.onload = () => window.RdIntegration.integrate(getRdToken(), eventId);
-                integrationScript.src = 'https://d335luupugsy2.cloudfront.net/js/integration/stable/rd-js-integration.min.js';
-            }
-
-            return false;
+        if (!document.getElementById(integrationScript.id)) {
+            document.body.appendChild(integrationScript);
+            integrationScript.onload = () => window.RdIntegration.integrate(getRdToken(), eventId);
+            integrationScript.src = 'https://d335luupugsy2.cloudfront.net/js/integration/stable/rd-js-integration.min.js';
         }
-    },
 
+        return false;
+    },
     analyticsEvent = (eventObj, fn = Function.prototype) => {
         // https://developers.google.com/analytics/devguides/collection/analyticsjs/command-queue-reference#send
         if (!eventObj) {
             return fn;
         }
 
-        return (data) => {
+        return data => {
             try {
-                if (!eventObj.project) { eventObj.project = getCurrentProject(); }
-                if (!eventObj.user) { eventObj.user = getUser(); }
+                if (!eventObj.project) {
+                    eventObj.project = getCurrentProject();
+                }
+                if (!eventObj.user) {
+                    eventObj.user = getUser();
+                }
                 CatarseAnalytics.event(eventObj);
             } catch (e) {
                 // console.error('[h.analyticsEvent] error:', e);
@@ -666,15 +709,18 @@ const
             }
         };
     },
-    monetaryToFloat = (propValue) => {
+    monetaryToFloat = propValue => {
         if (_.isNumber(propValue())) {
             return parseFloat(propValue());
         }
 
-        return parseFloat(propValue().replace('.', '').replace(',', '.'));
+        return parseFloat(
+            propValue()
+                .replace('.', '')
+                .replace(',', '.')
+        );
     },
-
-    applyMonetaryMask = (number) => {
+    applyMonetaryMask = number => {
         let onlyNumbers = String(number).replace(/[^0-9]|[.]/g, ''),
             integerPart = onlyNumbers.slice(0, onlyNumbers.length - 2),
             decimalPart = onlyNumbers.slice(onlyNumbers.length - 2);
@@ -683,20 +729,16 @@ const
 
         return `${integerPart},${decimalPart}`;
     },
-
     noNumbersMask = value => value.replace(/[0-9]/g, ''),
-
     numbersOnlyMask = value => value.replace(/[^0-9]/g, ''),
-
-    addChar = (position, maskChar) => char => (string) => {
+    addChar = (position, maskChar) => char => string => {
         if (string.length === position && char !== maskChar) {
-            return (string + maskChar);
+            return string + maskChar;
         }
         return string;
     },
-
-    readMaskDefinition = maskCharDefinitions => maskDefinition => _.compact(_.map(maskDefinition, (letter, index) => (letter in maskCharDefinitions ? null : [index, letter]))),
-
+    readMaskDefinition = maskCharDefinitions => maskDefinition =>
+        _.compact(_.map(maskDefinition, (letter, index) => (letter in maskCharDefinitions ? null : [index, letter]))),
     isCharAllowed = maskCharDefinitions => maskDefinition => (position, newChar) => {
         if (position >= maskDefinition.length) {
             return false;
@@ -706,80 +748,83 @@ const
         if (maskChar in maskCharDefinitions) {
             return maskCharDefinitions[maskChar].test(newChar);
         }
-        return (newChar === maskChar || isCharAllowed(maskCharDefinitions)(maskDefinition)(position + 1, newChar));
+        return newChar === maskChar || isCharAllowed(maskCharDefinitions)(maskDefinition)(position + 1, newChar);
     },
-
-    applyMask = (maskDefinition) => {
+    applyMask = maskDefinition => {
         const maskFunctions = _.map(maskDefinition, maskChar => addChar(maskChar[0], maskChar[1]));
         return (string, newChar) => {
             const addNewCharFunctions = _.map(maskFunctions, el => el(newChar));
-            const applyMaskFunctions = _.reduce(addNewCharFunctions, (memo, f) => (_.isFunction(memo) ? _.compose(f, memo) : f));
+            const applyMaskFunctions = _.reduce(addNewCharFunctions, (memo, f) =>
+                _.isFunction(memo)
+                    ? _.compose(
+                          f,
+                          memo
+                      )
+                    : f
+            );
             return applyMaskFunctions(string);
         };
     },
-
     // Adapted from https://github.com/diogob/jquery.fixedmask
     mask = (maskDefinition, value) => {
         const maskCharDefinitions = {
                 9: /\d/, // String key needed to avoid flowType error
-                A: /[a-zA-Z]/
+                A: /[a-zA-Z]/,
             },
             readMask = readMaskDefinition(maskCharDefinitions),
             isStrCharAllowed = isCharAllowed(maskCharDefinitions),
             applyValueMask = applyMask(readMask(maskDefinition)),
             restrictInput = isStrCharAllowed(maskDefinition);
 
-        return _.reduce(value, (memo, chr) => {
-            if (restrictInput(memo.length, chr)) {
-                memo = applyValueMask(memo, chr) + chr;
-            }
-            return memo;
-        }, '');
+        return _.reduce(
+            value,
+            (memo, chr) => {
+                if (restrictInput(memo.length, chr)) {
+                    memo = applyValueMask(memo, chr) + chr;
+                }
+                return memo;
+            },
+            ''
+        );
     },
-
     removeStoredObject = sessionKey => sessionStorage.removeItem(sessionKey),
-
-    currentProject = m.prop(),
-    setProject = (project) => {
+    currentProject = prop(),
+    setProject = project => {
         currentProject(project);
     },
     getProject = () => currentProject,
-    currentReward = m.prop(),
-    setReward = (reward) => {
+    currentReward = prop(),
+    setReward = reward => {
         currentReward(reward);
     },
     getReward = () => currentReward,
     buildLink = (link, refStr) => `/${link}${refStr ? `?ref=${refStr}` : ''}`,
-    analyticsWindowScroll = (eventObj) => {
+    analyticsWindowScroll = eventObj => {
         if (eventObj) {
-            setTimeout(()=>{
-                const u=window.location.href;
-                let fired=false;
+            setTimeout(() => {
+                const u = window.location.href;
+                let fired = false;
                 window.addEventListener('scroll', function sc(e) {
                     //console.log('windowScroll');
-                    const same=window.location.href===u;
-                    if (same && !fired && window.$
-                            && $(document).scrollTop() > $(window).height()/2) {
-                        fired=true;
+                    const same = window.location.href === u;
+                    if (same && !fired && window.$ && $(document).scrollTop() > $(window).height() / 2) {
+                        fired = true;
                         const fireEvent = analyticsEvent(eventObj);
                         fireEvent();
                         window.removeEventListener('scroll', sc);
-                    } else if(!same) {
+                    } else if (!same) {
                         window.removeEventListener('scroll', sc);
                     }
                 });
-            },1000);
+            }, 1000);
         }
     },
-
-
     analytics = {
         event: analyticsEvent,
         oneTimeEvent: analyticsOneTimeEvent,
-        windowScroll: analyticsWindowScroll
+        windowScroll: analyticsWindowScroll,
     },
-
-    projectFullPermalink = (project) => {
+    projectFullPermalink = project => {
         let permalink;
         if (typeof project === 'function') {
             permalink = project().permalink;
@@ -795,7 +840,7 @@ const
         return path == '/en' || path == '/';
     },
     isProjectPage = () => {
-        const path = window.location.pathname,
+        const path = window.location.pathname || '',
             isOnInsights = path.indexOf('/insights') > -1,
             isOnFiscal = path.indexOf('/fiscal') > -1,
             isOnEdit = path.indexOf('/edit') > -1,
@@ -803,12 +848,12 @@ const
 
         return !isOnEdit && !isOnInsights && !isOnContribution && !isOnFiscal;
     },
-    setPageTitle = title => (el, isInitialized) => {
+    setPageTitle = title => vnode => {
         const titleEl = document.getElementsByTagName('title')[0],
             currentTitle = titleEl.innerText;
 
         if (currentTitle !== title) {
-            return titleEl.innerText = title;
+            return (titleEl.innerText = title);
         }
     },
     checkReminder = () => {
@@ -819,7 +864,9 @@ const
         }
     },
     rootUrl = () => {
-        if (_dataCache.rootUrl) { return _dataCache.rootUrl; }
+        if (_dataCache.rootUrl) {
+            return _dataCache.rootUrl;
+        }
 
         const meta = _.first(document.querySelectorAll('[name=root-url]'));
 
@@ -833,39 +880,44 @@ const
                 tag: 'blockquote',
                 title: 'Citar',
                 class: 'fontsize-base quote',
-                clear: true
+                clear: true,
             },
 
             {
                 tag: 'p',
                 title: 'Cabeçalho 1',
                 class: 'fontsize-larger fontweight-semibold',
-                clear: true
+                clear: true,
             },
             {
                 tag: 'p',
                 title: 'Cabeçalho 2',
                 class: 'fontsize-large',
-                clear: true
-            }],
+                clear: true,
+            },
+        ],
         lang: 'pt_br',
         maxHeight: 800,
         minHeight: 300,
         convertVideoLinks: true,
         convertUrlLinks: true,
         convertImageLinks: false,
-          // You can specify, which ones plugins you need.
-          // If you want to use plugins, you have add plugins to your
-          // application.js and application.css files and uncomment the line below:
-          // "plugins": ['fontsize', 'fontcolor', 'fontfamily', 'fullscreen', 'textdirection', 'clips'],
+        // You can specify, which ones plugins you need.
+        // If you want to use plugins, you have add plugins to your
+        // application.js and application.css files and uncomment the line below:
+        // "plugins": ['fontsize', 'fontcolor', 'fontfamily', 'fullscreen', 'textdirection', 'clips'],
         plugins: ['video'],
         imageUpload: `/redactor_rails/pictures?${params}`,
         imageGetJson: '/redactor_rails/pictures',
         path: '/assets/redactor-rails',
-        css: 'style.css'
+        css: 'style.css',
     }),
-    setRedactor = prop => (el, isInit) => {
+    setRedactor = (
+        prop,
+        isInit = false //(el, isInit) => {
+    ) => vnode => {
         if (!isInit) {
+            const el = vnode.dom;
             const $editor = window.$(el);
             const csrf_token = authenticityToken();
             const csrf_param = authenticityParam();
@@ -882,48 +934,39 @@ const
             window.$('.redactor-editor').on('blur', () => prop($editor.redactor('code.get')));
         }
     },
-
-    redactor = (name, prop) => m('textarea.input_field.redactor.w-input.text-field.bottom.jumbo.positive', {
-        name, config: setRedactor(prop)
-    }),
-
-    setCsrfToken = (xhr) => {
+    redactor = (name, prop) =>
+        m('textarea.input_field.redactor.w-input.text-field.bottom.jumbo.positive', {
+            name,
+            oncreate: setRedactor(prop),
+        }),
+    setCsrfToken = xhr => {
         if (authenticityToken()) {
             xhr.setRequestHeader('X-CSRF-Token', authenticityToken());
         }
     },
-
-    contributionStatusBadge = (contribution) => {
+    contributionStatusBadge = contribution => {
         const status = {
-            delivered: m('span.fontsize-smallest.badge.badge-success',
-                'Enviada'
-            ),
-            received: m('span.fontsize-smallest.badge.badge-success',
-                'Recebida'
-            ),
-            undelivered: m('span.fontsize-smallest.badge.badge-light',
-                'Não enviada'
-            ),
-            error: m('span.fontsize-smallest.badge.badge-attention',
-                'Erro no envio'
-            )
+            delivered: m('span.fontsize-smallest.badge.badge-success', 'Enviada'),
+            received: m('span.fontsize-smallest.badge.badge-success', 'Recebida'),
+            undelivered: m('span.fontsize-smallest.badge.badge-light', 'Não enviada'),
+            error: m('span.fontsize-smallest.badge.badge-attention', 'Erro no envio'),
         };
 
         return contributionVM.canBeDelivered(contribution) ? status[contribution.delivery_status] : '';
     },
-    getParams = (searchKey) => {
+    getParams = searchKey => {
         const query = window.location.href;
         const queryParams = (/^[?#]/.test(query) ? query.slice(1) : query).split('?');
 
-        return queryParams.length > 1 ? queryParams[1]
-            .split('&')
-            .reduce((params, param) => {
-                const [key, value] = param.split('=');
-                params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-                return params;
-            }, {})[searchKey] : null;
+        return queryParams.length > 1
+            ? queryParams[1].split('&').reduce((params, param) => {
+                  const [key, value] = param.split('=');
+                  params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+                  return params;
+              }, {})[searchKey]
+            : null;
     },
-    stripScripts = (s) => {
+    stripScripts = s => {
         const div = document.createElement('div');
         div.innerHTML = s;
         const scripts = div.getElementsByTagName('script');
@@ -933,12 +976,76 @@ const
         }
         return div.innerHTML;
     },
-    sleep = (time) => {
-        const p = m.deferred();
+    sleep = time => {
+        const p = new Promise((resolve, reject) => {
+            setTimeout(resolve, time);
+        });
 
-        setTimeout(p.resolve, time);
+        return p;
+    },
+    createRequestRedrawWithCountdown = countdown => {
+        countdown = countdown || 0;
+        return () => {
+            countdown = Math.max(0, countdown - 1);
+            if (countdown <= 0) {
+                m.redraw();
+            }
+        };
+    },
+    createRequestAutoRedraw = function() {
+        return createRequestRedrawWithCountdown(arguments.length);
+    },
+    redraw = function() {
+        RedrawScheduler.schedule();
+    },
+    createBasicPaginationVMWithAutoRedraw = vmInstance => {
+        const error = prop(false);
+        const errorMessage = prop('');
 
-        return p.promise;
+        return {
+            isLastPage: vmInstance.isLastPage,
+            isLoading: vmInstance.isLoading,
+            collection: vmInstance.collection,
+            total: vmInstance.total,
+            error,
+            errorMessage,
+            firstPage: params => {
+                return new Promise((resolve, reject) => {
+                    vmInstance
+                        .firstPage(params)
+                        .then(data => {
+                            error(false);
+                            errorMessage('');
+                            resolve(data);
+                            redraw();
+                        })
+                        .catch(errorString => {
+                            error(true);
+                            errorMessage(errorString);
+                            reject(errorString);
+                            redraw();
+                        });
+                });
+            },
+            nextPage: () => {
+                return new Promise((resolve, reject) => {
+                    vmInstance
+                        .nextPage()
+                        .then(data => {
+                            error(false);
+                            errorMessage('');
+                            resolve(data);
+                            redraw();
+                        })
+                        .catch(errorString => {
+                            error(true);
+                            errorMessage(errorString);
+                            reject(errorString);
+                            redraw();
+                        });
+                });
+            },
+        };
     };
 
 setMomentifyLocale();
@@ -947,6 +1054,12 @@ closeModal();
 checkReminder();
 
 export default {
+    redraw,
+    getCallStack,
+    createRequestRedrawWithCountdown,
+    createBasicPaginationVMWithAutoRedraw,
+    createRequestAutoRedraw,
+    autoRedrawProp,
     sleep,
     stripScripts,
     authenticityParam,
@@ -1026,5 +1139,5 @@ export default {
     redactor,
     setCsrfToken,
     userSignedIn,
-    isDevEnv
+    isDevEnv,
 };

@@ -93,7 +93,9 @@ const models = {
     city: catarse.model('cities'),
     mailMarketingList: catarse.model('mail_marketing_lists'),
     commonUserDetails: commonCommunity.model('rpc/user_details'),
-    rechargeSubscription: commonPayment.model('rpc/recharge_subscription')
+    rechargeSubscription: commonPayment.model('rpc/recharge_subscription'),
+    unsubscribes: catarse.model('unsubscribes'),
+    newSubscribersFromPeriod: commonAnalytics.model('rpc/new_subscribers_from_period')
 };
 
 models.teamMember.pageSize(40);

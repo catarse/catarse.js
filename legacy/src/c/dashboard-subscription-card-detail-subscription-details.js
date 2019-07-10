@@ -5,15 +5,10 @@ import paymentMethodIcon from './payment-method-icon';
 import dashboardSubscriptionCardDetailPaymentHistory from './dashboard-subscription-card-detail-payment-history';
 
 const dashboardSubscriptionCardDetailSubscriptionDetails = {
-    controller: function(args)
-    {
-
-    },
-    view: function(ctrl, args)
-    {
-        const subscription = args.subscription,
-            reward = args.reward,
-            user = args.user;
+    view: function({attrs}) {
+        const subscription = attrs.subscription,
+            reward = attrs.reward,
+            user = attrs.user;
             
         return m('.u-marginbottom-20.card.u-radius', 
         [
@@ -31,7 +26,7 @@ const dashboardSubscriptionCardDetailSubscriptionDetails = {
                 ]),
                 m('div', [
                     m('span.fontcolor-secondary',
-                        'Valor da assinatura: '
+                        'Valor do pagamento mensal: '
                     ),
                     `R$${subscription.amount / 100}`
                 ]),
@@ -48,13 +43,13 @@ const dashboardSubscriptionCardDetailSubscriptionDetails = {
                 ]),
                 m('div', [
                     m('span.fontcolor-secondary',
-                        'Qtde. de apoios confirmados: '
+                        'Qtde. de pagamentos confirmados: '
                     ),
                     `${subscription.paid_count} meses`
                 ]),
                 m('.fontsize-base.u-margintop-10', [
                     m('span.fontcolor-secondary',
-                        'Total apoiado: '
+                        'Total pago: '
                     ),
                     m.trust('&nbsp;'),
                     m('span.fontweight-semibold.text-success',

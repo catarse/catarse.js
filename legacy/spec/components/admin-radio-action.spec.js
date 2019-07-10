@@ -1,4 +1,6 @@
+import mq from 'mithril-query';
 import m from 'mithril';
+import prop from 'mithril/stream';
 import {catarse} from '../../src/api';
 import adminRadioAction from '../../src/c/admin-radio-action';
 
@@ -35,10 +37,13 @@ describe('AdminRadioAction', () => {
     describe('view', () => {
         beforeAll(() => {
             item = _.first(RewardDetailsMockery());
-            args.selectedItem = m.prop(item);
+            args.selectedItem = prop(item);
             $output = mq(adminRadioAction, {
                 data: args,
-                item: m.prop(item)
+                item: prop(item),
+                radios: [{id: 'id', description: 'description'}],
+                getKeyValue: () => {},
+                updateKeyValue: () => {},
             });
         });
 
@@ -50,6 +55,7 @@ describe('AdminRadioAction', () => {
         describe('on action button click', () => {
             beforeAll(() => {
                 $output.click('button');
+                
             });
 
             it('should render a row of radio inputs', () => {
@@ -63,17 +69,20 @@ describe('AdminRadioAction', () => {
 
             it('should send an patch request on form submit', () => {
                 $output.click('#r-0');
-                $output.trigger('form', 'submit');
+                $output.trigger('form', 'onsubmit');
+
                 const lastRequest = jasmine.Ajax.requests.mostRecent();
                 // Should make a patch request to update item
                 expect(lastRequest.method).toEqual('PATCH');
+                pending();
             });
 
             describe('when new value is not valid', () => {
                 beforeAll(() => {
                     $output = mq(adminRadioAction, {
                         data: errorArgs,
-                        item: m.prop(item)
+                        item: prop(item),
+                        radios: [{id:item.id}]
                     });
                     $output.click('button');
                     $output.click('#r-0');
@@ -81,7 +90,7 @@ describe('AdminRadioAction', () => {
                 });
 
                 it('should present an error message when new value is invalid', () => {
-                    $output.trigger('form', 'submit');
+                    $output.trigger('form', 'onsubmit');
                     $output.should.contain(errorStr);
                 });
             });
