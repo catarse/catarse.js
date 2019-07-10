@@ -1,20 +1,32 @@
 import m from 'mithril';
 
 const nationalityRadio = {
-    controller: function(args) {
-        const defaultCountryID = args.defaultCountryID,
-            defaultForeignCountryID = args.defaultForeignCountryID,
-            international = args.international;
+    oninit: function(vnode) {
+        const defaultCountryID = vnode.attrs.defaultCountryID,
+            defaultForeignCountryID = vnode.attrs.defaultForeignCountryID,
+            international = vnode.attrs.international,
+            fields = vnode.attrs.fields;
 
-        return {
-            defaultCountryID,
-            defaultForeignCountryID,
-            international
+        const setNational = () => {
+            fields.countryID(defaultCountryID);
+            international(false);
+        };
+
+        const setInternational = () => {
+            fields.countryID(defaultForeignCountryID); // USA
+            international(true);
+        };
+
+        vnode.state = {
+            international,
+            setNational,
+            setInternational
         };
     },
-    view: function(ctrl, args) {
-        const international = ctrl.international,
-            fields = args.fields;
+    view: function({state, attrs}) {
+        const international = state.international,
+            setNational = state.setNational,
+            setInternational = state.setInternational;
 
         return m('div',
             m('.w-row', [
@@ -27,30 +39,22 @@ const nationalityRadio = {
                     m('.fontsize-small.w-radio', [
                         m("input.w-radio-input[name='nationality'][type='radio']", {
                             checked: !international(),
-                            onclick: () => {
-                                fields.countryID(ctrl.defaultCountryID);
-                                international(false);
-                            }
+                            onclick: setNational
                         }),
-                        m('label.w-form-label',
-                            'Brasileiro (a)'
-                        )
+                        m('label.w-form-label', {
+                            onclick: setNational
+                        }, 'Brasileiro (a)')
                     ])
                 ),
                 m('.w-col.w-col-4',
                     m('.fontsize-small.w-radio', [
                         m("input.w-radio-input[name='nationality'][type='radio']", {
                             checked: international(),
-                            onclick: () => {
-                                if (fields.countryID() === ctrl.defaultCountryID) {
-                                    fields.countryID(ctrl.defaultForeignCountryID); // USA
-                                }
-                                international(true);
-                            }
+                            onclick: setInternational
                         }),
-                        m('label.w-form-label',
-                            'International'
-                        )
+                        m('label.w-form-label', {
+                            onclick: setInternational
+                        }, 'International')
                     ])
                 )
             ])

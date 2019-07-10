@@ -1,4 +1,5 @@
 import m from 'mithril';
+import prop from 'mithril/stream';
 import _ from 'underscore';
 import {
     catarse,
@@ -14,44 +15,43 @@ import projectDashboardMenu from '../c/project-dashboard-menu';
 import dashboardSubscriptionCard from '../c/dashboard-subscription-card';
 import projectsSubscriptionReportVM from '../vms/projects-subscription-report-vm';
 import projectsContributionReportVM from '../vms/projects-contribution-report-vm';
+import projectSubscriptionsListVM from '../vms/project-subscriptions-list-vm';
 
 const statusCustomFilter = {
     view: () => m('.fontsize-smaller.u-text-center', [
         'Status ',
         m('a.fontsize-smallest.tooltip-wrapper.fa.fa-question-circle.fontcolor-secondary', {
-            href: 'https://suporte.catarse.me/hc/pt-br/articles/115005632746-Catarse-Assinaturas-FAQ-Realizadores#status',
+            href: 'https://suporte.catarse.me/hc/pt-br/articles/360024090391-O-que-significa-cada-status-das-assinaturas-e-pagamentos-',
             target: '_blank'
         })
     ])
 };
 
 const dropdownFilterCustomLabel = {
-    view: function(ctrl, args) 
+    view: function({attrs}) 
     {
-        return m('.fontsize-smaller.u-text-center', args.label);
+        return m('.fontsize-smaller.u-text-center', attrs.label);
     }
 };
 
 const projectSubscriptionReport = {
-    controller: function (args) {
+    oninit: function (vnode) {
         const filterVM = projectsSubscriptionReportVM,
             catarseVM = projectsContributionReportVM,
-            dropdownNumber = m.prop(0),
-            error = m.prop(false),
-            loader = m.prop(true),
-            isProjectDataLoaded = m.prop(false),
-            isRewardsDataLoaded = m.prop(false),
-            rewards = m.prop([]),
-            subscriptions = commonPayment.paginationVM(models.userSubscription, 'last_payment_data_created_at.desc', {
-                Prefer: 'count=exact'
-            }),
+            dropdownNumber = prop(0),
+            error = prop(false),
+            loader = prop(true),
+            isProjectDataLoaded = prop(false),
+            isRewardsDataLoaded = prop(false),
+            rewards = prop([]),
+            subscriptions = projectSubscriptionsListVM(),
             submit = () => {
                 // Set order by last paid on filters too
                 filterVM.order({ last_payment_data_created_at: 'desc' });
                 if (filterVM.reward_external_id() === 'null') {
-                    subscriptions.firstPage(filterVM.withNullParameters()).then(null);
+                    subscriptions.firstPage(filterVM.withNullParameters());
                 } else {
-                    subscriptions.firstPage(filterVM.parameters()).then(null);
+                    subscriptions.firstPage(filterVM.parameters());
                 }
 
                 return false;
@@ -155,7 +155,7 @@ const projectSubscriptionReport = {
                 data: {
                     index: 1,
                     selectable: dropdownNumber,
-                    label: 'Total apoiado',
+                    label: 'Total pago',
                     name: 'total_paid',
                     onapply: submit,
                     vm: filterVM.total_paid,
@@ -176,7 +176,7 @@ const projectSubscriptionReport = {
                 data: {
                     index: 2,
                     selectable: dropdownNumber,
-                    label: 'Qtde. de apoios',
+                    label: 'Meses pagos',
                     name: 'paid_count',
                     onapply: submit,
                     vm: filterVM.paid_count,
@@ -201,9 +201,9 @@ const projectSubscriptionReport = {
                 isProjectDataLoaded(true);
                 m.redraw();
             },
-            project = m.prop([{}]);
+            project = prop([{}]);
 
-        catarseVM.project_id(args.project_id);
+        catarseVM.project_id(vnode.attrs.project_id);
 
         const lReward = catarse.loaderWithToken(models.rewardDetail.getPageOptions({
             project_id: `eq.${catarseVM.project_id()}`
@@ -212,6 +212,7 @@ const projectSubscriptionReport = {
         lReward.load().then((loadedRewards) => {
             rewards(loadedRewards);
             isRewardsDataLoaded(true);
+            m.redraw();
         });
         const mapRewardsToOptions = () => {
             let options = [];
@@ -243,14 +244,19 @@ const projectSubscriptionReport = {
             filterVM.project_id(_.first(data).common_id);
             // override default 'created_at' order on vm
             filterVM.order({ last_payment_data_created_at: 'desc' });
-            subscriptions.firstPage(filterVM.parameters()).then(() => {
+            subscriptions.firstPage(filterVM.parameters()).then(result => {
                 loader(false);
                 isProjectDataLoaded(true);
-            }).catch(handleError);
+                m.redraw();
+            }).catch(err => {
+                handleError(err);
+                m.redraw();
+            });
             project(data);
+            m.redraw();
         });
 
-        return {
+        vnode.state = {
             filterVM,
             mapRewardsToOptions,
             filterBuilder,
@@ -262,10 +268,9 @@ const projectSubscriptionReport = {
             isRewardsDataLoaded
         };
     },
-    view: function (ctrl, args) {
-
-        const subsCollection = ctrl.subscriptions.collection(),
-            filterBuilder = ctrl.filterBuilder,
+    view: function ({state, attrs}) {
+        const subsCollection = state.subscriptions.collection(),
+            filterBuilder = state.filterBuilder,
             statusFilter = _.findWhere(filterBuilder, {
                 label: 'status_filter'
             }),
@@ -284,11 +289,11 @@ const projectSubscriptionReport = {
             paidCountFilter = _.findWhere(filterBuilder, {
                 label: 'paid_count_filter'
             });
-        rewardFilter.data.options = ctrl.mapRewardsToOptions();
-        if (ctrl.isProjectDataLoaded() && ctrl.isRewardsDataLoaded()) {
+        rewardFilter.data.options = state.mapRewardsToOptions();
+        if (state.isProjectDataLoaded() && state.isRewardsDataLoaded()) {
             return m('div', [
-                m.component(projectDashboardMenu, {
-                    project: m.prop(_.first(ctrl.project()))
+                m(projectDashboardMenu, {
+                    project: prop(_.first(state.project()))
                 }),
                 m('.dashboard-header', [
                     m('.w-container',
@@ -305,17 +310,17 @@ const projectSubscriptionReport = {
                     m('.u-marginbottom-30.w-container',
                         m('.w-form', [
                             m('form', {
-                                onsubmit: ctrl.submit
+                                onsubmit: state.submit
                             },
                                 m('w-row', [
-                                    m.component(textFilter.component, textFilter.data),
+                                    m(textFilter.component, textFilter.data),
                                     m('.w-col.w-col-9',
                                         m('.w-row', [
-                                            m.component(statusFilter.component, statusFilter.data),
-                                            m.component(rewardFilter.component, rewardFilter.data),
-                                            m.component(paymentFilter.component, paymentFilter.data),
-                                            m.component(totalPaidFilter.component, totalPaidFilter.data),
-                                            m.component(paidCountFilter.component, paidCountFilter.data),
+                                            m(statusFilter.component, statusFilter.data),
+                                            m(rewardFilter.component, rewardFilter.data),
+                                            m(paymentFilter.component, paymentFilter.data),
+                                            m(totalPaidFilter.component, totalPaidFilter.data),
+                                            m(paidCountFilter.component, paidCountFilter.data),
                                         ])
                                     )
                                 ])
@@ -331,15 +336,15 @@ const projectSubscriptionReport = {
                                 m('.u-marginbottom-20.u-text-center-small-only.w-col.w-col-6',
                                     m('.w-inline-block.fontsize-base.u-marginright-10', [
                                         m('span.fontweight-semibold',
-                                            ctrl.subscriptions.total()
+                                            state.subscriptions.total()
                                         ),
-                                        ' pessoas',
+                                        ' assinaturas',
                                         m.trust('&nbsp;')
                                     ])
                                 ),
                                 m('.w-col.w-col-6',
-                                    m(`a.alt-link.fontsize-small.u-right[href='/projects/${args.project_id}/subscriptions_report_download']`, {
-                                        config: m.route
+                                    m(`a.alt-link.fontsize-small.u-right[href='/projects/${attrs.project_id}/subscriptions_report_download']`, {
+                                        oncreate: m.route.link
                                     }, [
                                             m('span.fa.fa-download',
                                                 m.trust('&nbsp;')
@@ -364,12 +369,12 @@ const projectSubscriptionReport = {
                                     ),
                                     m('.table-col.w-col.w-col-1.u-text-center',
                                         m('div',
-                                            'Apoio mensal'
+                                            'Pgto. mensal'
                                         )
                                     ),
                                     m('.table-col.w-col.w-col-2.u-text-center',
                                         m('div',
-                                            'Total apoiado'
+                                            'Total pago'
                                         )
                                     ),
                                     m('.table-col.w-col.w-col-2.u-text-center',
@@ -396,7 +401,7 @@ const projectSubscriptionReport = {
                         m('.w-container',
                             m('.u-marginbottom-60.w-row', [
                                 m(loadMoreBtn, {
-                                    collection: ctrl.subscriptions,
+                                    collection: state.subscriptions,
                                     cssClass: '.w-col-push-4'
                                 })
                             ])

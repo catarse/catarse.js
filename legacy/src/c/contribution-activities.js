@@ -11,18 +11,19 @@
  * }
  */
 import m from 'mithril';
+import prop from 'mithril/stream';
 import _ from 'underscore';
 import { catarse } from '../api';
 import h from '../h';
 import models from '../models';
 
 const contributionActivities = {
-    controller: function(args) {
+    oninit: function(vnode) {
         let interval;
-        const collection = m.prop([]),
-            resource = m.prop(),
-            collectionIndex = m.prop(0),
-            collectionSize = m.prop(),
+        const collection = prop([]),
+            resource = prop(),
+            collectionIndex = prop(0),
+            collectionSize = prop(),
             collectionL = catarse.loader(
                   models.contributionActivity.getPageOptions()),
             nextResource = () => {
@@ -34,9 +35,7 @@ const contributionActivities = {
                 resource(collection()[collectionIndex()]);
                 m.redraw();
             },
-            startConfig = (el, isinitialized, context) => {
-                context.onunload = () => clearInterval(interval);
-            },
+            removeTimer = () => clearInterval(interval),
             startTimer = () => {
                 interval = setInterval(nextResource, 15000);
             };
@@ -49,21 +48,21 @@ const contributionActivities = {
 
         startTimer();
 
-        return {
+        vnode.state = {
             collection,
-            startConfig,
+            removeTimer,
             collectionL,
             resource,
             collectionSize
         };
     },
-    view: function(ctrl, args) {
-        if (!ctrl.collectionL() && !_.isUndefined(ctrl.resource()) && (ctrl.collectionSize() || 0) > 0) {
-            const resource = ctrl.resource(),
+    view: function({state, attrs}) {
+        if (!state.collectionL() && !_.isUndefined(state.resource()) && (state.collectionSize() || 0) > 0) {
+            const resource = state.resource(),
                 elapsed = h.translatedTime(resource.elapsed_time),
                 projectLink = `https://catarse.me/${resource.permalink}?ref=ctrse_home_activities`;
 
-            return m('.w-section.section.bg-backs-carrosel', { config: ctrl.startConfig }, [
+            return m('.w-section.section.bg-backs-carrosel', { onremove: state.removeTimer }, [
                 m('.w-container.u-text-center.fontcolor-negative', [
                     m('.fontsize-large.u-marginbottom-30', `há ${parseInt(elapsed.total)} ${elapsed.unit}...`),
                     m('.w-clearfix.w-inline-block.u-marginbottom-10', [

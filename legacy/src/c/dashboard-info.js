@@ -16,12 +16,11 @@ import m from 'mithril';
 import _ from 'underscore';
 
 const dashboardInfo = {
-    controller: function(args) {
-        const toRedraw = args.dataToRedraw || {},
-            listenToReplace = (element, isInitialized, context) => {
-                if (isInitialized) return;
+    oninit: function(vnode) {
+        const toRedraw = vnode.attrs.dataToRedraw || {},
+            listenToReplace = localVnode => {
 
-                _.map(element.children, (item) => {
+                _.map(localVnode.dom.children, (item) => {
                     const toR = toRedraw[item.getAttribute('id')];
 
                     if (toR) {
@@ -30,12 +29,12 @@ const dashboardInfo = {
                 });
             };
 
-        return {
+        vnode.state = {
             listenToReplace
         };
     },
-    view: function(ctrl, args) {
-        const content = args.content;
+    view: function({state, attrs}) {
+        const content = attrs.content;
 
         return m('.w-container', [
             m('.w-row.u-marginbottom-40', [
@@ -43,8 +42,8 @@ const dashboardInfo = {
                     m('.u-text-center', [
                         m('img.u-marginbottom-20', { src: content.icon, width: 94 }),
                         m('.fontsize-large.fontweight-semibold.u-marginbottom-20', content.title),
-                        m('.fontsize-base.u-marginbottom-30', { config: ctrl.listenToReplace }, m.trust(content.text)),
-                        content.cta ? m('a.btn.btn-large.btn-inline', { href: content.href, onclick: args.nextStage }, content.cta) : ''
+                        m('.fontsize-base.u-marginbottom-30', { oncreate: state.listenToReplace }, m.trust(content.text)),
+                        content.cta ? m('a.btn.btn-large.btn-inline', { href: content.href, onclick: attrs.nextStage }, content.cta) : ''
                     ])
                 ])
             ])

@@ -7,24 +7,30 @@
  * <div data-mithril="UsersBalance" data-parameters="{'user_id': 10}">
  */
 import m from 'mithril';
+import prop from 'mithril/stream';
 import { catarse } from '../api';
 import _ from 'underscore';
 import models from '../models';
 import userBalance from './user-balance';
 import userBalanceTransactions from './user-balance-transactions';
 import userBalanceWithdrawHistory from './user-balance-withdraw-history';
+import userBalanceTransactionsListVM from '../vms/user-balance-transactions-list-vm';
+import userBalanceTransfersListVM from '../vms/user-balance-transfers-list-vm';
 
 const userBalanceMain = {
-    controller: function(args) {
+    oninit: function(vnode) {
         const userIdVM = catarse.filtersVM({ user_id: 'eq' });
 
-        userIdVM.user_id(args.user_id);
+        userIdVM.user_id(vnode.attrs.user_id);
 
         // Handles with user balance request data
         const balanceManager = (() => {
-                const collection = m.prop([{ amount: 0, user_id: args.user_id }]),
+                const collection = prop([{ amount: 0, user_id: vnode.attrs.user_id }]),
                     load = () => {
-                        models.balance.getRowWithToken(userIdVM.parameters()).then(collection);
+                        return models.balance
+                            .getRowWithToken(userIdVM.parameters())
+                            .then(collection)
+                            .then(_ => m.redraw());
                     };
 
                 return {
@@ -33,28 +39,21 @@ const userBalanceMain = {
                 };
             })(),
 
-              // Handles with user balance transactions list data
-            balanceTransactionManager = (() => {
-                const listVM = catarse.paginationVM(
-                      models.balanceTransaction, 'created_at.desc'),
-                    load = () => {
-                        listVM.firstPage(userIdVM.parameters());
-                    };
+            // Handles with user balance transactions list data
+            userBalanceTransactionsList = userBalanceTransactionsListVM(userIdVM.parameters()),
+            userBalanceTransfersList = userBalanceTransfersListVM(userIdVM.parameters()),
 
-                return {
-                    load,
-                    list: listVM
-                };
-            })(),
-
-              // Handles with bank account to check
+            // Handles with bank account to check
             bankAccountManager = (() => {
-                const collection = m.prop([]),
+                const collection = prop([]),
                     loader = (() => catarse.loaderWithToken(
                                 models.bankAccount.getRowOptions(
                                     userIdVM.parameters())))(),
                     load = () => {
-                        loader.load().then(collection);
+                        return loader
+                            .load()
+                            .then(collection)
+                            .then(() => m.redraw());
                     };
 
                 return {
@@ -64,19 +63,20 @@ const userBalanceMain = {
                 };
             })();
 
-        return {
+        vnode.state = {
             bankAccountManager,
             balanceManager,
-            balanceTransactionManager
+            userBalanceTransactionsList,
+            userBalanceTransfersList
         };
     },
-    view: function(ctrl, args) {
-        const opts = _.extend({}, args, ctrl);
+    view: function({state, attrs}) {
+        const opts = _.extend({}, attrs, state);
         return m('#balance-area', [
-            m.component(userBalance, opts),
-            m(userBalanceWithdrawHistory, { user_id: args.user_id }),
+            m(userBalance, opts),
+            m(userBalanceWithdrawHistory, opts),
             m('.divider'),
-            m.component(userBalanceTransactions, opts),
+            m(userBalanceTransactions, opts),
             m('.u-marginbottom-40'),
             m('.w-section.section.card-terciary.before-footer')
         ]);
