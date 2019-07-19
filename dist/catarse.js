@@ -200,6 +200,8 @@ var _chart2 = _interopRequireDefault(_chart);
 
 var _util = __webpack_require__(/*! util */ "./node_modules/util/util.js");
 
+var _wrap = __webpack_require__(/*! ./wrap */ "./legacy/src/wrap.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -246,89 +248,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
 
     var app = document.getElementById('application'),
-        body = document.getElementsByTagName('body')[0];
-
-    var firstRun = true; // Indica se é a primeira vez q executa um controller.
-    var wrap = function wrap(component, customAttr) {
-        return {
-            oninit: function oninit(vnode) {
-                if (firstRun) {
-                    firstRun = false;
-                } else {
-                    // só roda se nao for firstRun
-                    try {
-                        CatarseAnalytics.pageView(false);
-                        CatarseAnalytics.origin(); //force update of origin's cookie
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-                var parameters = app.getAttribute('data-parameters') ? JSON.parse(app.getAttribute('data-parameters')) : {};
-                var attr = customAttr,
-                    postParam = _mithril2.default.route.param('post_id') || parameters.post_id,
-                    projectParam = _mithril2.default.route.param('project_id') || parameters.project_id,
-                    projectUserIdParam = _mithril2.default.route.param('project_user_id') || parameters.user_id || parameters.project_user_id,
-                    userParam = _mithril2.default.route.param('user_id') || app.getAttribute('data-userid') || parameters.user_id,
-                    rewardIdParam = _mithril2.default.route.param('reward_id'),
-                    surveyIdParam = _mithril2.default.route.param('survey_id'),
-                    filterParam = _mithril2.default.route.param('filter'),
-                    thankYouParam = app && JSON.parse(app.getAttribute('data-contribution'));
-
-                var addToAttr = function addToAttr(newAttr) {
-                    attr = _underscore2.default.extend({}, newAttr, attr);
-                };
-
-                if (postParam) {
-                    addToAttr({ post_id: postParam });
-                }
-
-                if (projectParam) {
-                    addToAttr({ project_id: projectParam });
-                }
-
-                if (userParam) {
-                    addToAttr({ user_id: userParam });
-                }
-
-                if (projectUserIdParam) {
-                    addToAttr({ project_user_id: projectUserIdParam });
-                }
-
-                if (surveyIdParam) {
-                    addToAttr({ survey_id: surveyIdParam });
-                }
-
-                if (rewardIdParam) {
-                    addToAttr({ reward_id: rewardIdParam });
-                }
-
-                if (filterParam) {
-                    addToAttr({ filter: filterParam });
-                }
-
-                if (thankYouParam) {
-                    addToAttr({ contribution: thankYouParam });
-                }
-
-                if (window.localStorage && window.localStorage.getItem('globalVideoLanding') !== 'true') {
-                    addToAttr({ withAlert: false });
-                }
-
-                if (document.getElementById('fixed-alert')) {
-                    addToAttr({ withFixedAlert: true });
-                }
-
-                body.className = 'body-project closed';
-
-                vnode.state.attr = attr;
-            },
-            view: function view(_ref2) {
-                var state = _ref2.state;
-
-                return (0, _mithril2.default)('#app', [(0, _mithril2.default)(_c2.default.root.Menu, state.attr), _h2.default.getUserID() ? (0, _mithril2.default)(_c2.default.root.CheckEmail, state.attr) : '', (0, _mithril2.default)(component, state.attr), state.attr.hideFooter ? '' : (0, _mithril2.default)(_c2.default.root.Footer, state.attr)]);
-            }
-        };
-    };
+        body = document.body;
 
     var urlWithLocale = function urlWithLocale(url) {
         return '/' + window.I18n.locale + url;
@@ -343,29 +263,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         _mithril2.default.route.prefix('');
 
         _mithril2.default.route(rootEl, '/', (_m$route = {
-            '/': wrap(isUserProfile ? _c2.default.root.UsersShow : _c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true, absoluteHome: isUserProfile }),
-            '/explore': wrap(_c2.default.root.ProjectsExplore, { menuTransparency: true, footerBig: true }),
-            '/start': wrap(_c2.default.root.Start, { menuTransparency: true, footerBig: true }),
-            '/start-sub': wrap(_c2.default.root.SubProjectNew, { menuTransparency: false }),
-            '/projects/:project_id/contributions/new': wrap(_c2.default.root.ProjectsContribution),
-            '/projects/:project_id/contributions/fallback_create': wrap(_c2.default.root.ProjectsContribution),
-            '/projects/:project_id/contributions/:contribution_id/edit': wrap(_c2.default.root.ProjectsPayment, { menuShort: true }),
-            '/projects/:project_id/subscriptions/start': wrap(_c2.default.root.ProjectsSubscriptionContribution, { menuShort: true, footerBig: false }),
-            '/projects/:project_id/subscriptions/checkout': wrap(_c2.default.root.ProjectsSubscriptionCheckout, { menuShort: true, footerBig: false }),
-            '/projects/:project_id/subscriptions/thank_you': wrap(_c2.default.root.ProjectsSubscriptionThankYou, { menuShort: true, footerBig: false })
-        }, _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions/new'), wrap(_c2.default.root.ProjectsContribution)), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions/:contribution_id/edit'), wrap(_c2.default.root.ProjectsPayment, { menuShort: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions/start'), wrap(_c2.default.root.ProjectsSubscriptionContribution, { menuShort: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions/checkout'), wrap(_c2.default.root.ProjectsSubscriptionCheckout, { menuShort: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/subscriptions/thank_you'), wrap(_c2.default.root.ProjectsSubscriptionThankYou, { menuShort: true, footerBig: false })), _defineProperty(_m$route, '/en', wrap(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/pt', wrap(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/flexible_projects'), wrap(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects'), wrap(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/projects', wrap(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/explore'), wrap(_c2.default.root.ProjectsExplore, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/start'), wrap(_c2.default.root.Start, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions/:contribution_id'), wrap(_c2.default.root.ThankYou, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/contributions/:contribution_id', wrap(_c2.default.root.ThankYou, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/insights', wrap(_c2.default.root.Insights, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/insights'), wrap(_c2.default.root.Insights, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/contributions_report', wrap(_c2.default.root.ProjectsContributionReport, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions_report'), wrap(_c2.default.root.ProjectsContributionReport, {
+            '/': (0, _wrap.wrap)(isUserProfile ? _c2.default.root.UsersShow : _c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true, absoluteHome: isUserProfile }),
+            '/explore': (0, _wrap.wrap)(_c2.default.root.ProjectsExplore, { menuTransparency: true, footerBig: true }),
+            '/start': (0, _wrap.wrap)(_c2.default.root.Start, { menuTransparency: true, footerBig: true }),
+            '/start-sub': (0, _wrap.wrap)(_c2.default.root.SubProjectNew, { menuTransparency: false }),
+            '/projects/:project_id/contributions/new': (0, _wrap.wrap)(_c2.default.root.ProjectsContribution),
+            '/projects/:project_id/contributions/fallback_create': (0, _wrap.wrap)(_c2.default.root.ProjectsContribution),
+            '/projects/:project_id/contributions/:contribution_id/edit': (0, _wrap.wrap)(_c2.default.root.ProjectsPayment, { menuShort: true }),
+            '/projects/:project_id/subscriptions/start': (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionContribution, { menuShort: true, footerBig: false }),
+            '/projects/:project_id/subscriptions/checkout': (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionCheckout, { menuShort: true, footerBig: false }),
+            '/projects/:project_id/subscriptions/thank_you': (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionThankYou, { menuShort: true, footerBig: false })
+        }, _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions/new'), (0, _wrap.wrap)(_c2.default.root.ProjectsContribution)), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions/:contribution_id/edit'), (0, _wrap.wrap)(_c2.default.root.ProjectsPayment, { menuShort: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions/start'), (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionContribution, { menuShort: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions/checkout'), (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionCheckout, { menuShort: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/subscriptions/thank_you'), (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionThankYou, { menuShort: true, footerBig: false })), _defineProperty(_m$route, '/en', (0, _wrap.wrap)(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/pt', (0, _wrap.wrap)(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/flexible_projects'), (0, _wrap.wrap)(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects'), (0, _wrap.wrap)(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/projects', (0, _wrap.wrap)(_c2.default.root.ProjectsHome, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/explore'), (0, _wrap.wrap)(_c2.default.root.ProjectsExplore, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/start'), (0, _wrap.wrap)(_c2.default.root.Start, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions/:contribution_id'), (0, _wrap.wrap)(_c2.default.root.ThankYou, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/contributions/:contribution_id', (0, _wrap.wrap)(_c2.default.root.ThankYou, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/insights', (0, _wrap.wrap)(_c2.default.root.Insights, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/insights'), (0, _wrap.wrap)(_c2.default.root.Insights, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/contributions_report', (0, _wrap.wrap)(_c2.default.root.ProjectsContributionReport, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/contributions_report'), (0, _wrap.wrap)(_c2.default.root.ProjectsContributionReport, {
             menuTransparency: false,
             footerBig: false
-        })), _defineProperty(_m$route, '/projects/:project_id/subscriptions_report', wrap(_c2.default.root.ProjectsSubscriptionReport, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions_report'), wrap(_c2.default.root.ProjectsSubscriptionReport, {
+        })), _defineProperty(_m$route, '/projects/:project_id/subscriptions_report', (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionReport, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions_report'), (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionReport, {
             menuTransparency: false,
             footerBig: false
-        })), _defineProperty(_m$route, '/projects/:project_id/subscriptions_report_download', wrap(_c2.default.root.ProjectsSubscriptionReportDownload, {
+        })), _defineProperty(_m$route, '/projects/:project_id/subscriptions_report_download', (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionReportDownload, {
             menuTransparency: false,
             footerBig: false
-        })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions_report_download'), wrap(_c2.default.root.ProjectsSubscriptionReportDownload, {
+        })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/subscriptions_report_download'), (0, _wrap.wrap)(_c2.default.root.ProjectsSubscriptionReportDownload, {
             menuTransparency: false,
             footerBig: false
-        })), _defineProperty(_m$route, '/projects/:project_id/surveys', wrap(_c2.default.root.Surveys, { menuTransparency: false, footerBig: false, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/fiscal', wrap(_c2.default.root.ProjectsFiscal, { menuTransparency: false, footerBig: false, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/posts', wrap(_c2.default.root.Posts, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/posts/:post_id', wrap(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/posts'), wrap(_c2.default.root.Posts, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/posts/:post_id'), wrap(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: true })), _defineProperty(_m$route, '/projects/:project_id', wrap(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/users/:user_id', wrap(_c2.default.root.UsersShow, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/users/:user_id'), wrap(_c2.default.root.UsersShow, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, '/contributions/:contribution_id/surveys/:survey_id', wrap(_c2.default.root.SurveysShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/contributions/:contribution_id/surveys/:survey_id'), wrap(_c2.default.root.SurveysShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/users/:user_id/edit', wrap(_c2.default.root.UsersEdit, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/users/:user_id/edit'), wrap(_c2.default.root.UsersEdit, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/edit', wrap(_c2.default.root.ProjectEdit, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/edit'), wrap(_c2.default.root.ProjectEdit, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/rewards/:reward_id/surveys/new', wrap(_c2.default.root.SurveyCreate, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, urlWithLocale('/follow-fb-friends'), wrap(_c2.default.root.FollowFoundFriends, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/follow-fb-friends', wrap(_c2.default.root.FollowFoundFriends, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/:project'), wrap(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/:project', wrap(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/team'), wrap(_c2.default.root.Team, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/team', wrap(_c2.default.root.Team, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/jobs'), wrap(_c2.default.root.Jobs, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/jobs', wrap(_c2.default.root.Jobs, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/press', wrap(_c2.default.root.Press, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/press'), wrap(_c2.default.root.Press, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/publish'), wrap(_c2.default.root.Publish, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/publish', wrap(_c2.default.root.Publish, { menuTransparency: false, hideFooter: true, menuShort: true })), _m$route));
+        })), _defineProperty(_m$route, '/projects/:project_id/surveys', (0, _wrap.wrap)(_c2.default.root.Surveys, { menuTransparency: false, footerBig: false, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/fiscal', (0, _wrap.wrap)(_c2.default.root.ProjectsFiscal, { menuTransparency: false, footerBig: false, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/posts', (0, _wrap.wrap)(_c2.default.root.Posts, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/posts/:post_id', (0, _wrap.wrap)(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/posts'), (0, _wrap.wrap)(_c2.default.root.Posts, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/posts/:post_id'), (0, _wrap.wrap)(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: true })), _defineProperty(_m$route, '/projects/:project_id', (0, _wrap.wrap)(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/users/:user_id', (0, _wrap.wrap)(_c2.default.root.UsersShow, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/users/:user_id'), (0, _wrap.wrap)(_c2.default.root.UsersShow, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, '/contributions/:contribution_id/surveys/:survey_id', (0, _wrap.wrap)(_c2.default.root.SurveysShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/contributions/:contribution_id/surveys/:survey_id'), (0, _wrap.wrap)(_c2.default.root.SurveysShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/users/:user_id/edit', (0, _wrap.wrap)(_c2.default.root.UsersEdit, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/users/:user_id/edit'), (0, _wrap.wrap)(_c2.default.root.UsersEdit, { menuTransparency: true, footerBig: false })), _defineProperty(_m$route, '/projects/:project_id/edit', (0, _wrap.wrap)(_c2.default.root.ProjectEdit, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/edit'), (0, _wrap.wrap)(_c2.default.root.ProjectEdit, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/rewards/:reward_id/surveys/new', (0, _wrap.wrap)(_c2.default.root.SurveyCreate, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, urlWithLocale('/follow-fb-friends'), (0, _wrap.wrap)(_c2.default.root.FollowFoundFriends, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/follow-fb-friends', (0, _wrap.wrap)(_c2.default.root.FollowFoundFriends, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/:project'), (0, _wrap.wrap)(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, '/:project', (0, _wrap.wrap)(_c2.default.root.ProjectsShow, { menuTransparency: false, footerBig: false })), _defineProperty(_m$route, urlWithLocale('/team'), (0, _wrap.wrap)(_c2.default.root.Team, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/team', (0, _wrap.wrap)(_c2.default.root.Team, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/jobs'), (0, _wrap.wrap)(_c2.default.root.Jobs, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/jobs', (0, _wrap.wrap)(_c2.default.root.Jobs, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, '/press', (0, _wrap.wrap)(_c2.default.root.Press, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/press'), (0, _wrap.wrap)(_c2.default.root.Press, { menuTransparency: true, footerBig: true })), _defineProperty(_m$route, urlWithLocale('/projects/:project_id/publish'), (0, _wrap.wrap)(_c2.default.root.Publish, { menuTransparency: false, hideFooter: true, menuShort: true })), _defineProperty(_m$route, '/projects/:project_id/publish', (0, _wrap.wrap)(_c2.default.root.Publish, { menuTransparency: false, hideFooter: true, menuShort: true })), _m$route));
     }
 })();
 
@@ -771,13 +691,30 @@ var addressForm = {
             defaultForeignCountryID: defaultForeignCountryID,
             fields: fields,
             international: international,
-            states: states
+            states: states,
+            parsedErrors: parsedErrors
         };
     },
-    onbeforeupdate: function onbeforeupdate(vnode) {},
     view: function view(_ref) {
         var state = _ref.state,
             attrs = _ref.attrs;
+
+
+        if (state.parsedErrors) {
+            var parsedErrors = state.parsedErrors;
+            state.errors = {
+                countryID: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('country_id') : false),
+                stateID: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('state') : false),
+                addressStreet: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('street') : false),
+                addressNumber: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('number') : false),
+                addressComplement: (0, _stream2.default)(false),
+                addressNeighbourhood: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('neighbourhood') : false),
+                addressCity: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('city') : false),
+                addressState: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('state') : false),
+                addressZipCode: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('zipcode') : false),
+                phoneNumber: (0, _stream2.default)(parsedErrors ? parsedErrors.hasError('phonenumber') : false)
+            };
+        }
 
         var fields = state.fields,
             international = state.international,
@@ -20514,7 +20451,7 @@ var userSettings = {
                 if (parsedErrors) {
                     parsedErrors.resetFieldErrors();
                 }
-                //parsedErrors = userSettingsVM.mapRailsErrors(err.errors_json);
+                parsedErrors = _userSettingsVm2.default.mapRailsErrors(err.errors_json);
                 error('Erro ao atualizar informações.');
                 loading(false);
                 if (showSuccess()) {
@@ -20571,7 +20508,6 @@ var userSettings = {
             parsedErrors: parsedErrors
         };
     },
-    onbeforeupdate: function onbeforeupdate(vnode) {},
     view: function view(_ref) {
         var state = _ref.state,
             attrs = _ref.attrs;
@@ -20594,7 +20530,7 @@ var userSettings = {
             message: window.I18n.t('update_success_msg', I18nScope()),
             toggleOpt: state.showSuccess
         }) : '', state.showError() ? (0, _mithril2.default)(_popNotification2.default, {
-            message: _mithril2.default.trust(state.error()),
+            message: state.error(),
             toggleOpt: state.showError,
             error: true
         }) : '', (0, _mithril2.default)('form.w-form', { onsubmit: state.onSubmit }, [(0, _mithril2.default)('div', [(0, _mithril2.default)('.w-container', isProjectUserEdit ? (0, _mithril2.default)('.w-row', [(0, _mithril2.default)(".w-col.w-col-8", [(0, _mithril2.default)(_userSettingsResponsible2.default, { parsedErrors: parsedErrors, fields: fields, user: user, disableFields: disableFields, applyDocumentMask: applyDocumentMask, applyBirthDateMask: applyBirthDateMask }), (0, _mithril2.default)(_userSettingsAddress2.default, { fields: fields, parsedErrors: parsedErrors })]), (0, _mithril2.default)(_userSettingsHelp2.default, {})]) : (0, _mithril2.default)('.w-col.w-col-10.w-col-push-1', [(0, _mithril2.default)(_userSettingsResponsible2.default, { parsedErrors: parsedErrors, fields: fields, user: user, disableFields: disableFields, applyDocumentMask: applyDocumentMask, applyBirthDateMask: applyBirthDateMask }), (0, _mithril2.default)(_userSettingsAddress2.default, { fields: fields, parsedErrors: parsedErrors }), shouldHideCreditCards ? '' : (0, _mithril2.default)(_userSettingsSavedCreditCards2.default, { user: user, creditCards: creditCards, setCardDeletionForm: setCardDeletionForm, deleteCard: deleteCard, toDeleteCard: toDeleteCard })])), (0, _mithril2.default)(_projectEditSaveBtn2.default, {
@@ -25303,7 +25239,8 @@ var menu = {
             homeAttrs = function homeAttrs() {
             if (vnode.attrs.absoluteHome) {
                 return {
-                    href: _h2.default.rootUrl()
+                    href: _h2.default.rootUrl(),
+                    oncreate: _mithril2.default.route.link
                 };
             }
             return {
@@ -37030,6 +36967,151 @@ var userVM = {
 };
 
 exports.default = userVM;
+
+/***/ }),
+
+/***/ "./legacy/src/wrap.js":
+/*!****************************!*\
+  !*** ./legacy/src/wrap.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _mithril = __webpack_require__(/*! mithril */ "./node_modules/mithril/mithril.js");
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _underscore = __webpack_require__(/*! underscore */ "./node_modules/underscore/underscore.js");
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _h = __webpack_require__(/*! ./h */ "./legacy/src/h.js");
+
+var _h2 = _interopRequireDefault(_h);
+
+var _c = __webpack_require__(/*! ./c */ "./legacy/src/c.js");
+
+var _c2 = _interopRequireDefault(_c);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var app = document.getElementById('application');
+var body = document.body;
+
+var wrap = function wrap(component, customAttr) {
+    if (!app) {
+        app = document.getElementById('application');
+    }
+
+    var firstRun = true; // Indica se é a primeira vez q executa um controller.
+    return {
+        oninit: function oninit(vnode) {
+
+            try {
+                if (firstRun) {
+                    firstRun = false;
+                } else {
+                    // só roda se nao for firstRun
+                    try {
+                        CatarseAnalytics.pageView(false);
+                        CatarseAnalytics.origin(); //force update of origin's cookie
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+                var parameters = app.getAttribute('data-parameters') ? JSON.parse(app.getAttribute('data-parameters')) : {};
+                var attr = customAttr,
+                    postParam = _mithril2.default.route.param('post_id') || parameters.post_id,
+                    projectParam = _mithril2.default.route.param('project_id') || parameters.project_id,
+                    projectUserIdParam = _mithril2.default.route.param('project_user_id') || parameters.user_id || parameters.project_user_id,
+                    userParam = _mithril2.default.route.param('user_id') || app.getAttribute('data-userid') || parameters.user_id,
+                    rewardIdParam = _mithril2.default.route.param('reward_id'),
+                    surveyIdParam = _mithril2.default.route.param('survey_id'),
+                    filterParam = _mithril2.default.route.param('filter'),
+                    thankYouParam = app && JSON.parse(app.getAttribute('data-contribution'));
+
+                var addToAttr = function addToAttr(newAttr) {
+                    attr = _underscore2.default.extend({}, newAttr, attr);
+                };
+
+                if (postParam) {
+                    addToAttr({ post_id: postParam });
+                }
+
+                if (projectParam) {
+                    addToAttr({ project_id: projectParam });
+                }
+
+                if (userParam) {
+                    addToAttr({ user_id: userParam });
+                }
+
+                if (projectUserIdParam) {
+                    addToAttr({ project_user_id: projectUserIdParam });
+                }
+
+                if (surveyIdParam) {
+                    addToAttr({ survey_id: surveyIdParam });
+                }
+
+                if (rewardIdParam) {
+                    addToAttr({ reward_id: rewardIdParam });
+                }
+
+                if (filterParam) {
+                    addToAttr({ filter: filterParam });
+                }
+
+                if (thankYouParam) {
+                    addToAttr({ contribution: thankYouParam });
+                }
+
+                if (window.localStorage && window.localStorage.getItem('globalVideoLanding') !== 'true') {
+                    addToAttr({ withAlert: false });
+                }
+
+                if (document.getElementById('fixed-alert')) {
+                    addToAttr({ withFixedAlert: true });
+                }
+
+                body.className = 'body-project closed';
+
+                vnode.state.attr = attr;
+            } catch (e) {
+                console.log('Error on wrap.oninit:', e);
+            }
+        },
+        oncreate: function oncreate(vnode) {
+            var hasUnmanagedRootComponent = app && app.children.app && app.children.length > 1;
+
+            var removeUnmanagedRootComponentFromDom = function removeUnmanagedRootComponentFromDom() {
+                app.removeChild(app.children.app);
+            };
+
+            if (hasUnmanagedRootComponent) {
+                removeUnmanagedRootComponentFromDom();
+            }
+        },
+        view: function view(_ref) {
+            var state = _ref.state;
+
+            var key = 0;
+            try {
+                return (0, _mithril2.default)('div#app', { key: key }, [(0, _mithril2.default)(_c2.default.root.Menu, state.attr), _h2.default.getUserID() ? (0, _mithril2.default)(_c2.default.root.CheckEmail, state.attr) : '', (0, _mithril2.default)(component, state.attr), state.attr.hideFooter ? '' : (0, _mithril2.default)(_c2.default.root.Footer, state.attr)]);
+            } catch (e) {
+                console.log('Error on wrap.view:', e);
+                return (0, _mithril2.default)('div#app', { key: key });
+            }
+        }
+    };
+};
+
+module.exports = {
+    wrap: wrap
+};
 
 /***/ }),
 
