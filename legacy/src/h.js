@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import moment from 'moment';
+import * as Sentry from '@sentry/browser';
 import m from 'mithril';
 import prop from 'mithril/stream';
 import { catarse } from './api';
@@ -1052,7 +1053,49 @@ const _dataCache = {},
             },
         };
     },
-    trust = (text) => generativeTrust(text, { eliminateScriptTags : true });
+    trust = text => generativeTrust(text, { eliminateScriptTags: true }),
+    SentryInitSDK = () => {
+        const metaSentryUrlDSN = document.querySelector('[name="sentry-public-dsn"]');
+
+        if (metaSentryUrlDSN && metaSentryUrlDSN.getAttribute('content')) {
+            Sentry.init({ dsn: metaSentryUrlDSN.getAttribute('content') });
+            if (getUserID()) {
+                Sentry.configureScope(scope => scope.setUser({ id: getUserID() }));
+            }
+        }
+    },
+    captureException = (exception) => {
+        try {
+            Sentry.captureException(exception);
+        } catch (e) {
+            Sentry.captureException(e);
+        }
+    },
+    captureMessage = (message) => {
+        try {
+            Sentry.captureMessage(message);
+        } catch (e) {
+            Sentry.captureException(e);
+        }
+    };
+
+/**
+ * @param {string} phoneNumberStr
+ * @return {string}
+ */
+const extractPhoneDDD = (phoneNumberStr) => {
+    const extractPhoneFieldsRegex = /\(([^)]*)\)(.*)/;
+    return phoneNumberStr.match(extractPhoneFieldsRegex)[1].replace(/\D/g, '');
+};
+
+/**
+ * @param {string} phoneNumberStr
+ * @return {string}
+ */
+const extractPhoneNumber = (phoneNumberStr) => {
+    const extractPhoneFieldsRegex = /\(([^)]*)\)(.*)/;
+    return phoneNumberStr.match(extractPhoneFieldsRegex)[2].replace(/\D/g, '');
+};
 
 setMomentifyLocale();
 closeFlash();
@@ -1060,6 +1103,11 @@ closeModal();
 checkReminder();
 
 export default {
+    extractPhoneDDD,
+    extractPhoneNumber,
+    SentryInitSDK,
+    captureException,
+    captureMessage,
     redraw,
     getCallStack,
     createRequestRedrawWithCountdown,
