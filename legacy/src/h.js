@@ -39,11 +39,19 @@ function RedrawScheduler() {
         if (redrawsRequestCounter > 0) {
             /// #if DEBUG
             const callStack = markedCallStack[redrawsRequestCounter];
+            try {
             /// #endif
 
-            if (redrawsRequestCounter === 1) {
-                m.redraw();
+                if (redrawsRequestCounter === 1) {
+                    m.redraw();
+                }
+
+            /// #if DEBUG
+            } catch(e) {
+                console.log('redraw error:', e);
+                console.log('callstack', callStack);
             }
+            /// #endif
 
             redrawsRequestCounter = Math.max(0, --redrawsRequestCounter);
         }
@@ -429,6 +437,7 @@ const _dataCache = {},
     useAvatarOrDefault = avatarPath => avatarPath || '/assets/catarse_bootstrap/user.jpg',
     // Templates
     loader = () => m('.u-text-center.u-margintop-30 u-marginbottom-30', [m('img[alt="Loader"][src="https://s3.amazonaws.com/catarse.files/loader.gif"]')]),
+    loaderWithSize = (width, height) => m(`img[alt="Loader"][width=${width}][height=${height || width}][src="https://s3.amazonaws.com/catarse.files/loader.gif"]`),
     newFeatureBadge = () => m('span.badge.badge-success.margin-side-5', window.I18n.t('projects.new_feature_badge')),
     fbParse = () => {
         const tryParse = () => {
@@ -1097,12 +1106,116 @@ const extractPhoneNumber = (phoneNumberStr) => {
     return phoneNumberStr.match(extractPhoneFieldsRegex)[2].replace(/\D/g, '');
 };
 
+/**
+ * @param {T} data
+ * @template T
+ */
+function ObservableStream(data) {
+
+    /**
+     * @type {Array<function(T):void>}
+     */
+    const observers = [];
+    const privateData = prop(data);
+
+    /**
+     * @return {T}
+     */
+    function get() {
+        return privateData();
+    }
+
+    /**
+     * @param {T} newData 
+     * @return {T}
+     */
+    function set(newData) {
+        privateData(newData);
+        notifyAll();
+        return newData;
+    }
+
+    /**
+     * @param {function(T):void} observeFunction 
+     */
+    function observe(observeFunction) {
+        observers.push(observeFunction);
+    }
+
+    /**
+     * @param {T} newData
+     */
+    function notifyAll(newData) {
+        for (const observeFunction of observers) {
+            observeFunction(newData);
+        }
+    }
+
+    return {
+        get,
+        set,
+        observe,
+    }
+}
+
+/**
+ * @param {T} data
+ * @template T
+ */
+function ObservableRedrawStream(data) {
+    const observableStream = ObservableStream(data);
+    observableStream.observe(redraw);
+    return observableStream;
+}
+
+/**
+ * @param {T} data
+ * @template T
+ */
+function RedrawStream(data) {
+    
+    const _data = prop(data);
+
+    /**
+     * @param {T} newData
+     * @template T
+     */
+    function streamAccessor(newData) {
+        if (newData !== undefined) {
+            _data(newData);
+            redraw();
+            return newData;
+        }
+        return _data();
+    }
+
+    return streamAccessor;
+}
+
+function createPropAcessors(obj) {
+    return Object.keys(obj).reduce((curObject, prop) => {
+        return Object.assign(curObject, {
+            [prop]: function (newValue) {
+                if (newValue !== undefined) {
+                    obj[prop] = newValue;
+                    return newValue;
+                }
+                return obj[prop];
+            }
+        });
+    }, {});
+}
+
 setMomentifyLocale();
 closeFlash();
 closeModal();
 checkReminder();
 
 export default {
+    createPropAcessors,
+    ObservableStream,
+    ObservableRedrawStream,
+    RedrawStream,
     extractPhoneDDD,
     extractPhoneNumber,
     SentryInitSDK,
@@ -1141,6 +1254,7 @@ export default {
     getParams,
     toggleProp,
     loader,
+    loaderWithSize,
     newFeatureBadge,
     fbParse,
     pluralize,
