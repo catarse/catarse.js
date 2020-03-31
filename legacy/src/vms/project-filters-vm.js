@@ -45,6 +45,11 @@ const projectFiltersVM = () => {
             open_for_contributions: 'eq'
         }).open_for_contributions('true'),
 
+        saved_projects = filtersVM({
+            open_for_contributions: 'eq',
+            saved_projects: 'eq'
+        }).open_for_contributions('true').saved_projects(true),
+
         contributed_by_friends = filtersVM({
             open_for_contributions: 'eq',
             contributed_by_friends: 'eq'
@@ -56,7 +61,33 @@ const projectFiltersVM = () => {
 
         finished = filtersVM({}),
 
+        projects_we_love = filtersVM({
+            recommended: 'eq'
+        }).recommended(true),
+
+        projects_we_love_not_sub = filtersVM({
+            recommended: 'eq',
+            mode: 'not.eq'
+        }).recommended(true).mode('sub'),
+        
         filters = {
+            projects_we_love_not_sub: {
+                title: 'Projetos que amamos',
+                filter: projects_we_love_not_sub,
+                mode: 'not_sub',
+                nicename: 'Projetos que amamos',
+                isContextual: false,
+                keyName: 'projects_we_love',
+                header_badges: ['badge-aon-h-margin', 'badge-flex-h-margin']
+            },
+            projects_we_love: {
+                title: 'Projetos que amamos',
+                filter: projects_we_love,
+                nicename: 'Projetos que amamos',
+                isContextual: false,
+                keyName: 'projects_we_love',
+                header_badges: ['badge-aon-h-margin', 'badge-flex-h-margin']
+            },
             all: {
                 title: 'Todas as Categorias',
                 filter: all,
@@ -78,6 +109,13 @@ const projectFiltersVM = () => {
             //    isContextual: false,
             //    keyName: 'recommended_2'
             //},
+            saved_projects: {
+                title: 'Projetos Salvos',
+                filter: saved_projects,
+                nicename: 'Projetos Salvos',
+                isContextual: false,
+                keyName: 'saved_projects'
+            },
             contributed_by_friends: {
                 title: 'Amigos',
                 filter: contributed_by_friends,
@@ -144,6 +182,7 @@ const projectFiltersVM = () => {
                 title: 'Assinaturas',
                 nicename: 'Assinaturas',
                 filter: sub,
+                mode: 'sub',
                 isContextual: false,
                 keyName: 'sub',
                 header_badges: ['badge-sub-h-margin']

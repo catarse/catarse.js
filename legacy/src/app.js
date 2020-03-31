@@ -13,9 +13,14 @@ m.trust = (text) => h.trust(text);
 
     h.SentryInitSDK();
 
+    history.pushState = h.attachEventsToHistory('pushState');
+    history.replaceState = h.attachEventsToHistory('replaceState');
     /// Setup an AUTO-SCROLL TOP when change route
     const pushState = history.pushState;
     history.pushState = function () {
+        if (typeof window.history.onpushstate == 'function') {
+            window.history.onpushstate.apply(history, arguments);
+        }
         pushState.apply(history, arguments);
         h.scrollTop();
     };
@@ -78,6 +83,14 @@ m.trust = (text) => h.trust(text);
                 app.getAttribute('data-hassubdomain') == 'true';
 
         m.route.prefix('');
+
+        /**
+         * Contribution/Subscription flow.
+         * 
+         * ProjectShow ->
+         *      contribution: ProjectsContribution -> ProjectsPayment -> ThankYou
+         *      subscription: ProjectsSubscriptionContribution -> ProjectsSubscriptionCheckout -> ProjectsSubscriptionThankYou 
+         */
 
         m.route(rootEl, '/', {
             '/': wrap(isUserProfile ? c.root.UsersShow : c.root.ProjectsHome, { menuTransparency: true, footerBig: true, absoluteHome: isUserProfile }),

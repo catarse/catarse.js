@@ -15,6 +15,12 @@ import modalBox from '../c/modal-box';
 const projectsShow = {
     oninit: function(vnode) {
         const {
+            ViewContentEvent,
+        } = projectVM;
+        
+        projectVM.sendPageViewForCurrentProject(vnode.attrs.project_id, [ ViewContentEvent() ]);
+
+        const {
             project_id,
             project_user_id,
             post_id

@@ -5,7 +5,7 @@ import m from 'mithril';
 import prop from 'mithril/stream';
 import { catarse } from './api';
 import contributionVM from './vms/contribution-vm';
-import generativeTrust from 'mithril-generative-trust/src/index';
+import generativeTrust from './../vendor/mithril-generative-trust';
 
 function getCallStack() {
     const callStackStr = new Error().stack;
@@ -89,6 +89,41 @@ const _dataCache = {},
             regex = new RegExp(`[\\?&]${normalName}=([^&#]*)`),
             results = regex.exec(location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    },
+    reduceSearchString = (callback, initial) => window.location.search.replace('?', '').split('&').reduce(callback, initial),
+    objectToSearchString = (obj) => '?' + Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&'),
+    setParamByName = (name, value) => {
+        const originalHash = window.location.hash;
+        const keysAndValues = reduceSearchString((finalQueryObject, keyValue) => {
+            const [key, value] = keyValue.split('=');
+            if (key) {
+                finalQueryObject[key] = value;
+            }
+            return finalQueryObject;
+        }, {});
+
+        keysAndValues[name] = value;
+
+        const queryString = objectToSearchString(keysAndValues);
+
+        const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryString + (window.location.hash === '#' ? '' : window.location.hash);
+        m.route.set(newurl);
+    },
+    removeParamByName = (name) => {
+
+        const keysAndValues = reduceSearchString((finalQueryObject, keyValue) => {
+
+            const [key, value] = keyValue.split('=');
+            if (name !== key && key) {
+                finalQueryObject[key] = value;
+            }
+            return finalQueryObject;
+        }, {});
+
+        const queryString = objectToSearchString(keysAndValues);
+
+        const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryString + (window.location.hash === '#' ? '' : window.location.hash);
+        m.route.set(newurl);
     },
     selfOrEmpty = (obj, emptyState = '') => obj || emptyState,
     setMomentifyLocale = () => {
@@ -376,14 +411,6 @@ const _dataCache = {},
 
         const meta = _.first(document.querySelectorAll('[name=rd-token]'));
         return meta ? (_dataCache.rdToken = meta.getAttribute('content')) : null;
-    },
-    getSimilityCustomer = () => {
-        if (_dataCache.similityCustomer) {
-            return _dataCache.similityCustomer;
-        }
-
-        const meta = _.first(document.querySelectorAll('[name=simility-customer]'));
-        return meta ? (_dataCache.similityCustomer = meta.getAttribute('content')) : null;
     },
     getNewsletterUrl = () => {
         if (_dataCache.newsletterUrl) {
@@ -1170,19 +1197,21 @@ function ObservableRedrawStream(data) {
 
 /**
  * @param {T} data
+ * @param {(data : T) => void} onUpdate
  * @template T
  */
-function RedrawStream(data) {
+function RedrawStream(data, onUpdate = (param) => {}) {
     
     const _data = prop(data);
 
     /**
      * @param {T} newData
-     * @template T
+     * @returns {T}
      */
     function streamAccessor(newData) {
         if (newData !== undefined) {
             _data(newData);
+            onUpdate(newData);
             redraw();
             return newData;
         }
@@ -1210,6 +1239,23 @@ setMomentifyLocale();
 closeFlash();
 closeModal();
 checkReminder();
+
+function attachEventsToHistory(type) {
+    var orig = history[type];
+    return function() {
+        var rv = orig.apply(this, arguments);
+        var e = new Event(type.toLowerCase());
+        e.arguments = arguments;
+        window.dispatchEvent(e);
+        return rv;
+    };
+};
+
+/**
+ * @typedef VNode
+ * @property {Object} attrs
+ * @property {Object} state
+ */
 
 export default {
     createPropAcessors,
@@ -1247,7 +1293,6 @@ export default {
     idVM,
     getUser,
     getUserID,
-    getSimilityCustomer,
     getApiHost,
     getNewsletterUrl,
     getCurrentProject,
@@ -1276,6 +1321,8 @@ export default {
     toAnchor,
     capitalize,
     paramByName,
+    setParamByName,
+    removeParamByName,
     i18nScope,
     RDTracker,
     selfOrEmpty,
@@ -1309,4 +1356,5 @@ export default {
     userSignedIn,
     isDevEnv,
     trust,
+    attachEventsToHistory,
 };

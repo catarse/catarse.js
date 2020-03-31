@@ -1,11 +1,16 @@
 import mq from 'mithril-query';
+import prop from 'mithril/stream';
+import h from '../../../src/h';
 import projectsExplore from '../../../src/root/projects-explore';
+import { loadProjectsWithConfiguredParameters } from '../../../src/vms/projects-explore-vm';
+import projectFilters from '../../../src/vms/project-filters-vm';
 
 describe('ProjectsExplore', () => {
     let $output, project, component;
+    
 
     beforeAll(() => {
-        window.location.hash = '#by_category_id/1';
+        // window.onpopstate = function() {}        
 
         component = m(projectsExplore, { root: { getAttribute: (x) => { return null; }} });
         $output = mq(component);
@@ -17,21 +22,32 @@ describe('ProjectsExplore', () => {
 
     describe('view', () => {
 
-        let $outputWithSubscriptionsSelected, $outputWithAonFlexSelected;
+        let $outputWithSubscriptionsSelected, $outputWithAonFlexSelected, $outputAllModes;
+        let $outputSearch;
+        let projectFiltersVM; 
+        let filtersMap;
 
-        beforeAll(() => {
-            $outputWithSubscriptionsSelected = mq(m(projectsExplore, { filter: 'sub' }));
-            $outputWithAonFlexSelected = mq(m(projectsExplore, { filter: 'not_sub' }));
+        beforeAll(() => {            
+            // $outputSearch = mq(m(projectsExplore, { pg_search: 'SEARCH'}));
+            $outputAllModes = mq(m(projectsExplore));
+            $outputWithSubscriptionsSelected = mq(m(projectsExplore, { mode: 'sub' }));
+            $outputWithAonFlexSelected = mq(m(projectsExplore, { mode: 'not_sub' }));
+        });
+
+        // it('should make a search request for projects', () => {
+        //     $outputSearch.should.contain('SEARCH');
+        // });
+
+        it('should render explore with all modes', () => {  
+            expect($outputAllModes.contains('Todos os projetos')).toBeTrue();
         });
 
         it('should render explorer selecting subscriptions', () => {
             expect($outputWithSubscriptionsSelected.contains('Assinaturas')).toBeTrue();
-            expect($outputWithSubscriptionsSelected.find('.explore-mobile-label').length).toEqual(2);
         });
 
         it('should render explorer selecting aon and flex', () => {
             expect($outputWithAonFlexSelected.contains('Projetos pontuais')).toBeTrue();
-            expect($outputWithAonFlexSelected.contains('Populares')).toBeTrue();            
         });
     });
 });

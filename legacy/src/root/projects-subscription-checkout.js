@@ -25,6 +25,12 @@ const I18nIntScope = _.partial(h.i18nScope, 'projects.contributions.edit_interna
 
 const projectsSubscriptionCheckout = {
     oninit: function(vnode) {
+        const {
+            ViewContentEvent,
+            AddToCartEvent
+        } = projectVM;
+        
+        projectVM.sendPageViewForCurrentProject(null, [ ViewContentEvent(), AddToCartEvent() ]);
         projectVM.getCurrentProject();
 
         const project = projectVM.currentProject;
