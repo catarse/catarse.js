@@ -436,6 +436,10 @@ const _dataCache = {},
         const user = getUser();
         return user == null || user.user_id == null ? null : user.user_id;
     },
+    getUserCommonID = () => {
+        const user = getUser();
+        return user && user.common_id
+    },
     userSignedIn = () => !_.isNull(getUserID()),
     getBlogPosts = () => {
         if (_dataCache.blogPosts) {
@@ -1113,7 +1117,24 @@ const _dataCache = {},
         } catch (e) {
             Sentry.captureException(e);
         }
-    };
+    },
+    titleCase = (str) => {
+        // remove leading and trailing spaces
+        let newString = str ? str.trim() : '';
+        // remove multiple spaces
+        newString = newString.replace(/\s{2,}/g, ' ');
+        // lowercase
+        newString = newString.toLowerCase();
+
+        return newString.split(' ').map(function(word) {
+            if (['de', 'da', 'do', 'das', 'dos'].includes(word)) {
+                return word.toLowerCase()
+            } else {
+                return word ? word.replace(word[0], word[0].toUpperCase()) : '';
+            }
+        }).join(' ');
+    }
+
 
 /**
  * @param {string} phoneNumberStr
@@ -1153,7 +1174,7 @@ function ObservableStream(data) {
     }
 
     /**
-     * @param {T} newData 
+     * @param {T} newData
      * @return {T}
      */
     function set(newData) {
@@ -1163,7 +1184,7 @@ function ObservableStream(data) {
     }
 
     /**
-     * @param {function(T):void} observeFunction 
+     * @param {function(T):void} observeFunction
      */
     function observe(observeFunction) {
         observers.push(observeFunction);
@@ -1201,7 +1222,7 @@ function ObservableRedrawStream(data) {
  * @template T
  */
 function RedrawStream(data, onUpdate = (param) => {}) {
-    
+
     const _data = prop(data);
 
     /**
@@ -1293,6 +1314,7 @@ export default {
     idVM,
     getUser,
     getUserID,
+    getUserCommonID,
     getApiHost,
     getNewsletterUrl,
     getCurrentProject,
@@ -1357,4 +1379,5 @@ export default {
     isDevEnv,
     trust,
     attachEventsToHistory,
+    titleCase,
 };
