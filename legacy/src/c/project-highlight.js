@@ -5,6 +5,7 @@ import projectShareBox from './project-share-box';
 import facebookButton from './facebook-button';
 import addressTag from './address-tag';
 import categoryTag from './category-tag';
+import { ProjectWeLovedTag } from './project-we-loved-tag';
 import projectVM from '../vms/project-vm';
 import projectVideo from './project-video';
 
@@ -27,7 +28,8 @@ const projectHighlight = {
             ),
             m('.w-hidden-small.w-hidden-tiny', [
                 m(addressTag, { project, isDark: isSub }),
-                m(categoryTag, { project, isDark: isSub })
+                m(categoryTag, { project, isDark: isSub }),
+                project().recommended && m(ProjectWeLovedTag, { project, isDark: isSub }),
             ]),
             !isSub ? m('.project-blurb', project().headline) : null,
             m('.project-share.w-hidden-small.w-hidden-tiny',
